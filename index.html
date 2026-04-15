@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dating Coach Practice</title>
+<link rel="preload" as="image" href="Ryan.jpg">
+<style>
+  :root{
+    --bg:#121316; --panel:#1a1c22; --card:#21232b; --muted:#9aa4b2; --accent:#ffb300; --stroke:#2b2e36;
+    --text:#e9ecf1; --shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+  /* top bar */
+  .topbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--stroke);background:#111}
+  .topbar label{font-size:14px;color:#cfd6e4;margin-right:6px}
+  select,button{border:1px solid var(--stroke);background:#1d2026;color:var(--text);border-radius:8px;padding:8px 10px}
+  .btn-primary{background:var(--accent);color:#000;border:none;font-weight:700}
+  .btn-ghost{background:#2a2e36}
+  .btn-pill{border-radius:999px}
+
+  /* layout */
+  .wrap{display:grid;grid-template-columns: 1fr 360px; gap:18px; height:calc(100vh - 58px); padding:16px;}
+  .stage{display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
+  .frame{max-width:860px;width:100%;border-radius:16px;border:3px solid #fff;overflow:hidden;box-shadow:var(--shadow);background:#000}
+  .media{display:block;width:100%;height:520px;object-fit:cover;background:#000}
+  .name{font-size:28px;font-weight:800;color:var(--accent);text-align:center;margin:14px 0 6px}
+  .line{font-size:18px;max-width:860px;text-align:center;color:#e3eaf4}
+
+  /* right shelf */
+  .shelf{background:var(--panel);border:1px solid var(--stroke);border-radius:14px;padding:12px;display:flex;flex-direction:column}
+  .shelf h3{margin:4px 8px 10px 8px;font-size:16px;color:#cfd6e4}
+  .sc-list{overflow:auto;padding-right:6px}
+  .sc-card{display:grid;grid-template-columns:92px 1fr;gap:12px;align-items:center;padding:10px;border-radius:12px;
+           border:1px solid var(--stroke);background:var(--card);cursor:pointer;margin:8px;transition:transform .06s ease, background .15s}
+  .sc-card:hover{transform:translateY(-1px);background:#272b34}
+  .sc-thumb{width:92px;height:60px;object-fit:cover;border-radius:8px;background:#000}
+  .sc-title{font-size:14px;font-weight:700;line-height:1.2}
+  .sc-sub{font-size:12px;color:#muted}
+  .showmore{margin:6px 10px 2px 10px;color:#9ec1ff;font-size:13px;cursor:pointer;user-select:none}
+
+  /* practice prompt block */
+  .practice-prompt{background:rgba(255,179,0,.12);border:1px solid rgba(255,179,0,.35);border-radius:14px;
+                   padding:16px;margin:14px 0;color:#ffd67a}
+  .user-response-area{background:rgba(64,199,112,.12);border:1px solid rgba(64,199,112,.35);border-radius:12px;
+                      padding:12px;margin:10px 0;color:#94f1b6}
+
+  /* listening pill */
+  .pill{position:fixed;top:10px;right:10px;background:var(--accent);color:#000;padding:8px 12px;border-radius:20px;font-weight:700;display:none}
+
+  /* ===== Avatar Picker Overlay ===== */
+  .picker-backdrop{
+    position:fixed; inset:0; background:rgba(0,0,0,.75); display:flex; align-items:center; justify-content:center;
+    z-index:9999;
+  }
+  .picker{
+    width:min(980px, 92vw); max-height:84vh; overflow:auto; background:#15171c; border:1px solid var(--stroke);
+    border-radius:16px; box-shadow:var(--shadow); padding:18px;
+  }
+  .picker h2{margin:0 0 10px 0; font-size:20px; color:#ffd67a}
+  .picker p{margin:0 0 14px 0; color:#cfd6e4; font-size:14px}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(170px,1fr)); gap:12px;}
+  .pick-card{background:#21232b; border:1px solid var(--stroke); border-radius:12px; overflow:hidden; cursor:pointer;
+             transition:transform .08s ease, box-shadow .15s ease, border-color .15s ease;}
+  .pick-card:hover{ transform:translateY(-2px); box-shadow:0 10px 20px rgba(0,0,0,.35); border-color:#3a3f4b; }
+  .pick-img{ display:block; width:100%; height:120px; object-fit:cover; background:#000; }
+  .pick-meta{ padding:10px; font-size:13px; color:#cfd6e4; }
+  .pick-meta b{ color:#fff }
+  .pick-foot{ display:flex; gap:8px; padding:10px; border-top:1px solid var(--stroke); font-size:12px; color:#9aa4b2 }
+
+  /* metrics pill styles */
+  .metrics{display:flex;gap:12px;align-items:center}
+  .metrics .count{font-weight:700}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <label>Scenario:</label>
+    <select id="scenarioSelect" aria-label="Choose scenario"></select>
+    <button id="enterPractice" class="btn-primary btn-pill">✏️ Enter Practice Mode</button>
+    <button id="micBtn" class="btn-ghost btn-pill">🎤 Mic</button>
+    <button id="chooseAvatarBtn" class="btn-ghost btn-pill">👤 Choose Avatar</button>
+
+    <!-- Simple metrics UI -->
+    <div class="metrics" style="margin-left:auto">
+      <button id="likeBtn" class="btn-ghost btn-pill">👍 Like <span id="likeCount" class="count">0</span></button>
+      <span>👁️ Views: <b id="viewCount" class="count">0</b></span>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="stage">
+      <div class="frame">
+        <!-- image/video swapped dynamically -->
+        <img id="media" class="media" alt="speaker"/>
+      </div>
+      <div id="speakerName" class="name">Ryan</div>
+      <div id="lineText" class="line"></div>
+    </div>
+
+    <aside class="shelf">
+      <h3>Scenarios</h3>
+      <div id="shelfList" class="sc-list"></div>
+      <div id="showMore" class="showmore" style="display:none;"></div>
+    </aside>
+  </div>
+
+  <div id="listenPill" class="pill">🎤 Listening…</div>
+
+  <!-- Avatar Picker (opened when user clicks the button) -->
+  <div id="avatarPicker" class="picker-backdrop" style="display:none;">
+    <div class="picker">
+      <h2>Choose who you want to talk to</h2>
+      <p>Pick an avatar set. You can change scenarios anytime after.</p>
+      <div id="pickerGrid" class="grid"></div>
+    </div>
+  </div>
+
+  <script src="scenarios.js"></script>
+  <script src="player.js"></script>
+</body>
+</html>
