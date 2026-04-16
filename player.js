@@ -1,6 +1,5 @@
 /* ===== Global state ===== */
-let voices = [];
-let voiceReady = false;
+// voices / voiceReady removed — Kokoro JS handles TTS now
 
 let currentScenarioKey = null;
 let currentScript = null;
@@ -120,7 +119,7 @@ function applyAvatarSet(set) {
 /* ===== Utility ===== */
 function stopEverything() {
   session++;
-  try { speechSynthesis.cancel(); } catch {}
+  KokoroSpeech.cancel();
   if (rec) {
     try { rec.onresult = null; rec.onerror = null; rec.onend = null; rec.stop(); } catch {}
     rec = null;
@@ -128,37 +127,14 @@ function stopEverything() {
   if (listenTimer) { clearTimeout(listenTimer); listenTimer = null; }
 }
 
-/* ===== Voices ===== */
-function getVoiceIndex(speaker) {
-  if (speaker === "Daniel" || speaker === "User" || speaker === "User_Prompt") return 140;
-  if (speaker === "Mary")  return 139;
-  if (speaker === "Ryan")  return 137;
-  return 0;
-}
-function selectVoiceFor(speaker) {
-  const desired = getVoiceIndex(speaker);
-  if (!voices || !voices.length) return null;
-  if (voices[desired]) return voices[desired];
-  const clamped = Math.min(Math.max(desired, 0), voices.length - 1);
-  return voices[clamped] || voices[0] || null;
-}
-function initVoices() {
-  voices = window.speechSynthesis.getVoices();
-  if (voices.length) voiceReady = true;
-}
-initVoices();
-window.speechSynthesis.onvoiceschanged = () => { initVoices(); };
-function waitForVoicesReady(maxMs = 4000) {
-  return new Promise(resolve => {
-    if (voiceReady) return resolve();
-    const start = Date.now();
-    const tick = () => {
-      initVoices();
-      if (voiceReady || (Date.now() - start) > maxMs) return resolve();
-      setTimeout(tick, 100);
-    };
-    tick();
-  });
+/* ===== Voices — Kokoro JS ===== */
+// Maps app speaker names → Kokoro voice IDs
+function getKokoroVoice(speaker) {
+  if (speaker === 'Mary')                                    return 'af_nicole';  // female, American
+  if (speaker === 'Ryan')                                    return 'am_adam';    // male, American
+  if (speaker === 'Daniel' || speaker === 'User' ||
+      speaker === 'User_Prompt')                             return 'am_michael'; // male, American
+  return 'am_michael';
 }
 
 /* ===== Media display ===== */
@@ -195,18 +171,11 @@ function renderLine(line) {
   }
 }
 
-/* ===== Speech synthesis ===== */
+/* ===== Speech synthesis — Kokoro JS ===== */
 async function speak(text, speaker) {
   setMediaForSpeaker(speaker);
-  await waitForVoicesReady();
-  return new Promise((resolve)=>{
-    const u = new SpeechSynthesisUtterance(text);
-    const voice = selectVoiceFor(speaker);
-    if (voice) u.voice = voice;
-    u.onend = u.onerror = () => resolve();
-    try { speechSynthesis.cancel(); } catch {}
-    speechSynthesis.speak(u);
-  });
+  const voice = getKokoroVoice(speaker);
+  return KokoroSpeech.speak(text, voice);
 }
 
 /* ===== Recognition ===== */
@@ -401,7 +370,65 @@ function bootDefault(){
   const set = AVATAR_SETS[Math.floor(Math.random()*AVATAR_SETS.length)];
   applyAvatarSet(set);
   Metrics.bindLikeButton();
-  bootAfterAvatarSelected();
+  renderShelf(); // show scenario list immediately while waiting
+
+  // ── Start screen ──────────────────────────────────────────────────────
+  // Must wait for user tap before loading model — two reasons:
+  //   1) Browser blocks AudioContext without a user gesture
+  //   2) 80MB model download should not race against the conversation
+  const overlay = document.createElement('div');
+  overlay.id = 'ek-start-overlay';
+  overlay.style.cssText = [
+    'position:fixed','inset:0','z-index:10000',
+    'background:rgba(13,14,18,0.97)',
+    'display:flex','flex-direction:column',
+    'align-items:center','justify-content:center','gap:16px'
+  ].join(';');
+  overlay.innerHTML = `
+    <div style="font-size:52px;line-height:1">🎙️</div>
+    <div style="font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.5px">Eklipses</div>
+    <div style="font-size:14px;color:#9aa4b2;max-width:280px;text-align:center;line-height:1.7">
+      AI voices load once (~80MB) and are cached forever after.
+    </div>
+    <button id="ek-start-btn" style="
+      background:#ffb300;color:#000;border:none;border-radius:999px;
+      padding:14px 44px;font-size:16px;font-weight:800;cursor:pointer;margin-top:4px;
+      transition:transform .1s ease;
+    " onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''">
+      ▶&nbsp; Tap to Start
+    </button>
+    <div id="ek-prog-wrap" style="display:none;width:280px;text-align:center">
+      <div style="background:#2b2e36;border-radius:6px;height:8px;overflow:hidden;margin-bottom:8px">
+        <div id="ek-prog-fill" style="
+          background:#ffb300;height:100%;width:0%;
+          border-radius:6px;transition:width 0.25s ease;
+        "></div>
+      </div>
+      <div id="ek-prog-label" style="font-size:12px;color:#777">Downloading AI model…</div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  document.getElementById('ek-start-btn').onclick = async () => {
+    document.getElementById('ek-start-btn').style.display = 'none';
+    document.getElementById('ek-prog-wrap').style.display = 'block';
+
+    try {
+      await KokoroSpeech.preload((info) => {
+        const fill  = document.getElementById('ek-prog-fill');
+        const label = document.getElementById('ek-prog-label');
+        if (fill  && info.progress != null) fill.style.width = Math.round(info.progress) + '%';
+        if (label && info.file) label.textContent = 'Loading ' + info.file.split('/').pop() + '…';
+      });
+    } catch(err) {
+      console.error('[Eklipses] Model load failed:', err);
+    }
+
+    overlay.remove();
+    const firstKey = Object.keys(SCENARIOS)[0];
+    Metrics.refreshUI(firstKey);
+    playScenario(firstKey, false);
+  };
 }
 
 bootDefault();
