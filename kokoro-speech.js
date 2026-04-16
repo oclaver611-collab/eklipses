@@ -1,95 +1,70 @@
 /**
- * kokoro-speech.js  v3
- * Uses esm.sh CDN — properly handles transitive dependencies
- * unlike jsdelivr which fails silently on complex packages.
+ * kokoro-speech.js  v4 — OpenAI TTS
+ * Calls /api/tts (Vercel serverless) → OpenAI TTS API
+ * No model download. Works instantly.
+ *
+ * Voice mapping:
+ *   af_nicole  → nova   (Mary  — warm female)
+ *   am_michael → onyx   (Daniel — deep male)
+ *   am_adam    → echo   (Ryan  — clear male)
  */
 
 const KokoroSpeech = (() => {
+  let currentAudio = null;
 
-  let tts        = null;
-  let loading    = false;
-  let waiters    = [];
-  let audioCtx   = null;
-  let currentSrc = null;
+  const VOICE_MAP = {
+    'af_nicole':  'nova',
+    'am_michael': 'onyx',
+    'am_adam':    'echo',
+  };
 
-  async function ensureLoaded(onProgress) {
-    if (tts) return tts;
-    if (loading) return new Promise(r => waiters.push(r));
-    loading = true;
-
-    console.log("[KokoroSpeech] Starting model load...");
-
-    let KokoroTTS;
-    try {
-      ({ KokoroTTS } = await import("https://esm.sh/kokoro-js@1"));
-      console.log("[KokoroSpeech] kokoro-js imported OK");
-    } catch (err) {
-      loading = false;
-      waiters.forEach(r => r(null));
-      waiters = [];
-      console.error("[KokoroSpeech] Import FAILED:", err);
-      throw new Error("Failed to import kokoro-js: " + err.message);
-    }
-
-    try {
-      tts = await KokoroTTS.from_pretrained(
-        "onnx-community/Kokoro-82M-v1.0",
-        { dtype: "q8", progress_callback: onProgress }
-      );
-      console.log("[KokoroSpeech] Model loaded OK");
-    } catch (err) {
-      loading = false;
-      waiters.forEach(r => r(null));
-      waiters = [];
-      console.error("[KokoroSpeech] Model load FAILED:", err);
-      throw new Error("Failed to load model: " + err.message);
-    }
-
-    loading = false;
-    waiters.forEach(r => r(tts));
-    waiters = [];
-    return tts;
-  }
-
-  async function preload(onProgress) { return ensureLoaded(onProgress); }
-
-  async function speak(text, voice = "af_nicole") {
+  async function speak(text, voice = 'af_nicole') {
     if (!text?.trim()) return;
+    cancel();
+    const openaiVoice = VOICE_MAP[voice] || 'nova';
     try {
-      const engine = await ensureLoaded();
-      if (!engine) return;
-      console.log("[KokoroSpeech] Speaking:", text.slice(0,40), "voice:", voice);
-      const result = await engine.generate(text, { voice, speed: 1.0 });
-      await _playPCM(result.audio, result.sampling_rate);
+      console.log(`[TTS] ${openaiVoice}: "${text.slice(0,50)}"`);
+      const response = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, voice: openaiVoice }),
+      });
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({ error: response.statusText }));
+        console.error('[TTS] API error:', err);
+        return;
+      }
+      const blob = await response.blob();
+      const url  = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      currentAudio = audio;
+      await new Promise((resolve) => {
+        audio.onended = () => { URL.revokeObjectURL(url); currentAudio = null; resolve(); };
+        audio.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; resolve(); };
+        audio.play().catch(() => resolve());
+      });
     } catch (err) {
-      console.error("[KokoroSpeech] speak() error:", err);
+      console.error('[TTS] speak() error:', err);
     }
   }
 
   function cancel() {
-    if (currentSrc) { try { currentSrc.stop(); } catch (_) {} currentSrc = null; }
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.src = '';
+      currentAudio = null;
+    }
   }
 
-  function isReady() { return tts !== null; }
-
-  async function _playPCM(float32, sampleRate) {
-    cancel();
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === "suspended") await audioCtx.resume();
-    const buf = audioCtx.createBuffer(1, float32.length, sampleRate);
-    buf.copyToChannel(float32, 0);
-    const src = audioCtx.createBufferSource();
-    src.buffer = buf;
-    src.connect(audioCtx.destination);
-    currentSrc = src;
-    return new Promise(resolve => {
-      src.onended = () => { currentSrc = null; resolve(); };
-      src.start(0);
-    });
+  async function preload() {
+    console.log('[TTS] OpenAI TTS — no preload needed');
+    return true;
   }
+
+  function isReady() { return true; }
 
   return { speak, cancel, preload, isReady };
 })();
 
 window.KokoroSpeech = KokoroSpeech;
-console.log("[KokoroSpeech] Ready on window.KokoroSpeech");
+console.log('[TTS] OpenAI TTS module ready');
