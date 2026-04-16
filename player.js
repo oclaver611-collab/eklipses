@@ -421,7 +421,10 @@ function bootDefault(){
         if (label && info.file) label.textContent = 'Loading ' + info.file.split('/').pop() + '…';
       });
     } catch(err) {
-      console.error('[Eklipses] Model load failed:', err);
+      console.error("[Eklipses] Model load failed:", err);
+      const lbl = document.getElementById("ek-prog-label");
+      if (lbl) lbl.innerHTML = "<span style='color:#ff6b6b'>❌ Failed: " + err.message + "<br>Check F12 console for details.</span>";
+      return; // stay on start screen so user can read the error
     }
 
     overlay.remove();
