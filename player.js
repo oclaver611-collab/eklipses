@@ -178,6 +178,41 @@ async function speak(text, speaker) {
   return KokoroSpeech.speak(text, voice);
 }
 
+/* ===== Dynamic Mary (Claude API) ===== */
+let conversationHistory = []; // tracks {role, content} for Claude context
+
+function resetConversation() {
+  conversationHistory = [];
+}
+
+async function getDynamicMaryResponse(userSaid) {
+  const sc = SCENARIOS[currentScenarioKey] || {};
+  try {
+    const response = await fetch('/api/mary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userMessage: userSaid,
+        scenarioTitle: sc.title || '',
+        scenarioSetting: sc.setting || '',
+        history: conversationHistory,
+      }),
+    });
+    if (!response.ok) return null;
+    const data = await response.json();
+    const maryText = data.response;
+    // Add to history for context in next turn
+    conversationHistory.push({ role: 'user',      content: userSaid   });
+    conversationHistory.push({ role: 'assistant', content: maryText   });
+    // Keep history to last 6 exchanges (avoid token bloat)
+    if (conversationHistory.length > 12) conversationHistory = conversationHistory.slice(-12);
+    return maryText;
+  } catch (err) {
+    console.error('[Mary] API error:', err);
+    return null;
+  }
+}
+
 /* ===== Recognition ===== */
 function createRecognition() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -191,6 +226,7 @@ function showListening(on=true){ els.listenPill.style.display = on ? 'block' : '
 /* ===== Scenario engine ===== */
 async function playScenario(key, practice=false) {
   stopEverything();
+  resetConversation();
   const mySession = session;
 
   currentScenarioKey = key;
@@ -220,13 +256,35 @@ async function playLoop(mySession) {
       const said = await listenForUser(mySession, 10000);
       if (mySession !== session) return;
 
-      if (said && similarity(said, line.text) >= 0.4) {
-        await speak(randomChoice(["Nice!","Good job!","Great!"]), 'Ryan');
-      } else if (!said) {
+      if (said) {
+        // Practice mode: get dynamic Mary response via Claude API
+        if (isPractice) {
+          const dynamicReply = await getDynamicMaryResponse(said);
+          if (mySession !== session) return;
+          if (dynamicReply) {
+            // Skip next scripted Mary line — replace with dynamic response
+            if (stepIndex + 1 < currentScript.length &&
+                currentScript[stepIndex + 1].speaker === 'Mary') {
+              stepIndex++; // skip the scripted Mary line
+            }
+            await speak(dynamicReply, 'Mary');
+          } else {
+            // Fallback: play scripted line if Claude fails
+            await speak(randomChoice(["Interesting…", "Tell me more.", "Ha, okay."]), 'Mary');
+          }
+        } else {
+          // Demo mode: Ryan coaching feedback
+          if (similarity(said, line.text) >= 0.4) {
+            await speak(randomChoice(["Nice!","Good job!","Great!"]), 'Ryan');
+          } else {
+            await speak("No worries — here's the line for reference.", 'Ryan');
+            await speak(line.text.replace('Say: ','').replace(/'/g,''), 'Daniel');
+          }
+        }
+      } else {
+        // No speech detected
         await speak("No worries — here's the line for reference.", 'Ryan');
         await speak(line.text.replace('Say: ','').replace(/'/g,''), 'Daniel');
-      } else {
-        await speak("Interesting approach — let's continue.", 'Ryan');
       }
       stepIndex++;
       continue;
