@@ -297,7 +297,77 @@ async function playLoop(mySession) {
   }
 
   if (!isPractice) renderAskToPractice(mySession);
-  else await speak("Excellent work! Want to try another scenario? Pick one on the right.", "Ryan");
+  else await runCoachFeedback(mySession);
+}
+
+/* ===== Coach Feedback ===== */
+async function runCoachFeedback(mySession) {
+  if (mySession !== session) return;
+
+  els.name.textContent = "Ryan";
+  els.text.textContent = "Analyzing your session…";
+  setMediaForSpeaker('Ryan');
+
+  const sc = SCENARIOS[currentScenarioKey] || {};
+
+  try {
+    const response = await fetch('/api/coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        conversation: conversationHistory,
+        scenarioTitle: sc.title || 'Dating scenario',
+      }),
+    });
+
+    if (!response.ok) throw new Error('Coach API failed');
+    const feedback = await response.json();
+    if (mySession !== session) return;
+
+    await speak(feedback.spokenSummary, 'Ryan');
+    if (mySession !== session) return;
+
+    showFeedbackCard(feedback);
+
+  } catch (err) {
+    console.error('[Coach] error:', err);
+    await speak("Good session! Keep practicing — pick another scenario.", 'Ryan');
+  }
+}
+
+function showFeedbackCard(f) {
+  const scoreColor = f.score >= 7 ? '#40c770' : f.score >= 5 ? '#ffb300' : '#ff6b6b';
+  els.text.innerHTML = `
+    <div style="background:#1a1c22;border:1px solid #2b2e36;border-radius:16px;padding:20px;margin:10px 0;text-align:left;max-width:860px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+        <div style="font-size:42px;font-weight:900;color:${scoreColor}">${f.score}<span style="font-size:20px;color:#666">/10</span></div>
+        <div style="font-size:16px;color:#cfd6e4;line-height:1.5">${f.spokenSummary}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div style="background:#162016;border:1px solid #1e3a1e;border-radius:10px;padding:12px">
+          <div style="color:#40c770;font-size:12px;font-weight:700;margin-bottom:8px">✓ WHAT WORKED</div>
+          ${(f.strengths||[]).map(s=>`<div style="color:#c8e6c9;font-size:13px;margin-bottom:4px">• ${s}</div>`).join('')}
+        </div>
+        <div style="background:#1e1616;border:1px solid #3a1e1e;border-radius:10px;padding:12px">
+          <div style="color:#ff6b6b;font-size:12px;font-weight:700;margin-bottom:8px">↑ IMPROVE THIS</div>
+          ${(f.improvements||[]).map(i=>`<div style="color:#ffcdd2;font-size:13px;margin-bottom:4px">• ${i}</div>`).join('')}
+        </div>
+      </div>
+      <div style="background:#1a1730;border:1px solid #2e2a50;border-radius:10px;padding:12px">
+        <div style="color:#a78bfa;font-size:12px;font-weight:700;margin-bottom:6px">💬 TRY THIS LINE NEXT TIME</div>
+        <div style="color:#e0d9ff;font-size:14px;font-style:italic">"${f.tryThisLine}"</div>
+      </div>
+      <div style="margin-top:14px;text-align:center">
+        <button onclick="playScenario('${currentScenarioKey}', true)"
+          style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:10px 28px;font-size:14px;font-weight:800;cursor:pointer;margin-right:8px">
+          🔄 Try Again
+        </button>
+        <button onclick="playScenario(Object.keys(SCENARIOS).find(k=>k!=='${currentScenarioKey}'), false)"
+          style="background:#2a2e36;color:#fff;border:1px solid #3a3f4b;border-radius:999px;padding:10px 28px;font-size:14px;font-weight:700;cursor:pointer">
+          Next Scenario →
+        </button>
+      </div>
+    </div>`;
 }
 
 function renderAskToPractice(mySession){
