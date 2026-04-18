@@ -187,6 +187,15 @@ function resetConversation() {
 
 async function getDynamicMaryResponse(userSaid) {
   const sc = SCENARIOS[currentScenarioKey] || {};
+
+  // Show thinking indicator immediately so user knows they were heard
+  els.name.textContent = 'Mary';
+  els.text.textContent = '💭 …';
+
+  // 8 second timeout on Groq call — if it hangs, fallback immediately
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+
   try {
     const response = await fetch('/api/mary', {
       method: 'POST',
@@ -197,18 +206,19 @@ async function getDynamicMaryResponse(userSaid) {
         scenarioSetting: sc.setting || '',
         history: conversationHistory,
       }),
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
     if (!response.ok) return null;
     const data = await response.json();
     const maryText = data.response;
-    // Add to history for context in next turn
-    conversationHistory.push({ role: 'user',      content: userSaid   });
-    conversationHistory.push({ role: 'assistant', content: maryText   });
-    // Keep history to last 6 exchanges (avoid token bloat)
+    conversationHistory.push({ role: 'user',      content: userSaid });
+    conversationHistory.push({ role: 'assistant', content: maryText });
     if (conversationHistory.length > 12) conversationHistory = conversationHistory.slice(-12);
     return maryText;
   } catch (err) {
-    console.error('[Mary] API error:', err);
+    clearTimeout(timeout);
+    console.error('[Mary] API error:', err.name === 'AbortError' ? 'Timeout after 8s' : err);
     return null;
   }
 }
@@ -253,7 +263,7 @@ async function playLoop(mySession) {
     renderLine(line);
 
     if (line.speaker === 'User_Prompt') {
-      const said = await listenForUser(mySession, 10000);
+      const said = await listenForUser(mySession, 15000); // 15s for longer sentences
       if (mySession !== session) return;
 
       if (said) {
@@ -265,15 +275,18 @@ async function playLoop(mySession) {
             // Skip next scripted Mary line — replace with dynamic response
             if (stepIndex + 1 < currentScript.length &&
                 currentScript[stepIndex + 1].speaker === 'Mary') {
-              stepIndex++; // skip the scripted Mary line
+              stepIndex++;
             }
             await speak(dynamicReply, 'Mary');
           } else {
-            // Fallback: play scripted line if Claude fails
-            await speak(randomChoice(["Interesting…", "Tell me more.", "Ha, okay."]), 'Mary');
+            // Groq timed out or failed — use a natural filler so conversation continues
+            await speak(randomChoice([
+              "Sorry, say that again?",
+              "Hmm, I didn't quite catch that.",
+              "What was that?"
+            ]), 'Mary');
           }
         } else {
-          // Demo mode: Ryan coaching feedback
           if (similarity(said, line.text) >= 0.4) {
             await speak(randomChoice(["Nice!","Good job!","Great!"]), 'Ryan');
           } else {
@@ -282,9 +295,27 @@ async function playLoop(mySession) {
           }
         }
       } else {
-        // No speech detected
-        await speak("No worries — here's the line for reference.", 'Ryan');
-        await speak(line.text.replace('Say: ','').replace(/'/g,''), 'Daniel');
+        // Nothing heard — show prompt again and wait once more
+        els.text.innerHTML =
+          `<div class="practice-prompt"><strong>READ THIS OUT LOUD:</strong><br><br>
+           "${line.text.replace('Say: ', '').replace(/'/g,'')}"</div>
+           <div class="user-response-area">🎤 Didn't catch that — try again…</div>`;
+        const retry = await listenForUser(mySession, 15000);
+        if (mySession !== session) return;
+        if (retry && isPractice) {
+          const dynamicReply = await getDynamicMaryResponse(retry);
+          if (mySession !== session) return;
+          if (dynamicReply) {
+            if (stepIndex + 1 < currentScript.length &&
+                currentScript[stepIndex + 1].speaker === 'Mary') {
+              stepIndex++;
+            }
+            await speak(dynamicReply, 'Mary');
+          }
+        } else if (!retry) {
+          // Still nothing — skip and continue
+          await speak("No worries, let's keep going.", 'Ryan');
+        }
       }
       stepIndex++;
       continue;
@@ -398,14 +429,39 @@ function listenForUser(mySession, timeoutMs){
   return new Promise((resolve)=>{
     const r = createRecognition();
     if (!r) return resolve(null);
+    r.interimResults = true; // needed to detect speech start
     rec = r; showListening(true);
+
+    let finalResult = null;
+    let silenceTimer = null;
+
+    // Hard timeout — absolute max wait
     listenTimer = setTimeout(()=>{ try{ r.stop(); }catch{} }, timeoutMs);
-    r.onresult = (e)=>{ if (mySession!==session) return resolve(null);
-      clearTimeout(listenTimer); showListening(false);
-      resolve(e.results[0][0].transcript.trim());
+
+    r.onresult = (e)=>{
+      if (mySession !== session) return resolve(null);
+      // Grab best final result so far
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) {
+          finalResult = e.results[i][0].transcript.trim();
+          // Got a final result — stop listening after tiny buffer (300ms)
+          clearTimeout(silenceTimer);
+          silenceTimer = setTimeout(()=>{ try{ r.stop(); }catch{} }, 300);
+        }
+      }
     };
-    r.onerror = ()=>{ clearTimeout(listenTimer); showListening(false); resolve(null); };
-    r.onend = ()=>{ showListening(false); };
+
+    r.onerror = ()=>{
+      clearTimeout(listenTimer); clearTimeout(silenceTimer);
+      showListening(false); resolve(null);
+    };
+
+    r.onend = ()=>{
+      clearTimeout(listenTimer); clearTimeout(silenceTimer);
+      showListening(false);
+      resolve(finalResult);
+    };
+
     try { r.start(); } catch { resolve(null); }
   });
 }
