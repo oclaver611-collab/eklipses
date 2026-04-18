@@ -204,6 +204,7 @@ async function getDynamicMaryResponse(userSaid) {
         userMessage: userSaid,
         scenarioTitle: sc.title || '',
         scenarioSetting: sc.setting || '',
+        scenarioKey: currentScenarioKey,
         history: conversationHistory,
       }),
       signal: controller.signal,
