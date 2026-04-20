@@ -1,0 +1,191 @@
+/* ============================================================
+   Eklipses — Netflix-style category rows
+   Additive stylesheet. Works alongside existing <style> block.
+   ============================================================ */
+
+/* The main layout switches from 2-column (stage + sidebar) to stacked:
+   stage on top, Netflix rows below. */
+.wrap.netflix-mode {
+  display: block;
+  height: auto;
+  min-height: calc(100vh - 58px);
+  padding: 16px;
+}
+
+.wrap.netflix-mode .stage {
+  max-width: 860px;
+  margin: 0 auto 28px auto;
+}
+
+/* The frame/avatar gets a bit smaller so rows fit below without scrolling too far */
+.wrap.netflix-mode .media {
+  height: 440px;
+}
+
+/* The old right shelf is hidden in netflix mode */
+.wrap.netflix-mode aside.shelf { display: none; }
+
+/* ===== Netflix rows container ===== */
+.nf-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 8px;
+}
+
+.nf-intro {
+  text-align: center;
+  color: #cfd6e4;
+  margin: 0 0 20px 0;
+  font-size: 14px;
+}
+
+.nf-row {
+  margin-bottom: 32px;
+}
+
+.nf-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 8px 12px 8px;
+}
+
+.nf-row-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  letter-spacing: -0.2px;
+}
+
+.nf-row-title .nf-emoji {
+  margin-right: 10px;
+}
+
+.nf-row-count {
+  font-size: 13px;
+  color: #9aa4b2;
+  font-weight: 600;
+}
+
+/* Horizontal scrolling strip */
+.nf-strip {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 8px 14px 8px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: #2b2e36 transparent;
+}
+
+.nf-strip::-webkit-scrollbar { height: 8px; }
+.nf-strip::-webkit-scrollbar-track { background: transparent; }
+.nf-strip::-webkit-scrollbar-thumb {
+  background: #2b2e36;
+  border-radius: 4px;
+}
+.nf-strip::-webkit-scrollbar-thumb:hover { background: #3a3f4b; }
+
+/* Individual scenario card (Netflix tile style) */
+.nf-card {
+  flex: 0 0 280px;
+  background: #21232b;
+  border: 1px solid #2b2e36;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  position: relative;
+}
+
+.nf-card:hover {
+  transform: translateY(-3px) scale(1.02);
+  border-color: #ffb300;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+}
+
+.nf-card-thumb {
+  width: 100%;
+  height: 158px;
+  object-fit: cover;
+  background: #0a0a0a;
+  display: block;
+}
+
+/* Fallback gradient thumb when image fails to load */
+.nf-card-thumb-fallback {
+  width: 100%;
+  height: 158px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 800;
+}
+
+.nf-card-body {
+  padding: 12px 14px 14px 14px;
+}
+
+.nf-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+  margin: 0 0 8px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 36px;
+}
+
+.nf-card-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 11px;
+}
+
+.nf-badge {
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.nf-badge-difficulty {
+  background: rgba(255, 179, 0, 0.15);
+  color: #ffd67a;
+  border: 1px solid rgba(255, 179, 0, 0.3);
+}
+
+.nf-badge-duration {
+  background: rgba(120, 180, 255, 0.12);
+  color: #a8c5ff;
+  border: 1px solid rgba(120, 180, 255, 0.25);
+}
+
+.nf-badge-new {
+  background: rgba(64, 199, 112, 0.15);
+  color: #94f1b6;
+  border: 1px solid rgba(64, 199, 112, 0.3);
+}
+
+/* Category row color accents (applied to the row title emoji/bar) */
+.nf-row[data-category="dating"] .nf-row-title { color: #ffb3d9; }
+.nf-row[data-category="interview"] .nf-row-title { color: #a8c5ff; }
+.nf-row[data-category="dark_psychology"] .nf-row-title { color: #ff9a8b; }
+
+/* Mobile responsiveness */
+@media (max-width: 720px) {
+  .wrap.netflix-mode .media { height: 280px; }
+  .nf-card { flex: 0 0 220px; }
+  .nf-card-thumb, .nf-card-thumb-fallback { height: 125px; }
+  .nf-row-title { font-size: 18px; }
+}
