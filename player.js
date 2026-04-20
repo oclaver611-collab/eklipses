@@ -324,7 +324,8 @@ async function playLoop(mySession) {
 
     await speak(line.text, line.speaker);
     if (mySession !== session) return;
-    await pause(650);
+    // Shorter pause between AI turns for more natural conversation flow (was 650ms)
+    await pause(200);
     stepIndex++;
   }
 
@@ -445,9 +446,10 @@ function listenForUser(mySession, timeoutMs){
       for (let i = e.resultIndex; i < e.results.length; i++) {
         if (e.results[i].isFinal) {
           finalResult = e.results[i][0].transcript.trim();
-          // Got a final result — stop listening after tiny buffer (300ms)
+          // Got a final result — wait for natural pause before stopping (1100ms)
+          // This prevents cutting the user off mid-thought. Praktika uses ~1200ms.
           clearTimeout(silenceTimer);
-          silenceTimer = setTimeout(()=>{ try{ r.stop(); }catch{} }, 300);
+          silenceTimer = setTimeout(()=>{ try{ r.stop(); }catch{} }, 1100);
         }
       }
     };
