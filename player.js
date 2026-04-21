@@ -179,23 +179,76 @@ function getKokoroVoice(speaker) {
 }
 
 /* ===== Media display ===== */
+// ============================================================
+// Dual-element media system — no more DOM reconstruction on speaker change.
+// One persistent <img> for Ryan (coach), one persistent <video> for avatars.
+// We just swap src and toggle visibility. Zero flicker.
+// ============================================================
+let _ryanEl = null;    // persistent Ryan image element
+let _avatarEl = null;  // persistent avatar video element
+
+function initMediaElements() {
+  const frame = document.querySelector('.frame');
+  if (!frame) return;
+
+  // Remove the original placeholder media element
+  const original = document.getElementById('media') ||
+                   frame.querySelector('.media');
+  if (original) original.remove();
+
+  // Create the persistent Ryan image
+  _ryanEl = document.createElement('img');
+  _ryanEl.src = 'Ryan.jpg';
+  _ryanEl.className = 'media';
+  _ryanEl.alt = 'Ryan';
+  _ryanEl.style.display = 'none';
+  _ryanEl.onerror = () => { _ryanEl.alt = ''; };
+  frame.appendChild(_ryanEl);
+
+  // Create the persistent avatar video
+  _avatarEl = document.createElement('video');
+  _avatarEl.className = 'media';
+  _avatarEl.autoplay = true;
+  _avatarEl.loop = true;
+  _avatarEl.muted = true;
+  _avatarEl.playsInline = true;
+  _avatarEl.style.display = 'none';
+  frame.appendChild(_avatarEl);
+
+  // Keep els.media pointing at whatever is currently visible
+  // (for any legacy code that reads els.media)
+  els.media = _avatarEl;
+}
+
 function setMediaForSpeaker(speaker) {
+  // Lazily initialize the dual elements if not yet done
+  if (!_ryanEl || !_avatarEl) initMediaElements();
+
   const asset = AVATARS[speaker] || AVATARS.Ryan;
-  if (asset.type === 'video') {
-    const v = document.createElement('video');
-    v.src = asset.src;
-    v.className = 'media';
-    v.autoplay = true; v.loop = true; v.muted = true; v.playsInline = true;
-    els.media.replaceWith(v);
-    els.media = v;
+
+  if (asset.type === 'img') {
+    // Ryan — show the persistent image, hide the avatar video
+    _ryanEl.src = asset.src;
+    _ryanEl.style.display = 'block';
+    _avatarEl.style.display = 'none';
+    // Pause the video to save resources while Ryan is showing
+    try { _avatarEl.pause(); } catch (e) {}
+    els.media = _ryanEl;
   } else {
-    const img = document.createElement('img');
-    img.src = asset.src;
-    img.className = 'media';
-    img.alt = speaker;
-    img.onerror = () => { img.style.display = 'none'; };
-    els.media.replaceWith(img);
-    els.media = img;
+    // Mary / Daniel / User — show avatar video, hide Ryan image
+    // Only update src if it actually changed (avoids restarting the video
+    // unnecessarily when Daniel and User_Prompt use the same video file)
+    const newSrc = asset.src;
+    if (_avatarEl.src !== newSrc &&
+        !_avatarEl.src.endsWith('/' + newSrc) &&
+        !_avatarEl.src.endsWith('\\' + newSrc)) {
+      _avatarEl.src = newSrc;
+      _avatarEl.load();
+    }
+    _avatarEl.style.display = 'block';
+    _ryanEl.style.display = 'none';
+    try { _avatarEl.play(); } catch (e) {}
+    els.media = _avatarEl;
   }
 }
 
@@ -784,6 +837,7 @@ els.chooseBtn.onclick = renderAvatarPicker;
 
 /* ===== Boot sequence ===== */
 function bootAfterAvatarSelected(){
+  initMediaElements(); // set up dual-element media system (Ryan img + avatar video)
   renderShelf();
   const firstKey = Object.keys(SCENARIOS)[0];
   // Initialize metrics UI for first scenario immediately:
@@ -854,6 +908,7 @@ function bootDefault(){
     }
 
     overlay.remove();
+    initMediaElements(); // set up dual-element media system
     const firstKey = Object.keys(SCENARIOS)[0];
     Metrics.refreshUI(firstKey);
     playScenario(firstKey, false);
