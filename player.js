@@ -119,7 +119,22 @@ function applyAvatarSet(set) {
 /* ===== Utility ===== */
 function stopEverything() {
   session++;
-  KokoroSpeech.cancel();
+
+  // Cancel Kokoro speech (may not be instant — see speak() guard below)
+  try { KokoroSpeech.cancel(); } catch (e) {}
+
+  // Also pause and reset any active <audio> elements on the page
+  // (Kokoro creates these for TTS playback; brute-force stop to prevent overlap)
+  try {
+    document.querySelectorAll('audio').forEach(a => {
+      try {
+        a.pause();
+        a.currentTime = 0;
+        a.src = '';
+      } catch (e) {}
+    });
+  } catch (e) {}
+
   if (rec) {
     try { rec.onresult = null; rec.onerror = null; rec.onend = null; rec.stop(); } catch {}
     rec = null;
@@ -173,9 +188,24 @@ function renderLine(line) {
 
 /* ===== Speech synthesis — Kokoro JS ===== */
 async function speak(text, speaker) {
+  // Capture current session — if scenario switches, we abort this speech
+  const mySession = session;
+
   setMediaForSpeaker(speaker);
+
+  // Abort if session already changed while we were setting media
+  if (mySession !== session) return;
+
   const voice = getKokoroVoice(speaker);
-  return KokoroSpeech.speak(text, voice);
+
+  try {
+    await KokoroSpeech.speak(text, voice);
+  } catch (e) {
+    // Speech interrupted or failed — silent fail, conversation continues
+  }
+
+  // After speaking, check again — session may have changed during playback
+  if (mySession !== session) return;
 }
 
 /* ===== Dynamic Mary (Claude API) ===== */
@@ -264,7 +294,7 @@ async function playLoop(mySession) {
     renderLine(line);
 
     if (line.speaker === 'User_Prompt') {
-      const said = await listenForUser(mySession, 15000); // 15s for longer sentences
+      const said = await listenForUser(mySession, 60000); // 60s absolute cap; function auto-restarts on browser timeouts
       if (mySession !== session) return;
 
       if (said) {
@@ -320,7 +350,7 @@ async function playLoop(mySession) {
           `<div class="practice-prompt"><strong>READ THIS OUT LOUD:</strong><br><br>
            "${line.text.replace('Say: ', '').replace(/'/g,'')}"</div>
            <div class="user-response-area">🎤 Didn't catch that — try again…</div>`;
-        const retry = await listenForUser(mySession, 15000);
+        const retry = await listenForUser(mySession, 60000);
         if (mySession !== session) return;
         if (retry && isPractice) {
           const dynamicReply = await getDynamicMaryResponse(retry);
@@ -460,45 +490,163 @@ function startListeningYesNo(mySession){
   try { r.start(); } catch {}
 }
 
-function listenForUser(mySession, timeoutMs){
+// ============================================================
+// Continuous speech listening — auto-restart when browser times out
+// Fix for the 15s cutoff problem. Browser speech recognition will
+// auto-stop periodically; we restart it and accumulate the transcript.
+// User is "done" when they pause for ~1.5s of silence.
+// ============================================================
+function listenForUser(mySession, maxTotalMs){
   return new Promise((resolve)=>{
-    const r = createRecognition();
-    if (!r) return resolve(null);
-    r.interimResults = true; // needed to detect speech start
-    rec = r; showListening(true);
+    maxTotalMs = maxTotalMs || 60000; // absolute hard cap: 60s
 
-    let finalResult = null;
-    let silenceTimer = null;
+    let accumulatedTranscript = '';   // everything the user has said so far
+    let currentInterim = '';          // latest interim result from current rec session
+    let silenceTimer = null;          // fires when user stops speaking
+    let hardTimer = null;             // absolute maximum listen time
+    let currentRec = null;
+    let isResolved = false;
+    let lastSpeechActivity = Date.now();
+    let restartCount = 0;
+    const MAX_RESTARTS = 8;           // safety: ~8 * 10s = 80s max theoretical
 
-    // Hard timeout — absolute max wait
-    listenTimer = setTimeout(()=>{ try{ r.stop(); }catch{} }, timeoutMs);
+    const SILENCE_BEFORE_STOP_MS = 1500; // how long user must be silent before we decide they're done
 
-    r.onresult = (e)=>{
-      if (mySession !== session) return resolve(null);
-      // Grab best final result so far
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        if (e.results[i].isFinal) {
-          finalResult = e.results[i][0].transcript.trim();
-          // Got a final result — wait for natural pause before stopping (1100ms)
-          // This prevents cutting the user off mid-thought. Praktika uses ~1200ms.
-          clearTimeout(silenceTimer);
-          silenceTimer = setTimeout(()=>{ try{ r.stop(); }catch{} }, 1100);
-        }
+    function finish(reason){
+      if (isResolved) return;
+      isResolved = true;
+
+      // Stop whatever timers are running
+      clearTimeout(silenceTimer);
+      clearTimeout(hardTimer);
+      if (listenTimer) { clearTimeout(listenTimer); listenTimer = null; }
+
+      // Stop the current recognition cleanly
+      if (currentRec) {
+        try {
+          currentRec.onresult = null;
+          currentRec.onerror = null;
+          currentRec.onend = null;
+          currentRec.stop();
+        } catch (e) {}
+        currentRec = null;
       }
-    };
 
-    r.onerror = ()=>{
-      clearTimeout(listenTimer); clearTimeout(silenceTimer);
-      showListening(false); resolve(null);
-    };
-
-    r.onend = ()=>{
-      clearTimeout(listenTimer); clearTimeout(silenceTimer);
       showListening(false);
-      resolve(finalResult);
-    };
 
-    try { r.start(); } catch { resolve(null); }
+      // Combine accumulated + any trailing interim result
+      let finalText = accumulatedTranscript.trim();
+      if (currentInterim.trim() && !finalText.toLowerCase().includes(currentInterim.trim().toLowerCase())) {
+        finalText = (finalText + ' ' + currentInterim).trim();
+      }
+
+      resolve(finalText || null);
+    }
+
+    function scheduleSilenceCheck(){
+      clearTimeout(silenceTimer);
+      silenceTimer = setTimeout(()=>{
+        // If no new speech in SILENCE_BEFORE_STOP_MS, the user is done.
+        if (Date.now() - lastSpeechActivity >= SILENCE_BEFORE_STOP_MS - 100) {
+          finish('silence_detected');
+        }
+      }, SILENCE_BEFORE_STOP_MS);
+    }
+
+    function startRecognitionSession(){
+      if (isResolved || mySession !== session) return;
+      if (restartCount >= MAX_RESTARTS) {
+        finish('max_restarts');
+        return;
+      }
+      restartCount++;
+
+      const r = createRecognition();
+      if (!r) { finish('no_recognition'); return; }
+      r.interimResults = true;
+      r.continuous = true; // request continuous mode (not all browsers honor this but ask for it)
+      currentRec = r;
+      rec = r; // expose globally so stopEverything() can kill it
+
+      currentInterim = '';
+
+      r.onresult = (e)=>{
+        if (isResolved || mySession !== session) { finish('session_changed'); return; }
+
+        lastSpeechActivity = Date.now();
+
+        // Walk ALL results in this batch and categorize them
+        let newFinalChunks = '';
+        let latestInterim = '';
+
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const transcript = e.results[i][0].transcript;
+          if (e.results[i].isFinal) {
+            newFinalChunks += (newFinalChunks ? ' ' : '') + transcript.trim();
+          } else {
+            latestInterim = transcript.trim();
+          }
+        }
+
+        if (newFinalChunks) {
+          // Append new final chunks to accumulated transcript
+          accumulatedTranscript = (accumulatedTranscript + ' ' + newFinalChunks).trim();
+        }
+        currentInterim = latestInterim;
+
+        // Any speech activity resets the silence timer
+        scheduleSilenceCheck();
+      };
+
+      r.onerror = (e)=>{
+        // Common errors: 'no-speech', 'aborted', 'audio-capture', 'network'
+        // 'no-speech' is normal — user just paused. Don't bail.
+        if (e.error === 'no-speech' || e.error === 'aborted') {
+          // Let onend handle the restart decision
+          return;
+        }
+        finish('error_' + e.error);
+      };
+
+      r.onend = ()=>{
+        if (isResolved || mySession !== session) return;
+
+        // Browser auto-stopped. Decide: restart (continue listening) or finish.
+        const timeSinceLastSpeech = Date.now() - lastSpeechActivity;
+
+        if (timeSinceLastSpeech >= SILENCE_BEFORE_STOP_MS) {
+          // User has been silent long enough — they're done.
+          finish('browser_stopped_after_silence');
+        } else if (!accumulatedTranscript && !currentInterim && restartCount >= 2) {
+          // No speech captured in 2 attempts — user probably not speaking
+          finish('no_speech_after_retries');
+        } else {
+          // User is still mid-thought — restart recognition quickly
+          setTimeout(()=>{
+            if (!isResolved && mySession === session) {
+              startRecognitionSession();
+            }
+          }, 100);
+        }
+      };
+
+      try {
+        r.start();
+        showListening(true);
+      } catch (e) {
+        // Couldn't start — wait briefly and try once more
+        setTimeout(()=>{
+          if (!isResolved) startRecognitionSession();
+        }, 200);
+      }
+    }
+
+    // Absolute hard cap on total listen time
+    hardTimer = setTimeout(()=>{ finish('hard_timeout'); }, maxTotalMs);
+    listenTimer = hardTimer; // expose so stopEverything() can cancel
+
+    // Start the first recognition session
+    startRecognitionSession();
   });
 }
 
