@@ -279,6 +279,25 @@ async function playLoop(mySession) {
               stepIndex++;
             }
             await speak(dynamicReply, 'Mary');
+            // FIX: Skip any Ryan coaching lines that follow — they were scripted
+            // for context before Mary's reply, now out of date because Mary
+            // took the conversation dynamically. Advance until next User_Prompt
+            // (if one exists in the remaining script).
+            let lookAhead = stepIndex + 1;
+            let foundNextUserPrompt = false;
+            while (lookAhead < currentScript.length) {
+              if (currentScript[lookAhead].speaker === 'User_Prompt') {
+                foundNextUserPrompt = true;
+                break;
+              }
+              if (currentScript[lookAhead].speaker !== 'Ryan') break;
+              lookAhead++;
+            }
+            if (foundNextUserPrompt) {
+              // Skip all Ryan lines between here and next User_Prompt
+              stepIndex = lookAhead - 1; // -1 because outer loop will stepIndex++
+            }
+            // Else: no more user turns — let Ryan's final wrap-up play normally
           } else {
             // Groq timed out or failed — use a natural filler so conversation continues
             await speak(randomChoice([
@@ -312,6 +331,20 @@ async function playLoop(mySession) {
               stepIndex++;
             }
             await speak(dynamicReply, 'Mary');
+            // FIX: Same Ryan-skip logic on retry path
+            let lookAhead = stepIndex + 1;
+            let foundNextUserPrompt = false;
+            while (lookAhead < currentScript.length) {
+              if (currentScript[lookAhead].speaker === 'User_Prompt') {
+                foundNextUserPrompt = true;
+                break;
+              }
+              if (currentScript[lookAhead].speaker !== 'Ryan') break;
+              lookAhead++;
+            }
+            if (foundNextUserPrompt) {
+              stepIndex = lookAhead - 1;
+            }
           }
         } else if (!retry) {
           // Still nothing — skip and continue
