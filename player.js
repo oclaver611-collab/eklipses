@@ -117,24 +117,50 @@ function applyAvatarSet(set) {
 }
 
 /* ===== Utility ===== */
+// Track AudioContexts so we can suspend them on stop
+const __audioContexts = [];
+if (typeof AudioContext !== 'undefined') {
+  const OriginalAudioContext = AudioContext;
+  window.AudioContext = function (...args) {
+    const ctx = new OriginalAudioContext(...args);
+    __audioContexts.push(ctx);
+    return ctx;
+  };
+  window.AudioContext.prototype = OriginalAudioContext.prototype;
+}
+
 function stopEverything() {
   session++;
 
-  // Cancel Kokoro speech (may not be instant — see speak() guard below)
-  try { KokoroSpeech.cancel(); } catch (e) {}
-
-  // Also pause and reset any active <audio> elements on the page
-  // (Kokoro creates these for TTS playback; brute-force stop to prevent overlap)
+  // STEP 1 — Instantly silence all audio by muting it. Even if playback
+  // continues for a few ms in the background, the USER hears silence now.
   try {
     document.querySelectorAll('audio').forEach(a => {
       try {
+        a.muted = true;
+        a.volume = 0;
         a.pause();
         a.currentTime = 0;
         a.src = '';
+        // Remove from DOM entirely so it can't resume
+        if (a.parentNode) a.parentNode.removeChild(a);
       } catch (e) {}
     });
   } catch (e) {}
 
+  // STEP 2 — Cancel Kokoro's internal speech queue
+  try { if (typeof KokoroSpeech !== 'undefined') KokoroSpeech.cancel(); } catch (e) {}
+
+  // STEP 3 — Suspend all tracked AudioContexts (stops Web Audio playback)
+  try {
+    __audioContexts.forEach(ctx => {
+      try {
+        if (ctx.state === 'running') ctx.suspend();
+      } catch (e) {}
+    });
+  } catch (e) {}
+
+  // STEP 4 — Stop any in-flight speech recognition
   if (rec) {
     try { rec.onresult = null; rec.onerror = null; rec.onend = null; rec.stop(); } catch {}
     rec = null;
@@ -191,6 +217,16 @@ async function speak(text, speaker) {
   // Capture current session — if scenario switches, we abort this speech
   const mySession = session;
 
+  // If stopEverything() recently suspended audio contexts, resume them
+  // so this new speech can actually play.
+  try {
+    __audioContexts.forEach(ctx => {
+      try {
+        if (ctx.state === 'suspended') ctx.resume();
+      } catch (e) {}
+    });
+  } catch (e) {}
+
   setMediaForSpeaker(speaker);
 
   // Abort if session already changed while we were setting media
@@ -199,9 +235,25 @@ async function speak(text, speaker) {
   const voice = getKokoroVoice(speaker);
 
   try {
-    await KokoroSpeech.speak(text, voice);
+    // Race the speech against a session-abort check. If session changes,
+    // we reject early so the calling code can move on — even if Kokoro's
+    // internal playback continues briefly, stopEverything() has muted it.
+    await Promise.race([
+      KokoroSpeech.speak(text, voice),
+      new Promise((_, reject) => {
+        const checker = setInterval(() => {
+          if (mySession !== session) {
+            clearInterval(checker);
+            reject(new Error('session_changed'));
+          }
+        }, 50);
+        // Clear interval when outer promise settles (prevents leak)
+        setTimeout(() => clearInterval(checker), 120000);
+      })
+    ]);
   } catch (e) {
-    // Speech interrupted or failed — silent fail, conversation continues
+    // Speech interrupted, session changed, or Kokoro failed — silent fail,
+    // conversation continues in the new scenario.
   }
 
   // After speaking, check again — session may have changed during playback
@@ -268,6 +320,12 @@ function showListening(on=true){ els.listenPill.style.display = on ? 'block' : '
 async function playScenario(key, practice=false) {
   stopEverything();
   resetConversation();
+
+  // Give the kill sequence a brief moment to settle before new audio starts.
+  // This prevents the very tail end of previous audio from overlapping with
+  // the start of this scenario's first line.
+  await new Promise(r => setTimeout(r, 200));
+
   const mySession = session;
 
   currentScenarioKey = key;
