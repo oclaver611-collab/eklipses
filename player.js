@@ -265,32 +265,53 @@ function renderLine(line) {
 
 /* ===== Speech synthesis — Kokoro JS ===== */
 async function speak(text, speaker) {
-  // Capture current session — if scenario switches, we abort this speech
   const mySession = session;
 
-  // If stopEverything() recently suspended audio contexts, resume them
-  // so this new speech can actually play.
   try {
     __audioContexts.forEach(ctx => {
-      try {
-        if (ctx.state === 'suspended') ctx.resume();
-      } catch (e) {}
+      try { if (ctx.state === 'suspended') ctx.resume(); } catch (e) {}
     });
   } catch (e) {}
 
+  // Set media but pause video immediately — sync it to audio start below
   setMediaForSpeaker(speaker);
+  const mediaEl = els.media;
+  if (mediaEl && mediaEl.tagName === 'VIDEO') {
+    try { mediaEl.pause(); mediaEl.currentTime = 0; } catch (e) {}
+  }
 
-  // Abort if session already changed while we were setting media
   if (mySession !== session) return;
 
   const voice = getKokoroVoice(speaker);
 
   try {
-    // Race the speech against a session-abort check. If session changes,
-    // we reject early so the calling code can move on — even if Kokoro's
-    // internal playback continues briefly, stopEverything() has muted it.
     await Promise.race([
-      KokoroSpeech.speak(text, voice),
+      (async () => {
+        // Poll for AudioContext becoming active (signals audio is playing)
+        // then start the video to sync lips with audio
+        let videoStarted = false;
+        const syncVideo = () => {
+          if (!videoStarted && mySession === session) {
+            videoStarted = true;
+            const el = els.media;
+            if (el && el.tagName === 'VIDEO') {
+              try { el.play().catch(() => {}); } catch (e) {}
+            }
+          }
+        };
+        const pollId = setInterval(() => {
+          if (mySession !== session) { clearInterval(pollId); return; }
+          if (__audioContexts.some(c => c.state === 'running')) {
+            clearInterval(pollId);
+            syncVideo();
+          }
+        }, 30);
+        // Fallback: start video after 500ms regardless
+        setTimeout(() => { clearInterval(pollId); syncVideo(); }, 500);
+
+        await KokoroSpeech.speak(text, voice);
+        clearInterval(pollId);
+      })(),
       new Promise((_, reject) => {
         const checker = setInterval(() => {
           if (mySession !== session) {
@@ -298,16 +319,11 @@ async function speak(text, speaker) {
             reject(new Error('session_changed'));
           }
         }, 50);
-        // Clear interval when outer promise settles (prevents leak)
         setTimeout(() => clearInterval(checker), 120000);
       })
     ]);
-  } catch (e) {
-    // Speech interrupted, session changed, or Kokoro failed — silent fail,
-    // conversation continues in the new scenario.
-  }
+  } catch (e) {}
 
-  // After speaking, check again — session may have changed during playback
   if (mySession !== session) return;
 }
 
