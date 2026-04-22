@@ -180,72 +180,73 @@ function getKokoroVoice(speaker) {
 
 /* ===== Media display ===== */
 // ============================================================
+// Media display — replaceWith() approach, one element at a time
 // ============================================================
-// Media display — two persistent elements, swap on speaker change
-// ============================================================
-let _ryanEl = null;
-let _avatarEl = null;
+let _lastSpeaker = null;
 
 function initMediaElements() {
-  // Get the current media element (the <img id="media"> from HTML)
-  const current = els.media;
-  if (!current) return;
-
-  // If already initialized, skip
-  if (_ryanEl && _avatarEl) return;
-
-  const parent = current.parentNode;
-  if (!parent) return;
-
-  // Build Ryan image element
-  _ryanEl = document.createElement('img');
-  _ryanEl.id = 'media-ryan';
-  _ryanEl.className = 'media';
-  _ryanEl.alt = 'Ryan';
-  _ryanEl.style.cssText = 'display:none;width:100%;height:440px;object-fit:cover;background:#111';
-
-  // Build avatar video element
-  _avatarEl = document.createElement('video');
-  _avatarEl.id = 'media-avatar';
-  _avatarEl.className = 'media';
-  _avatarEl.autoplay = true;
-  _avatarEl.loop = true;
-  _avatarEl.muted = true;
-  _avatarEl.playsInline = true;
-  _avatarEl.style.cssText = 'display:none;width:100%;height:440px;object-fit:cover;background:#000';
-
-  // Replace the original element with our two new ones
-  parent.insertBefore(_ryanEl, current);
-  parent.insertBefore(_avatarEl, current);
-  current.remove();
-
-  els.media = _ryanEl; // default reference
+  // No-op: we no longer pre-create elements. setMediaForSpeaker handles everything.
 }
 
 function setMediaForSpeaker(speaker) {
-  if (!_ryanEl || !_avatarEl) initMediaElements();
-  if (!_ryanEl || !_avatarEl) return; // DOM not ready yet
-
   const asset = AVATARS[speaker] || AVATARS.Ryan;
+  const current = els.media;
+  if (!current) return;
+
+  // If same speaker and same src, nothing to do
+  if (_lastSpeaker === speaker) {
+    // For video, make sure it's playing
+    if (asset.type === 'video' && current.tagName === 'VIDEO') {
+      try { current.play().catch(() => {}); } catch (e) {}
+    }
+    return;
+  }
+  _lastSpeaker = speaker;
 
   if (asset.type === 'img') {
-    // Ryan — show photo, hide avatar video
-    _ryanEl.src = asset.src;
-    _ryanEl.style.display = 'block';
-    _avatarEl.style.display = 'none';
-    try { _avatarEl.pause(); } catch (e) {}
-    els.media = _ryanEl;
-  } else {
-    // Mary / Daniel / User — show avatar video, hide Ryan
-    const newSrc = asset.src;
-    if ((_avatarEl.getAttribute('src') || '') !== newSrc) {
-      _avatarEl.setAttribute('src', newSrc);
-      _avatarEl.load();
+    // Ryan — swap to an <img> element
+    if (current.tagName !== 'IMG') {
+      // Currently showing a video — replace with img
+      if (current.tagName === 'VIDEO') {
+        try { current.pause(); current.src = ''; } catch (e) {}
+      }
+      const img = document.createElement('img');
+      img.id = 'media';
+      img.className = current.className;
+      img.alt = 'Ryan';
+      img.src = asset.src;
+      img.style.cssText = current.style.cssText || 'width:100%;height:440px;object-fit:cover;';
+      current.replaceWith(img);
+      els.media = img;
+    } else {
+      // Already an img — just update src
+      current.src = asset.src;
     }
-    _avatarEl.style.display = 'block';
-    _ryanEl.style.display = 'none';
-    try { _avatarEl.play().catch(() => {}); } catch (e) {}
-    els.media = _avatarEl;
+  } else {
+    // Mary / Daniel / User_Prompt — swap to a <video> element
+    if (current.tagName !== 'VIDEO') {
+      // Currently showing an img — replace with video
+      const vid = document.createElement('video');
+      vid.id = 'media';
+      vid.className = current.className;
+      vid.autoplay = true;
+      vid.loop = true;
+      vid.muted = true;
+      vid.playsInline = true;
+      vid.style.cssText = current.style.cssText || 'width:100%;height:440px;object-fit:cover;';
+      vid.src = asset.src;
+      current.replaceWith(vid);
+      els.media = vid;
+      vid.load();
+      try { vid.play().catch(() => {}); } catch (e) {}
+    } else {
+      // Already a video — update src if needed
+      if ((current.getAttribute('src') || '') !== asset.src) {
+        current.src = asset.src;
+        current.load();
+      }
+      try { current.play().catch(() => {}); } catch (e) {}
+    }
   }
 }
 
