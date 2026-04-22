@@ -180,59 +180,57 @@ function getKokoroVoice(speaker) {
 
 /* ===== Media display ===== */
 // ============================================================
-// Dual-element media system — persistent Ryan img + avatar video
-// No DOM reconstruction on speaker change. Just src swap + show/hide.
+// ============================================================
+// Media display — two persistent elements, swap on speaker change
 // ============================================================
 let _ryanEl = null;
 let _avatarEl = null;
 
 function initMediaElements() {
-  // Find the existing media element in the DOM
-  const existing = els.media;
-  if (!existing || !existing.parentNode) return;
-  const frame = existing.parentNode;
+  // Get the current media element (the <img id="media"> from HTML)
+  const current = els.media;
+  if (!current) return;
 
-  // Convert the existing element into the Ryan image
-  // (It's already an <img> in the HTML, so just update it in place)
-  const ryanImg = document.createElement('img');
-  ryanImg.id = 'media-ryan';
-  ryanImg.src = 'Ryan.jpg';
-  ryanImg.className = 'media';
-  ryanImg.alt = 'Ryan';
-  ryanImg.style.display = 'none';
-  ryanImg.onerror = () => {};
-  existing.replaceWith(ryanImg);
-  _ryanEl = ryanImg;
-  els.media = ryanImg;
+  // If already initialized, skip
+  if (_ryanEl && _avatarEl) return;
 
-  // Create a new video element for the avatar (Mary / Daniel / User)
-  const avatarVid = document.createElement('video');
-  avatarVid.id = 'media-avatar';
-  avatarVid.className = 'media';
-  avatarVid.autoplay = true;
-  avatarVid.loop = true;
-  avatarVid.muted = true;
-  avatarVid.playsInline = true;
-  avatarVid.style.display = 'none';
-  // Insert right after the Ryan image
-  _ryanEl.insertAdjacentElement('afterend', avatarVid);
-  _avatarEl = avatarVid;
+  const parent = current.parentNode;
+  if (!parent) return;
+
+  // Build Ryan image element
+  _ryanEl = document.createElement('img');
+  _ryanEl.id = 'media-ryan';
+  _ryanEl.className = 'media';
+  _ryanEl.alt = 'Ryan';
+  _ryanEl.style.cssText = 'display:none;width:100%;height:440px;object-fit:cover;background:#111';
+
+  // Build avatar video element
+  _avatarEl = document.createElement('video');
+  _avatarEl.id = 'media-avatar';
+  _avatarEl.className = 'media';
+  _avatarEl.autoplay = true;
+  _avatarEl.loop = true;
+  _avatarEl.muted = true;
+  _avatarEl.playsInline = true;
+  _avatarEl.style.cssText = 'display:none;width:100%;height:440px;object-fit:cover;background:#000';
+
+  // Replace the original element with our two new ones
+  parent.insertBefore(_ryanEl, current);
+  parent.insertBefore(_avatarEl, current);
+  current.remove();
+
+  els.media = _ryanEl; // default reference
 }
 
 function setMediaForSpeaker(speaker) {
-  // Lazily initialize if not yet done
   if (!_ryanEl || !_avatarEl) initMediaElements();
-  // If still not initialized (DOM not ready), bail gracefully
-  if (!_ryanEl || !_avatarEl) return;
+  if (!_ryanEl || !_avatarEl) return; // DOM not ready yet
 
   const asset = AVATARS[speaker] || AVATARS.Ryan;
 
   if (asset.type === 'img') {
-    // Ryan speaking — show his photo, hide avatar video
-    if (_ryanEl.src !== asset.src &&
-        !_ryanEl.src.endsWith('/' + asset.src)) {
-      _ryanEl.src = asset.src;
-    }
+    // Ryan — show photo, hide avatar video
+    _ryanEl.src = asset.src;
     _ryanEl.style.display = 'block';
     _avatarEl.style.display = 'none';
     try { _avatarEl.pause(); } catch (e) {}
@@ -240,8 +238,7 @@ function setMediaForSpeaker(speaker) {
   } else {
     // Mary / Daniel / User — show avatar video, hide Ryan
     const newSrc = asset.src;
-    const curSrc = _avatarEl.getAttribute('src') || '';
-    if (curSrc !== newSrc) {
+    if ((_avatarEl.getAttribute('src') || '') !== newSrc) {
       _avatarEl.setAttribute('src', newSrc);
       _avatarEl.load();
     }
