@@ -180,74 +180,74 @@ function getKokoroVoice(speaker) {
 
 /* ===== Media display ===== */
 // ============================================================
-// Dual-element media system — no more DOM reconstruction on speaker change.
-// One persistent <img> for Ryan (coach), one persistent <video> for avatars.
-// We just swap src and toggle visibility. Zero flicker.
+// Dual-element media system — persistent Ryan img + avatar video
+// No DOM reconstruction on speaker change. Just src swap + show/hide.
 // ============================================================
-let _ryanEl = null;    // persistent Ryan image element
-let _avatarEl = null;  // persistent avatar video element
+let _ryanEl = null;
+let _avatarEl = null;
 
 function initMediaElements() {
-  const frame = document.querySelector('.frame');
-  if (!frame) return;
+  // Find the existing media element in the DOM
+  const existing = els.media;
+  if (!existing || !existing.parentNode) return;
+  const frame = existing.parentNode;
 
-  // Remove the original placeholder media element
-  const original = document.getElementById('media') ||
-                   frame.querySelector('.media');
-  if (original) original.remove();
+  // Convert the existing element into the Ryan image
+  // (It's already an <img> in the HTML, so just update it in place)
+  const ryanImg = document.createElement('img');
+  ryanImg.id = 'media-ryan';
+  ryanImg.src = 'Ryan.jpg';
+  ryanImg.className = 'media';
+  ryanImg.alt = 'Ryan';
+  ryanImg.style.display = 'none';
+  ryanImg.onerror = () => {};
+  existing.replaceWith(ryanImg);
+  _ryanEl = ryanImg;
+  els.media = ryanImg;
 
-  // Create the persistent Ryan image
-  _ryanEl = document.createElement('img');
-  _ryanEl.src = 'Ryan.jpg';
-  _ryanEl.className = 'media';
-  _ryanEl.alt = 'Ryan';
-  _ryanEl.style.display = 'none';
-  _ryanEl.onerror = () => { _ryanEl.alt = ''; };
-  frame.appendChild(_ryanEl);
-
-  // Create the persistent avatar video
-  _avatarEl = document.createElement('video');
-  _avatarEl.className = 'media';
-  _avatarEl.autoplay = true;
-  _avatarEl.loop = true;
-  _avatarEl.muted = true;
-  _avatarEl.playsInline = true;
-  _avatarEl.style.display = 'none';
-  frame.appendChild(_avatarEl);
-
-  // Keep els.media pointing at whatever is currently visible
-  // (for any legacy code that reads els.media)
-  els.media = _avatarEl;
+  // Create a new video element for the avatar (Mary / Daniel / User)
+  const avatarVid = document.createElement('video');
+  avatarVid.id = 'media-avatar';
+  avatarVid.className = 'media';
+  avatarVid.autoplay = true;
+  avatarVid.loop = true;
+  avatarVid.muted = true;
+  avatarVid.playsInline = true;
+  avatarVid.style.display = 'none';
+  // Insert right after the Ryan image
+  _ryanEl.insertAdjacentElement('afterend', avatarVid);
+  _avatarEl = avatarVid;
 }
 
 function setMediaForSpeaker(speaker) {
-  // Lazily initialize the dual elements if not yet done
+  // Lazily initialize if not yet done
   if (!_ryanEl || !_avatarEl) initMediaElements();
+  // If still not initialized (DOM not ready), bail gracefully
+  if (!_ryanEl || !_avatarEl) return;
 
   const asset = AVATARS[speaker] || AVATARS.Ryan;
 
   if (asset.type === 'img') {
-    // Ryan — show the persistent image, hide the avatar video
-    _ryanEl.src = asset.src;
+    // Ryan speaking — show his photo, hide avatar video
+    if (_ryanEl.src !== asset.src &&
+        !_ryanEl.src.endsWith('/' + asset.src)) {
+      _ryanEl.src = asset.src;
+    }
     _ryanEl.style.display = 'block';
     _avatarEl.style.display = 'none';
-    // Pause the video to save resources while Ryan is showing
     try { _avatarEl.pause(); } catch (e) {}
     els.media = _ryanEl;
   } else {
-    // Mary / Daniel / User — show avatar video, hide Ryan image
-    // Only update src if it actually changed (avoids restarting the video
-    // unnecessarily when Daniel and User_Prompt use the same video file)
+    // Mary / Daniel / User — show avatar video, hide Ryan
     const newSrc = asset.src;
-    if (_avatarEl.src !== newSrc &&
-        !_avatarEl.src.endsWith('/' + newSrc) &&
-        !_avatarEl.src.endsWith('\\' + newSrc)) {
-      _avatarEl.src = newSrc;
+    const curSrc = _avatarEl.getAttribute('src') || '';
+    if (curSrc !== newSrc) {
+      _avatarEl.setAttribute('src', newSrc);
       _avatarEl.load();
     }
     _avatarEl.style.display = 'block';
     _ryanEl.style.display = 'none';
-    try { _avatarEl.play(); } catch (e) {}
+    try { _avatarEl.play().catch(() => {}); } catch (e) {}
     els.media = _avatarEl;
   }
 }
