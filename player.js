@@ -106,7 +106,7 @@ let SELECTED_AVATAR_SET = null;
 const AVATARS = {
   Daniel:     { type: "video", src: "bella9.mp4" },
   Mary:       { type: "video", src: "bella1.mp4" },
-  Ryan:       { type: "img",   src: "Ryan.jpg" },
+  Ryan:       { type: "video", src: "Ryan.mp4" },
   User_Prompt:{ type: "video", src: "bella9.mp4" }
 };
 
@@ -179,23 +179,74 @@ function getKokoroVoice(speaker) {
 }
 
 /* ===== Media display ===== */
+// ============================================================
+// Media display — replaceWith() approach, one element at a time
+// ============================================================
+let _lastSpeaker = null;
+
+function initMediaElements() {
+  // No-op: we no longer pre-create elements. setMediaForSpeaker handles everything.
+}
+
 function setMediaForSpeaker(speaker) {
   const asset = AVATARS[speaker] || AVATARS.Ryan;
-  if (asset.type === 'video') {
-    const v = document.createElement('video');
-    v.src = asset.src;
-    v.className = 'media';
-    v.autoplay = true; v.loop = true; v.muted = true; v.playsInline = true;
-    els.media.replaceWith(v);
-    els.media = v;
+  const current = els.media;
+  if (!current) return;
+
+  // If same speaker and same src, nothing to do
+  if (_lastSpeaker === speaker) {
+    // For video, make sure it's playing
+    if (asset.type === 'video' && current.tagName === 'VIDEO') {
+      try { current.play().catch(() => {}); } catch (e) {}
+    }
+    return;
+  }
+  _lastSpeaker = speaker;
+
+  if (asset.type === 'img') {
+    // Ryan — swap to an <img> element
+    if (current.tagName !== 'IMG') {
+      // Currently showing a video — replace with img
+      if (current.tagName === 'VIDEO') {
+        try { current.pause(); current.src = ''; } catch (e) {}
+      }
+      const img = document.createElement('img');
+      img.id = 'media';
+      img.className = current.className;
+      img.alt = 'Ryan';
+      img.src = asset.src;
+      img.style.cssText = current.style.cssText || 'width:100%;height:440px;object-fit:cover;';
+      current.replaceWith(img);
+      els.media = img;
+    } else {
+      // Already an img — just update src
+      current.src = asset.src;
+    }
   } else {
-    const img = document.createElement('img');
-    img.src = asset.src;
-    img.className = 'media';
-    img.alt = speaker;
-    img.onerror = () => { img.style.display = 'none'; };
-    els.media.replaceWith(img);
-    els.media = img;
+    // Mary / Daniel / User_Prompt — swap to a <video> element
+    if (current.tagName !== 'VIDEO') {
+      // Currently showing an img — replace with video
+      const vid = document.createElement('video');
+      vid.id = 'media';
+      vid.className = current.className;
+      vid.autoplay = true;
+      vid.loop = true;
+      vid.muted = true;
+      vid.playsInline = true;
+      vid.style.cssText = current.style.cssText || 'width:100%;height:440px;object-fit:cover;';
+      vid.src = asset.src;
+      current.replaceWith(vid);
+      els.media = vid;
+      vid.load();
+      try { vid.play().catch(() => {}); } catch (e) {}
+    } else {
+      // Already a video — update src if needed
+      if ((current.getAttribute('src') || '') !== asset.src) {
+        current.src = asset.src;
+        current.load();
+      }
+      try { current.play().catch(() => {}); } catch (e) {}
+    }
   }
 }
 
@@ -214,32 +265,58 @@ function renderLine(line) {
 
 /* ===== Speech synthesis — Kokoro JS ===== */
 async function speak(text, speaker) {
-  // Capture current session — if scenario switches, we abort this speech
   const mySession = session;
 
-  // If stopEverything() recently suspended audio contexts, resume them
-  // so this new speech can actually play.
   try {
     __audioContexts.forEach(ctx => {
-      try {
-        if (ctx.state === 'suspended') ctx.resume();
-      } catch (e) {}
+      try { if (ctx.state === 'suspended') ctx.resume(); } catch (e) {}
     });
   } catch (e) {}
 
+  // Set media but pause video immediately — sync it to audio start below
   setMediaForSpeaker(speaker);
+  const mediaEl = els.media;
+  if (mediaEl && mediaEl.tagName === 'VIDEO') {
+    try { mediaEl.pause(); mediaEl.currentTime = 0; } catch (e) {}
+  }
 
-  // Abort if session already changed while we were setting media
   if (mySession !== session) return;
 
   const voice = getKokoroVoice(speaker);
 
   try {
-    // Race the speech against a session-abort check. If session changes,
-    // we reject early so the calling code can move on — even if Kokoro's
-    // internal playback continues briefly, stopEverything() has muted it.
     await Promise.race([
-      KokoroSpeech.speak(text, voice),
+      (async () => {
+        // Poll for AudioContext becoming active (signals audio is playing)
+        // then start the video to sync lips with audio
+        let videoStarted = false;
+        const syncVideo = () => {
+          if (!videoStarted && mySession === session) {
+            videoStarted = true;
+            const el = els.media;
+            if (el && el.tagName === 'VIDEO') {
+              try { el.play().catch(() => {}); } catch (e) {}
+            }
+          }
+        };
+        const pollId = setInterval(() => {
+          if (mySession !== session) { clearInterval(pollId); return; }
+          if (__audioContexts.some(c => c.state === 'running')) {
+            clearInterval(pollId);
+            syncVideo();
+          }
+        }, 30);
+        // Fallback: start video after 500ms regardless
+        setTimeout(() => { clearInterval(pollId); syncVideo(); }, 500);
+
+        await KokoroSpeech.speak(text, voice);
+        clearInterval(pollId);
+        // Audio done — pause video so lips stop moving during silence
+        const doneEl = els.media;
+        if (doneEl && doneEl.tagName === 'VIDEO') {
+          try { doneEl.pause(); doneEl.currentTime = 0; } catch(e) {}
+        }
+      })(),
       new Promise((_, reject) => {
         const checker = setInterval(() => {
           if (mySession !== session) {
@@ -247,16 +324,11 @@ async function speak(text, speaker) {
             reject(new Error('session_changed'));
           }
         }, 50);
-        // Clear interval when outer promise settles (prevents leak)
         setTimeout(() => clearInterval(checker), 120000);
       })
     ]);
-  } catch (e) {
-    // Speech interrupted, session changed, or Kokoro failed — silent fail,
-    // conversation continues in the new scenario.
-  }
+  } catch (e) {}
 
-  // After speaking, check again — session may have changed during playback
   if (mySession !== session) return;
 }
 
@@ -451,7 +523,86 @@ async function playLoop(mySession) {
   }
 
   if (!isPractice) renderAskToPractice(mySession);
-  else await runCoachFeedback(mySession);
+  else await freeConversation(mySession);
+}
+
+/* ===== Free Conversation Mode ===== */
+async function freeConversation(mySession) {
+  if (mySession !== session) return;
+
+  const FREE_DURATION_MS = 10 * 60 * 1000; // 10 minutes
+  const NUDGE_AT_MS     =  8 * 60 * 1000; // nudge at 8 min
+  const startTime = Date.now();
+  let nudgeSent = false;
+
+  // Ryan intro
+  await speak("Great work on the script! Now let's have a real conversation — no script, no prompts. Just talk to me naturally for the next ten minutes. I'll give you feedback at the end.", 'Ryan');
+  if (mySession !== session) return;
+
+  els.name.textContent = 'Ryan';
+  els.text.textContent = 'Free conversation started. Just speak naturally…';
+
+  // Show a countdown timer in the UI
+  const timerEl = document.createElement('div');
+  timerEl.id = 'free-timer';
+  timerEl.style.cssText = 'position:fixed;top:70px;right:20px;background:#1a1c22;border:1px solid #2b2e36;border-radius:999px;padding:6px 16px;font-size:13px;font-weight:700;color:#ffb300;z-index:999';
+  document.body.appendChild(timerEl);
+  const timerInterval = setInterval(() => {
+    if (mySession !== session) { clearInterval(timerInterval); timerEl.remove(); return; }
+    const remaining = Math.max(0, FREE_DURATION_MS - (Date.now() - startTime));
+    const mins = Math.floor(remaining / 60000);
+    const secs = Math.floor((remaining % 60000) / 1000);
+    timerEl.textContent = `⏱ ${mins}:${secs.toString().padStart(2,'0')} left`;
+  }, 1000);
+
+  while (mySession === session) {
+    const elapsed = Date.now() - startTime;
+
+    // Time's up
+    if (elapsed >= FREE_DURATION_MS) {
+      await speak("That's a wrap! Great conversation. Let me put together your feedback now.", 'Ryan');
+      break;
+    }
+
+    // 8-minute nudge
+    if (!nudgeSent && elapsed >= NUDGE_AT_MS) {
+      nudgeSent = true;
+      await speak("You're doing great — keep the conversation going, two more minutes.", 'Ryan');
+      if (mySession !== session) return;
+    }
+
+    // Listen for user (30s max per turn, then loop back)
+    const remainingMs = FREE_DURATION_MS - (Date.now() - startTime);
+    const listenMs = Math.min(30000, remainingMs);
+    if (listenMs < 2000) break; // not enough time left
+
+    const said = await listenForUser(mySession, listenMs);
+    if (mySession !== session) return;
+    if (!said) {
+      // No speech — wait a moment before trying again so we don't spin
+      await pause(1000);
+      continue;
+    }
+
+    // Get Mary's dynamic response
+    const reply = await getDynamicMaryResponse(said);
+    if (mySession !== session) return;
+
+    if (reply) {
+      await speak(reply, 'Mary');
+    } else {
+      await speak(randomChoice(["Sorry, say that again?", "Hmm, I didn't quite catch that.", "What was that?"]), 'Mary');
+    }
+    if (mySession !== session) return;
+    await pause(200);
+  }
+
+  clearInterval(timerInterval);
+  const te = document.getElementById('free-timer');
+  if (te) te.remove();
+
+  if (mySession !== session) return;
+  await runCoachFeedback(mySession);
 }
 
 /* ===== Coach Feedback ===== */
@@ -675,8 +826,8 @@ function listenForUser(mySession, maxTotalMs){
         if (timeSinceLastSpeech >= SILENCE_BEFORE_STOP_MS) {
           // User has been silent long enough — they're done.
           finish('browser_stopped_after_silence');
-        } else if (!accumulatedTranscript && !currentInterim && restartCount >= 2) {
-          // No speech captured in 2 attempts — user probably not speaking
+        } else if (!accumulatedTranscript && !currentInterim && restartCount >= MAX_RESTARTS) {
+          // No speech captured in max attempts — user probably not speaking
           finish('no_speech_after_retries');
         } else {
           // User is still mid-thought — restart recognition quickly
@@ -784,6 +935,7 @@ els.chooseBtn.onclick = renderAvatarPicker;
 
 /* ===== Boot sequence ===== */
 function bootAfterAvatarSelected(){
+  initMediaElements(); // set up dual-element media system (Ryan img + avatar video)
   renderShelf();
   const firstKey = Object.keys(SCENARIOS)[0];
   // Initialize metrics UI for first scenario immediately:
@@ -854,6 +1006,7 @@ function bootDefault(){
     }
 
     overlay.remove();
+    initMediaElements(); // set up dual-element media system
     const firstKey = Object.keys(SCENARIOS)[0];
     Metrics.refreshUI(firstKey);
     playScenario(firstKey, false);
