@@ -523,7 +523,86 @@ async function playLoop(mySession) {
   }
 
   if (!isPractice) renderAskToPractice(mySession);
-  else await runCoachFeedback(mySession);
+  else await freeConversation(mySession);
+}
+
+/* ===== Free Conversation Mode ===== */
+async function freeConversation(mySession) {
+  if (mySession !== session) return;
+
+  const FREE_DURATION_MS = 10 * 60 * 1000; // 10 minutes
+  const NUDGE_AT_MS     =  8 * 60 * 1000; // nudge at 8 min
+  const startTime = Date.now();
+  let nudgeSent = false;
+
+  // Ryan intro
+  await speak("Great work on the script! Now let's have a real conversation — no script, no prompts. Just talk to me naturally for the next ten minutes. I'll give you feedback at the end.", 'Ryan');
+  if (mySession !== session) return;
+
+  els.name.textContent = 'Ryan';
+  els.text.textContent = 'Free conversation started. Just speak naturally…';
+
+  // Show a countdown timer in the UI
+  const timerEl = document.createElement('div');
+  timerEl.id = 'free-timer';
+  timerEl.style.cssText = 'position:fixed;top:70px;right:20px;background:#1a1c22;border:1px solid #2b2e36;border-radius:999px;padding:6px 16px;font-size:13px;font-weight:700;color:#ffb300;z-index:999';
+  document.body.appendChild(timerEl);
+  const timerInterval = setInterval(() => {
+    if (mySession !== session) { clearInterval(timerInterval); timerEl.remove(); return; }
+    const remaining = Math.max(0, FREE_DURATION_MS - (Date.now() - startTime));
+    const mins = Math.floor(remaining / 60000);
+    const secs = Math.floor((remaining % 60000) / 1000);
+    timerEl.textContent = `⏱ ${mins}:${secs.toString().padStart(2,'0')} left`;
+  }, 1000);
+
+  while (mySession === session) {
+    const elapsed = Date.now() - startTime;
+
+    // Time's up
+    if (elapsed >= FREE_DURATION_MS) {
+      await speak("That's a wrap! Great conversation. Let me put together your feedback now.", 'Ryan');
+      break;
+    }
+
+    // 8-minute nudge
+    if (!nudgeSent && elapsed >= NUDGE_AT_MS) {
+      nudgeSent = true;
+      await speak("You're doing great — keep the conversation going, two more minutes.", 'Ryan');
+      if (mySession !== session) return;
+    }
+
+    // Listen for user (30s max per turn, then loop back)
+    const remainingMs = FREE_DURATION_MS - (Date.now() - startTime);
+    const listenMs = Math.min(30000, remainingMs);
+    if (listenMs < 2000) break; // not enough time left
+
+    const said = await listenForUser(mySession, listenMs);
+    if (mySession !== session) return;
+    if (!said) {
+      // No speech — wait a moment before trying again so we don't spin
+      await pause(1000);
+      continue;
+    }
+
+    // Get Mary's dynamic response
+    const reply = await getDynamicMaryResponse(said);
+    if (mySession !== session) return;
+
+    if (reply) {
+      await speak(reply, 'Mary');
+    } else {
+      await speak(randomChoice(["Sorry, say that again?", "Hmm, I didn't quite catch that.", "What was that?"]), 'Mary');
+    }
+    if (mySession !== session) return;
+    await pause(200);
+  }
+
+  clearInterval(timerInterval);
+  const te = document.getElementById('free-timer');
+  if (te) te.remove();
+
+  if (mySession !== session) return;
+  await runCoachFeedback(mySession);
 }
 
 /* ===== Coach Feedback ===== */
@@ -747,8 +826,8 @@ function listenForUser(mySession, maxTotalMs){
         if (timeSinceLastSpeech >= SILENCE_BEFORE_STOP_MS) {
           // User has been silent long enough — they're done.
           finish('browser_stopped_after_silence');
-        } else if (!accumulatedTranscript && !currentInterim && restartCount >= 2) {
-          // No speech captured in 2 attempts — user probably not speaking
+        } else if (!accumulatedTranscript && !currentInterim && restartCount >= MAX_RESTARTS) {
+          // No speech captured in max attempts — user probably not speaking
           finish('no_speech_after_retries');
         } else {
           // User is still mid-thought — restart recognition quickly
