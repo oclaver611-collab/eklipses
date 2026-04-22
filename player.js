@@ -311,6 +311,11 @@ async function speak(text, speaker) {
 
         await KokoroSpeech.speak(text, voice);
         clearInterval(pollId);
+        // Audio done — pause video so lips stop moving during silence
+        const doneEl = els.media;
+        if (doneEl && doneEl.tagName === 'VIDEO') {
+          try { doneEl.pause(); doneEl.currentTime = 0; } catch(e) {}
+        }
       })(),
       new Promise((_, reject) => {
         const checker = setInterval(() => {
