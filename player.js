@@ -106,7 +106,7 @@ let SELECTED_AVATAR_SET = null;
 const AVATARS = {
   Daniel:     { type: "video", src: "bella9.mp4" },
   Mary:       { type: "video", src: "bella1.mp4" },
-  Ryan:       { type: "img",   src: "ryan.jpg" },
+  Ryan:       { type: "video", src: "Ryan.mp4" },
   User_Prompt:{ type: "video", src: "bella9.mp4" }
 };
 
