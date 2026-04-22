@@ -151,14 +151,8 @@ function stopEverything() {
   // STEP 2 — Cancel Kokoro's internal speech queue
   try { if (typeof KokoroSpeech !== 'undefined') KokoroSpeech.cancel(); } catch (e) {}
 
-  // STEP 3 — Suspend all tracked AudioContexts (stops Web Audio playback)
-  try {
-    __audioContexts.forEach(ctx => {
-      try {
-        if (ctx.state === 'running') ctx.suspend();
-      } catch (e) {}
-    });
-  } catch (e) {}
+  // STEP 3 — AudioContext suspension removed: suspending AudioContexts
+  // blocks Chrome's speech recognition mic input, causing instant 0.0s failures.
 
   // STEP 4 — Stop any in-flight speech recognition
   if (rec) {
@@ -269,7 +263,7 @@ async function speak(text, speaker) {
 
   try {
     __audioContexts.forEach(ctx => {
-      try { if (ctx.state === 'suspended') ctx.resume(); } catch (e) {}
+      // AudioContext resume removed
     });
   } catch (e) {}
 
