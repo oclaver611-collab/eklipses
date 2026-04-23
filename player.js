@@ -106,7 +106,7 @@ let SELECTED_AVATAR_SET = null;
 const AVATARS = {
   Daniel:     { type: "video", src: "bella9.mp4" },
   Mary:       { type: "video", src: "bella1.mp4" },
-  Ryan:       { type: "video", src: "Ryan.mp4" },
+  Ryan:       { type: "orb" },
   User_Prompt:{ type: "video", src: "bella9.mp4" }
 };
 
@@ -188,65 +188,154 @@ function initMediaElements() {
   // No-op: we no longer pre-create elements. setMediaForSpeaker handles everything.
 }
 
+/* ===== Ryan Orb — animated voice indicator ===== */
+// Injected once into the DOM, reused for all Ryan turns
+let _ryanOrbEl = null;
+let _ryanOrbAnimFrame = null;
+let _ryanOrbT = 0;
+
+function getRyanOrb() {
+  if (_ryanOrbEl) return _ryanOrbEl;
+  const div = document.createElement('div');
+  div.id = 'ryan-orb';
+  div.innerHTML = `
+    <style>
+      #ryan-orb {
+        display:flex; flex-direction:column; align-items:center; justify-content:center;
+        width:100%; height:440px; gap:14px;
+      }
+      #ryan-orb .ro-wrap { position:relative; width:110px; height:110px; display:flex; align-items:center; justify-content:center; }
+      #ryan-orb .ro-ring { position:absolute; border-radius:50%; border:1.5px solid #378ADD; opacity:0; transition:opacity 0.2s; }
+      #ryan-orb .ro-ring1 { width:110px; height:110px; }
+      #ryan-orb .ro-ring2 { width:130px; height:130px; }
+      #ryan-orb .ro-ring3 { width:152px; height:152px; }
+      #ryan-orb .ro-orb  { width:80px; height:80px; border-radius:50%; background:#378ADD; display:flex; align-items:center; justify-content:center; position:relative; z-index:2; }
+      #ryan-orb .ro-inner{ width:54px; height:54px; border-radius:50%; background:#185FA5; display:flex; align-items:center; justify-content:center; }
+      #ryan-orb .ro-lbl  { font-size:15px; font-weight:600; color:#B5D4F4; letter-spacing:0.1em; }
+      #ryan-orb .ro-name { font-size:14px; color:#9aa4b2; letter-spacing:0.05em; }
+      #ryan-orb .ro-bars { display:flex; align-items:flex-end; gap:3px; height:32px; }
+      #ryan-orb .ro-bar  { width:4px; background:#378ADD; border-radius:2px; min-height:4px; }
+    </style>
+    <div class="ro-wrap">
+      <div class="ro-ring ro-ring1" id="roR1"></div>
+      <div class="ro-ring ro-ring2" id="roR2"></div>
+      <div class="ro-ring ro-ring3" id="roR3"></div>
+      <div class="ro-orb" id="roOrb">
+        <div class="ro-inner"><span class="ro-lbl">R</span></div>
+      </div>
+    </div>
+    <div class="ro-bars" id="roBars"></div>
+    <div class="ro-name">Ryan</div>
+  `;
+  // Build bars
+  const barsEl = div.querySelector('#roBars');
+  for (let i = 0; i < 18; i++) {
+    const b = document.createElement('div');
+    b.className = 'ro-bar';
+    b.style.height = '4px';
+    barsEl.appendChild(b);
+  }
+  return div;
+}
+
+function ryanOrbSetState(state) {
+  // state: 'silent' | 'speaking' | 'listening'
+  const orb = document.getElementById('ryan-orb');
+  if (!orb) return;
+  cancelAnimationFrame(_ryanOrbAnimFrame);
+  _ryanOrbT = 0;
+
+  const orbEl  = orb.querySelector('#roOrb');
+  const r1     = orb.querySelector('#roR1');
+  const r2     = orb.querySelector('#roR2');
+  const r3     = orb.querySelector('#roR3');
+  const bars   = orb.querySelectorAll('.ro-bar');
+
+  function tick() {
+    _ryanOrbT += 0.08;
+    const t = _ryanOrbT;
+
+    if (state === 'speaking') {
+      const amp = 0.5 + 0.5 * Math.sin(t * 1.2);
+      bars.forEach((b, i) => {
+        const wave = Math.sin(t * 2.5 + i * 0.5) * 0.5 + 0.5;
+        b.style.height = Math.round(6 + wave * 22 * amp) + 'px';
+        b.style.background = '#378ADD';
+      });
+      const scale = (1 + 0.06 * Math.sin(t * 2.5)).toFixed(3);
+      orbEl.style.transform = `scale(${scale})`;
+      r1.style.opacity = (0.25 + 0.25 * Math.sin(t * 1.8)).toFixed(3);
+      r2.style.opacity = (0.15 + 0.15 * Math.sin(t * 1.8)).toFixed(3);
+      r3.style.opacity = (0.08 + 0.08 * Math.sin(t * 1.8)).toFixed(3);
+    } else if (state === 'listening') {
+      bars.forEach((b, i) => {
+        const wave = Math.sin(t * 1.2 + i * 0.4) * 0.5 + 0.5;
+        b.style.height = Math.round(4 + wave * 9) + 'px';
+        b.style.background = '#9FE1CB';
+      });
+      orbEl.style.transform = 'scale(1)';
+      r1.style.opacity = '0.12';
+      r2.style.opacity = '0';
+      r3.style.opacity = '0';
+    } else {
+      bars.forEach(b => { b.style.height = '4px'; b.style.background = '#378ADD'; });
+      orbEl.style.transform = 'scale(1)';
+      r1.style.opacity = '0';
+      r2.style.opacity = '0';
+      r3.style.opacity = '0';
+    }
+    _ryanOrbAnimFrame = requestAnimationFrame(tick);
+  }
+  tick();
+}
+
 function setMediaForSpeaker(speaker) {
   const asset = AVATARS[speaker] || AVATARS.Ryan;
   const current = els.media;
   if (!current) return;
 
-  // If same speaker and same src, nothing to do
-  if (_lastSpeaker === speaker) {
-    // For video, make sure it's playing
-    if (asset.type === 'video' && current.tagName === 'VIDEO') {
-      try { current.play().catch(() => {}); } catch (e) {}
-    }
-    return;
-  }
-  _lastSpeaker = speaker;
-
-  if (asset.type === 'img') {
-    // Ryan — swap to an <img> element
-    if (current.tagName !== 'IMG') {
-      // Currently showing a video — replace with img
+  if (asset.type === 'orb') {
+    // Ryan — swap to orb div if not already showing it
+    if (current.id !== 'ryan-orb') {
       if (current.tagName === 'VIDEO') {
         try { current.pause(); current.src = ''; } catch (e) {}
       }
-      const img = document.createElement('img');
-      img.id = 'media';
-      img.className = current.className;
-      img.alt = 'Ryan';
-      img.src = asset.src;
-      img.style.cssText = current.style.cssText || 'width:100%;height:440px;object-fit:cover;';
-      current.replaceWith(img);
-      els.media = img;
-    } else {
-      // Already an img — just update src
-      current.src = asset.src;
+      const orbEl = getRyanOrb();
+      current.replaceWith(orbEl);
+      els.media = orbEl;
+      _ryanOrbEl = orbEl;
     }
+    if (_lastSpeaker !== speaker) ryanOrbSetState('silent');
+    _lastSpeaker = speaker;
+    return;
+  }
+
+  // If switching away from orb, stop its animation
+  if (_ryanOrbAnimFrame) { cancelAnimationFrame(_ryanOrbAnimFrame); _ryanOrbAnimFrame = null; }
+
+  _lastSpeaker = speaker;
+
+  // Mary / Daniel / User_Prompt — swap to a <video> element
+  if (current.tagName !== 'VIDEO') {
+    const vid = document.createElement('video');
+    vid.id = 'media';
+    vid.className = current.className || '';
+    vid.autoplay = true;
+    vid.loop = true;
+    vid.muted = true;
+    vid.playsInline = true;
+    vid.style.cssText = 'width:100%;height:440px;object-fit:cover;';
+    vid.src = asset.src;
+    current.replaceWith(vid);
+    els.media = vid;
+    vid.load();
+    try { vid.play().catch(() => {}); } catch (e) {}
   } else {
-    // Mary / Daniel / User_Prompt — swap to a <video> element
-    if (current.tagName !== 'VIDEO') {
-      // Currently showing an img — replace with video
-      const vid = document.createElement('video');
-      vid.id = 'media';
-      vid.className = current.className;
-      vid.autoplay = true;
-      vid.loop = true;
-      vid.muted = true;
-      vid.playsInline = true;
-      vid.style.cssText = current.style.cssText || 'width:100%;height:440px;object-fit:cover;';
-      vid.src = asset.src;
-      current.replaceWith(vid);
-      els.media = vid;
-      vid.load();
-      try { vid.play().catch(() => {}); } catch (e) {}
-    } else {
-      // Already a video — update src if needed
-      if ((current.getAttribute('src') || '') !== asset.src) {
-        current.src = asset.src;
-        current.load();
-      }
-      try { current.play().catch(() => {}); } catch (e) {}
+    if ((current.getAttribute('src') || '') !== asset.src) {
+      current.src = asset.src;
+      current.load();
     }
+    try { current.play().catch(() => {}); } catch (e) {}
   }
 }
 
@@ -278,6 +367,10 @@ async function speak(text, speaker) {
   const mediaEl = els.media;
   if (mediaEl && mediaEl.tagName === 'VIDEO') {
     try { mediaEl.pause(); mediaEl.currentTime = 0; } catch (e) {}
+  }
+  // If Ryan orb — start speaking animation immediately
+  if (speaker === 'Ryan' && mediaEl && mediaEl.id === 'ryan-orb') {
+    ryanOrbSetState('speaking');
   }
 
   if (mySession !== session) return;
@@ -315,6 +408,10 @@ async function speak(text, speaker) {
         const doneEl = els.media;
         if (doneEl && doneEl.tagName === 'VIDEO') {
           try { doneEl.pause(); doneEl.currentTime = 0; } catch(e) {}
+        }
+        // Audio done — stop Ryan orb animation
+        if (doneEl && doneEl.id === 'ryan-orb') {
+          ryanOrbSetState('silent');
         }
       })(),
       new Promise((_, reject) => {
@@ -386,7 +483,12 @@ function createRecognition() {
   r.lang = 'en-US'; r.interimResults = false; r.maxAlternatives = 1;
   return r;
 }
-function showListening(on=true){ els.listenPill.style.display = on ? 'block' : 'none'; }
+function showListening(on=true){
+  els.listenPill.style.display = on ? 'block' : 'none';
+  // Also animate Ryan orb if it's visible
+  const orbEl = document.getElementById('ryan-orb');
+  if (orbEl) ryanOrbSetState(on ? 'listening' : 'silent');
+}
 
 /* ===== Scenario engine ===== */
 async function playScenario(key, practice=false) {
