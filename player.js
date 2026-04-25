@@ -128,14 +128,14 @@ const AVATARS = {
   Daniel:     { type: "video", src: "bella9.mp4" },
   Mary:       { type: "video", src: "bella1.mp4" },
   Ryan:       { type: "orb" },
-  User_Prompt:{ type: "video", src: "bella1.mp4" } // always same as Mary
+  User_Prompt:{ type: "video", src: "bella9.mp4" } // idle/listening video
 };
 
 function applyAvatarSet(set) {
   SELECTED_AVATAR_SET = set;
   if (set?.maryVideo) {
     AVATARS.Mary.src        = set.maryVideo;
-    AVATARS.User_Prompt.src = set.maryVideo; // keep in sync with Mary
+    AVATARS.User_Prompt.src = set.danielVideo; // idle = same as Daniel
   }
   if (set?.danielVideo) AVATARS.Daniel.src = set.danielVideo;
 }
