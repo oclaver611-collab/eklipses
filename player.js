@@ -39,19 +39,12 @@ function setSceneBackground(scenarioKey) {
   if (!bgEl || !frameEl) return;
 
   if (bgSrc) {
-    if ((bgEl.getAttribute('src') || bgEl.currentSrc || '') !== bgSrc) {
-      bgEl.src = bgSrc;
-      if (bgEl.tagName === 'VIDEO') {
-        bgEl.load();
-        bgEl.play().catch(() => {});
-      }
-    }
+    bgEl.src = bgSrc;
     bgEl.classList.remove('hidden');
     frameEl.classList.add('has-bg');
   } else {
     bgEl.classList.add('hidden');
-    if (bgEl.tagName === 'VIDEO') { bgEl.pause(); bgEl.src = ''; }
-    else bgEl.src = '';
+    bgEl.src = '';
     frameEl.classList.remove('has-bg');
   }
 }
@@ -393,12 +386,9 @@ async function speak(text, speaker) {
     });
   } catch (e) {}
 
-  // Set media but pause video immediately — sync it to audio start below
+  // Set media for this speaker
   setMediaForSpeaker(speaker);
   const mediaEl = els.media;
-  if (mediaEl && mediaEl.tagName === 'VIDEO') {
-    try { mediaEl.pause(); mediaEl.currentTime = 0; } catch (e) {}
-  }
   // If Ryan orb — start speaking animation immediately
   if (speaker === 'Ryan' && mediaEl && mediaEl.id === 'ryan-orb') {
     ryanOrbSetState('speaking');
@@ -435,12 +425,8 @@ async function speak(text, speaker) {
 
         await KokoroSpeech.speak(text, voice);
         clearInterval(pollId);
-        // Audio done — pause video so lips stop moving during silence
+        // Stop Ryan orb animation when done speaking
         const doneEl = els.media;
-        if (doneEl && doneEl.tagName === 'VIDEO') {
-          try { doneEl.pause(); doneEl.currentTime = 0; } catch(e) {}
-        }
-        // Audio done — stop Ryan orb animation
         if (doneEl && doneEl.id === 'ryan-orb') {
           ryanOrbSetState('silent');
         }
