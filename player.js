@@ -26,7 +26,28 @@ const els = {
   likeBtn: document.getElementById('likeBtn'),
   likeCount: document.getElementById('likeCount'),
   viewCount: document.getElementById('viewCount'),
+  sceneBg: document.getElementById('sceneBg'),
+  stageFrame: document.getElementById('stageFrame'),
 };
+
+/* ===== Scenario Background ===== */
+function setSceneBackground(scenarioKey) {
+  const sc = SCENARIOS[scenarioKey] || {};
+  const bgSrc = sc.bg || null;
+  const bgEl = els.sceneBg;
+  const frameEl = els.stageFrame;
+  if (!bgEl || !frameEl) return;
+
+  if (bgSrc) {
+    bgEl.src = bgSrc;
+    bgEl.classList.remove('hidden');
+    frameEl.classList.add('has-bg');
+  } else {
+    bgEl.classList.add('hidden');
+    bgEl.src = '';
+    frameEl.classList.remove('has-bg');
+  }
+}
 
 /* ============================================================
    Metrics (likes & views) — persisted locally (no server)
@@ -507,6 +528,9 @@ async function playScenario(key, practice=false) {
   // update view count + UI for this scenario
   Metrics.bumpView(key);
   Metrics.refreshUI(key);
+
+  // Set scenario-specific background if defined
+  setSceneBackground(key);
 
   const sc = SCENARIOS[key];
   if (!sc) return;
