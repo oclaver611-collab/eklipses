@@ -39,12 +39,19 @@ function setSceneBackground(scenarioKey) {
   if (!bgEl || !frameEl) return;
 
   if (bgSrc) {
-    bgEl.src = bgSrc;
+    if ((bgEl.getAttribute('src') || bgEl.currentSrc || '') !== bgSrc) {
+      bgEl.src = bgSrc;
+      if (bgEl.tagName === 'VIDEO') {
+        bgEl.load();
+        bgEl.play().catch(() => {});
+      }
+    }
     bgEl.classList.remove('hidden');
     frameEl.classList.add('has-bg');
   } else {
     bgEl.classList.add('hidden');
-    bgEl.src = '';
+    if (bgEl.tagName === 'VIDEO') { bgEl.pause(); bgEl.src = ''; }
+    else bgEl.src = '';
     frameEl.classList.remove('has-bg');
   }
 }

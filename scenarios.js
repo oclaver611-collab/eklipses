@@ -30,7 +30,7 @@ window.SCENARIOS = {
   beach: {
     title: "Scenario2: dating on the beach",
     thumb: "beach.jpg",
-    bg: "beach_bg.jpg",
+    bg: "beach_bg.mp4",
     demo: [
       { speaker:"Ryan",   text:"New scenario: you're on a quiet beach path. Watch and listen first." },
       { speaker:"Daniel", text:"Hey, sorry to bother you—I'm heading for an iced coffee and your beach hat is iconic. Had to say hello." },
