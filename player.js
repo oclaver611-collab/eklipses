@@ -561,6 +561,8 @@ async function playLoop(mySession) {
               stepIndex++;
             }
             await speak(dynamicReply, 'Mary');
+            // Restore idle/listening video after Mary speaks
+            setMediaForSpeaker('User_Prompt');
             // FIX: Skip any Ryan coaching lines that follow — they were scripted
             // for context before Mary's reply, now out of date because Mary
             // took the conversation dynamically. Advance until next User_Prompt
@@ -587,6 +589,8 @@ async function playLoop(mySession) {
               "Hmm, I didn't quite catch that.",
               "What was that?"
             ]), 'Mary');
+            // Restore idle/listening video after Mary speaks
+            setMediaForSpeaker('User_Prompt');
           }
         } else {
           if (similarity(said, line.text) >= 0.4) {
