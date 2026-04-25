@@ -365,6 +365,13 @@ function setMediaForSpeaker(speaker) {
 
 function renderLine(line) {
   setMediaForSpeaker(line.speaker);
+  // When it's the user's turn — pause the video so Mary isn't lip-flapping
+  if (line.speaker === 'User_Prompt') {
+    const mediaEl = els.media;
+    if (mediaEl && mediaEl.tagName === 'VIDEO') {
+      try { mediaEl.pause(); mediaEl.currentTime = 0; } catch (e) {}
+    }
+  }
   els.name.textContent = (line.speaker === 'User_Prompt') ? 'Your Turn' : line.speaker;
   if (line.speaker === 'User_Prompt') {
     els.text.innerHTML =
