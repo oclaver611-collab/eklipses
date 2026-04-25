@@ -133,11 +133,11 @@ const AVATARS = {
 
 function applyAvatarSet(set) {
   SELECTED_AVATAR_SET = set;
-  if (set?.maryVideo) {
-    AVATARS.Mary.src        = set.maryVideo;
+  if (set?.maryVideo)   AVATARS.Mary.src        = set.maryVideo;
+  if (set?.danielVideo) {
+    AVATARS.Daniel.src      = set.danielVideo;
     AVATARS.User_Prompt.src = set.danielVideo; // idle = same as Daniel
   }
-  if (set?.danielVideo) AVATARS.Daniel.src = set.danielVideo;
 }
 
 /* ===== Utility ===== */
@@ -365,13 +365,6 @@ function setMediaForSpeaker(speaker) {
 
 function renderLine(line) {
   setMediaForSpeaker(line.speaker);
-  // When it's the user's turn — pause the video so Mary isn't lip-flapping
-  if (line.speaker === 'User_Prompt') {
-    const mediaEl = els.media;
-    if (mediaEl && mediaEl.tagName === 'VIDEO') {
-      try { mediaEl.pause(); mediaEl.currentTime = 0; } catch (e) {}
-    }
-  }
   els.name.textContent = (line.speaker === 'User_Prompt') ? 'Your Turn' : line.speaker;
   if (line.speaker === 'User_Prompt') {
     els.text.innerHTML =
