@@ -11,7 +11,7 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { text, voice = 'leah' } = req.body || {};
+  const { text, voice = 'nova' } = req.body || {};
 
   if (!text?.trim()) {
     return res.status(400).json({ error: 'No text provided' });
@@ -23,14 +23,11 @@ module.exports = async function handler(req, res) {
 
   // Map OpenAI voice names → Groq Orpheus voices
   const VOICE_MAP = {
-    nova:    'jessica', // Mary  — warm female
-    leah:    'jessica', // fallback
-    onyx:    'daniel',  // Daniel — deep male
-    daniel:  'daniel',  // already correct
-    echo:    'troy',    // Ryan  — clear male
-    troy:    'troy',    // already correct
+    nova:  'leah',     // Mary — warm female
+    onyx:  'austin',   // Daniel — deep male
+    echo:  'thaddeus', // Ryan — clear male
   };
-  const groqVoice = VOICE_MAP[voice] || 'jessica';
+  const groqVoice = VOICE_MAP[voice] || 'leah';
 
   try {
     const response = await fetch('https://api.groq.com/openai/v1/audio/speech', {
