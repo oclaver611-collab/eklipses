@@ -24,8 +24,8 @@ module.exports = async function handler(req, res) {
   // Map OpenAI voice names → Groq Orpheus voices
   const VOICE_MAP = {
     nova:  'leah',     // Mary — warm female
-    onyx:  'austin',   // Daniel — deep male
-    echo:  'thaddeus', // Ryan — clear male
+    onyx:  'daniel',   // Daniel — deep male
+    echo:  'troy', // Ryan — clear male
   };
   const groqVoice = VOICE_MAP[voice] || 'leah';
 
