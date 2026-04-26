@@ -23,14 +23,14 @@ module.exports = async function handler(req, res) {
 
   // Map OpenAI voice names → Groq Orpheus voices
   const VOICE_MAP = {
-    nova:    'leah',    // Mary  — warm female
-    leah:    'leah',    // already correct
+    nova:    'jessica', // Mary  — warm female
+    leah:    'jessica', // fallback
     onyx:    'daniel',  // Daniel — deep male
     daniel:  'daniel',  // already correct
     echo:    'troy',    // Ryan  — clear male
     troy:    'troy',    // already correct
   };
-  const groqVoice = VOICE_MAP[voice] || 'leah';
+  const groqVoice = VOICE_MAP[voice] || 'jessica';
 
   try {
     const response = await fetch('https://api.groq.com/openai/v1/audio/speech', {
