@@ -719,6 +719,9 @@ async function freeConversation(mySession) {
     } else {
       await speak(randomChoice(["Sorry, say that again?", "Hmm, I didn't quite catch that.", "What was that?"]), 'Mary');
     }
+    // Restore idle/listening video — user's turn to speak
+    setMediaForSpeaker('User_Prompt');
+    els.name.textContent = 'Your Turn';
     if (mySession !== session) return;
     await pause(200);
   }
