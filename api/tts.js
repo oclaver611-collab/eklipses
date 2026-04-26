@@ -11,7 +11,7 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { text, voice = 'nova' } = req.body || {};
+  const { text, voice = 'leah' } = req.body || {};
 
   if (!text?.trim()) {
     return res.status(400).json({ error: 'No text provided' });
@@ -23,9 +23,12 @@ module.exports = async function handler(req, res) {
 
   // Map OpenAI voice names → Groq Orpheus voices
   const VOICE_MAP = {
-    nova:  'leah',     // Mary — warm female
-    onyx:  'daniel',   // Daniel — deep male
-    echo:  'troy', // Ryan — clear male
+    nova:    'leah',    // Mary  — warm female
+    leah:    'leah',    // already correct
+    onyx:    'daniel',  // Daniel — deep male
+    daniel:  'daniel',  // already correct
+    echo:    'troy',    // Ryan  — clear male
+    troy:    'troy',    // already correct
   };
   const groqVoice = VOICE_MAP[voice] || 'leah';
 
