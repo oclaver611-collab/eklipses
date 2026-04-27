@@ -228,7 +228,7 @@ function createRecognition() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) return null;
   const r = new SR();
-  r.lang = 'en-US'; r.interimResults = false; r.maxAlternatives = 1;
+  r.lang = 'en-US'; r.interimResults = false; r.maxAlternatives = 1; r.continuous = false;
   return r;
 }
 function showListening(on=true){ els.listenPill.style.display = on ? 'block' : 'none'; }
@@ -424,18 +424,55 @@ async function runFreeConversationLoop(mySession, isColdOpen) {
 
 function listenForUserTimed(mySession, timeoutMs) {
   return new Promise((resolve) => {
-    const r = createRecognition();
-    if (!r) return resolve(null);
+    if (mySession !== session) return resolve(null);
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return resolve(null);
+    const r = new SR();
+    r.lang = 'en-US'; r.interimResults = false; r.maxAlternatives = 1;
     rec = r;
-    listenTimer = setTimeout(() => { try { r.stop(); } catch {} }, timeoutMs);
-    r.onresult = (e) => {
-      if (mySession !== session) return resolve(null);
+    let done = false;
+    let restartCount = 0;
+    const maxRestarts = 3;
+
+    const finish = (val) => {
+      if (done) return;
+      done = true;
       clearTimeout(listenTimer);
-      resolve(e.results[0][0].transcript.trim());
+      showListening(false);
+      resolve(val);
     };
-    r.onerror = () => { clearTimeout(listenTimer); resolve(null); };
-    r.onend   = () => { resolve(null); };
-    try { r.start(); } catch { resolve(null); }
+
+    listenTimer = setTimeout(() => {
+      try { r.stop(); } catch {}
+      finish(null);
+    }, timeoutMs);
+
+    r.onresult = (e) => {
+      if (mySession !== session) return finish(null);
+      const transcript = e.results[0][0].transcript.trim();
+      if (transcript) finish(transcript);
+    };
+
+    r.onerror = (e) => {
+      if (e.error === 'no-speech' && restartCount < maxRestarts && !done && mySession === session) {
+        restartCount++;
+        try { r.start(); } catch { finish(null); }
+      } else {
+        finish(null);
+      }
+    };
+
+    r.onend = () => {
+      // Only auto-restart if we haven't timed out and got no result yet
+      if (!done && restartCount < maxRestarts && mySession === session) {
+        restartCount++;
+        try { r.start(); } catch { finish(null); }
+      } else {
+        finish(null);
+      }
+    };
+
+    try { r.start(); } catch { finish(null); }
   });
 }
 
