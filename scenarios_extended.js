@@ -20,6 +20,7 @@
 
 // --- 1. Behavioral Interview — STAR Method ---
 SCENARIOS.interview_behavioral = {
+  bg: "interview_bg.jpg",
   title: "Behavioral Interview: Master the STAR Method",
   thumb: "interview_office.jpg",
   category: "interview",
@@ -72,6 +73,7 @@ SCENARIOS.interview_behavioral = {
 
 // --- 2. Salary Negotiation — Anchor High, Stay Calm ---
 SCENARIOS.interview_salary = {
+  bg: "interview_bg.jpg",
   title: "Salary Negotiation: Anchor High, Stay Calm",
   thumb: "interview_negotiation.jpg",
   category: "interview",
@@ -124,6 +126,7 @@ SCENARIOS.interview_salary = {
 
 // --- 3. The Stress Interview — Composure Under Pressure ---
 SCENARIOS.interview_stress = {
+  bg: "interview_bg.jpg",
   title: "The Stress Test: Composure Under Hostile Questioning",
   thumb: "interview_boardroom.jpg",
   category: "interview",
@@ -180,6 +183,7 @@ SCENARIOS.interview_stress = {
 
 // --- 4. The Weakness Trap — Reframe Without Lying ---
 SCENARIOS.interview_weakness = {
+  bg: "interview_bg.jpg",
   title: "The Weakness Trap: Reframe Without Lying",
   thumb: "interview_friendly.jpg",
   category: "interview",
@@ -222,6 +226,7 @@ SCENARIOS.interview_weakness = {
 
 // --- 5. Counter-Offer Showdown ---
 SCENARIOS.interview_counter = {
+  bg: "interview_bg.jpg",
   title: "Counter-Offer Showdown: Hold Your Value",
   thumb: "interview_handshake.jpg",
   category: "interview",
@@ -275,6 +280,7 @@ SCENARIOS.interview_counter = {
 
 // --- 1. Gaslighting Defense ---
 SCENARIOS.darkpsych_gaslight = {
+  bg: "livingroom_bg.jpg",
   title: "Gaslighting Defense: Don't Doubt Your Reality",
   thumb: "darkpsych_livingroom.jpg",
   category: "dark_psychology",
@@ -328,6 +334,7 @@ SCENARIOS.darkpsych_gaslight = {
 
 // --- 2. DARVO — Deny, Attack, Reverse Victim and Offender ---
 SCENARIOS.darkpsych_darvo = {
+  bg: "livingroom_bg.jpg",
   title: "DARVO Decoded: When They Flip the Script",
   thumb: "darkpsych_cafe.jpg",
   category: "dark_psychology",
@@ -375,6 +382,7 @@ SCENARIOS.darkpsych_darvo = {
 
 // --- 3. Narcissist Boss — The Unfair Review ---
 SCENARIOS.darkpsych_narc_boss = {
+  bg: "office_bg.jpg",
   title: "Narcissist Boss: The Unfair Performance Review",
   thumb: "darkpsych_boss_office.jpg",
   category: "dark_psychology",
@@ -427,6 +435,7 @@ SCENARIOS.darkpsych_narc_boss = {
 
 // --- 4. Love Bombing Red Flags ---
 SCENARIOS.darkpsych_lovebomb = {
+  bg: "livingroom_bg.jpg",
   title: "Love Bombing Red Flags: Slow Down Safely",
   thumb: "darkpsych_date.jpg",
   category: "dark_psychology",
@@ -475,6 +484,7 @@ SCENARIOS.darkpsych_lovebomb = {
 
 // --- 5. The Guilt Trip — Family Boundaries ---
 SCENARIOS.darkpsych_guilt = {
+  bg: "livingroom_bg.jpg",
   title: "The Guilt Trip: Holding Boundaries with Family",
   thumb: "darkpsych_family_dinner.jpg",
   category: "dark_psychology",

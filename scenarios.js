@@ -2,6 +2,7 @@ window.SCENARIOS = {
   street_intro: {
     title: "Street Introduction (Demo + Practice)",
     thumb: "street.jpg",
+    bg: "street_bg.jpg",
     // seedLikes: 3, seedViews: 42, // optional starting numbers
     demo: [
       { speaker:"Ryan",   text:"Hi, I'm Ryan, a dating coach. Watch this example conversation first." },
@@ -53,6 +54,7 @@ window.SCENARIOS = {
   bar: {
     title: "Scenario3: dating at bar",
     thumb: "bar.jpg",
+    bg: "bar_bg.jpg",
     demo: [
       { speaker:"Ryan",   text:"New scenario: a busy bar, moderate noise. Watch the flow first." },
       { speaker:"Daniel", text:"Hey—quick question. Do you think that neon sign is ironically cool, or just bad?" },
@@ -75,6 +77,7 @@ window.SCENARIOS = {
   museum: {
     title: "Scenario4: dating at the museum",
     thumb: "museum.jpg",
+    bg: "museum_bg.jpg",
     demo: [
       { speaker:"Ryan",   text:"New scenario: a museum gallery—quiet tone." },
       { speaker:"Daniel", text:"Hey—sorry, quick thought. That sculpture looks like it wants a nap." },
@@ -99,6 +102,7 @@ window.SCENARIOS = {
 SCENARIOS.wedding = {
   title: "Wedding Reception — Warm Approach",
   thumb: "wedding.jpg",
+  bg: "wedding_bg.jpg",
   demo: [
     { speaker: "Ryan",   text: "Watch this smooth, respectful intro at a wedding." },
     { speaker: "Daniel", text: "Hey—congrats to the happy couple! I’m Daniel. How do you know them?" },
@@ -121,6 +125,7 @@ SCENARIOS.wedding = {
 SCENARIOS.bookstore_extended = {
   title: "Bookstore Encounter — Shared Curiosity (Extended Edition)",
   thumb: "bookstore.jpg",
+  bg: "bookstore_bg.jpg",
   demo: [
     { speaker:"Ryan",   text:"You’re in a cozy downtown bookstore. Low jazz playing, soft lamp lighting, smell of old paper. You notice a woman browsing the same shelf — psychology and philosophy." },
     { speaker:"Ryan",   text:"This one’s about micro-progressions — small, stacked wins. Watch how Daniel moves from curiosity to connection." },
@@ -197,6 +202,7 @@ SCENARIOS.bookstore_extended = {
 SCENARIOS.gym_sparks = {
   title: "Gym Sparks — The Unplanned Spot",
   thumb: "gym.jpg",
+  bg: "gym_bg.jpg",
   demo: [
     { speaker: "Ryan", text: "Scenario: a crowded gym, late afternoon. Music pumps, weights clank. You notice her struggling slightly on her last rep." },
     { speaker: "Daniel", text: "Need a spot?" },
