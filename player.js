@@ -26,28 +26,7 @@ const els = {
   likeBtn: document.getElementById('likeBtn'),
   likeCount: document.getElementById('likeCount'),
   viewCount: document.getElementById('viewCount'),
-  sceneBg: document.getElementById('sceneBg'),
-  stageFrame: document.getElementById('stageFrame'),
 };
-
-/* ===== Scenario Background ===== */
-function setSceneBackground(scenarioKey) {
-  const sc = SCENARIOS[scenarioKey] || {};
-  const bgSrc = sc.bg || null;
-  const bgEl = els.sceneBg;
-  const frameEl = els.stageFrame;
-  if (!bgEl || !frameEl) return;
-
-  if (bgSrc) {
-    bgEl.src = bgSrc;
-    bgEl.classList.remove('hidden');
-    frameEl.classList.add('has-bg');
-  } else {
-    bgEl.classList.add('hidden');
-    bgEl.src = '';
-    frameEl.classList.remove('has-bg');
-  }
-}
 
 /* ============================================================
    Metrics (likes & views) — persisted locally (no server)
@@ -127,64 +106,20 @@ let SELECTED_AVATAR_SET = null;
 const AVATARS = {
   Daniel:     { type: "video", src: "bella9.mp4" },
   Mary:       { type: "video", src: "bella1.mp4" },
-  Ryan:       { type: "orb" },
-  User_Prompt:{ type: "video", src: "bella9.mp4" } // idle/listening video
+  Ryan:       { type: "img",   src: "Ryan.jpg" },
+  User_Prompt:{ type: "video", src: "bella9.mp4" }
 };
 
 function applyAvatarSet(set) {
   SELECTED_AVATAR_SET = set;
-  if (set?.maryVideo)   AVATARS.Mary.src        = set.maryVideo;
-  if (set?.danielVideo) {
-    AVATARS.Daniel.src      = set.danielVideo;
-    AVATARS.User_Prompt.src = set.danielVideo; // idle = same as Daniel
-  }
+  if (set?.maryVideo)   AVATARS.Mary.src   = set.maryVideo;
+  if (set?.danielVideo) AVATARS.Daniel.src = set.danielVideo;
 }
 
 /* ===== Utility ===== */
-// Track AudioContexts so we can suspend them on stop
-const __audioContexts = [];
-if (typeof AudioContext !== 'undefined') {
-  const OriginalAudioContext = AudioContext;
-  window.AudioContext = function (...args) {
-    const ctx = new OriginalAudioContext(...args);
-    __audioContexts.push(ctx);
-    return ctx;
-  };
-  window.AudioContext.prototype = OriginalAudioContext.prototype;
-}
-
 function stopEverything() {
   session++;
-
-  // STEP 1 — Instantly silence all audio by muting it. Even if playback
-  // continues for a few ms in the background, the USER hears silence now.
-  try {
-    document.querySelectorAll('audio').forEach(a => {
-      try {
-        a.muted = true;
-        a.volume = 0;
-        a.pause();
-        a.currentTime = 0;
-        a.src = '';
-        // Remove from DOM entirely so it can't resume
-        if (a.parentNode) a.parentNode.removeChild(a);
-      } catch (e) {}
-    });
-  } catch (e) {}
-
-  // STEP 2 — Cancel Kokoro's internal speech queue
-  try { if (typeof KokoroSpeech !== 'undefined') KokoroSpeech.cancel(); } catch (e) {}
-
-  // STEP 3 — Suspend all tracked AudioContexts (stops Web Audio playback)
-  try {
-    __audioContexts.forEach(ctx => {
-      try {
-        if (ctx.state === 'running') ctx.suspend();
-      } catch (e) {}
-    });
-  } catch (e) {}
-
-  // STEP 4 — Stop any in-flight speech recognition
+  KokoroSpeech.cancel();
   if (rec) {
     try { rec.onresult = null; rec.onerror = null; rec.onend = null; rec.stop(); } catch {}
     rec = null;
@@ -203,163 +138,23 @@ function getKokoroVoice(speaker) {
 }
 
 /* ===== Media display ===== */
-// ============================================================
-// Media display — replaceWith() approach, one element at a time
-// ============================================================
-let _lastSpeaker = null;
-
-function initMediaElements() {
-  // No-op: we no longer pre-create elements. setMediaForSpeaker handles everything.
-}
-
-/* ===== Ryan Orb — animated voice indicator ===== */
-// Injected once into the DOM, reused for all Ryan turns
-let _ryanOrbEl = null;
-let _ryanOrbAnimFrame = null;
-let _ryanOrbT = 0;
-
-function getRyanOrb() {
-  if (_ryanOrbEl) return _ryanOrbEl;
-  const div = document.createElement('div');
-  div.id = 'ryan-orb';
-  div.innerHTML = `
-    <style>
-      #ryan-orb {
-        display:flex; flex-direction:column; align-items:center; justify-content:center;
-        width:100%; height:440px; gap:14px;
-      }
-      #ryan-orb .ro-wrap { position:relative; width:110px; height:110px; display:flex; align-items:center; justify-content:center; }
-      #ryan-orb .ro-ring { position:absolute; border-radius:50%; border:1.5px solid #378ADD; opacity:0; transition:opacity 0.2s; }
-      #ryan-orb .ro-ring1 { width:110px; height:110px; }
-      #ryan-orb .ro-ring2 { width:130px; height:130px; }
-      #ryan-orb .ro-ring3 { width:152px; height:152px; }
-      #ryan-orb .ro-orb  { width:80px; height:80px; border-radius:50%; background:#378ADD; display:flex; align-items:center; justify-content:center; position:relative; z-index:2; }
-      #ryan-orb .ro-inner{ width:54px; height:54px; border-radius:50%; background:#185FA5; display:flex; align-items:center; justify-content:center; }
-      #ryan-orb .ro-lbl  { font-size:15px; font-weight:600; color:#B5D4F4; letter-spacing:0.1em; }
-      #ryan-orb .ro-name { font-size:14px; color:#9aa4b2; letter-spacing:0.05em; }
-      #ryan-orb .ro-bars { display:flex; align-items:flex-end; gap:3px; height:32px; }
-      #ryan-orb .ro-bar  { width:4px; background:#378ADD; border-radius:2px; min-height:4px; }
-    </style>
-    <div class="ro-wrap">
-      <div class="ro-ring ro-ring1" id="roR1"></div>
-      <div class="ro-ring ro-ring2" id="roR2"></div>
-      <div class="ro-ring ro-ring3" id="roR3"></div>
-      <div class="ro-orb" id="roOrb">
-        <div class="ro-inner"><span class="ro-lbl">R</span></div>
-      </div>
-    </div>
-    <div class="ro-bars" id="roBars"></div>
-    <div class="ro-name">Ryan</div>
-  `;
-  // Build bars
-  const barsEl = div.querySelector('#roBars');
-  for (let i = 0; i < 18; i++) {
-    const b = document.createElement('div');
-    b.className = 'ro-bar';
-    b.style.height = '4px';
-    barsEl.appendChild(b);
-  }
-  return div;
-}
-
-function ryanOrbSetState(state) {
-  // state: 'silent' | 'speaking' | 'listening'
-  const orb = document.getElementById('ryan-orb');
-  if (!orb) return;
-  cancelAnimationFrame(_ryanOrbAnimFrame);
-  _ryanOrbT = 0;
-
-  const orbEl  = orb.querySelector('#roOrb');
-  const r1     = orb.querySelector('#roR1');
-  const r2     = orb.querySelector('#roR2');
-  const r3     = orb.querySelector('#roR3');
-  const bars   = orb.querySelectorAll('.ro-bar');
-
-  function tick() {
-    _ryanOrbT += 0.08;
-    const t = _ryanOrbT;
-
-    if (state === 'speaking') {
-      const amp = 0.5 + 0.5 * Math.sin(t * 1.2);
-      bars.forEach((b, i) => {
-        const wave = Math.sin(t * 2.5 + i * 0.5) * 0.5 + 0.5;
-        b.style.height = Math.round(6 + wave * 22 * amp) + 'px';
-        b.style.background = '#378ADD';
-      });
-      const scale = (1 + 0.06 * Math.sin(t * 2.5)).toFixed(3);
-      orbEl.style.transform = `scale(${scale})`;
-      r1.style.opacity = (0.25 + 0.25 * Math.sin(t * 1.8)).toFixed(3);
-      r2.style.opacity = (0.15 + 0.15 * Math.sin(t * 1.8)).toFixed(3);
-      r3.style.opacity = (0.08 + 0.08 * Math.sin(t * 1.8)).toFixed(3);
-    } else if (state === 'listening') {
-      bars.forEach((b, i) => {
-        const wave = Math.sin(t * 1.2 + i * 0.4) * 0.5 + 0.5;
-        b.style.height = Math.round(4 + wave * 9) + 'px';
-        b.style.background = '#9FE1CB';
-      });
-      orbEl.style.transform = 'scale(1)';
-      r1.style.opacity = '0.12';
-      r2.style.opacity = '0';
-      r3.style.opacity = '0';
-    } else {
-      bars.forEach(b => { b.style.height = '4px'; b.style.background = '#378ADD'; });
-      orbEl.style.transform = 'scale(1)';
-      r1.style.opacity = '0';
-      r2.style.opacity = '0';
-      r3.style.opacity = '0';
-    }
-    _ryanOrbAnimFrame = requestAnimationFrame(tick);
-  }
-  tick();
-}
-
 function setMediaForSpeaker(speaker) {
   const asset = AVATARS[speaker] || AVATARS.Ryan;
-  const current = els.media;
-  if (!current) return;
-
-  if (asset.type === 'orb') {
-    // Ryan — swap to orb div if not already showing it
-    if (current.id !== 'ryan-orb') {
-      if (current.tagName === 'VIDEO') {
-        try { current.pause(); current.src = ''; } catch (e) {}
-      }
-      const orbEl = getRyanOrb();
-      current.replaceWith(orbEl);
-      els.media = orbEl;
-      _ryanOrbEl = orbEl;
-    }
-    if (_lastSpeaker !== speaker) ryanOrbSetState('silent');
-    _lastSpeaker = speaker;
-    return;
-  }
-
-  // If switching away from orb, stop its animation
-  if (_ryanOrbAnimFrame) { cancelAnimationFrame(_ryanOrbAnimFrame); _ryanOrbAnimFrame = null; }
-
-  _lastSpeaker = speaker;
-
-  // Mary / Daniel / User_Prompt — swap to a <video> element
-  if (current.tagName !== 'VIDEO') {
-    const vid = document.createElement('video');
-    vid.id = 'media';
-    vid.className = current.className || '';
-    vid.autoplay = true;
-    vid.loop = true;
-    vid.muted = true;
-    vid.playsInline = true;
-    vid.style.cssText = 'width:100%;height:440px;object-fit:cover;';
-    vid.src = asset.src;
-    current.replaceWith(vid);
-    els.media = vid;
-    vid.load();
-    try { vid.play().catch(() => {}); } catch (e) {}
+  if (asset.type === 'video') {
+    const v = document.createElement('video');
+    v.src = asset.src;
+    v.className = 'media';
+    v.autoplay = true; v.loop = true; v.muted = true; v.playsInline = true;
+    els.media.replaceWith(v);
+    els.media = v;
   } else {
-    if ((current.getAttribute('src') || '') !== asset.src) {
-      current.src = asset.src;
-      current.load();
-    }
-    try { current.play().catch(() => {}); } catch (e) {}
+    const img = document.createElement('img');
+    img.src = asset.src;
+    img.className = 'media';
+    img.alt = speaker;
+    img.onerror = () => { img.style.display = 'none'; };
+    els.media.replaceWith(img);
+    els.media = img;
   }
 }
 
@@ -378,72 +173,9 @@ function renderLine(line) {
 
 /* ===== Speech synthesis — Kokoro JS ===== */
 async function speak(text, speaker) {
-  const mySession = session;
-
-  try {
-    __audioContexts.forEach(ctx => {
-      try { if (ctx.state === 'suspended') ctx.resume(); } catch (e) {}
-    });
-  } catch (e) {}
-
-  // Set media for this speaker
   setMediaForSpeaker(speaker);
-  const mediaEl = els.media;
-  // If Ryan orb — start speaking animation immediately
-  if (speaker === 'Ryan' && mediaEl && mediaEl.id === 'ryan-orb') {
-    ryanOrbSetState('speaking');
-  }
-
-  if (mySession !== session) return;
-
   const voice = getKokoroVoice(speaker);
-
-  try {
-    await Promise.race([
-      (async () => {
-        // Poll for AudioContext becoming active (signals audio is playing)
-        // then start the video to sync lips with audio
-        let videoStarted = false;
-        const syncVideo = () => {
-          if (!videoStarted && mySession === session) {
-            videoStarted = true;
-            const el = els.media;
-            if (el && el.tagName === 'VIDEO') {
-              try { el.play().catch(() => {}); } catch (e) {}
-            }
-          }
-        };
-        const pollId = setInterval(() => {
-          if (mySession !== session) { clearInterval(pollId); return; }
-          if (__audioContexts.some(c => c.state === 'running')) {
-            clearInterval(pollId);
-            syncVideo();
-          }
-        }, 30);
-        // Fallback: start video after 500ms regardless
-        setTimeout(() => { clearInterval(pollId); syncVideo(); }, 500);
-
-        await KokoroSpeech.speak(text, voice);
-        clearInterval(pollId);
-        // Stop Ryan orb animation when done speaking
-        const doneEl = els.media;
-        if (doneEl && doneEl.id === 'ryan-orb') {
-          ryanOrbSetState('silent');
-        }
-      })(),
-      new Promise((_, reject) => {
-        const checker = setInterval(() => {
-          if (mySession !== session) {
-            clearInterval(checker);
-            reject(new Error('session_changed'));
-          }
-        }, 50);
-        setTimeout(() => clearInterval(checker), 120000);
-      })
-    ]);
-  } catch (e) {}
-
-  if (mySession !== session) return;
+  return KokoroSpeech.speak(text, voice);
 }
 
 /* ===== Dynamic Mary (Claude API) ===== */
@@ -472,7 +204,6 @@ async function getDynamicMaryResponse(userSaid) {
         userMessage: userSaid,
         scenarioTitle: sc.title || '',
         scenarioSetting: sc.setting || '',
-        scenarioKey: currentScenarioKey,
         history: conversationHistory,
       }),
       signal: controller.signal,
@@ -500,23 +231,12 @@ function createRecognition() {
   r.lang = 'en-US'; r.interimResults = false; r.maxAlternatives = 1;
   return r;
 }
-function showListening(on=true){
-  els.listenPill.style.display = on ? 'block' : 'none';
-  // Also animate Ryan orb if it's visible
-  const orbEl = document.getElementById('ryan-orb');
-  if (orbEl) ryanOrbSetState(on ? 'listening' : 'silent');
-}
+function showListening(on=true){ els.listenPill.style.display = on ? 'block' : 'none'; }
 
 /* ===== Scenario engine ===== */
 async function playScenario(key, practice=false) {
   stopEverything();
   resetConversation();
-
-  // Give the kill sequence a brief moment to settle before new audio starts.
-  // This prevents the very tail end of previous audio from overlapping with
-  // the start of this scenario's first line.
-  await new Promise(r => setTimeout(r, 200));
-
   const mySession = session;
 
   currentScenarioKey = key;
@@ -524,9 +244,6 @@ async function playScenario(key, practice=false) {
   // update view count + UI for this scenario
   Metrics.bumpView(key);
   Metrics.refreshUI(key);
-
-  // Set scenario-specific background if defined
-  setSceneBackground(key);
 
   const sc = SCENARIOS[key];
   if (!sc) return;
@@ -546,7 +263,7 @@ async function playLoop(mySession) {
     renderLine(line);
 
     if (line.speaker === 'User_Prompt') {
-      const said = await listenForUser(mySession, 60000); // 60s absolute cap; function auto-restarts on browser timeouts
+      const said = await listenForUser(mySession, 15000); // 15s for longer sentences
       if (mySession !== session) return;
 
       if (said) {
@@ -561,27 +278,6 @@ async function playLoop(mySession) {
               stepIndex++;
             }
             await speak(dynamicReply, 'Mary');
-            // Restore idle/listening video after Mary speaks
-            setMediaForSpeaker('User_Prompt');
-            // FIX: Skip any Ryan coaching lines that follow — they were scripted
-            // for context before Mary's reply, now out of date because Mary
-            // took the conversation dynamically. Advance until next User_Prompt
-            // (if one exists in the remaining script).
-            let lookAhead = stepIndex + 1;
-            let foundNextUserPrompt = false;
-            while (lookAhead < currentScript.length) {
-              if (currentScript[lookAhead].speaker === 'User_Prompt') {
-                foundNextUserPrompt = true;
-                break;
-              }
-              if (currentScript[lookAhead].speaker !== 'Ryan') break;
-              lookAhead++;
-            }
-            if (foundNextUserPrompt) {
-              // Skip all Ryan lines between here and next User_Prompt
-              stepIndex = lookAhead - 1; // -1 because outer loop will stepIndex++
-            }
-            // Else: no more user turns — let Ryan's final wrap-up play normally
           } else {
             // Groq timed out or failed — use a natural filler so conversation continues
             await speak(randomChoice([
@@ -589,8 +285,6 @@ async function playLoop(mySession) {
               "Hmm, I didn't quite catch that.",
               "What was that?"
             ]), 'Mary');
-            // Restore idle/listening video after Mary speaks
-            setMediaForSpeaker('User_Prompt');
           }
         } else {
           if (similarity(said, line.text) >= 0.4) {
@@ -606,7 +300,7 @@ async function playLoop(mySession) {
           `<div class="practice-prompt"><strong>READ THIS OUT LOUD:</strong><br><br>
            "${line.text.replace('Say: ', '').replace(/'/g,'')}"</div>
            <div class="user-response-area">🎤 Didn't catch that — try again…</div>`;
-        const retry = await listenForUser(mySession, 60000);
+        const retry = await listenForUser(mySession, 15000);
         if (mySession !== session) return;
         if (retry && isPractice) {
           const dynamicReply = await getDynamicMaryResponse(retry);
@@ -617,20 +311,6 @@ async function playLoop(mySession) {
               stepIndex++;
             }
             await speak(dynamicReply, 'Mary');
-            // FIX: Same Ryan-skip logic on retry path
-            let lookAhead = stepIndex + 1;
-            let foundNextUserPrompt = false;
-            while (lookAhead < currentScript.length) {
-              if (currentScript[lookAhead].speaker === 'User_Prompt') {
-                foundNextUserPrompt = true;
-                break;
-              }
-              if (currentScript[lookAhead].speaker !== 'Ryan') break;
-              lookAhead++;
-            }
-            if (foundNextUserPrompt) {
-              stepIndex = lookAhead - 1;
-            }
           }
         } else if (!retry) {
           // Still nothing — skip and continue
@@ -643,8 +323,7 @@ async function playLoop(mySession) {
 
     await speak(line.text, line.speaker);
     if (mySession !== session) return;
-    // Shorter pause between AI turns for more natural conversation flow (was 650ms)
-    await pause(200);
+    await pause(650);
     stepIndex++;
   }
 
@@ -656,19 +335,39 @@ async function playLoop(mySession) {
 async function freeConversation(mySession) {
   if (mySession !== session) return;
 
-  const FREE_DURATION_MS = 10 * 60 * 1000; // 10 minutes
-  const NUDGE_AT_MS     =  8 * 60 * 1000; // nudge at 8 min
+  const FREE_DURATION_MS = 10 * 60 * 1000;
+  const NUDGE_AT_MS      =  8 * 60 * 1000;
   const startTime = Date.now();
   let nudgeSent = false;
 
-  // Ryan intro
-  await speak("Great work on the script! Now let's have a real conversation — no script, no prompts. Just talk to me naturally for the next ten minutes. I'll give you feedback at the end.", 'Ryan');
-  if (mySession !== session) return;
+  const sc = SCENARIOS[currentScenarioKey] || {};
 
-  els.name.textContent = 'Ryan';
-  els.text.textContent = 'Free conversation started. Just speak naturally…';
+  if (!sc.coldOpen) {
+    await speak("Great work on the script! Now let's have a real conversation -- no script, no prompts. Just talk to her naturally for the next ten minutes. I'll give you feedback at the end.", 'Ryan');
+    if (mySession !== session) return;
+    await pause(900);
+  } else {
+    setMediaForSpeaker('Mary');
+    els.name.textContent = 'Sofia';
+    els.text.innerHTML = `
+      <div style="text-align:center;padding:20px 0">
+        <div style="font-size:15px;color:#9aa4b2;margin-bottom:20px">She's right there.</div>
+        <button id="startSpeakBtn" style="
+          background:#ffb300;color:#000;border:none;border-radius:999px;
+          padding:16px 48px;font-size:18px;font-weight:800;cursor:pointer;
+          animation:pulse 1.5s ease-in-out infinite;
+        ">Speak</button>
+      </div>
+      <style>@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}</style>`;
+    await new Promise(resolve => {
+      const btn = document.getElementById('startSpeakBtn');
+      if (btn) btn.onclick = () => resolve();
+      else resolve();
+    });
+    if (mySession !== session) return;
+    els.text.textContent = '...';
+  }
 
-  // Show a countdown timer in the UI
   const timerEl = document.createElement('div');
   timerEl.id = 'free-timer';
   timerEl.style.cssText = 'position:fixed;top:70px;right:20px;background:#1a1c22;border:1px solid #2b2e36;border-radius:999px;padding:6px 16px;font-size:13px;font-weight:700;color:#ffb300;z-index:999';
@@ -678,58 +377,50 @@ async function freeConversation(mySession) {
     const remaining = Math.max(0, FREE_DURATION_MS - (Date.now() - startTime));
     const mins = Math.floor(remaining / 60000);
     const secs = Math.floor((remaining % 60000) / 1000);
-    timerEl.textContent = `⏱ ${mins}:${secs.toString().padStart(2,'0')} left`;
+    timerEl.textContent = mins + ':' + secs.toString().padStart(2,'0') + ' left';
   }, 1000);
+
+  setMediaForSpeaker('Mary');
+  els.name.textContent = sc.coldOpen ? 'Sofia' : 'Mary';
 
   while (mySession === session) {
     const elapsed = Date.now() - startTime;
-
-    // Time's up
     if (elapsed >= FREE_DURATION_MS) {
-      await speak("That's a wrap! Great conversation. Let me put together your feedback now.", 'Ryan');
+      await speak("That's time. Let me put together your feedback.", 'Ryan');
       break;
     }
 
-    // 8-minute nudge
     if (!nudgeSent && elapsed >= NUDGE_AT_MS) {
       nudgeSent = true;
-      await speak("You're doing great — keep the conversation going, two more minutes.", 'Ryan');
-      if (mySession !== session) return;
+      await speak("Two minutes left -- make it count.", 'Ryan');
+      if (mySession !== session) break;
+      await pause(900);
     }
 
-    // Listen for user (30s max per turn, then loop back)
     const remainingMs = FREE_DURATION_MS - (Date.now() - startTime);
     const listenMs = Math.min(30000, remainingMs);
-    if (listenMs < 2000) break; // not enough time left
+    if (listenMs < 2000) break;
 
     const said = await listenForUser(mySession, listenMs);
-    if (mySession !== session) return;
-    if (!said) {
-      // No speech — wait a moment before trying again so we don't spin
-      await pause(1000);
-      continue;
-    }
+    if (mySession !== session) break;
+    if (!said) { await pause(500); continue; }
 
-    // Get Mary's dynamic response
     const reply = await getDynamicMaryResponse(said);
-    if (mySession !== session) return;
+    if (mySession !== session) break;
 
     if (reply) {
       await speak(reply, 'Mary');
     } else {
-      await speak(randomChoice(["Sorry, say that again?", "Hmm, I didn't quite catch that.", "What was that?"]), 'Mary');
+      await speak('Say that again?', 'Mary');
     }
-    // Restore idle/listening video — user's turn to speak
-    setMediaForSpeaker('User_Prompt');
-    els.name.textContent = 'Your Turn';
-    if (mySession !== session) return;
-    await pause(200);
+    setMediaForSpeaker('Mary');
+    if (mySession !== session) break;
+    await pause(900);
   }
 
   clearInterval(timerInterval);
   const te = document.getElementById('free-timer');
   if (te) te.remove();
-
   if (mySession !== session) return;
   await runCoachFeedback(mySession);
 }
@@ -828,163 +519,19 @@ function startListeningYesNo(mySession){
   try { r.start(); } catch {}
 }
 
-// ============================================================
-// Continuous speech listening — auto-restart when browser times out
-// Fix for the 15s cutoff problem. Browser speech recognition will
-// auto-stop periodically; we restart it and accumulate the transcript.
-// User is "done" when they pause for ~1.5s of silence.
-// ============================================================
-function listenForUser(mySession, maxTotalMs){
+function listenForUser(mySession, timeoutMs){
   return new Promise((resolve)=>{
-    maxTotalMs = maxTotalMs || 60000; // absolute hard cap: 60s
-
-    let accumulatedTranscript = '';   // everything the user has said so far
-    let currentInterim = '';          // latest interim result from current rec session
-    let silenceTimer = null;          // fires when user stops speaking
-    let hardTimer = null;             // absolute maximum listen time
-    let currentRec = null;
-    let isResolved = false;
-    let lastSpeechActivity = Date.now();
-    let restartCount = 0;
-    const MAX_RESTARTS = 8;           // safety: ~8 * 10s = 80s max theoretical
-
-    const SILENCE_BEFORE_STOP_MS = 1500; // how long user must be silent before we decide they're done
-
-    function finish(reason){
-      if (isResolved) return;
-      isResolved = true;
-
-      // Stop whatever timers are running
-      clearTimeout(silenceTimer);
-      clearTimeout(hardTimer);
-      if (listenTimer) { clearTimeout(listenTimer); listenTimer = null; }
-
-      // Stop the current recognition cleanly
-      if (currentRec) {
-        try {
-          currentRec.onresult = null;
-          currentRec.onerror = null;
-          currentRec.onend = null;
-          currentRec.stop();
-        } catch (e) {}
-        currentRec = null;
-      }
-
-      showListening(false);
-
-      // Combine accumulated + any trailing interim result
-      let finalText = accumulatedTranscript.trim();
-      if (currentInterim.trim() && !finalText.toLowerCase().includes(currentInterim.trim().toLowerCase())) {
-        finalText = (finalText + ' ' + currentInterim).trim();
-      }
-
-      resolve(finalText || null);
-    }
-
-    function scheduleSilenceCheck(){
-      clearTimeout(silenceTimer);
-      silenceTimer = setTimeout(()=>{
-        // If no new speech in SILENCE_BEFORE_STOP_MS, the user is done.
-        if (Date.now() - lastSpeechActivity >= SILENCE_BEFORE_STOP_MS - 100) {
-          finish('silence_detected');
-        }
-      }, SILENCE_BEFORE_STOP_MS);
-    }
-
-    function startRecognitionSession(){
-      if (isResolved || mySession !== session) return;
-      if (restartCount >= MAX_RESTARTS) {
-        finish('max_restarts');
-        return;
-      }
-      restartCount++;
-
-      const r = createRecognition();
-      if (!r) { finish('no_recognition'); return; }
-      r.interimResults = true;
-      r.continuous = true; // request continuous mode (not all browsers honor this but ask for it)
-      currentRec = r;
-      rec = r; // expose globally so stopEverything() can kill it
-
-      currentInterim = '';
-
-      r.onresult = (e)=>{
-        if (isResolved || mySession !== session) { finish('session_changed'); return; }
-
-        lastSpeechActivity = Date.now();
-
-        // Walk ALL results in this batch and categorize them
-        let newFinalChunks = '';
-        let latestInterim = '';
-
-        for (let i = e.resultIndex; i < e.results.length; i++) {
-          const transcript = e.results[i][0].transcript;
-          if (e.results[i].isFinal) {
-            newFinalChunks += (newFinalChunks ? ' ' : '') + transcript.trim();
-          } else {
-            latestInterim = transcript.trim();
-          }
-        }
-
-        if (newFinalChunks) {
-          // Append new final chunks to accumulated transcript
-          accumulatedTranscript = (accumulatedTranscript + ' ' + newFinalChunks).trim();
-        }
-        currentInterim = latestInterim;
-
-        // Any speech activity resets the silence timer
-        scheduleSilenceCheck();
-      };
-
-      r.onerror = (e)=>{
-        // Common errors: 'no-speech', 'aborted', 'audio-capture', 'network'
-        // 'no-speech' is normal — user just paused. Don't bail.
-        if (e.error === 'no-speech' || e.error === 'aborted') {
-          // Let onend handle the restart decision
-          return;
-        }
-        finish('error_' + e.error);
-      };
-
-      r.onend = ()=>{
-        if (isResolved || mySession !== session) return;
-
-        // Browser auto-stopped. Decide: restart (continue listening) or finish.
-        const timeSinceLastSpeech = Date.now() - lastSpeechActivity;
-
-        if (timeSinceLastSpeech >= SILENCE_BEFORE_STOP_MS) {
-          // User has been silent long enough — they're done.
-          finish('browser_stopped_after_silence');
-        } else if (!accumulatedTranscript && !currentInterim && restartCount >= MAX_RESTARTS) {
-          // No speech captured in max attempts — user probably not speaking
-          finish('no_speech_after_retries');
-        } else {
-          // User is still mid-thought — restart recognition quickly
-          setTimeout(()=>{
-            if (!isResolved && mySession === session) {
-              startRecognitionSession();
-            }
-          }, 100);
-        }
-      };
-
-      try {
-        r.start();
-        showListening(true);
-      } catch (e) {
-        // Couldn't start — wait briefly and try once more
-        setTimeout(()=>{
-          if (!isResolved) startRecognitionSession();
-        }, 200);
-      }
-    }
-
-    // Absolute hard cap on total listen time
-    hardTimer = setTimeout(()=>{ finish('hard_timeout'); }, maxTotalMs);
-    listenTimer = hardTimer; // expose so stopEverything() can cancel
-
-    // Start the first recognition session
-    startRecognitionSession();
+    const r = createRecognition();
+    if (!r) return resolve(null);
+    rec = r; showListening(true);
+    listenTimer = setTimeout(()=>{ try{ r.stop(); }catch{} }, timeoutMs);
+    r.onresult = (e)=>{ if (mySession!==session) return resolve(null);
+      clearTimeout(listenTimer); showListening(false);
+      resolve(e.results[0][0].transcript.trim());
+    };
+    r.onerror = ()=>{ clearTimeout(listenTimer); showListening(false); resolve(null); };
+    r.onend = ()=>{ showListening(false); };
+    try { r.start(); } catch { resolve(null); }
   });
 }
 
@@ -1064,7 +611,6 @@ els.chooseBtn.onclick = renderAvatarPicker;
 
 /* ===== Boot sequence ===== */
 function bootAfterAvatarSelected(){
-  initMediaElements(); // set up dual-element media system (Ryan img + avatar video)
   renderShelf();
   const firstKey = Object.keys(SCENARIOS)[0];
   // Initialize metrics UI for first scenario immediately:
@@ -1135,7 +681,6 @@ function bootDefault(){
     }
 
     overlay.remove();
-    initMediaElements(); // set up dual-element media system
     const firstKey = Object.keys(SCENARIOS)[0];
     Metrics.refreshUI(firstKey);
     playScenario(firstKey, false);
