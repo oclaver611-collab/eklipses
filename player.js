@@ -350,14 +350,40 @@ async function startFreeConversation(mySession) {
 
   if (!isColdOpen) {
     await speak("Great work on the script! Now let's have a real conversation — no script, no prompts. Just talk to her naturally for the next ten minutes. I'll give you feedback at the end.", 'Ryan');
+    if (mySession !== session) return;
   }
+
+  // Show Sofia waiting — user must tap to activate mic (Chrome requires user gesture)
+  setMediaForSpeaker('Mary');
+  els.name.textContent = isColdOpen ? 'Sofia' : 'Mary';
+  els.text.innerHTML = `
+    <div style="text-align:center;padding:20px 0">
+      <div style="font-size:15px;color:#9aa4b2;margin-bottom:20px">
+        ${isColdOpen ? "She's right there." : "She's listening."}
+      </div>
+      <button id="startSpeakBtn" style="
+        background:#ffb300;color:#000;border:none;border-radius:999px;
+        padding:16px 48px;font-size:18px;font-weight:800;cursor:pointer;
+        animation: pulse 1.5s ease-in-out infinite;
+      ">🎤 Speak</button>
+    </div>
+    <style>
+      @keyframes pulse {
+        0%,100% { transform: scale(1); }
+        50% { transform: scale(1.06); }
+      }
+    </style>`;
+
+  // Wait for the tap — this IS the user gesture Chrome needs
+  await new Promise(resolve => {
+    const btn = document.getElementById('startSpeakBtn');
+    if (btn) btn.onclick = () => resolve();
+    else resolve(); // fallback if button missing
+  });
 
   if (mySession !== session) return;
 
   showFreeConvTimer(mySession, 10 * 60);
-
-  setMediaForSpeaker('Mary');
-  els.name.textContent = 'Sofia';
   els.text.textContent = '…';
 
   await runFreeConversationLoop(mySession, isColdOpen);
@@ -423,57 +449,9 @@ async function runFreeConversationLoop(mySession, isColdOpen) {
 }
 
 function listenForUserTimed(mySession, timeoutMs) {
-  return new Promise((resolve) => {
-    if (mySession !== session) return resolve(null);
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) return resolve(null);
-    const r = new SR();
-    r.lang = 'en-US'; r.interimResults = false; r.maxAlternatives = 1;
-    rec = r;
-    let done = false;
-    let restartCount = 0;
-    const maxRestarts = 3;
-
-    const finish = (val) => {
-      if (done) return;
-      done = true;
-      clearTimeout(listenTimer);
-      showListening(false);
-      resolve(val);
-    };
-
-    listenTimer = setTimeout(() => {
-      try { r.stop(); } catch {}
-      finish(null);
-    }, timeoutMs);
-
-    r.onresult = (e) => {
-      if (mySession !== session) return finish(null);
-      const transcript = e.results[0][0].transcript.trim();
-      if (transcript) finish(transcript);
-    };
-
-    r.onerror = (e) => {
-      if (e.error === 'no-speech' && restartCount < maxRestarts && !done && mySession === session) {
-        restartCount++;
-        try { r.start(); } catch { finish(null); }
-      } else {
-        finish(null);
-      }
-    };
-
-    r.onend = () => {
-      // Only auto-restart if we haven't timed out and got no result yet
-      if (!done && restartCount < maxRestarts && mySession === session) {
-        restartCount++;
-        try { r.start(); } catch { finish(null); }
-      } else {
-        finish(null);
-      }
-    };
-
-    try { r.start(); } catch { finish(null); }
-  });
+  // Same as listenForUser but with a shorter timeout for silence detection.
+  // Mic permission is already granted via the tap-to-speak button before this runs.
+  return listenForUser(mySession, timeoutMs);
 }
 
 let freeConvTimerInterval = null;
