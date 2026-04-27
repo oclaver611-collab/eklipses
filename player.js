@@ -406,10 +406,8 @@ async function runFreeConversationLoop(mySession, isColdOpen) {
       if (mySession !== session) return;
     }
 
-    showListening(true);
     const said = await listenForUserTimed(mySession, SILENCE_RESCUE_MS);
     if (mySession !== session) return;
-    showListening(false);
 
     if (!said) {
       const rescues = isColdOpen ? [
@@ -424,6 +422,7 @@ async function runFreeConversationLoop(mySession, isColdOpen) {
       const rescue = rescues[Math.floor(Math.random() * rescues.length)];
       await speak(rescue, 'Mary');
       if (mySession !== session) return;
+      await pause(600); // let TTS audio fully clear before mic opens
       continue;
     }
 
@@ -432,8 +431,12 @@ async function runFreeConversationLoop(mySession, isColdOpen) {
 
     if (reply) {
       await speak(reply, 'Mary');
+      if (mySession !== session) return;
+      await pause(600); // let TTS audio fully clear before mic opens
     } else {
       await speak(randomChoice(["Say that again?", "Hmm?", "What was that?"]), 'Mary');
+      if (mySession !== session) return;
+      await pause(600);
     }
   }
 
@@ -616,14 +619,44 @@ function listenForUser(mySession, timeoutMs){
     const r = createRecognition();
     if (!r) return resolve(null);
     rec = r; showListening(true);
-    listenTimer = setTimeout(()=>{ try{ r.stop(); }catch{} }, timeoutMs);
-    r.onresult = (e)=>{ if (mySession!==session) return resolve(null);
-      clearTimeout(listenTimer); showListening(false);
-      resolve(e.results[0][0].transcript.trim());
+    let resolved = false;
+    const deadline = Date.now() + timeoutMs;
+
+    const done = (val) => {
+      if (resolved) return;
+      resolved = true;
+      clearTimeout(listenTimer);
+      showListening(false);
+      resolve(val);
     };
-    r.onerror = ()=>{ clearTimeout(listenTimer); showListening(false); resolve(null); };
-    r.onend = ()=>{ showListening(false); };
-    try { r.start(); } catch { resolve(null); }
+
+    listenTimer = setTimeout(()=>{ try{ r.stop(); }catch{} done(null); }, timeoutMs);
+
+    r.onresult = (e)=>{
+      if (mySession !== session) return done(null);
+      const t = e.results[0][0].transcript.trim();
+      if (t) done(t);
+    };
+
+    r.onerror = (e)=>{
+      if (resolved) return;
+      // Only restart on no-speech if we still have time left
+      if (e.error === 'no-speech' && Date.now() < deadline && mySession === session) {
+        try { r.start(); return; } catch {}
+      }
+      done(null);
+    };
+
+    r.onend = ()=>{
+      if (resolved) return;
+      // Only restart if we still have time left
+      if (Date.now() < deadline - 500 && mySession === session) {
+        try { r.start(); return; } catch {}
+      }
+      done(null);
+    };
+
+    try { r.start(); } catch { done(null); }
   });
 }
 
