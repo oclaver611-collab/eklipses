@@ -294,6 +294,18 @@ function showListening(on=true) {
   if (els.listenPill) els.listenPill.style.display=on?'block':'none';
   const orbEl=document.getElementById('ryan-orb');
   if (orbEl) ryanOrbSetState(on?'listening':'silent');
+  // Swap avatar: listening video when mic is open, talking video when Mary speaks
+  if (on) {
+    // User is speaking — show idle/listening video
+    const current=els.media;
+    if (current && current.tagName==='VIDEO' && current.id!=='ryan-orb') {
+      const idleSrc=AVATARS.User_Prompt?.src;
+      if (idleSrc && (current.getAttribute('src')||'')!==idleSrc) {
+        current.src=idleSrc; current.load();
+        try{current.play().catch(()=>{});}catch{}
+      }
+    }
+  }
 }
 
 /* ===== listenForUser — robust continuous ===== */
