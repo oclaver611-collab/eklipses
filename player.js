@@ -258,7 +258,14 @@ async function getDynamicMaryResponse(userSaid) {
   try {
     const res=await fetch('/api/mary',{
       method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ userMessage:userSaid, scenarioTitle:sc.title||'', scenarioKey:currentScenarioKey, history:conversationHistory }),
+      body:JSON.stringify({
+        userMessage:userSaid,
+        scenarioTitle:sc.title||'',
+        scenarioKey:currentScenarioKey,
+        history:conversationHistory,
+        // If Sofia already introduced herself, remind her
+        alreadyIntroduced: currentScenarioKey==='beach' && conversationHistory.some(m=>m.role==='assistant' && m.content.toLowerCase().includes('sofia')),
+      }),
       signal:controller.signal,
     });
     clearTimeout(timeout);
@@ -364,6 +371,8 @@ async function playScenario(key, practice=false) {
   Metrics.bumpView(key); Metrics.refreshUI(key);
   setSceneBackground(key);
   const sc=SCENARIOS[key]; if(!sc) return;
+  // Cold open scenarios skip demo entirely — throw user straight into practice
+  if (sc.coldOpen) practice=true;
   isPractice=practice;
   currentScript=practice?sc.practice:sc.demo;
   stepIndex=0;
@@ -409,6 +418,7 @@ async function playLoop(mySession) {
 
   if(!isPractice) renderAskToPractice(mySession);
   else await freeConversation(mySession);
+  // Note: coldOpen scenarios always have isPractice=true so they always go to freeConversation
 }
 
 /* ===== Free Conversation ===== */
@@ -668,7 +678,6 @@ function bootDefault() {
   const set=AVATAR_SETS[Math.floor(Math.random()*AVATAR_SETS.length)];
   applyAvatarSet(set);
   Metrics.bindLikeButton();
-  renderShelf();
 
   const overlay=document.createElement('div');
   overlay.id='ek-start-overlay';
@@ -690,7 +699,10 @@ function bootDefault() {
     </div>`;
   document.body.appendChild(overlay);
 
+  let _bootStarted = false;
   document.getElementById('ek-start-btn').onclick=async()=>{
+    if (_bootStarted) return; // prevent double-tap
+    _bootStarted = true;
     document.getElementById('ek-start-btn').style.display='none';
     document.getElementById('ek-prog-wrap').style.display='block';
     try {
@@ -705,6 +717,7 @@ function bootDefault() {
       return;
     }
     overlay.remove();
+    renderShelf(); // populate shelf and dropdown now, after overlay gone
     const firstKey=Object.keys(SCENARIOS)[0];
     Metrics.refreshUI(firstKey);
     currentScenarioKey=firstKey;
@@ -713,7 +726,7 @@ function bootDefault() {
     els.text.textContent='';
     // Ryan speaks the hook — then waits for user to pick a scenario
     await speak("Most guys know what to say. They freeze anyway.", 'Ryan');
-    await pause(400);
+    await pause(500);
     await speak("Pick a scenario. Show me what you've got.", 'Ryan');
     // Show idle state — user picks from shelf or dropdown
     els.text.textContent='Choose a scenario to begin.';
