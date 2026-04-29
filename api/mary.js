@@ -10,8 +10,8 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'No user message provided' });
   }
 
-  if (!process.env.NVIDIA_API_KEY) {
-    return res.status(500).json({ error: 'NVIDIA_API_KEY not set' });
+  if (!process.env.GROQ_API_KEY) {
+    return res.status(500).json({ error: 'GROQ_API_KEY not set' });
   }
 
   const PERSONALITIES = {
@@ -366,14 +366,14 @@ Personality: real, natural, direct.`;
   const systemPrompt = personality + baseRules;
 
   try {
-    const response = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.NVIDIA_API_KEY}`,
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'moonshotai/kimi-k2.5',
+        model: 'llama-3.1-8b-instant',
         max_tokens: 120,
         messages: [
           { role: 'system', content: systemPrompt },
