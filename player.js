@@ -708,14 +708,16 @@ function bootDefault() {
     const firstKey=Object.keys(SCENARIOS)[0];
     Metrics.refreshUI(firstKey);
     currentScenarioKey=firstKey;
-    setSceneBackground(firstKey);
     setMediaForSpeaker('Ryan');
     els.name.textContent='Ryan';
     els.text.textContent='';
+    // Ryan speaks the hook — then waits for user to pick a scenario
     await speak("Most guys know what to say. They freeze anyway.", 'Ryan');
     await pause(400);
     await speak("Pick a scenario. Show me what you've got.", 'Ryan');
-    playScenario(firstKey, false);
+    // Show idle state — user picks from shelf or dropdown
+    els.text.textContent='Choose a scenario to begin.';
+    ryanOrbSetState('silent');
   };
 }
 
