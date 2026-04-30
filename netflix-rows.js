@@ -48,8 +48,54 @@
 
   function difficultyStars(level) {
     const n = Math.max(1, Math.min(5, level || 2));
-    return '★'.repeat(n) + '☆'.repeat(5 - n);
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+      html += `<div class="nf-star${i <= n ? ' filled' : ''}"></div>`;
+    }
+    return html;
   }
+
+  // Character metadata per scenario key
+  const CHARACTER_META = {
+    'street_intro':         { name: 'Sofia',    vibe: 'Warm & curious' },
+    'beach_cold_open':      { name: 'Sofia',    vibe: 'Guarded but open' },
+    'bar_dating':           { name: 'Maya',     vibe: 'Sarcastic, tests you' },
+    'museum_dating':        { name: 'Isabelle', vibe: 'Intellectual, easily bored' },
+    'wedding_reception':    { name: 'Claire',   vibe: 'Sophisticated, high standards' },
+    'bookstore_encounter':  { name: 'Léa',      vibe: 'Quirky, bookish' },
+    'gym_sparks':           { name: 'Zoe',      vibe: 'Focused, hard to reach' },
+    'interview_behavioral': { name: 'Marcus',   vibe: 'By the book, firm' },
+    'interview_salary':     { name: 'Diana',    vibe: 'Strategic, poker face' },
+    'interview_stress':     { name: 'Victor',   vibe: 'Hostile on purpose' },
+    'interview_weakness':   { name: 'Priya',    vibe: 'Sharp, reads between lines' },
+    'interview_counter':    { name: 'James',    vibe: "Calculated, won't budge" },
+    'darkpsych_gaslight':   { name: 'Alex',     vibe: 'Twists your reality' },
+    'darkpsych_darvo':      { name: 'Rachel',   vibe: 'Flips the script fast' },
+    'darkpsych_narc_boss':  { name: 'Derek',    vibe: 'Power hungry, unfair' },
+    'darkpsych_lovebomb':   { name: 'Mia',      vibe: 'Intense, too fast' },
+    'darkpsych_guilt':      { name: 'Carol',    vibe: 'Weaponizes family' },
+  };
+
+  // Skill trained per scenario
+  const SKILL_META = {
+    'street_intro':         'Cold approach',
+    'beach_cold_open':      'Cold open + date close',
+    'bar_dating':           'Hold interest under pressure',
+    'museum_dating':        'Intellectual conversation',
+    'wedding_reception':    'High-value social skills',
+    'bookstore_encounter':  'Shared interest connection',
+    'gym_sparks':           'Approach without disrupting',
+    'interview_behavioral': 'STAR method storytelling',
+    'interview_salary':     'Anchor high, stay calm',
+    'interview_stress':     'Composure under fire',
+    'interview_weakness':   'Reframe without lying',
+    'interview_counter':    'Hold your value',
+    'darkpsych_gaslight':   'Trust your perception',
+    'darkpsych_darvo':      'Spot script-flipping',
+    'darkpsych_narc_boss':  'Navigate unfair authority',
+    'darkpsych_lovebomb':   'Slow down safely',
+    'darkpsych_guilt':      'Hold boundaries with family',
+  };
 
   function groupScenariosByCategory() {
     const scenarios = window.SCENARIOS || {};
@@ -72,27 +118,35 @@
     card.setAttribute('role', 'button');
     card.setAttribute('tabindex', '0');
 
-    // Thumbnail — try the image, fallback to gradient if it fails
     const cat = sc.category || DEFAULT_CATEGORY;
     const gradient = (CATEGORIES[cat] || CATEGORIES[DEFAULT_CATEGORY]).gradient;
     const emoji = (CATEGORIES[cat] || CATEGORIES[DEFAULT_CATEGORY]).emoji;
-
-    const thumbUrl = sc.thumb || '';
-    const thumbHTML = thumbUrl
-      ? `<img class="nf-card-thumb" src="${thumbUrl}" alt="" onerror="this.outerHTML='<div class=\\'nf-card-thumb-fallback\\' style=\\'background:${gradient}\\'>${emoji}</div>'">`
-      : `<div class="nf-card-thumb-fallback" style="background:${gradient}">${emoji}</div>`;
-
+    const char = CHARACTER_META[key] || { name: '', vibe: '' };
+    const skill = SKILL_META[key] || '';
     const difficulty = sc.difficulty || 2;
     const duration = sc.duration_min || 10;
     const isNew = NEW_SCENARIO_KEYS.has(key);
 
+    const thumbUrl = sc.thumb || '';
+    const thumbInner = thumbUrl
+      ? `<img class="nf-card-thumb" src="${thumbUrl}" alt="" onerror="this.style.display='none'">`
+      : `<div class="nf-card-thumb-fallback" style="background:${gradient}">${emoji}</div>`;
+
     card.innerHTML = `
-      ${thumbHTML}
+      <div class="nf-card-thumb-wrap">
+        ${thumbInner}
+        <div class="nf-card-thumb-overlay"></div>
+        ${isNew ? '<div class="nf-card-new-badge">NEW</div>' : ''}
+        <div class="nf-card-character">
+          ${char.name ? `<div class="nf-card-char-name">${char.name}</div>` : ''}
+          ${char.vibe ? `<div class="nf-card-char-vibe">${char.vibe}</div>` : ''}
+        </div>
+      </div>
       <div class="nf-card-body">
         <div class="nf-card-title">${sc.title || key}</div>
+        ${skill ? `<div class="nf-card-skill">${skill}</div>` : ''}
+        <div class="nf-card-stars">${difficultyStars(difficulty)}</div>
         <div class="nf-card-meta">
-          ${isNew ? '<span class="nf-badge nf-badge-new">NEW</span>' : ''}
-          <span class="nf-badge nf-badge-difficulty" title="Difficulty ${difficulty}/5">${difficultyStars(difficulty)}</span>
           <span class="nf-badge nf-badge-duration">⏱ ${duration} min</span>
         </div>
       </div>

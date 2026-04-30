@@ -90,10 +90,10 @@
 
 /* Individual scenario card (Netflix tile style) */
 .nf-card {
-  flex: 0 0 280px;
-  background: #21232b;
+  flex: 0 0 260px;
+  background: #1a1c22;
   border: 1px solid #2b2e36;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   cursor: pointer;
   scroll-snap-align: start;
@@ -102,9 +102,18 @@
 }
 
 .nf-card:hover {
-  transform: translateY(-3px) scale(1.02);
+  transform: translateY(-4px) scale(1.02);
   border-color: #ffb300;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 16px 36px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,179,0,0.2);
+}
+
+/* Thumbnail area with character overlay */
+.nf-card-thumb-wrap {
+  position: relative;
+  width: 100%;
+  height: 158px;
+  background: #0a0a0a;
+  overflow: hidden;
 }
 
 .nf-card-thumb {
@@ -113,6 +122,62 @@
   object-fit: cover;
   background: #0a0a0a;
   display: block;
+  transition: transform 0.3s ease;
+}
+
+.nf-card:hover .nf-card-thumb {
+  transform: scale(1.06);
+}
+
+/* Gradient overlay on thumb for text readability */
+.nf-card-thumb-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(26,28,34,0.98) 0%, rgba(26,28,34,0.4) 50%, transparent 100%);
+  z-index: 1;
+}
+
+/* Character name on top of image */
+.nf-card-character {
+  position: absolute;
+  bottom: 10px;
+  left: 12px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nf-card-char-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+  letter-spacing: -0.3px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+
+.nf-card-char-vibe {
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+  font-style: italic;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+}
+
+/* NEW badge top-right */
+.nf-card-new-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 3;
+  background: #40c770;
+  color: #000;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 /* Fallback gradient thumb when image fails to load */
@@ -127,26 +192,62 @@
   font-weight: 800;
 }
 
+/* Card body */
 .nf-card-body {
   padding: 12px 14px 14px 14px;
 }
 
 .nf-card-title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  color: #fff;
+  color: #e9ecf1;
   line-height: 1.3;
-  margin: 0 0 8px 0;
+  margin: 0 0 10px 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  min-height: 36px;
+  min-height: 34px;
 }
 
+/* Skill trained line */
+.nf-card-skill {
+  font-size: 11px;
+  color: #9aa4b2;
+  margin: 0 0 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.nf-card-skill::before {
+  content: '🎯';
+  font-size: 10px;
+}
+
+/* Difficulty stars */
+.nf-card-stars {
+  display: flex;
+  gap: 3px;
+  margin: 0 0 10px 0;
+}
+
+.nf-star {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: #2b2e36;
+}
+
+.nf-star.filled {
+  background: #ffb300;
+  box-shadow: 0 0 6px rgba(255,179,0,0.4);
+}
+
+/* Bottom meta row */
 .nf-card-meta {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
   flex-wrap: wrap;
   font-size: 11px;
@@ -185,7 +286,8 @@
 /* Mobile responsiveness */
 @media (max-width: 720px) {
   .wrap.netflix-mode .media { height: 280px; }
-  .nf-card { flex: 0 0 220px; }
-  .nf-card-thumb, .nf-card-thumb-fallback { height: 125px; }
+  .nf-card { flex: 0 0 200px; }
+  .nf-card-thumb, .nf-card-thumb-fallback, .nf-card-thumb-wrap { height: 125px; }
+  .nf-card-char-name { font-size: 15px; }
   .nf-row-title { font-size: 18px; }
 }
