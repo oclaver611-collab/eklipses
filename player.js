@@ -212,7 +212,6 @@ function renderLine(line) {
 
 /* ===== TTS ===== */
 async function speak(text, speaker) {
-  text = text.replace(/\([^)]*\)/g, '').trim();
   const mySession=session;
   try { __audioContexts.forEach(c=>{ try{if(c.state==='suspended')c.resume();}catch{} }); } catch {}
   setMediaForSpeaker(speaker);
@@ -730,18 +729,19 @@ function bootDefault() {
       return;
     }
     overlay.remove();
-    renderShelf(); // populate shelf and dropdown now, after overlay gone
     const firstKey=Object.keys(SCENARIOS)[0];
-    Metrics.refreshUI(firstKey);
     currentScenarioKey=firstKey;
     setMediaForSpeaker('Ryan');
     els.name.textContent='Ryan';
     els.text.textContent='';
-    // Ryan speaks the hook — then waits for user to pick a scenario
+    // Ryan speaks the hook FIRST — shelf renders only after he finishes
+    // Prevents user clicking a scenario mid-speech and causing line bleed
     await speak("Most guys know what to say. They freeze anyway.", 'Ryan');
     await pause(500);
     await speak("Pick a scenario. Show me what you've got.", 'Ryan');
-    // Show idle state — user picks from shelf or dropdown
+    // NOW show the shelf — user can only interact after hook completes
+    renderShelf();
+    Metrics.refreshUI(firstKey);
     els.text.textContent='Choose a scenario to begin.';
     ryanOrbSetState('silent');
   };
