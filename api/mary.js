@@ -4,7 +4,8 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { userMessage, scenarioTitle, scenarioKey, history = [] } = req.body || {};
+  const { userMessage, scenarioTitle, scenarioKey, history: rawHistory = [] } = req.body || {};
+  const history = rawHistory.slice(-16); // keep last 8 exchanges (16 messages)
 
   if (!userMessage?.trim()) {
     return res.status(400).json({ error: 'No user message provided' });
@@ -348,7 +349,7 @@ Remember: this character loves her son. Her tactics come from hurt, not malice. 
   const baseRules = `
 
 CRITICAL CONVERSATION RULES:
-- Max 1-2 sentences per reply. Short. Natural. Real. NOT formal.
+- HARD LIMIT: 1-2 sentences maximum. Never more. If you feel like saying more — cut it in half. Short is better. Real conversations don't monologue.
 - Daniel is speaking directly TO YOU. When he compliments you, he means YOU — not someone else walking by.
 - When he says "you look gorgeous" or "you seem interesting," that's about YOU. React as a real woman would — briefly warm or slightly guarded depending on your personality, but NEVER misinterpret who the compliment is about.
 - Match the emotional register of the scenario. If your personality says "warm" — BE warm. If it says "playful" — BE playful. Don't default to cold/suspicious unless your character is supposed to be.
