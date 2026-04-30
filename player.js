@@ -212,6 +212,7 @@ function renderLine(line) {
 
 /* ===== TTS ===== */
 async function speak(text, speaker) {
+  text = text.replace(/\([^)]*\)/g, '').trim();
   const mySession=session;
   try { __audioContexts.forEach(c=>{ try{if(c.state==='suspended')c.resume();}catch{} }); } catch {}
   setMediaForSpeaker(speaker);
