@@ -58,11 +58,11 @@
   // Character metadata per scenario key
   const CHARACTER_META = {
     'street_intro':         { name: 'Sofia',    vibe: 'Warm & curious' },
-    'beach_cold_open':      { name: 'Sofia',    vibe: 'Guarded but open' },
-    'bar_dating':           { name: 'Maya',     vibe: 'Sarcastic, tests you' },
-    'museum_dating':        { name: 'Isabelle', vibe: 'Intellectual, easily bored' },
-    'wedding_reception':    { name: 'Claire',   vibe: 'Sophisticated, high standards' },
-    'bookstore_encounter':  { name: 'Léa',      vibe: 'Quirky, bookish' },
+    'beach':                { name: 'Sofia',    vibe: 'Guarded but open' },
+    'bar':                  { name: 'Maya',     vibe: 'Sarcastic, tests you' },
+    'museum':               { name: 'Isabelle', vibe: 'Intellectual, easily bored' },
+    'wedding':              { name: 'Claire',   vibe: 'Sophisticated, high standards' },
+    'bookstore_extended':   { name: 'Léa',      vibe: 'Quirky, bookish' },
     'gym_sparks':           { name: 'Zoe',      vibe: 'Focused, hard to reach' },
     'interview_behavioral': { name: 'Marcus',   vibe: 'By the book, firm' },
     'interview_salary':     { name: 'Diana',    vibe: 'Strategic, poker face' },
@@ -79,11 +79,11 @@
   // Skill trained per scenario
   const SKILL_META = {
     'street_intro':         'Cold approach',
-    'beach_cold_open':      'Cold open + date close',
-    'bar_dating':           'Hold interest under pressure',
-    'museum_dating':        'Intellectual conversation',
-    'wedding_reception':    'High-value social skills',
-    'bookstore_encounter':  'Shared interest connection',
+    'beach':                'Cold open + date close',
+    'bar':                  'Hold interest under pressure',
+    'museum':               'Intellectual conversation',
+    'wedding':              'High-value social skills',
+    'bookstore_extended':   'Shared interest connection',
     'gym_sparks':           'Approach without disrupting',
     'interview_behavioral': 'STAR method storytelling',
     'interview_salary':     'Anchor high, stay calm',
