@@ -437,7 +437,7 @@ async function playLoop(mySession) {
 async function freeConversation(mySession) {
   if(mySession!==session) return;
   const sc=SCENARIOS[currentScenarioKey]||{};
-  const FREE_MS=10*60*1000, NUDGE_MS=8*60*1000;
+  const FREE_MS=3*60*1000, NUDGE_MS=2*60*1000;
   const start=Date.now();
   let nudged=false;
 
