@@ -284,7 +284,24 @@
 .nf-row[data-category="dark_psychology"] .nf-row-title { color: #ff9a8b; }
 
 /* Mobile responsiveness */
-@media (max-width: 720px) {
+@media (max-width: 600px) {
+  .wrap.netflix-mode .media { height: 56vw !important; min-height: 220px; }
+  .nf-card { flex: 0 0 180px; }
+  .nf-card-thumb, .nf-card-thumb-fallback, .nf-card-thumb-wrap { height: 110px; }
+  .nf-card-char-name { font-size: 14px; }
+  .nf-card-char-vibe { font-size: 10px; }
+  .nf-card-body { padding: 8px 10px 10px; }
+  .nf-card-title { font-size: 12px; min-height: 28px; margin-bottom: 6px; }
+  .nf-card-skill { font-size: 10px; margin-bottom: 6px; }
+  .nf-card-stars { margin-bottom: 6px; }
+  .nf-row-title { font-size: 16px; }
+  .nf-row { margin-bottom: 20px; }
+  .nf-strip { gap: 10px; padding: 4px 6px 10px 6px; }
+  .nf-intro { font-size: 12px; margin-bottom: 12px; }
+  .nf-container { padding: 0 4px; }
+}
+
+@media (max-width: 720px) and (min-width: 601px) {
   .wrap.netflix-mode .media { height: 280px; }
   .nf-card { flex: 0 0 200px; }
   .nf-card-thumb, .nf-card-thumb-fallback, .nf-card-thumb-wrap { height: 125px; }

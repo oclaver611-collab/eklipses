@@ -110,7 +110,59 @@
   /* metrics pill styles */
   .metrics{display:flex;gap:12px;align-items:center}
   .metrics .count{font-weight:700}
-</style>
+
+  /* ===== MOBILE ===== */
+  @media (max-width: 600px) {
+    /* Topbar: single clean row, hide non-essential items */
+    .topbar {
+      padding: 8px 10px;
+      gap: 6px;
+      flex-wrap: nowrap;
+      overflow: hidden;
+    }
+    .topbar label { display: none; }
+    #scenarioSelect {
+      flex: 1;
+      min-width: 0;
+      font-size: 13px;
+      padding: 7px 8px;
+    }
+    #enterPractice {
+      font-size: 12px;
+      padding: 7px 10px;
+      white-space: nowrap;
+    }
+    #micBtn {
+      font-size: 12px;
+      padding: 7px 10px;
+      white-space: nowrap;
+    }
+    #chooseAvatarBtn { display: none; }
+    .metrics { display: none; }
+
+    /* Stage: full width, taller frame */
+    .wrap, .wrap.netflix-mode { padding: 10px 8px; }
+    .wrap.netflix-mode .stage { margin-bottom: 16px; }
+    .frame, .frame.has-bg {
+      height: 56vw !important;
+      min-height: 220px;
+      border-width: 2px;
+    }
+    .media {
+      height: 56vw !important;
+      min-height: 220px;
+    }
+    .wrap.netflix-mode .media {
+      height: 56vw !important;
+      min-height: 220px;
+    }
+    .frame.has-bg #ryan-orb {
+      width: 160px !important;
+      height: 160px !important;
+    }
+    .name { font-size: 20px; margin: 8px 0 4px; }
+    .line { font-size: 14px; padding: 0 12px; }
+  }</style>
 </head>
 <body>
   <div class="topbar">
