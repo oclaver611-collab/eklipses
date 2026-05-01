@@ -32,7 +32,8 @@ Never give generic feedback. If you say "he complimented her" — quote exactly 
 Respond ONLY with valid JSON in this exact format — no markdown, no preamble:
 {
   "score": <number 1-10>,
-  "spokenSummary": "<2-3 punchy sentences Ryan says out loud — reference something specific that actually happened>",
+  "spokenSummary": "<2-3 punchy sentences for the feedback card — reference something specific that actually happened, 30 words max>",
+  "spokenFeedback": "<What Ryan says out loud to coach him — 150 to 200 words, spoken naturally like a real coach talking, NOT a list. Structure it like this: start with the score and one punchy honest reaction. Then walk through what actually happened — quote his exact opener and explain why it worked or didn't. Call out the single best thing he said and why it landed. Then name the moment he missed or the thing that stalled — be specific, quote both sides. End with one concrete thing he can literally do differently next time — an actual line or move, not a mindset tip. Speak in second person. No bullet points, no headers — just Ryan talking.>",
   "openerBreakdown": "<quote his exact opener, then explain why it worked or didn't>",
   "bestMoment": "<quote the single best thing he said verbatim, then explain why it landed>",
   "missedOpportunity": "<describe one specific moment — what he said, what Sofia said back, and what he should have done instead>",
@@ -49,7 +50,8 @@ Scoring guide:
 
 Rules:
 - QUOTE actual lines — use the exact words from the transcript
-- spokenSummary is what Ryan says out loud: punchy, direct, 30 words max
+- spokenFeedback is what Ryan SAYS OUT LOUD — flowing speech, 150-200 words, no lists
+- spokenSummary is the short card version — 30 words max
 - Never say "great job" unless the score is 8+
 - wouldSheDateHim is Sofia speaking in first person
 - tryNextTime must be something he could literally say — not a mindset note`
@@ -60,7 +62,8 @@ Analyze this practice conversation and give real feedback.
 Respond ONLY with valid JSON in this exact format:
 {
   "score": <number 1-10>,
-  "spokenSummary": "<2-3 sentences Ryan says out loud — conversational, direct, specific>",
+  "spokenSummary": "<2-3 punchy sentences for the feedback card — specific, direct, 30 words max>",
+  "spokenFeedback": "<What Ryan says out loud to coach him — 150 to 200 words, spoken naturally like a real coach talking, NOT a list. Start with the score and one honest reaction. Walk through what actually happened — quote specific things he said. Call out what worked and why. Then name what stalled or what he missed — be specific. End with one concrete line or move he can use next time. Second person, flowing speech, no bullet points, no headers.>",
   "strengths": ["<specific strength 1>", "<specific strength 2>"],
   "improvements": ["<specific thing to fix 1>", "<specific thing to fix 2>"],
   "tryThisLine": "<one specific better line he could have used>"
@@ -69,7 +72,8 @@ Respond ONLY with valid JSON in this exact format:
 Rules:
 - Be specific, reference actual things he said
 - Score honestly — most beginners get 4-6
-- spokenSummary is what Ryan SAYS OUT LOUD — keep it under 40 words, punchy
+- spokenFeedback is what Ryan SAYS OUT LOUD — 150-200 words of flowing speech, no lists
+- spokenSummary is the short card version — under 30 words
 - tryThisLine should be natural, not cheesy
 - No filler, no generic advice`;
 
@@ -82,7 +86,7 @@ Rules:
       },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        max_tokens: 800,
+        max_tokens: 1200,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: `Scenario: ${scenarioTitle}\n\nConversation:\n${transcript}` }
