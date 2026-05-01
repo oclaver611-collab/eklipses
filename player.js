@@ -527,7 +527,7 @@ async function runCoachFeedback(mySession) {
     if(!res.ok) throw new Error('Coach failed');
     const f=await res.json();
     if(mySession!==session) return;
-    await speak(f.spokenSummary,'Ryan');
+    await speak(f.spokenFeedback || f.spokenSummary,'Ryan');
     if(mySession!==session) return;
     showFeedbackCard(f);
   } catch(err) {
