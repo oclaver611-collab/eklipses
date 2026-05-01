@@ -527,7 +527,17 @@ async function runCoachFeedback(mySession) {
     if(!res.ok) throw new Error('Coach failed');
     const f=await res.json();
     if(mySession!==session) return;
-    await speak(f.spokenFeedback || f.spokenSummary,'Ryan');
+    // 4-part chronological coaching — opener, middle, mistake, verdict
+    const coachParts = [f.part1, f.part2, f.part3, f.part4].filter(Boolean);
+    if (coachParts.length) {
+      for (const part of coachParts) {
+        if (mySession !== session) return;
+        await speak(part, 'Ryan');
+        await pause(800);
+      }
+    } else {
+      await speak(f.spokenFeedback || f.spokenSummary, 'Ryan');
+    }
     if(mySession!==session) return;
     showFeedbackCard(f);
   } catch(err) {
