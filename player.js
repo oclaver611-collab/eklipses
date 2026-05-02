@@ -440,6 +440,9 @@ async function freeConversation(mySession) {
   const FREE_MS=3*60*1000, NUDGE_MS=2*60*1000;
   const start=Date.now();
   let nudged=false;
+  // Reset conversation history here so coach only sees the free conversation
+  // not the scripted demo/practice exchanges that happened before
+  resetConversation();
 
   if (!sc.coldOpen) {
     await speak("Great work! Now let's have a real conversation -- no script, just talk to her naturally for ten minutes. I'll give you feedback at the end.",'Ryan');
