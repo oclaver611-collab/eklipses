@@ -530,13 +530,13 @@ async function runCoachFeedback(mySession) {
     // 4-part chronological coaching — opener, middle, mistake, verdict
     const coachParts = [f.part1, f.part2, f.part3, f.part4].filter(Boolean);
     const fillers = [
-      "Alright...",
-      "Now here's the thing...",
-      "Let me show you something...",
-      "Okay, stay with me...",
-      "Here's what I saw...",
-      "Right, so...",
-      "Now watch this...",
+      "Now here's the thing — this is where it gets interesting.",
+      "Alright, let me show you something.",
+      "Here's what I saw happening in the middle of that.",
+      "Okay — this next part is important.",
+      "Right, so here's where it shifted.",
+      "Now watch this moment — this one matters.",
+      "Let me break down what happened next.",
     ];
     if (coachParts.length) {
       for (let i = 0; i < coachParts.length; i++) {
