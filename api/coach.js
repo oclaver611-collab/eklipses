@@ -14,17 +14,21 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: 'GROQ_API_KEY not set' });
   }
 
-  // Number HIM lines so Ryan can unambiguously find HIM_1 as the opener
+  // Extract opener explicitly in JS — never trust the model to find it
   let himCount = 0;
+  let openerLine = null;
   const transcript = conversation
     .map(m => {
       if (m.role === 'user') {
         himCount++;
-        return `HIM_${himCount}: ${m.content}`;
+        const text = m.content.trim();
+        if (!openerLine) openerLine = text;
+        return `HIM_${himCount}: ${text}`;
       }
       return `SOFIA: ${m.content}`;
     })
     .join('\n');
+  if (!openerLine) openerLine = conversation.find(m => m.role === 'user')?.content || '';
 
   const isBeach = scenarioKey === 'beach';
   const girlName = isBeach ? 'Sofia' : 'her';
@@ -48,13 +52,13 @@ Respond ONLY with valid JSON — no markdown, no preamble:
   "score": <number 1-10>,
   "spokenSummary": "<One punchy sentence for the card. Max 20 words. Reference something specific that actually happened.>",
 
-  "part1": "<OPENER + FIRST WIN. Minimum 70 words, maximum 90 words. Start by finding something real he did right in the opening — even if small: he showed up, he spoke, he asked something. Name it specifically. Then quote his exact HIM_1 line verbatim and explain what it signaled. If weak, say what made it weak without crushing him. Then give one concrete alternative opener — actual words — that would have made her more curious. End this part on something that builds confidence. Second person, flowing speech, no lists.>",
+  "part1": "<OPENER + FIRST WIN. Target 400-500 characters of spoken text. The opener is given above as HIS OPENER — quote that exact string verbatim, nothing else. Open by acknowledging something positive: he showed up, he spoke, he kept going. Then react to the opener honestly — if weak say why without crushing him. Give one concrete alternative opener in actual words. End on something that builds confidence. Second person, flowing speech, no lists.>",
 
-  "part2": "<MIDDLE — WHAT WORKED AND WHAT DIDN'T. Minimum 70 words, maximum 90 words. Find the best moment in the middle of the conversation — a real question, a genuine response, a moment of connection however brief. Quote it and say specifically why it worked or showed promise. Then quote one moment that didn't land and explain what was missing. Balance the two. Do not make this part all negative. Stay in the transcript, no generic advice.>",
+  "part2": "<MIDDLE — WIN + CORRECTION. Target 400-500 characters. Find the best genuine moment in the middle — a real question, common ground, anything that worked however briefly. Quote it and say why it showed promise. Then find one thing that missed and explain what was missing. Balance positive and negative equally. Stay in the transcript, no generic advice.>",
 
-  "part3": "<THE KEY MISTAKE. Minimum 70 words, maximum 85 words — do not exceed 85. Find the single moment where he lost the most ground. Quote exactly what he said and exactly what she said back. Call out what went wrong — apologetic energy, over-explaining, listing status, whatever it was. Calibrate the tone: if it cost him a lot say so directly, if it was a small slip correct without hammering. Then give him the exact line he should have said instead — actual words. Stop at 85 words.>",
+  "part3": "<THE KEY MISTAKE. Target 380-450 characters — hard cap at 450. Single worst moment only. Quote exactly what he said and exactly what she said back. Name what went wrong in one sharp sentence. Give him the exact words he should have said instead. Calibrate harshness to the size of the mistake. No padding.>",
 
-  "part4": "<CLOSE + VERDICT. Minimum 60 words, maximum 80 words. Restate one genuine strength from the session — something specific he did that showed real potential. Deliver the score and what it means in one honest sentence — do not default to 4, score what actually happened. Name the one thing that if fixed would change his results most. End with a sharp motivational close — specific and punchy, makes him want to hit Try Again immediately. Never end flat or generic.>",
+  "part4": "<CLOSE + VERDICT. Target 350-430 characters. Restate one genuine strength. Deliver the score honestly — do not default to 4, score what actually happened. Name the one fix that would change everything. End with one punchy motivational sentence — BANNED words: 'go out there', 'dive deeper', 'aim to', 'work on that'. Use something like: 'Hit Try Again right now — you know what to fix.' Never end flat.>",
 
   "openerBreakdown": "<Quote his exact first message verbatim. One sentence on why it worked or failed.>",
   "bestMoment": "<Quote the single best thing he said verbatim. One sentence on why it landed.>",
@@ -63,26 +67,21 @@ Respond ONLY with valid JSON — no markdown, no preamble:
   "wouldSheDateHim": "<'Yes', 'No', or 'Maybe' — then one sentence from ${girlName}'s perspective in first person, referencing something specific he said.>"
 }
 
-SCORING — read carefully, do not default to 4:
-Score based on what actually happened in THIS conversation, not an ideal standard.
-Most beginners score between 4 and 6. The score MUST reflect real differences between sessions.
-
+SCORING — do not default to 4, score what actually happened:
 3: Barely spoke, froze, or gave only one-word answers with no recovery
-4: Got through it but every question was generic, no real moment of connection at all
-5: Had at least one genuine exchange or showed real curiosity once — even briefly
-6: Found some common ground, made her engage more than once, showed a real side of himself
-7: Multiple real moments, held frame through at least one pushback, conversation felt alive
+4: Got through it but every question was generic — zero genuine connection
+5: Had at least one genuine exchange or showed real curiosity even once
+6: Found common ground, made her engage more than once, showed a real side of himself
+7: Multiple real moments, held frame through pushback, conversation felt alive
 8: Specific, curious, confident — she was noticeably more engaged by the end
-9: She would remember this conversation. Genuine chemistry.
+9: She would remember this conversation
 10: She is thinking about him on the drive home
 
-Key rule: if he asked at least one specific follow-up question that showed he was listening — that is a 5, not a 4. If he made her laugh or found genuine common ground even once — that is a 6. Score generously for effort and improvement, strictly for execution.
-
-COACHING RATIO — adjust based on score:
-- Score 3-4: Lead with 1 genuine win, then 2 corrections. He needs confidence to continue.
-- Score 5-6: Balance — 1 win, 1 correction, 1 win, 1 correction across the parts.
-- Score 7+: Acknowledge what worked first, then push for more.
-Never open with a criticism. Always find something real that worked first, even if small.
+COACHING RATIO by score:
+- Score 3-4: Lead with 1 win, then correct. He needs confidence to continue.
+- Score 5-6: Balance — alternate win and correction across parts.
+- Score 7+: Acknowledge what worked, then push for more.
+Never open a part with a criticism. Always find something real that worked first.
 
 RULES — non-negotiable:
 - QUOTE actual lines verbatim. Do not paraphrase or invent.
@@ -109,7 +108,7 @@ RULES — non-negotiable:
         max_tokens: 2000,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Scenario: ${scenarioTitle}\n\nFull conversation transcript:\n${transcript}` }
+          { role: 'user', content: `Scenario: ${scenarioTitle}\n\nHIS OPENER — the very first thing he said (quote this verbatim in part1, no substitutions): "${openerLine}"\n\nFull conversation transcript:\n${transcript}` }
         ],
         response_format: { type: 'json_object' }
       }),
