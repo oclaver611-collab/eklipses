@@ -14,8 +14,16 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: 'GROQ_API_KEY not set' });
   }
 
+  // Number HIM lines so Ryan can unambiguously find HIM_1 as the opener
+  let himCount = 0;
   const transcript = conversation
-    .map(m => `${m.role === 'user' ? 'HIM' : 'SOFIA'}: ${m.content}`)
+    .map(m => {
+      if (m.role === 'user') {
+        himCount++;
+        return `HIM_${himCount}: ${m.content}`;
+      }
+      return `SOFIA: ${m.content}`;
+    })
     .join('\n');
 
   const isBeach = scenarioKey === 'beach';
@@ -71,8 +79,9 @@ RULES — non-negotiable:
 - wouldSheDateHim is ${girlName} speaking in first person.
 - tryNextTime is actual words he can say, not a mindset concept.
 - Only reference details that appear in the transcript. Do not hallucinate props or context.
-- The OPENER is the first "HIM:" line in the transcript — find it by scanning from the top, take the first one, use it verbatim. Ignore any lines before it.
-- If a HIM line is clearly a voice recognition glitch (3 words or fewer with no coherent meaning like "nice I am full") — skip it and use the next HIM line as the opener instead.`;
+- The OPENER is always HIM_1 in the transcript — the line labeled "HIM_1:". Quote it verbatim. Do not use HIM_2 or any later line as the opener.
+- If HIM_1 is clearly a voice recognition glitch (3 words or fewer with no coherent meaning, e.g. "nice I am full") — use HIM_2 as the opener instead, and note it was garbled.
+- The transcript labels HIM lines as HIM_1, HIM_2, HIM_3 etc. Use these numbers to navigate chronologically.`;
 
   try {
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {

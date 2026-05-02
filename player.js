@@ -529,14 +529,29 @@ async function runCoachFeedback(mySession) {
     if(mySession!==session) return;
     // 4-part chronological coaching — opener, middle, mistake, verdict
     const coachParts = [f.part1, f.part2, f.part3, f.part4].filter(Boolean);
-    const fillers = [
-      "Now here's the thing — this is where it gets interesting.",
-      "Alright, let me show you something.",
-      "Here's what I saw happening in the middle of that.",
-      "Okay — this next part is important.",
-      "Right, so here's where it shifted.",
-      "Now watch this moment — this one matters.",
-      "Let me break down what happened next.",
+    // Positionally-aware fillers — each transition has its own set
+    const fillerSets = [
+      // After part1 → into part2 (middle of conversation)
+      [
+        "Now here's the thing — this is where the middle gets interesting.",
+        "Alright, let me show you what happened next.",
+        "Right, so here's where the conversation shifted.",
+        "Okay — this next part tells me a lot about your approach.",
+      ],
+      // After part2 → into part3 (the key mistake)
+      [
+        "Now watch this moment — this one matters.",
+        "Here's where it cost you.",
+        "This is the moment I want you to remember.",
+        "Okay, this is the one.",
+      ],
+      // After part3 → into part4 (verdict)
+      [
+        "So here's where I land on all of that.",
+        "Alright, let me give you the verdict.",
+        "Here's the bottom line.",
+        "So — putting it all together.",
+      ],
     ];
     if (coachParts.length) {
       for (let i = 0; i < coachParts.length; i++) {
@@ -544,7 +559,8 @@ async function runCoachFeedback(mySession) {
         await speak(coachParts[i], 'Ryan');
         if (i < coachParts.length - 1) {
           if (mySession !== session) return;
-          const filler = fillers[Math.floor(Math.random() * fillers.length)];
+          const set = fillerSets[i] || fillerSets[fillerSets.length - 1];
+          const filler = set[Math.floor(Math.random() * set.length)];
           await speak(filler, 'Ryan');
         }
       }
