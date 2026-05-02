@@ -70,7 +70,9 @@ RULES — non-negotiable:
 - Never say great job unless score is 8+.
 - wouldSheDateHim is ${girlName} speaking in first person.
 - tryNextTime is actual words he can say, not a mindset concept.
-- Only reference details that appear in the transcript. Do not hallucinate props or context.`;
+- Only reference details that appear in the transcript. Do not hallucinate props or context.
+- The OPENER is the first "HIM:" line in the transcript — find it by scanning from the top, take the first one, use it verbatim. Ignore any lines before it.
+- If a HIM line is clearly a voice recognition glitch (3 words or fewer with no coherent meaning like "nice I am full") — skip it and use the next HIM line as the opener instead.`;
 
   try {
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
