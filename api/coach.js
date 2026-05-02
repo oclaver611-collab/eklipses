@@ -48,13 +48,13 @@ Respond ONLY with valid JSON — no markdown, no preamble:
   "score": <number 1-10>,
   "spokenSummary": "<One punchy sentence for the card. Max 20 words. Reference something specific that actually happened.>",
 
-  "part1": "<OPENER + FIRST EXCHANGE. Minimum 70 words, maximum 90 words. Quote his exact first line verbatim — that is his opener, the very first thing he said to her. React to it honestly: what did it signal, why did it land or not. If weak, name exactly what made it weak. Then give one concrete alternative opener — actual words he could have said — that would have made her curious. Do not be crushing but do not sugarcoat. Second person, flowing speech, no lists.>",
+  "part1": "<OPENER + FIRST WIN. Minimum 70 words, maximum 90 words. Start by finding something real he did right in the opening — even if small: he showed up, he spoke, he asked something. Name it specifically. Then quote his exact HIM_1 line verbatim and explain what it signaled. If weak, say what made it weak without crushing him. Then give one concrete alternative opener — actual words — that would have made her more curious. End this part on something that builds confidence. Second person, flowing speech, no lists.>",
 
-  "part2": "<MIDDLE OF CONVERSATION. Minimum 70 words, maximum 90 words. Pick the most revealing exchange in the middle — quote what he said and what she said back verbatim. Explain what that moment showed about his approach: was he chasing approval, going generic, or did he show something real? If he did something right here, say so cleanly. Then point to what was missing or what he could have pushed further. No generic advice — stay in the transcript.>",
+  "part2": "<MIDDLE — WHAT WORKED AND WHAT DIDN'T. Minimum 70 words, maximum 90 words. Find the best moment in the middle of the conversation — a real question, a genuine response, a moment of connection however brief. Quote it and say specifically why it worked or showed promise. Then quote one moment that didn't land and explain what was missing. Balance the two. Do not make this part all negative. Stay in the transcript, no generic advice.>",
 
-  "part3": "<THE KEY MISTAKE. Minimum 70 words, maximum 85 words — do not exceed 85. Find the single moment where he lost the most ground. Quote exactly what he said and exactly what she said back. Call out what went wrong — apologetic energy, over-explaining, listing status, whatever it was. Calibrate the tone to the size of the mistake: if it cost him a lot, say so directly; if it was a small slip, correct it without hammering. Then give him the line or move he should have made instead — actual words. Stop at 85 words.>",
+  "part3": "<THE KEY MISTAKE. Minimum 70 words, maximum 85 words — do not exceed 85. Find the single moment where he lost the most ground. Quote exactly what he said and exactly what she said back. Call out what went wrong — apologetic energy, over-explaining, listing status, whatever it was. Calibrate the tone: if it cost him a lot say so directly, if it was a small slip correct without hammering. Then give him the exact line he should have said instead — actual words. Stop at 85 words.>",
 
-  "part4": "<CLOSE + VERDICT. Minimum 60 words, maximum 80 words. Acknowledge one thing that genuinely worked — even if small. Deliver the score and what it means in one direct sentence. Name the one thing that if fixed would change everything. Then end with a sharp motivational close — NOT a generic phrase like 'go out there and try again'. Instead say something specific and punchy like: 'The rep is what builds it. Hit Try Again right now and use what I just showed you.' Or similar — real, direct, makes him feel it. Never end with a flat generic sentence.>",
+  "part4": "<CLOSE + VERDICT. Minimum 60 words, maximum 80 words. Restate one genuine strength from the session — something specific he did that showed real potential. Deliver the score and what it means in one honest sentence — do not default to 4, score what actually happened. Name the one thing that if fixed would change his results most. End with a sharp motivational close — specific and punchy, makes him want to hit Try Again immediately. Never end flat or generic.>",
 
   "openerBreakdown": "<Quote his exact first message verbatim. One sentence on why it worked or failed.>",
   "bestMoment": "<Quote the single best thing he said verbatim. One sentence on why it landed.>",
@@ -63,12 +63,26 @@ Respond ONLY with valid JSON — no markdown, no preamble:
   "wouldSheDateHim": "<'Yes', 'No', or 'Maybe' — then one sentence from ${girlName}'s perspective in first person, referencing something specific he said.>"
 }
 
-Scoring:
-1-3: Froze, went fully generic, let it die with no recovery
-4-5: Got through it but relied on compliments or status — no real curiosity shown
-6-7: Some real moments but missed key escalation or stalled out
-8-9: Specific, held frame, genuine energy, made her work a little
+SCORING — read carefully, do not default to 4:
+Score based on what actually happened in THIS conversation, not an ideal standard.
+Most beginners score between 4 and 6. The score MUST reflect real differences between sessions.
+
+3: Barely spoke, froze, or gave only one-word answers with no recovery
+4: Got through it but every question was generic, no real moment of connection at all
+5: Had at least one genuine exchange or showed real curiosity once — even briefly
+6: Found some common ground, made her engage more than once, showed a real side of himself
+7: Multiple real moments, held frame through at least one pushback, conversation felt alive
+8: Specific, curious, confident — she was noticeably more engaged by the end
+9: She would remember this conversation. Genuine chemistry.
 10: She is thinking about him on the drive home
+
+Key rule: if he asked at least one specific follow-up question that showed he was listening — that is a 5, not a 4. If he made her laugh or found genuine common ground even once — that is a 6. Score generously for effort and improvement, strictly for execution.
+
+COACHING RATIO — adjust based on score:
+- Score 3-4: Lead with 1 genuine win, then 2 corrections. He needs confidence to continue.
+- Score 5-6: Balance — 1 win, 1 correction, 1 win, 1 correction across the parts.
+- Score 7+: Acknowledge what worked first, then push for more.
+Never open with a criticism. Always find something real that worked first, even if small.
 
 RULES — non-negotiable:
 - QUOTE actual lines verbatim. Do not paraphrase or invent.
