@@ -14,10 +14,10 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: 'GROQ_API_KEY not set' });
   }
 
-  // Extract opener in JS and replace HIM_1 in transcript with a placeholder
-  // This forces the model to use the provided opener — it cannot substitute another line
+  // Extract opener and Sofia's first response in JS — part1 is generated here, not by the model
   let himCount = 0;
   let openerLine = null;
+  let sofiaFirstResponse = null;
   const transcript = conversation
     .map(m => {
       if (m.role === 'user') {
@@ -25,14 +25,38 @@ module.exports = async function handler(req, res) {
         const text = m.content.trim();
         if (himCount === 1) {
           openerLine = text;
-          return `HIM_1: [provided above as HIS OPENER]`;
+          return null; // remove from transcript — handled in part1
         }
         return `HIM_${himCount}: ${text}`;
+      } else {
+        const text = m.content.trim();
+        if (!sofiaFirstResponse && himCount === 1) {
+          sofiaFirstResponse = text;
+          return null; // remove Sofia's first response too
+        }
+        return `SOFIA: ${text}`;
       }
-      return `SOFIA: ${m.content}`;
     })
+    .filter(Boolean)
     .join('\n');
   if (!openerLine) openerLine = conversation.find(m => m.role === 'user')?.content || '';
+
+  // Generate part1 directly in JS — guaranteed correct opener
+  const openerWords = openerLine.trim().split(/\s+/);
+  const isGeneric = openerWords.length <= 6 || 
+    /^(hi|hey|hello|what is your name|what.s your name)/i.test(openerLine.trim());
+  const nameOnly = /^(hi|hey|hello)[,.]?\s*$/i.test(openerLine.trim());
+  
+  let part1;
+  const sofiaReply = sofiaFirstResponse ? ' She responded with "' + sofiaFirstResponse + '" — she kept it short because you gave her nothing specific to work with.' : '';
+  const sofiaReplyGood = sofiaFirstResponse ? ' She came back with "' + sofiaFirstResponse + '" — that is a real response, which means the door was open.' : '';
+  if (nameOnly) {
+    part1 = 'You showed up — that already puts you ahead of the guys who freeze. But your opener was just "' + openerLine + '". One word. She has nothing to respond to — you made her do all the work. Next time try something that opens a door: "I keep walking past this spot and you are always here — what is the pull?" That is specific, curious, and gives her something real to say. You have the nerve. Now give it some substance.';
+  } else if (isGeneric) {
+    part1 = 'First thing — you walked up and said something. That matters. But your opener was "' + openerLine + '". That could have come from anyone.' + sofiaReply + ' A better opener: "You look like you have found the only quiet spot on this whole beach — is this your spot?" Specific, observational, gives her something real to respond to. Build on the confidence you already showed.';
+  } else {
+    part1 = 'Good start — you opened with "' + openerLine + '". That showed genuine intent and gave her something to respond to.' + sofiaReplyGood + ' The foundation was solid. The question is what you built on top of it.';
+  }
 
   const isBeach = scenarioKey === 'beach';
   const girlName = isBeach ? 'Sofia' : 'her';
@@ -56,11 +80,9 @@ Respond ONLY with valid JSON — no markdown, no preamble:
   "score": <number 1-10>,
   "spokenSummary": "<One punchy sentence for the card. Max 20 words. Reference something specific that actually happened.>",
 
-  "part1": "<OPENER + FIRST EXCHANGE. Minimum 70 words, maximum 90 words. Quote his exact first line verbatim — that is his opener, the very first thing he said to her. React to it honestly: what did it signal, why did it land or not. If weak, name exactly what made it weak. Then give one concrete alternative opener — actual words he could have said — that would have made her curious. Do not be crushing but do not sugarcoat. Second person, flowing speech, no lists.>",
-
   "part2": "<MIDDLE OF CONVERSATION. Minimum 70 words, maximum 90 words. Pick the most revealing exchange in the middle — quote what he said and what she said back verbatim. Explain what that moment showed about his approach: was he chasing approval, going generic, or did he show something real? If he did something right here, say so cleanly. Then point to what was missing or what he could have pushed further. No generic advice — stay in the transcript.>",
 
-  "part3": "<THE KEY MISTAKE. Minimum 70 words, maximum 85 words — do not exceed 85. Find the single moment where he lost the most ground. Quote exactly what he said and exactly what she said back. Call out what went wrong — apologetic energy, over-explaining, listing status, whatever it was. Calibrate the tone to the size of the mistake: if it cost him a lot, say so directly; if it was a small slip, correct it without hammering. Then give him the line or move he should have made instead — actual words. Stop at 85 words.>",
+  "part3": "<THE KEY MISTAKE. Minimum 80 words. Find the single moment where he lost the most ground. Quote exactly what he said and exactly what she said back verbatim. Call out what went wrong — apologetic energy, over-explaining, listing status, whatever it was. Calibrate tone to the size of the mistake. Then give him the exact words he should have said instead. Do not truncate — fully develop the correction.>",
 
   "part4": "<CLOSE + VERDICT. Target 350-430 characters. Restate one genuine strength from this session. Deliver the score honestly in one sentence. Name the single fix that would change his results most. Then close with a motivational line that makes him want to go again RIGHT NOW — pick based on score: score 3-4 use something like 'Practice is the only way through. Hit Try Again — every rep makes you sharper.' Score 5-6 use something like 'You are closer than you think. One more round and you will feel the difference.' Score 7+ use something like 'You have got something real here. Go again and push it further — you will surprise yourself.' Or write your own variation that fits — warm, specific, genuinely encouraging, makes going again feel obvious. BANNED: 'go out there', 'dive deeper', 'aim to', 'work on that'. Never end flat.>",
 
@@ -87,9 +109,8 @@ RULES — non-negotiable:
 - wouldSheDateHim is ${girlName} speaking in first person.
 - tryNextTime is actual words he can say, not a mindset concept.
 - Only reference details that appear in the transcript. Do not hallucinate props or context.
-- The OPENER is always HIM_1 in the transcript — the line labeled "HIM_1:". Quote it verbatim. Do not use HIM_2 or any later line as the opener.
-- If HIM_1 is clearly a voice recognition glitch (3 words or fewer with no coherent meaning, e.g. "nice I am full") — use HIM_2 as the opener instead, and note it was garbled.
-- The transcript labels HIM lines as HIM_1, HIM_2, HIM_3 etc. Use these numbers to navigate chronologically.`;
+- The transcript labels HIM lines as HIM_2, HIM_3 etc. (HIM_1 was the opener — already handled separately above the transcript). Navigate chronologically from HIM_2 onward.
+- Do not reference or quote HIM_1 — it is not in the transcript. Start analysis from HIM_2.`;
 
   try {
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -103,7 +124,7 @@ RULES — non-negotiable:
         max_tokens: 2000,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Scenario: ${scenarioTitle}\n\nHIS OPENER (quote this verbatim in part1 — it is already removed from the transcript below): "${openerLine}"\n\nFull conversation transcript:\n${transcript}` }
+          { role: 'user', content: `Scenario: ${scenarioTitle}\n\nNote: HIM_1 (the opener) was already handled separately. The transcript below starts from HIM_2 onward.\n\nFull conversation transcript:\n${transcript}` }
         ],
         response_format: { type: 'json_object' }
       }),
@@ -117,6 +138,8 @@ RULES — non-negotiable:
     const data = await response.json();
     const raw = data.choices?.[0]?.message?.content;
     const feedback = JSON.parse(raw);
+    // Inject JS-generated part1 — guaranteed correct opener
+    feedback.part1 = part1;
     res.json(feedback);
 
   } catch (err) {
