@@ -46,7 +46,7 @@ Respond ONLY with valid JSON — no markdown, no preamble:
 
   "part3": "<THE KEY MISTAKE. Minimum 70 words, maximum 90 words. Find the single moment where he lost the most ground. Quote exactly what he said and exactly what she said back. Call out what went wrong — apologetic energy, over-explaining, listing status, whatever it was. Calibrate the tone to the size of the mistake: if it cost him a lot, say so directly; if it was a small slip, correct it without hammering. Then give him the line or move he should have made instead — actual words.>",
 
-  "part4": "<CLOSE + VERDICT. Minimum 50 words, maximum 70 words. Acknowledge one thing that genuinely worked — even if small. Then deliver the score and what it means in one honest sentence. Name the single thing that if he fixed it would change his results the most. End with one sharp line that makes him want to go again — not a pep talk, just the truth delivered in a way that makes him hungry. Do not end flat.>",
+  "part4": "<CLOSE + VERDICT. Minimum 60 words, maximum 80 words. Acknowledge one thing that genuinely worked — even if small. Then deliver the score and what it means in one honest sentence. Name the single thing that if he fixed it would change his results the most. Then close with a motivational push — something like: the guys who get good at this are the ones who go again right now, not tomorrow. Keep it short, punchy, real — make him want to hit Try Again immediately. Do not end flat.>",
 
   "openerBreakdown": "<Quote his exact first message verbatim. One sentence on why it worked or failed.>",
   "bestMoment": "<Quote the single best thing he said verbatim. One sentence on why it landed.>",

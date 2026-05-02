@@ -529,11 +529,24 @@ async function runCoachFeedback(mySession) {
     if(mySession!==session) return;
     // 4-part chronological coaching — opener, middle, mistake, verdict
     const coachParts = [f.part1, f.part2, f.part3, f.part4].filter(Boolean);
+    const fillers = [
+      "Alright...",
+      "Now here's the thing...",
+      "Let me show you something...",
+      "Okay, stay with me...",
+      "Here's what I saw...",
+      "Right, so...",
+      "Now watch this...",
+    ];
     if (coachParts.length) {
-      for (const part of coachParts) {
+      for (let i = 0; i < coachParts.length; i++) {
         if (mySession !== session) return;
-        await speak(part, 'Ryan');
-        await pause(800);
+        await speak(coachParts[i], 'Ryan');
+        if (i < coachParts.length - 1) {
+          if (mySession !== session) return;
+          const filler = fillers[Math.floor(Math.random() * fillers.length)];
+          await speak(filler, 'Ryan');
+        }
       }
     } else {
       await speak(f.spokenFeedback || f.spokenSummary, 'Ryan');
