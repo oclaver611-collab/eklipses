@@ -4,7 +4,7 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { conversation, scenarioTitle, scenarioKey } = req.body || {};
+  const { conversation, scenarioTitle, scenarioKey, opener } = req.body || {};
 
   if (!conversation?.length) {
     return res.status(400).json({ error: 'No conversation provided' });
@@ -14,32 +14,32 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: 'GROQ_API_KEY not set' });
   }
 
-  // Extract opener and Sofia's first response in JS — part1 is generated here, not by the model
-  let himCount = 0;
-  let openerLine = null;
+  // Use the opener passed directly from player.js — this is the true first thing the user said
+  // If not passed, fall back to extracting from conversation
   let sofiaFirstResponse = null;
+  let openerLine = (opener || '').trim();
+
+  // Build transcript — number HIM lines, capture Sofia's first response for context
+  let himCount = 0;
+  let sofiaCount = 0;
   const transcript = conversation
     .map(m => {
       if (m.role === 'user') {
         himCount++;
-        const text = m.content.trim();
-        if (himCount === 1) {
-          openerLine = text;
-          return null; // remove from transcript — handled in part1
-        }
-        return `HIM_${himCount}: ${text}`;
+        return `HIM_${himCount}: ${m.content.trim()}`;
       } else {
+        sofiaCount++;
         const text = m.content.trim();
-        if (!sofiaFirstResponse && himCount === 1) {
-          sofiaFirstResponse = text;
-          return null; // remove Sofia's first response too
-        }
+        if (sofiaCount === 1) sofiaFirstResponse = text;
         return `SOFIA: ${text}`;
       }
     })
-    .filter(Boolean)
     .join('\n');
-  if (!openerLine) openerLine = conversation.find(m => m.role === 'user')?.content || '';
+
+  // If no opener was passed, extract from conversation as fallback
+  if (!openerLine) {
+    openerLine = conversation.find(m => m.role === 'user')?.content || '';
+  }
 
   // Generate part1 directly in JS — guaranteed correct opener
   const openerLower = openerLine.trim().toLowerCase();

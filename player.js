@@ -248,6 +248,7 @@ function getKokoroVoice(speaker) {
 
 /* ===== Dynamic Mary ===== */
 let conversationHistory=[];
+let firstUserOpener=null;
 function resetConversation() { conversationHistory=[]; }
 
 async function getDynamicMaryResponse(userSaid) {
@@ -272,6 +273,7 @@ async function getDynamicMaryResponse(userSaid) {
     if(!res.ok) return null;
     const data=await res.json();
     const maryText=data.response;
+    if(!firstUserOpener) firstUserOpener=userSaid;
     conversationHistory.push({role:'user',content:userSaid});
     conversationHistory.push({role:'assistant',content:maryText});
     if(conversationHistory.length>12) conversationHistory=conversationHistory.slice(-12);
@@ -377,6 +379,7 @@ function listenForUser(mySession, maxTotalMs) {
 async function playScenario(key, practice=false) {
   stopEverything();
   resetConversation();
+  firstUserOpener=null;
   await pause(200);
   const mySession=session;
   currentScenarioKey=key;
@@ -525,7 +528,7 @@ async function runCoachFeedback(mySession) {
   try {
     const res=await fetch('/api/coach',{
       method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ conversation:conversationHistory, scenarioTitle:sc.title||'Dating scenario', scenarioKey:currentScenarioKey||'' }),
+      body:JSON.stringify({ conversation:conversationHistory, scenarioTitle:sc.title||'Dating scenario', scenarioKey:currentScenarioKey||'', opener:firstUserOpener||'' }),
     });
     if(!res.ok) throw new Error('Coach failed');
     const f=await res.json();
