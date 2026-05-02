@@ -42,10 +42,18 @@ module.exports = async function handler(req, res) {
   if (!openerLine) openerLine = conversation.find(m => m.role === 'user')?.content || '';
 
   // Generate part1 directly in JS — guaranteed correct opener
+  const openerLower = openerLine.trim().toLowerCase();
   const openerWords = openerLine.trim().split(/\s+/);
-  const isGeneric = openerWords.length <= 6 || 
-    /^(hi|hey|hello|what is your name|what.s your name)/i.test(openerLine.trim());
-  const nameOnly = /^(hi|hey|hello)[,.]?\s*$/i.test(openerLine.trim());
+  // nameOnly = opener is just a greeting with nothing else
+  const nameOnly = openerWords.length <= 2 && /^(hi|hey|hello)/i.test(openerLower);
+  // isGeneric = starts with greeting, asks for name, or is very short and generic
+  const isGeneric = !nameOnly && (
+    /^(hi|hey|hello)\b/i.test(openerLower) ||
+    openerLower.includes('what is your name') ||
+    openerLower.includes("what's your name") ||
+    openerLower.includes('never saw you here') ||
+    openerWords.length <= 5
+  );
   
   let part1;
   const sofiaReply = sofiaFirstResponse ? ' She responded with "' + sofiaFirstResponse + '" — she kept it short because you gave her nothing specific to work with.' : '';
