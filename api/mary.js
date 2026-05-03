@@ -68,9 +68,11 @@ Neutral at start. Warms when he listens, asks real questions, says something spe
 
 HOW YOU TALK:
 - 1-2 sentences maximum. No exceptions.
-- Share things about yourself when asked — your magazine, your writing, why you like this spot. Do not volunteer your whole life unprompted.
-- Ask one thing back only when genuinely curious — not every turn.
+- Early in the conversation (first 2-3 exchanges): answer what's asked, keep it brief, let him work a little.
+- Once the conversation has real back-and-forth: loosen up. Add a small unprompted detail that opens a door — something about your writing, this spot, something you noticed. Not your life story. Just one thing that gives him something to grab onto.
+- Ask one thing back when something he said genuinely interests you. Not every turn, but don't be a wall either.
 - Dry and specific when funny. Never sarcastic for no reason.
+- Even early on, your answers have texture — a word choice, a small observation that shows you are present and engaged.
 
 DATE CLOSE RULES:
 - First ask, low rapport: one-sentence deflect, no lecture.
@@ -419,39 +421,58 @@ Personality: real, natural, direct.`;
 
   const systemPrompt = personality + baseRules;
 
-  try {
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
-        max_tokens: 120,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...history,
-          { role: 'user', content: userMessage }
-        ],
-      }),
-    });
+  const groqBody = JSON.stringify({
+    model: 'gemma2-9b-it',
+    max_tokens: 120,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      ...history,
+      { role: 'user', content: userMessage }
+    ],
+  });
 
-    if (!response.ok) {
-      const err = await response.text();
-      return res.status(500).json({ error: 'Groq error: ' + err });
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY_MS = 3000;
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: groqBody,
+      });
+
+      if (response.status === 429) {
+        if (attempt < MAX_RETRIES) {
+          await new Promise(r => setTimeout(r, RETRY_DELAY_MS * attempt));
+          continue;
+        }
+        return res.status(429).json({ error: 'Rate limit — try again in a moment' });
+      }
+
+      if (!response.ok) {
+        const err = await response.text();
+        return res.status(500).json({ error: 'Groq error: ' + err });
+      }
+
+      const data = await response.json();
+      const maryResponse = data.choices?.[0]?.message?.content?.trim();
+
+      if (!maryResponse) {
+        return res.status(500).json({ error: 'Empty response' });
+      }
+
+      return res.json({ response: maryResponse });
+
+    } catch (err) {
+      if (attempt < MAX_RETRIES) {
+        await new Promise(r => setTimeout(r, RETRY_DELAY_MS));
+        continue;
+      }
+      return res.status(500).json({ error: err.message });
     }
-
-    const data = await response.json();
-    const maryResponse = data.choices?.[0]?.message?.content?.trim();
-
-    if (!maryResponse) {
-      return res.status(500).json({ error: 'Empty response' });
-    }
-
-    res.json({ response: maryResponse });
-
-  } catch (err) {
-    res.status(500).json({ error: err.message });
   }
 };
