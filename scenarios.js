@@ -56,7 +56,7 @@ window.SCENARIOS = {
   },
 
   bar: {
-    title: "Scenario3: dating at bar",
+    title: "Bar — Night Out Cold Approach",
     thumb: "bar.jpg",
     bg: "bar_bg.jpg",
     demo: [
@@ -79,7 +79,7 @@ window.SCENARIOS = {
   },
 
   museum: {
-    title: "Scenario4: dating at the museum",
+    title: "Museum — Quiet Opener",
     thumb: "museum.jpg",
     bg: "museum_bg.jpg",
     demo: [
