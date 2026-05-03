@@ -525,12 +525,25 @@ async function runCoachFeedback(mySession) {
   els.name.textContent='Ryan'; els.text.textContent='Analyzing your session...';
   setMediaForSpeaker('Ryan');
   const sc=SCENARIOS[currentScenarioKey]||{};
+  // Guard: if no conversation happened, skip coaching
+  if (!conversationHistory.length) {
+    await speak("Looks like we didn't get enough conversation to work with. Hit Try Again and give me something to coach.", 'Ryan');
+    return;
+  }
   try {
+    const coachController=new AbortController();
+    const coachTimeout=setTimeout(()=>coachController.abort(),25000);
     const res=await fetch('/api/coach',{
+      signal:coachController.signal,
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({ conversation:conversationHistory, scenarioTitle:sc.title||'Dating scenario', scenarioKey:currentScenarioKey||'', opener:firstUserOpener||'' }),
     });
-    if(!res.ok) throw new Error('Coach failed');
+    clearTimeout(coachTimeout);
+    if(!res.ok) {
+      const errText = await res.text().catch(()=>'');
+      console.error('Coach API error:', res.status, errText);
+      throw new Error('Coach API returned ' + res.status);
+    }
     const f=await res.json();
     if(mySession!==session) return;
     // 4-part chronological coaching — opener, middle, mistake, verdict
@@ -576,7 +589,8 @@ async function runCoachFeedback(mySession) {
     if(mySession!==session) return;
     showFeedbackCard(f);
   } catch(err) {
-    await speak("Good session! Keep practicing -- pick another scenario.",'Ryan');
+    console.error('Coach feedback error:', err.message);
+    await speak("Something went wrong pulling your feedback — the session was good though. Hit Try Again and let's go again.",'Ryan');
   }
 }
 
