@@ -223,8 +223,9 @@ async function speak(text, speaker) {
   try {
     await Promise.race([
       (async()=>{
+        const LIP_SYNC_DELAY_MS = 350; // tune: increase if video leads audio, decrease if audio leads video
         let started=false;
-        const sync=()=>{ if(!started&&mySession===session){started=true;const el=els.media;if(el&&el.tagName==='VIDEO'){try{el.play().catch(()=>{});}catch{}}} };
+        const sync=()=>{ if(!started&&mySession===session){started=true;setTimeout(()=>{ if(mySession!==session)return; const el=els.media;if(el&&el.tagName==='VIDEO'){try{el.play().catch(()=>{});}catch{}} },LIP_SYNC_DELAY_MS);} };
         const poll=setInterval(()=>{ if(mySession!==session){clearInterval(poll);return;} if(__audioContexts.some(c=>c.state==='running')){clearInterval(poll);sync();} },30);
         setTimeout(()=>{clearInterval(poll);sync();},500);
         await KokoroSpeech.speak(text, voice);
@@ -440,7 +441,7 @@ async function playLoop(mySession) {
 async function freeConversation(mySession) {
   if(mySession!==session) return;
   const sc=SCENARIOS[currentScenarioKey]||{};
-  const FREE_MS=3*60*1000, NUDGE_MS=2*60*1000;
+  const FREE_MS=10*60*1000, NUDGE_MS=8*60*1000;
   const start=Date.now();
   let nudged=false;
   // Reset conversation history here so coach only sees the free conversation
