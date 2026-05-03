@@ -338,7 +338,7 @@ function listenForUser(mySession, maxTotalMs) {
 
     function startRec() {
       if (resolved||mySession!==session) return;
-      if (restarts>=MAX_RESTARTS) { finish('max_restarts'); return; }
+      if (restarts>=MAX_RESTARTS) { restarts=0; } // reset restart counter — keep listening
       restarts++;
       const r=createRecognition(); if(!r){finish('no_sr');return;}
       r.interimResults=true; r.continuous=true;
@@ -357,7 +357,11 @@ function listenForUser(mySession, maxTotalMs) {
         scheduleSilence();
       };
 
-      r.onerror=e=>{ if(e.error==='no-speech'||e.error==='aborted') return; finish('err_'+e.error); };
+      r.onerror=e=>{
+        if(e.error==='aborted') return;
+        if(e.error==='no-speech'){ setTimeout(()=>{ if(!resolved&&mySession===session) startRec(); },100); return; }
+        finish('err_'+e.error);
+      };
 
       r.onend=()=>{
         if(resolved||mySession!==session) return;
