@@ -317,7 +317,7 @@ function listenForUser(mySession, maxTotalMs) {
     maxTotalMs=maxTotalMs||30000;
     let accumulated='', interim='', silenceTimer=null, hardTimer=null, currentRec=null;
     let resolved=false, lastSpeech=Date.now(), restarts=0;
-    const MAX_RESTARTS=8, SILENCE_MS=1500;
+    const MAX_RESTARTS=8, SILENCE_MS=2800;
 
     function finish(val) {
       if (resolved) return;
@@ -439,6 +439,7 @@ async function playLoop(mySession) {
 
 /* ===== Free Conversation ===== */
 async function freeConversation(mySession) {
+  let freeConvRescueUsed = null;
   if(mySession!==session) return;
   const sc=SCENARIOS[currentScenarioKey]||{};
   const FREE_MS=10*60*1000, NUDGE_MS=8*60*1000;
@@ -490,8 +491,25 @@ async function freeConversation(mySession) {
 
     if (!said) {
       if (sc.coldOpen) {
-        const rescues=["You walked all the way over here. Might as well say something.","I don't bite. Usually.","The waves aren't that interesting, I promise."];
-        await speak(randomChoice(rescues),'Mary');
+        const rescues=[
+          "You walked all the way over here. Might as well say something.",
+          "I don't bite. Usually.",
+          "The waves aren't that interesting, I promise.",
+          "Most people just walk past. You didn't.",
+          "You can sit if you want. I don't mind.",
+          "The quiet is better when someone breaks it well.",
+          "I saw you walk by earlier.",
+          "You look like you had something to say.",
+          "Take your time.",
+          "Still working up to it?",
+        ];
+        if (!freeConvRescueUsed) freeConvRescueUsed = new Set();
+        const available = rescues.filter(r => !freeConvRescueUsed.has(r));
+        const pool = available.length > 0 ? available : rescues;
+        const chosen = pool[Math.floor(Math.random() * pool.length)];
+        freeConvRescueUsed.add(chosen);
+        if (freeConvRescueUsed.size >= rescues.length) freeConvRescueUsed.clear();
+        await speak(chosen,'Mary');
         if(mySession!==session) break;
         await pause(900);
       } else {
