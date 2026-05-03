@@ -338,7 +338,7 @@ function listenForUser(mySession, maxTotalMs) {
 
     function startRec() {
       if (resolved||mySession!==session) return;
-      if (restarts>=MAX_RESTARTS) { restarts=0; } // reset restart counter — keep listening
+      if (restarts>=MAX_RESTARTS) { finish('max_restarts'); return; }
       restarts++;
       const r=createRecognition(); if(!r){finish('no_sr');return;}
       r.interimResults=true; r.continuous=true;
@@ -357,11 +357,7 @@ function listenForUser(mySession, maxTotalMs) {
         scheduleSilence();
       };
 
-      r.onerror=e=>{
-        if(e.error==='aborted') return;
-        if(e.error==='no-speech'){ setTimeout(()=>{ if(!resolved&&mySession===session) startRec(); },100); return; }
-        finish('err_'+e.error);
-      };
+      r.onerror=e=>{ if(e.error==='no-speech'||e.error==='aborted') return; finish('err_'+e.error); };
 
       r.onend=()=>{
         if(resolved||mySession!==session) return;
@@ -473,6 +469,7 @@ async function freeConversation(mySession) {
   setMediaForSpeaker('Mary');
   els.name.textContent=sc.coldOpen?'Sofia':'Mary';
   els.text.textContent='...';
+  await pause(1200); // let any prior audio clear before first listen
 
   while(mySession===session) {
     const elapsed=Date.now()-start;
@@ -515,7 +512,7 @@ async function freeConversation(mySession) {
         if (freeConvRescueUsed.size >= rescues.length) freeConvRescueUsed.clear();
         await speak(chosen,'Mary');
         if(mySession!==session) break;
-        await pause(900);
+        await pause(1800); // wait for audio to clear before listening
       } else {
         await pause(500);
       }
@@ -531,7 +528,7 @@ async function freeConversation(mySession) {
       await speak(randomChoice(["Hmm?","Say that again?","What was that?"]),'Mary');
     }
     if(mySession!==session) break;
-    await pause(900);
+    await pause(1500); // wait for audio to clear before next listen
     setMediaForSpeaker('Mary');
     els.name.textContent=sc.coldOpen?'Sofia':'Mary';
   }
