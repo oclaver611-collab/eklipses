@@ -335,7 +335,13 @@ CRITICAL RULES:
 Mood: neutral, open but not overly enthusiastic.
 Personality: real, natural, direct.`;
 
-  const systemPrompt = personality + baseRules;
+  // Append urgent name reminder at the very end of system prompt — last thing model reads before generating
+  const nameReminder = (userName && !nameAlreadyAcknowledged)
+    ? `
+
+URGENT — BEFORE YOU RESPOND: His name is ${userName}. You have not used his name yet in this conversation. Your response MUST include his name naturally. This overrides everything else. Examples: "Nice to meet you, ${userName}." or "So what brings you here, ${userName}?"`
+    : '';
+  const systemPrompt = personality + baseRules + nameReminder;
 
   // ── Groq call with retry logic ───────────────────────────────────────────────
   const delays = [3000, 6000, 9000];
