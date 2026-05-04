@@ -386,12 +386,33 @@ function listenForUser(mySession, maxTotalMs) {
   });
 }
 
+/* ===== Mary API warmup — fires silently when a scenario loads ===== */
+// Primes the Groq cold start so the user's first real message never hits a timeout.
+// Fire-and-forget: we discard the response entirely.
+function warmupMaryApi(key) {
+  const sc = (SCENARIOS[key]) || {};
+  fetch('/api/mary', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      userMessage: 'hi',
+      scenarioKey: key,
+      scenarioTitle: sc.title || '',
+      history: [],
+    }),
+  }).catch(() => {}); // silent — failure is fine, this is just a warm-up
+}
+
 /* ===== Scenario engine ===== */
 async function playScenario(key, practice=false) {
   stopEverything();
   resetConversation();
   firstUserOpener=null;
   await pause(200);
+
+  // Fire warmup ping immediately — runs in background while Ryan speaks the intro
+  warmupMaryApi(key);
+
   const mySession=session;
   currentScenarioKey=key;
   Metrics.bumpView(key); Metrics.refreshUI(key);
@@ -648,7 +669,7 @@ function showFeedbackCard(f) {
         <div style="color:#e0d9ff;font-size:14px;font-style:italic">"${f.tryNextTime||f.tryThisLine||'---'}"</div>
       </div>
       <div style="background:#1a1620;border:1px solid #2e1e3a;border-radius:10px;padding:12px;display:flex;align-items:center;gap:12px">
-        <div style="font-size:22px">${(f.wouldSheDateHim||'').startsWith('Yes')?'💚':(f.wouldSheDateHim||'').startsWith('No')?'❌':'🤔'}</div>
+        <div style="font-size:22px">${(f.wouldSheDateHim||'').startsWith('Yes')?'💜':(f.wouldSheDateHim||'').startsWith('No')?'✖':'🤔'}</div>
         <div>
           <div style="color:#d4a8ff;font-size:11px;font-weight:700;margin-bottom:3px;text-transform:uppercase">Would Sofia date you?</div>
           <div style="color:#e0d9ff;font-size:13px;line-height:1.5">${f.wouldSheDateHim||'---'}</div>
@@ -784,7 +805,7 @@ function bootDefault() {
   overlay.id='ek-start-overlay';
   overlay.style.cssText='position:fixed;inset:0;z-index:10000;background:rgba(13,14,18,0.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px';
   overlay.innerHTML=`
-    <div style="font-size:48px;line-height:1">🎙️</div>
+    <div style="font-size:48px;line-height:1">🎭</div>
     <div style="font-size:26px;font-weight:800;color:#fff;letter-spacing:-0.5px">Eklipses</div>
     <div style="font-size:15px;color:#9aa4b2;max-width:320px;text-align:center;line-height:1.9;font-style:italic">
       "Most guys know what to say.<br>They freeze anyway.<br>This is where you fix that."
