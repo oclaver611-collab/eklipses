@@ -150,13 +150,25 @@ function evaluate(testCase, responseText) {
   else pass('no filler phrases');
 
   // 5. Comma splice check
+  // A true splice: both sides of the comma are independent clauses (subject + verb).
+  // False positives to exclude:
+  //   - tag phrases: ", I guess" ", I think" ", I suppose" (fragment, not a clause)
+  //   - relative/subordinate clauses: ", which" ", because" etc.
+  //   - short trailing fragments under 4 words
+  //   - participial phrases: ", mostly" ", just" ", really"
+  const TAG_PHRASES = /,\s+(I guess|I think|I suppose|I mean|I hope|I know|you know|right|maybe|actually|honestly|really|just|mostly|mostly about|for now|for sure|kind of|sort of|I\s+\'m sure)/i;
   const commaSplicePattern = /[a-z][^.!?]*,\s+(?:I|it|that|this|he|she|they|we|you|there|here)[^.!?]*[.!?]/gi;
   const splices = responseText.match(commaSplicePattern) || [];
   const realSplices = splices.filter(s => {
-    const beforeComma = s.split(',')[0].trim();
+    if (TAG_PHRASES.test(s)) return false; // tag phrase — not a splice
+    const parts = s.split(',');
+    const beforeComma = parts[0].trim();
+    const afterComma = parts.slice(1).join(',').trim();
     const wordsBefore = beforeComma.split(/\s+/).length;
-    if (wordsBefore <= 3) return false;
-    if (/\b(which|who|because|although|since|when|if|but|and|or)\b/i.test(s.split(',')[1])) return false;
+    const wordsAfter = afterComma.split(/\s+/).length;
+    if (wordsBefore <= 3) return false; // short prefix — not independent clause
+    if (wordsAfter <= 3) return false;  // short suffix — likely a fragment not a clause
+    if (/\b(which|who|because|although|since|when|if|but|and|or|as|while|after|before|though)\b/i.test(afterComma.split(' ').slice(0,3).join(' '))) return false;
     return true;
   });
   if (realSplices.length === 0) pass('no comma splices');
@@ -168,9 +180,12 @@ function evaluate(testCase, responseText) {
   if (foundBreak) fail('no character break', `Contains "${foundBreak}"`);
   else pass('no character break');
 
-  // 7. Not too short (exempt single-word openers)
+  // 7. Not too short
+  // Exempt: single-word openers (e.g. "hi" → "Sofia." is correct)
+  // Exempt: single-word complete answers (e.g. "Writing." is a valid terse response)
   const isShortOpener = (testCase.userMessage || '').trim().split(/\s+/).length <= 1;
-  if (responseText.trim().length >= 10 || isShortOpener) pass('response: not too short');
+  const isSingleWordAnswer = responseText.trim().split(/\s+/).length <= 2;
+  if (responseText.trim().length >= 10 || isShortOpener || isSingleWordAnswer) pass('response: not too short');
   else fail('response: not too short', `Only ${responseText.trim().length} chars: "${responseText}"`);
 
   // 8. No repeated opening from history

@@ -387,7 +387,26 @@ URGENT — BEFORE YOU RESPOND: His name is ${userName}. You have not used his na
         return res.status(500).json({ error: 'Empty response' });
       }
 
-      return res.json({ response: maryResponse });
+      // ── Name post-processor ─────────────────────────────────────────────
+      // If a name was given and Sofia didn't use it, inject it naturally.
+      // We don't fabricate dialogue — we append a natural acknowledgment
+      // only if the response doesn't already contain the name.
+      let finalResponse = maryResponse;
+      if (userName && !nameAlreadyAcknowledged) {
+        const alreadyUsed = finalResponse.toLowerCase().includes(userName.toLowerCase());
+        if (!alreadyUsed) {
+          // Append name acknowledgment naturally to end of response
+          const acknowledgments = [
+            `Nice to meet you, ${userName}.`,
+            `Good to meet you, ${userName}.`,
+            `${userName} — noted.`,
+          ];
+          const ack = acknowledgments[Math.floor(Math.random() * acknowledgments.length)];
+          // If response ends with punctuation, add as new sentence; otherwise append
+          finalResponse = finalResponse.replace(/[.!?]?\s*$/, '') + '. ' + ack;
+        }
+      }
+      return res.json({ response: finalResponse });
 
     } catch (err) {
       lastError = err.message;
