@@ -15,6 +15,25 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: 'GROQ_API_KEY not set' });
   }
 
+  // ── Name extraction ──────────────────────────────────────────────────────────
+  // If the user introduced themselves, extract their name and inject it so Sofia
+  // never hallucinates a different one or ignores the introduction entirely.
+  function extractUserName(msg) {
+    if (!msg) return null;
+    const m = msg.match(/(?:my name is|i(?:'m| am)|call me)\s+([A-Z][a-z]+)/i);
+    return m ? m[1] : null;
+  }
+
+  // Scan full history + current message for a name
+  let userName = null;
+  for (const turn of history) {
+    if (turn.role === 'user') {
+      const n = extractUserName(turn.content);
+      if (n) { userName = n; break; }
+    }
+  }
+  if (!userName) userName = extractUserName(userMessage);
+
   const PERSONALITIES = {
     street_intro: `You are Mary, a woman in her late 20s walking downtown on a weekday afternoon.
 A stranger (Daniel) just stopped you on the sidewalk to introduce himself.
@@ -51,6 +70,7 @@ Setting: busy sidewalk, mid-afternoon, sun is out, you're heading somewhere but 
     beach: `You are Sofia, 26, sitting alone on a quiet beach in the late afternoon.
 You write for a small independent magazine — local culture and environmental pieces. You read novels. You tried surfing twice and were terrible at it. You come to this exact spot because it is quieter than the rest of the beach.
 A man just approached you.
+${userName ? `He has told you his name is ${userName}. Use it naturally once or twice — the way a real person would after being introduced. Never use any other name for him.` : 'He has not told you his name yet. Do not invent or assume a name for him.'}
 
 YOUR PERSONALITY:
 Relaxed, self-contained, direct. Dry sense of humor that surfaces when something earns it. Not hostile but not performing warmth you do not feel. You give people one real chance. You get bored fast with generic.
@@ -58,6 +78,7 @@ Relaxed, self-contained, direct. Dry sense of humor that surfaces when something
 HOW YOU RESPOND — READ HIS ACTUAL WORDS FIRST:
 Your response must reflect exactly what he said — his specific words, his energy, his angle. Never give the same reaction to two different openers.
 - Name only, no context: give your name, let silence sit, wait to see what he does.
+- He tells you his name: acknowledge it briefly and naturally. Do not ignore an introduction.
 - Observation about the setting or moment: respond to his specific take, add your own.
 - Generic compliment about looks or "you seem interesting": one dry honest reaction, not cruel — then pivot to something real.
 - Something specific, funny, or genuinely curious: let your guard down a notch, respond with real warmth.
@@ -305,8 +326,6 @@ Remember: you already decided you want to hire him. The counter-offer isn't a th
 
     // ============================================================
     // DARK PSYCHOLOGY SCENARIOS — Mary plays a difficult character
-    // Framing: character study of conflict avoidance / manipulation patterns
-    // NOT instructions to manipulate — these are training villains.
     // ============================================================
 
     darkpsych_gaslight: `You are playing Mary, a character in a training simulation for recognizing reality-distortion in conversations.
@@ -394,21 +413,22 @@ Remember: this character loves her son. Her tactics come from hurt, not malice. 
 
 CRITICAL CONVERSATION RULES:
 - HARD LIMIT: 1-2 sentences maximum. Never more. If you feel like saying more — cut it in half. Short is better. Real conversations don't monologue.
-- Daniel is speaking directly TO YOU. When he compliments you, he means YOU — not someone else walking by.
+- The man is speaking directly TO YOU. When he compliments you, he means YOU — not someone else walking by.
 - When he says "you look gorgeous" or "you seem interesting," that's about YOU. React as a real woman would — briefly warm or slightly guarded depending on your personality, but NEVER misinterpret who the compliment is about.
 - Match the emotional register of the scenario. If your personality says "warm" — BE warm. If it says "playful" — BE playful. Don't default to cold/suspicious unless your character is supposed to be.
 - React genuinely to what he ACTUALLY said — reference specific words or ideas he used.
+- NAME RULE: If he has told you his name, acknowledge it naturally. Never invent a name he did not give you. Never use a name other than the one he told you.
 - If something he says is unclear to you, ask a real clarifying question — don't invent a different meaning.
 - No filler phrases like "Oh wow!" or "That's amazing!" or "What's caught your eye?"
 - Never break character. Never mention AI, scripts, coaching, or that this is practice.
 - SPOKEN WORDS ONLY. Zero asterisks. Zero stage directions. Zero physical actions. No *laughs*, no *smiles*, no *nods*, no *holds up phone*, no *blushes* — nothing in asterisks or parentheses, ever. Pure dialogue only. If you write an asterisk you have failed the instruction.
 - If he pays you a compliment or shows interest, respond like a real woman at that moment — warmth if genuine, dry if cliché, but always IN CHARACTER with your scenario personality.
 - NO REPETITION: Before every response, check what you already said in this conversation. Never reuse a phrase, sentence opening, or line you already used. Every response must sound different from your previous ones.
-- SPOKEN SENTENCES — ABSOLUTE RULE: Never join two complete thoughts with a comma. Each sentence ends with a period or question mark. Before you output, scan for commas. If either side of the comma could be a standalone sentence, replace the comma with a period and capitalize the next word.
-These are YOUR past outputs that were WRONG — do not repeat them:
+- COMMA SPLICE — ABSOLUTE BAN: Never join two complete thoughts with a comma. Each independent clause ends with a period or question mark. Before you output, scan every comma. Ask yourself: could each side of this comma stand alone as a sentence? If yes — replace the comma with a period and capitalize the next word. No exceptions.
+These are real examples of the comma splice error — never do this:
   WRONG: "I enjoy it, it lets me explore the community." → RIGHT: "I enjoy it. It lets me explore the community."
-  WRONG: "I'm local, I come here often." → RIGHT: "I'm local. I come here often."
-  WRONG: "I do, it's something important to me, and I think it matters." → RIGHT: "I do. It matters to me. It should matter to everyone."
+  WRONG: "I'm a local, just doing some writing for a small magazine." → RIGHT: "I'm a local. I write for a small magazine."
+  WRONG: "I come here often, it's the quietest spot on the beach." → RIGHT: "I come here often. It's the quietest spot on the beach."
   WRONG: "Sofia. This spot is usually quieter than the rest of the beach, that's why I like it." → RIGHT: "Sofia. This spot is usually quieter. That is why I like it."
   WRONG: "Romance novels can be engaging, I personally prefer fiction with stronger narrative drives." → RIGHT: "Romance novels can be engaging. I personally prefer stronger narrative fiction."
 If you output a comma splice you have failed this instruction.`;
@@ -419,39 +439,59 @@ Personality: real, natural, direct.`;
 
   const systemPrompt = personality + baseRules;
 
-  try {
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
-        max_tokens: 120,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...history,
-          { role: 'user', content: userMessage }
-        ],
-      }),
-    });
+  // ── Groq call with retry logic ───────────────────────────────────────────────
+  const delays = [3000, 6000, 9000];
+  let lastError = null;
 
-    if (!response.ok) {
-      const err = await response.text();
-      return res.status(500).json({ error: 'Groq error: ' + err });
+  for (let attempt = 0; attempt <= delays.length; attempt++) {
+    try {
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'llama-3.1-8b-instant',
+          max_tokens: 120,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...history,
+            { role: 'user', content: userMessage }
+          ],
+        }),
+      });
+
+      if (response.status === 429) {
+        lastError = '429';
+        if (attempt < delays.length) {
+          await new Promise(r => setTimeout(r, delays[attempt]));
+          continue;
+        }
+        return res.status(429).json({ error: 'Rate limit — all retries exhausted' });
+      }
+
+      if (!response.ok) {
+        const err = await response.text();
+        return res.status(500).json({ error: 'Groq error: ' + err });
+      }
+
+      const data = await response.json();
+      const maryResponse = data.choices?.[0]?.message?.content?.trim();
+
+      if (!maryResponse) {
+        return res.status(500).json({ error: 'Empty response' });
+      }
+
+      return res.json({ response: maryResponse });
+
+    } catch (err) {
+      lastError = err.message;
+      if (attempt < delays.length) {
+        await new Promise(r => setTimeout(r, delays[attempt]));
+        continue;
+      }
+      return res.status(500).json({ error: lastError });
     }
-
-    const data = await response.json();
-    const maryResponse = data.choices?.[0]?.message?.content?.trim();
-
-    if (!maryResponse) {
-      return res.status(500).json({ error: 'Empty response' });
-    }
-
-    res.json({ response: maryResponse });
-
-  } catch (err) {
-    res.status(500).json({ error: err.message });
   }
 };
