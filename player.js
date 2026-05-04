@@ -338,7 +338,8 @@ function listenForUser(mySession, maxTotalMs) {
 
     function startRec() {
       if (resolved||mySession!==session) return;
-      if (restarts>=MAX_RESTARTS) { finish('max_restarts'); return; }
+      // Reset restart counter when it maxes out — keep listening indefinitely until hard timeout
+      if (restarts>=MAX_RESTARTS) restarts=0;
       restarts++;
       const r=createRecognition(); if(!r){finish('no_sr');return;}
       r.interimResults=true; r.continuous=true;
@@ -357,17 +358,26 @@ function listenForUser(mySession, maxTotalMs) {
         scheduleSilence();
       };
 
-      r.onerror=e=>{ if(e.error==='no-speech'||e.error==='aborted') return; finish('err_'+e.error); };
+      r.onerror=e=>{
+        if(e.error==='aborted') return;
+        if(e.error==='no-speech'){
+          // Heard nothing — wait 500ms then try again, don't burn a restart slot
+          restarts=Math.max(0,restarts-1);
+          setTimeout(()=>{ if(!resolved&&mySession===session) startRec(); }, 500);
+          return;
+        }
+        finish('err_'+e.error);
+      };
 
       r.onend=()=>{
         if(resolved||mySession!==session) return;
-        if(Date.now()-lastSpeech>=SILENCE_MS) { finish('ended_silent'); return; }
-        if(!accumulated&&!interim&&restarts>=MAX_RESTARTS) { finish('no_speech'); return; }
-        setTimeout(()=>{ if(!resolved&&mySession===session) startRec(); }, 100);
+        if(accumulated||interim) { finish(accumulated||interim); return; }
+        // No speech yet — restart after short delay
+        setTimeout(()=>{ if(!resolved&&mySession===session) startRec(); }, 300);
       };
 
       try { r.start(); showListening(true); }
-      catch { setTimeout(()=>{ if(!resolved) startRec(); }, 200); }
+      catch { setTimeout(()=>{ if(!resolved) startRec(); }, 500); }
     }
 
     hardTimer=setTimeout(()=>finish('hard_timeout'), maxTotalMs);
