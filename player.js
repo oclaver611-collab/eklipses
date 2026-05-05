@@ -1,5 +1,6 @@
 /* ===== Global state ===== */
 let currentScenarioKey = null;
+let currentCharacterId = "sofia"; // active character — changes when user picks avatar
 let currentScript = null;
 let isPractice = false;
 let stepIndex = 0;
@@ -252,21 +253,19 @@ let conversationHistory=[];
 let firstUserOpener=null;
 function resetConversation() { conversationHistory=[]; }
 
-async function getDynamicMaryResponse(userSaid) {
+async function getCharacterResponse(userSaid) {
   const sc=SCENARIOS[currentScenarioKey]||{};
-  els.name.textContent='Mary'; els.text.textContent='...';
+  els.name.textContent=currentCharacterId.charAt(0).toUpperCase()+currentCharacterId.slice(1); els.text.textContent='...';
   const controller=new AbortController();
   const timeout=setTimeout(()=>controller.abort(),8000);
   try {
-    const res=await fetch('/api/mary',{
+    const res=await fetch('/api/character',{
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         userMessage:userSaid,
-        scenarioTitle:sc.title||'',
         scenarioKey:currentScenarioKey,
+        characterId:currentCharacterId,
         history:conversationHistory,
-        // If Sofia already introduced herself, remind her
-        alreadyIntroduced: currentScenarioKey==='beach' && conversationHistory.some(m=>m.role==='assistant' && m.content.toLowerCase().includes('sofia')),
       }),
       signal:controller.signal,
     });
@@ -389,15 +388,15 @@ function listenForUser(mySession, maxTotalMs) {
 /* ===== Mary API warmup — fires silently when a scenario loads ===== */
 // Primes the Groq cold start so the user's first real message never hits a timeout.
 // Fire-and-forget: we discard the response entirely.
-function warmupMaryApi(key) {
+function warmupCharacterApi(key) {
   const sc = (SCENARIOS[key]) || {};
-  fetch('/api/mary', {
+  fetch('/api/character', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       userMessage: 'hi',
       scenarioKey: key,
-      scenarioTitle: sc.title || '',
+      characterId: currentCharacterId,
       history: [],
     }),
   }).catch(() => {}); // silent — failure is fine, this is just a warm-up
@@ -411,7 +410,7 @@ async function playScenario(key, practice=false) {
   await pause(200);
 
   // Fire warmup ping immediately — runs in background while Ryan speaks the intro
-  warmupMaryApi(key);
+  warmupCharacterApi(key);
 
   const mySession=session;
   currentScenarioKey=key;
@@ -438,7 +437,7 @@ async function playLoop(mySession) {
       if(mySession!==session) return;
 
       if (said && isPractice) {
-        const reply=await getDynamicMaryResponse(said);
+        const reply=await getCharacterResponse(said);
         if(mySession!==session) return;
         if(reply) {
           if(stepIndex+1<currentScript.length && currentScript[stepIndex+1].speaker==='Mary') stepIndex++;
@@ -550,7 +549,7 @@ async function freeConversation(mySession) {
       continue;
     }
 
-    const reply=await getDynamicMaryResponse(said);
+    const reply=await getCharacterResponse(said);
     if(mySession!==session) break;
 
     if(reply) {

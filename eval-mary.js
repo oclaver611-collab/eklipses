@@ -236,7 +236,7 @@ function evaluate(testCase, responseText) {
 // ─── RUNNER ───────────────────────────────────────────────────────────────────
 
 async function callMary(body) {
-  const response = await fetch(`${VERCEL_URL}/api/mary`, {
+  const response = await fetch(`${VERCEL_URL}/api/character`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -247,7 +247,7 @@ async function callMary(body) {
 
 async function runAll() {
   console.log('\n╔══════════════════════════════════════════════════════════╗');
-  console.log('║        EKLIPSES MARY EVALUATOR v2                       ║');
+  console.log('║        EKLIPSES CHARACTER EVALUATOR v2                       ║');
   console.log(`║        ${TEST_CASES.length} tests  •  hitting ${VERCEL_URL.replace('https://','')}  ║`);
   console.log('╚══════════════════════════════════════════════════════════╝\n');
 
@@ -322,7 +322,7 @@ async function runAll() {
   console.log('╚══════════════════════════════════════════════════════════╝');
 
   if (totalFail === 0) {
-    console.log('\n🎉 All checks passed! Sofia is clean.\n');
+    console.log('\n🎉 All checks passed! Characters are clean.\n');
   } else {
     console.log(`\n⚠️  ${totalFail} checks failed:\n`);
     failedTests.forEach(t => console.log(`  • ${t}`));
