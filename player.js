@@ -67,6 +67,107 @@ const Metrics = (() => {
   return { bumpView, refreshUI, bindLikeButton, get };
 })();
 
+/* ===== Progress ===== */
+// Tracks score history, streak, and session count in localStorage.
+// Shows a thin stat bar on the main screen and a history row on the feedback card.
+const Progress = (() => {
+  const KEY = 'ek-progress-v1';
+
+  const load = () => {
+    try { return JSON.parse(localStorage.getItem(KEY)) || { sessions: [], lastSessionDate: null }; }
+    catch { return { sessions: [], lastSessionDate: null }; }
+  };
+
+  const save = d => { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch {} };
+
+  const recordSession = (score, scenarioKey) => {
+    const d = load();
+    const today = new Date().toDateString();
+    d.sessions.push({ score, scenarioKey, date: today, ts: Date.now() });
+    if (d.sessions.length > 50) d.sessions = d.sessions.slice(-50); // keep last 50
+    d.lastSessionDate = today;
+    save(d);
+    refreshStatBar();
+  };
+
+  const getStreak = () => {
+    const d = load();
+    if (!d.sessions.length) return 0;
+    const days = [...new Set(d.sessions.map(s => s.date))].sort().reverse();
+    let streak = 0;
+    const today = new Date().toDateString();
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    if (days[0] !== today && days[0] !== yesterday) return 0;
+    let check = days[0] === today ? new Date() : new Date(Date.now() - 86400000);
+    for (const day of days) {
+      if (day === check.toDateString()) { streak++; check = new Date(check - 86400000); }
+      else break;
+    }
+    return streak;
+  };
+
+  const getBest = () => {
+    const d = load();
+    if (!d.sessions.length) return null;
+    return Math.max(...d.sessions.map(s => s.score));
+  };
+
+  const getTotal = () => load().sessions.length;
+
+  const getLast = (n = 5) => {
+    const d = load();
+    return d.sessions.slice(-n).map(s => s.score);
+  };
+
+  const getImprovement = () => {
+    const d = load();
+    if (d.sessions.length < 2) return null;
+    const first = d.sessions[0].score;
+    const last = d.sessions[d.sessions.length - 1].score;
+    return last - first;
+  };
+
+  const refreshStatBar = () => {
+    const bar = document.getElementById('ek-stat-bar');
+    if (!bar) return;
+    const streak = getStreak();
+    const best = getBest();
+    const total = getTotal();
+    if (!total) { bar.style.display = 'none'; return; }
+    bar.style.display = 'flex';
+    bar.innerHTML =
+      (streak > 0 ? '<span>&#128293; ' + streak + '-day streak</span><span style="color:#2b2e36">•</span>' : '') +
+      (best !== null ? '<span>&#127942; Best: ' + best + '/10</span><span style="color:#2b2e36">•</span>' : '') +
+      '<span>&#127919; Sessions: ' + total + '</span>';
+  };
+
+  const getHistoryHTML = () => {
+    const scores = getLast(5);
+    if (!scores.length) return '';
+    const improvement = getImprovement();
+    const bars = scores.map(s => {
+      const h = Math.round(4 + (s / 10) * 16);
+      const color = s >= 7 ? '#40c770' : s >= 5 ? '#ffb300' : '#ff6b6b';
+      return '<div style="width:8px;height:' + h + 'px;background:' + color + ';border-radius:2px;align-self:flex-end"></div>';
+    }).join('');
+    const scoreList = scores.join(' → ');
+    const improvText = improvement !== null && improvement !== 0
+      ? '<span style="color:' + (improvement > 0 ? '#40c770' : '#ff6b6b') + ';font-weight:700">' +
+        (improvement > 0 ? '+' : '') + improvement + ' since you started</span>'
+      : '';
+    return '<div style="background:#161820;border:1px solid #2b2e3a;border-radius:10px;padding:12px;margin-bottom:10px">' +
+      '<div style="color:#9aa4b2;font-size:11px;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Your progress</div>' +
+      '<div style="display:flex;align-items:flex-end;gap:4px;margin-bottom:6px">' + bars + '</div>' +
+      '<div style="color:#cfd6e4;font-size:12px">' + scoreList +
+      (improvText ? ' &nbsp;' + improvText : '') + '</div>' +
+      '</div>';
+  };
+
+  return { recordSession, refreshStatBar, getHistoryHTML, getStreak, getBest, getTotal };
+})();
+
+
+
 /* ===== Avatar sets ===== */
 const AVATAR_SETS = [
   { id:'bella', label:'Bella', thumb:'bella_thumb.jpg', maryVideo:'bella1.mp4',    danielVideo:'bella9.mp4' },
@@ -645,6 +746,8 @@ async function runCoachFeedback(mySession) {
 }
 
 function showFeedbackCard(f) {
+  // Record this session in progress history
+  if (f.score >= 1 && f.score <= 10) Progress.recordSession(f.score, currentScenarioKey);
   const scoreColor=f.score>=7?'#40c770':f.score>=5?'#ffb300':'#ff6b6b';
   const isBeach=currentScenarioKey==='beach';
   const bodyHTML=isBeach?`
@@ -697,6 +800,7 @@ function showFeedbackCard(f) {
         <div style="font-size:16px;color:#cfd6e4;line-height:1.5">${f.spokenSummary}</div>
       </div>
       ${bodyHTML}
+      ${Progress.getHistoryHTML()}
       <div style="text-align:center;margin-top:14px">
         <button onclick="playScenario('${currentScenarioKey}',true)" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:10px 28px;font-size:14px;font-weight:800;cursor:pointer;margin-right:8px">
           Try Again
@@ -918,6 +1022,16 @@ function launchApp() {
     Metrics.refreshUI(firstKey);
     els.text.textContent='Choose a scenario to begin.';
     ryanOrbSetState('silent');
+    // Inject stat bar below Ryan name
+    const existingBar = document.getElementById('ek-stat-bar');
+    if (!existingBar) {
+      const bar = document.createElement('div');
+      bar.id = 'ek-stat-bar';
+      bar.style.cssText = 'display:none;justify-content:center;align-items:center;gap:12px;font-size:12px;color:#9aa4b2;padding:6px 0;flex-wrap:wrap';
+      const nameEl = document.getElementById('speakerName');
+      if (nameEl && nameEl.parentNode) nameEl.parentNode.insertBefore(bar, nameEl.nextSibling);
+    }
+    Progress.refreshStatBar();
   };
 }
 
