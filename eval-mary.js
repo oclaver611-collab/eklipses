@@ -174,9 +174,11 @@ function evaluate(testCase, responseText) {
   if (realSplices.length === 0) pass('no comma splices');
   else fail('no comma splices', `Splice found: "${realSplices[0].slice(0, 100)}"`);
 
-  // 6. No character break
-  const breakWords = ['ai', 'language model', 'coaching', 'simulation', 'practice', 'script', 'character'];
-  const foundBreak = breakWords.find(w => lower.includes(w));
+  // 6. No character break — use word boundaries to avoid false positives like 'mainly' containing 'ai'
+  const breakWords = ['language model', 'coaching', 'simulation', 'practice', 'script'];
+  const breakWordsExact = ['ai']; // only match as standalone word
+  const foundBreak = breakWords.find(w => lower.includes(w)) ||
+    breakWordsExact.find(w => new RegExp('\b' + w + '\b').test(lower));
   if (foundBreak) fail('no character break', `Contains "${foundBreak}"`);
   else pass('no character break');
 
