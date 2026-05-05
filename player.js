@@ -851,8 +851,8 @@ function showOnboarding(onComplete) {
     };
   }
 
-  renderScreen(0);
   document.body.appendChild(ov);
+  renderScreen(0);
 }
 
 /* ===== Boot ===== */
