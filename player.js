@@ -794,12 +794,83 @@ function similarity(actual,promptText){
   return words.filter(w=>said.includes(w)).length/Math.max(1,words.length);
 }
 
+/* ===== Onboarding ===== */
+const ONBOARDING_KEY = 'ek-onboarding-v1';
+function hasSeenOnboarding() { try { return !!localStorage.getItem(ONBOARDING_KEY); } catch { return false; } }
+function markOnboardingDone() { try { localStorage.setItem(ONBOARDING_KEY, '1'); } catch {} }
+
+function showOnboarding(onComplete) {
+  const ov = document.createElement('div');
+  ov.id = 'ek-onboarding';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:10001;background:rgba(13,14,18,0.98);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;box-sizing:border-box';
+
+  const screens = [
+    // Screen 1 — Hook
+    '<div style="display:flex;flex-direction:column;align-items:center;gap:20px;max-width:340px;text-align:center">' +
+    '<div style="font-size:52px">🎭</div>' +
+    '<div style="font-size:28px;font-weight:900;color:#fff;letter-spacing:-0.5px;line-height:1.2">Eklipses</div>' +
+    '<div style="font-size:17px;color:#e0e0e0;line-height:1.9;margin-top:4px">' +
+    '"You already know what to say.<br>You just need to stop being afraid to say it.<br>' +
+    '<span style='color:#ffb300;font-weight:700'>This is where that changes.</span>"</div>' +
+    '<button id="ob-btn" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:14px 44px;font-size:16px;font-weight:800;cursor:pointer;margin-top:12px;width:100%;max-width:260px">How does it work? →</button>' +
+    '</div>',
+
+    // Screen 2 — How it works
+    '<div style="display:flex;flex-direction:column;align-items:center;gap:18px;max-width:340px;text-align:center">' +
+    '<div style="font-size:22px;font-weight:800;color:#fff">Here's how it works</div>' +
+    '<div style="display:flex;flex-direction:column;gap:14px;width:100%;text-align:left">' +
+    '<div style="display:flex;align-items:flex-start;gap:14px"><div style="background:#ffb300;color:#000;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0">1</div><div style="color:#cfd6e4;font-size:15px;line-height:1.5"><strong style="color:#fff">Pick a scenario</strong><br>Beach, bar, gym — real situations where it counts.</div></div>' +
+    '<div style="display:flex;align-items:flex-start;gap:14px"><div style="background:#ffb300;color:#000;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0">2</div><div style="color:#cfd6e4;font-size:15px;line-height:1.5"><strong style="color:#fff">Talk out loud</strong><br>A real AI woman responds to exactly what you say. No scripts.</div></div>' +
+    '<div style="display:flex;align-items:flex-start;gap:14px"><div style="background:#ffb300;color:#000;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0">3</div><div style="color:#cfd6e4;font-size:15px;line-height:1.5"><strong style="color:#fff">Get coached</strong><br>Ryan breaks down exactly what worked and what cost you.</div></div>' +
+    '</div>' +
+    '<button id="ob-btn" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:14px 44px;font-size:16px;font-weight:800;cursor:pointer;margin-top:8px;width:100%;max-width:260px">I'm ready →</button>' +
+    '</div>',
+
+    // Screen 3 — Start
+    '<div style="display:flex;flex-direction:column;align-items:center;gap:20px;max-width:340px;text-align:center">' +
+    '<div style="font-size:44px">🎤</div>' +
+    '<div style="font-size:22px;font-weight:800;color:#fff">Your first session</div>' +
+    '<div style="font-size:15px;color:#9aa4b2;line-height:1.7">Starting with <strong style="color:#ffb300">Beach — Cold Open</strong>.<br>No warm-up. No script. Just you and Sofia.<br>Talk out loud. Ryan coaches you after.</div>' +
+    '<div style="background:#1a1c22;border:1px solid #2b2e36;border-radius:12px;padding:14px 20px;font-size:13px;color:#9aa4b2;line-height:1.6">💡 <strong style="color:#cfd6e4">Tip:</strong> Use Chrome or Edge. Allow mic access when asked.</div>' +
+    '<button id="ob-btn" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:14px 44px;font-size:16px;font-weight:800;cursor:pointer;width:100%;max-width:260px">Start my first session</button>' +
+    '</div>'
+  ];
+
+  let screen = 0;
+
+  function renderScreen(i) {
+    const dots = screens.map((_,idx) =>
+      '<div style="width:8px;height:8px;border-radius:50%;background:' + (idx===i?'#ffb300':'#2b2e36') + '"></div>'
+    ).join('');
+    ov.innerHTML = '<div style="position:absolute;top:20px;right:20px;display:flex;gap:6px">' + dots + '</div>' + screens[i];
+    document.getElementById('ob-btn').onclick = () => {
+      if (i < screens.length - 1) {
+        renderScreen(i + 1);
+      } else {
+        markOnboardingDone();
+        ov.remove();
+        onComplete();
+      }
+    };
+  }
+
+  renderScreen(0);
+  document.body.appendChild(ov);
+}
+
 /* ===== Boot ===== */
 function bootDefault() {
   const set=AVATAR_SETS[Math.floor(Math.random()*AVATAR_SETS.length)];
   applyAvatarSet(set);
   Metrics.bindLikeButton();
+  if (!hasSeenOnboarding()) {
+    showOnboarding(() => launchApp());
+  } else {
+    launchApp();
+  }
+}
 
+function launchApp() {
   const overlay=document.createElement('div');
   overlay.id='ek-start-overlay';
   overlay.style.cssText='position:fixed;inset:0;z-index:10000;background:rgba(13,14,18,0.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px';
@@ -807,10 +878,10 @@ function bootDefault() {
     <div style="font-size:48px;line-height:1">🎭</div>
     <div style="font-size:26px;font-weight:800;color:#fff;letter-spacing:-0.5px">Eklipses</div>
     <div style="font-size:15px;color:#9aa4b2;max-width:320px;text-align:center;line-height:1.9;font-style:italic">
-      "Most guys know what to say.<br>They freeze anyway.<br>This is where you fix that."
+      "You already know what to say.<br>You just need to stop being afraid to say it."
     </div>
     <button id="ek-start-btn" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:14px 48px;font-size:17px;font-weight:800;cursor:pointer;margin-top:8px;transition:transform .1s ease" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''">
-      Show me what you've got
+      Let's go
     </button>
     <div id="ek-prog-wrap" style="display:none;width:280px;text-align:center">
       <div style="background:#2b2e36;border-radius:6px;height:8px;overflow:hidden;margin-bottom:8px">
@@ -822,7 +893,7 @@ function bootDefault() {
 
   let _bootStarted = false;
   document.getElementById('ek-start-btn').onclick=async()=>{
-    if (_bootStarted) return; // prevent double-tap
+    if (_bootStarted) return;
     _bootStarted = true;
     document.getElementById('ek-start-btn').style.display='none';
     document.getElementById('ek-prog-wrap').style.display='block';
@@ -843,12 +914,9 @@ function bootDefault() {
     setMediaForSpeaker('Ryan');
     els.name.textContent='Ryan';
     els.text.textContent='';
-    // Ryan speaks the hook FIRST — shelf renders only after he finishes
-    // Prevents user clicking a scenario mid-speech and causing line bleed
-    await speak("Most guys know what to say. They freeze anyway.", 'Ryan');
-    await pause(500);
-    await speak("Pick a scenario. Show me what you've got.", 'Ryan');
-    // NOW show the shelf — user can only interact after hook completes
+    await speak("You already know what to say. You just need to stop being afraid to say it.", 'Ryan');
+    await pause(400);
+    await speak("Pick a scenario. Let's find out where you're at.", 'Ryan');
     renderShelf();
     Metrics.refreshUI(firstKey);
     els.text.textContent='Choose a scenario to begin.';
