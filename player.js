@@ -391,10 +391,6 @@ async function speak(text, speaker) {
   if (speaker==='Ryan') {
     const orbEl=document.getElementById('ryan-orb'); if(orbEl) ryanOrbSetState('speaking');
   }
-  // Show caption overlay when character speaks
-  if (speaker === 'Mary') {
-    Caption.show(text);
-  }
   if (mySession!==session) return;
   const voice=getKokoroVoice(speaker);
   try {
@@ -416,12 +412,6 @@ async function speak(text, speaker) {
     ]);
   } catch {}
   if (mySession!==session) return;
-  // Speech ended — switch to idle video and hide caption simultaneously
-  // This prevents the speaking video from looping with visible mouth movement
-  if (speaker === 'Mary') {
-    setMediaForSpeaker('User_Prompt'); // switch to idle video immediately
-    Caption.hide();                    // hide caption at same moment
-  }
 }
 
 function getKokoroVoice(speaker) {
