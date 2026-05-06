@@ -241,10 +241,11 @@ const Caption = (() => {
 
 /* ===== Avatar sets ===== */
 const AVATAR_SETS = [
-  { id:'bella', label:'Bella', thumb:'bella_thumb.jpg', maryVideo:'bella1.mp4',    danielVideo:'bella9.mp4' },
-  { id:'nora',  label:'Nora',  thumb:'nora_thumb.jpg',  maryVideo:'nora_mary.mp4', danielVideo:'nora_daniel.mp4' },
-  { id:'ivy',   label:'Ivy',   thumb:'ivy_thumb.jpg',   maryVideo:'ivy_mary.mp4',  danielVideo:'ivy_daniel.mp4' },
-  { id:'julia', label:'Julia', thumb:'julia_thumb.jpg', maryVideo:'julia_mary.mp4',danielVideo:'julia_daniel.mp4' },
+  { id:'sofia',    label:'Sofia',    thumb:'sofia_thumb.jpg',    maryVideo:'bella1.mp4',     danielVideo:'bella9.mp4',       vibe:'Direct & self-contained',  scenario:'Beach' },
+  { id:'maya',     label:'Maya',     thumb:'maya_thumb.jpg',     maryVideo:'julia_mary.mp4', danielVideo:'julia_daniel.mp4', vibe:'Sharp & quick-witted',     scenario:'Bar' },
+  { id:'claire',   label:'Claire',   thumb:'claire_thumb.jpg',   maryVideo:'bella1.mp4',     danielVideo:'bella9.mp4',       vibe:'Warm & emotionally open',  scenario:'Wedding' },
+  { id:'zoe',      label:'Zoe',      thumb:'zoe_thumb.jpg',      maryVideo:'julia_mary.mp4', danielVideo:'julia_daniel.mp4', vibe:'Direct & no-nonsense',     scenario:'Gym' },
+  { id:'julia',    label:'Julia',    thumb:'julia_thumb.jpg',    maryVideo:'julia_mary.mp4', danielVideo:'julia_daniel.mp4', vibe:'Mysterious & confident',   scenario:'Street' },
 ];
 
 const AVATARS = {
@@ -940,9 +941,12 @@ function renderAvatarPicker() {
   if(!els.pickerBackdrop) return;
   els.pickerGrid.innerHTML=AVATAR_SETS.map(s=>`
     <div class="pick-card" data-id="${s.id}">
-      <img class="pick-img" src="${s.thumb||'Ryan.jpg'}" alt="${s.label}">
-      <div class="pick-meta"><b>${s.label}</b><br>Choose this person</div>
-      <div class="pick-foot">${s.maryVideo||'--'} / ${s.danielVideo||'--'}</div>
+      <img class="pick-img" src="${s.thumb||'Ryan.jpg'}" alt="${s.label}" style="height:160px;object-fit:cover;">
+      <div class="pick-meta">
+        <b style="font-size:15px">${s.label}</b>
+        <div style="color:#9aa4b2;font-size:12px;margin-top:3px">${s.vibe||''}</div>
+        <div style="color:#ffb300;font-size:11px;font-weight:700;margin-top:4px;text-transform:uppercase;letter-spacing:.05em">${s.scenario||''}</div>
+      </div>
     </div>`).join('');
   els.pickerGrid.querySelectorAll('.pick-card').forEach(card=>{
     card.onclick=()=>{
