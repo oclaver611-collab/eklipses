@@ -166,6 +166,75 @@ const Progress = (() => {
   return { recordSession, refreshStatBar, getHistoryHTML, getStreak, getBest, getTotal };
 })();
 
+/* ===== Caption Overlay ===== */
+// When Sofia speaks: play speaking video + show caption bar over her mouth
+// When user speaks: play idle video + hide caption bar
+// This creates the illusion of natural conversation without lip sync
+
+const Caption = (() => {
+  let overlayEl = null;
+  let hideTimer = null;
+
+  function getOrCreateOverlay() {
+    if (overlayEl) return overlayEl;
+    const frame = document.getElementById('stageFrame');
+    if (!frame) return null;
+
+    const el = document.createElement('div');
+    el.id = 'ek-caption';
+    el.style.cssText = [
+      'position:absolute',
+      'bottom:12%',
+      'left:50%',
+      'transform:translateX(-50%)',
+      'z-index:10',
+      'max-width:86%',
+      'min-width:200px',
+      'background:rgba(10,10,18,0.82)',
+      'backdrop-filter:blur(8px)',
+      '-webkit-backdrop-filter:blur(8px)',
+      'border:1px solid rgba(255,255,255,0.12)',
+      'border-radius:12px',
+      'padding:10px 18px',
+      'text-align:center',
+      'color:#fff',
+      'font-size:15px',
+      'font-weight:500',
+      'line-height:1.5',
+      'letter-spacing:0.01em',
+      'box-shadow:0 4px 24px rgba(0,0,0,0.5)',
+      'opacity:0',
+      'transition:opacity 0.2s ease',
+      'pointer-events:none',
+    ].join(';');
+
+    frame.style.position = 'relative';
+    frame.appendChild(el);
+    overlayEl = el;
+    return el;
+  }
+
+  function show(text) {
+    const el = getOrCreateOverlay();
+    if (!el) return;
+    clearTimeout(hideTimer);
+    el.textContent = text;
+    el.style.opacity = '1';
+  }
+
+  function hide() {
+    if (!overlayEl) return;
+    overlayEl.style.opacity = '0';
+    hideTimer = setTimeout(() => {
+      if (overlayEl) overlayEl.textContent = '';
+    }, 250);
+  }
+
+  return { show, hide };
+})();
+
+
+
 
 
 /* ===== Avatar sets ===== */
@@ -320,6 +389,10 @@ async function speak(text, speaker) {
   if (speaker==='Ryan') {
     const orbEl=document.getElementById('ryan-orb'); if(orbEl) ryanOrbSetState('speaking');
   }
+  // Show caption overlay when character speaks
+  if (speaker === 'Mary') {
+    Caption.show(text);
+  }
   if (mySession!==session) return;
   const voice=getKokoroVoice(speaker);
   try {
@@ -341,6 +414,8 @@ async function speak(text, speaker) {
     ]);
   } catch {}
   if (mySession!==session) return;
+  // Hide caption after speaking finishes
+  if (speaker === 'Mary') Caption.hide();
 }
 
 function getKokoroVoice(speaker) {
