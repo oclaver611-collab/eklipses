@@ -190,18 +190,18 @@ const Caption = (() => {
       'z-index:10',
       'width:100%',
       'box-sizing:border-box',
-      'background:rgba(8,8,14,0.88)',
+      'background:rgba(0,0,0,0.97)',
       'backdrop-filter:blur(6px)',
       '-webkit-backdrop-filter:blur(6px)',
       'border-top:1px solid rgba(255,255,255,0.08)',
-      'padding:14px 20px',
+      'padding:20px 24px',
       'text-align:center',
       'color:#fff',
-      'font-size:15px',
+      'font-size:16px',
       'font-weight:500',
       'line-height:1.5',
       'letter-spacing:0.01em',
-      'min-height:56px',
+      'min-height:200px',
       'display:flex',
       'align-items:center',
       'justify-content:center',
@@ -416,8 +416,12 @@ async function speak(text, speaker) {
     ]);
   } catch {}
   if (mySession!==session) return;
-  // Hide caption after speaking finishes
-  if (speaker === 'Mary') Caption.hide();
+  // Speech ended — switch to idle video and hide caption simultaneously
+  // This prevents the speaking video from looping with visible mouth movement
+  if (speaker === 'Mary') {
+    setMediaForSpeaker('User_Prompt'); // switch to idle video immediately
+    Caption.hide();                    // hide caption at same moment
+  }
 }
 
 function getKokoroVoice(speaker) {
