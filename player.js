@@ -184,7 +184,7 @@ const Caption = (() => {
     el.id = 'ek-caption';
     el.style.cssText = [
       'position:absolute',
-      'bottom:12%',
+      'bottom:35%',
       'left:50%',
       'transform:translateX(-50%)',
       'z-index:10',
