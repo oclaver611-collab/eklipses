@@ -241,7 +241,7 @@ const Caption = (() => {
 
 /* ===== Avatar sets ===== */
 const AVATAR_SETS = [
-  { id:'sofia',    label:'Sofia',    thumb:'sofia_thumb.jpg',    maryVideo:'sofia_speaking.mp4', danielVideo:'sofia_idle.mp4',   vibe:'Direct & self-contained',  scenario:'Beach' },
+  { id:'sofia',    label:'Sofia',    thumb:'sofia_thumb.jpg',    maryVideo:'sofia_speaking.mp4', maryIdleVideo:'sofia_idle.mp4', danielVideo:'sofia_idle.mp4',   vibe:'Direct & self-contained',  scenario:'Beach' },
   { id:'maya',     label:'Maya',     thumb:'maya_thumb.jpg',     maryVideo:'julia_mary.mp4', danielVideo:'julia_daniel.mp4', vibe:'Sharp & quick-witted',     scenario:'Bar' },
   { id:'claire',   label:'Claire',   thumb:'claire_thumb.jpg',   maryVideo:'bella1.mp4',     danielVideo:'bella9.mp4',       vibe:'Warm & emotionally open',  scenario:'Wedding' },
   { id:'zoe',      label:'Zoe',      thumb:'zoe_thumb.jpg',      maryVideo:'julia_mary.mp4', danielVideo:'julia_daniel.mp4', vibe:'Direct & no-nonsense',     scenario:'Gym' },
@@ -257,8 +257,13 @@ const AVATARS = {
 
 function applyAvatarSet(set) {
   if (!set) return;
-  if (set.maryVideo)   AVATARS.Mary.src   = set.maryVideo;
+  // Mary defaults to idle video — speaking video only loads during speech
+  if (set.maryIdleVideo) AVATARS.Mary.src = set.maryIdleVideo;
+  else if (set.maryVideo) AVATARS.Mary.src = set.maryVideo;
   if (set.danielVideo) { AVATARS.Daniel.src = set.danielVideo; AVATARS.User_Prompt.src = set.danielVideo; }
+  // Store speaking video separately for use during speech
+  AVATARS._marySpeakingVideo = set.maryVideo || null;
+  AVATARS._maryIdleVideo = set.maryIdleVideo || set.danielVideo || null;
 }
 
 /* ===== Stop everything ===== */
@@ -410,7 +415,15 @@ async function speak(text, speaker) {
           setTimeout(()=>{
             if(mySession!==session) return;
             started=true;
-            setMediaForSpeaker('Mary');
+            // Switch to speaking video specifically
+            if (AVATARS._marySpeakingVideo) {
+              const el=els.media;
+              if(el&&el.tagName==='VIDEO'&&(el.getAttribute('src')||'')!==AVATARS._marySpeakingVideo){
+                el.src=AVATARS._marySpeakingVideo; el.load(); try{el.play().catch(()=>{});}catch{}
+              }
+            } else {
+              setMediaForSpeaker('Mary');
+            }
             const el=els.media;
             if(el&&el.tagName==='VIDEO'){try{el.play().catch(()=>{});}catch{}}
           }, SPEAKING_DELAY_MS);
@@ -426,7 +439,11 @@ async function speak(text, speaker) {
         // This prevents the speaking video from looping after audio ends
         if (speaker === 'Mary' && doneEl && doneEl.tagName === 'VIDEO') {
           try { doneEl.pause(); } catch {}
-          setMediaForSpeaker('User_Prompt'); // switch to idle instantly
+          // Switch back to idle video
+          const idleSrc = AVATARS._maryIdleVideo || AVATARS.User_Prompt.src;
+          if(idleSrc && (doneEl.getAttribute('src')||'')!==idleSrc){
+            doneEl.src=idleSrc; doneEl.load(); try{doneEl.play().catch(()=>{});}catch{}
+          }
         }
       })(),
       new Promise((_,rej)=>{
