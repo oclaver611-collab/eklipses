@@ -388,7 +388,12 @@ function renderLine(line) {
 async function speak(text, speaker) {
   const mySession=session;
   try { __audioContexts.forEach(c=>{ try{if(c.state==='suspended')c.resume();}catch{} }); } catch {}
-  setMediaForSpeaker(speaker);
+  // For Mary: start with idle video, switch to speaking only when audio actually starts
+  if (speaker === 'Mary') {
+    setMediaForSpeaker('User_Prompt'); // show idle while audio loads
+  } else {
+    setMediaForSpeaker(speaker);
+  }
   if (speaker==='Ryan') {
     const orbEl=document.getElementById('ryan-orb'); if(orbEl) ryanOrbSetState('speaking');
   }
@@ -397,9 +402,18 @@ async function speak(text, speaker) {
   try {
     await Promise.race([
       (async()=>{
-        const LIP_SYNC_DELAY_MS = 350; // tune: increase if video leads audio, decrease if audio leads video
+        const LIP_SYNC_DELAY_MS = 50; // minimal delay — switch to speaking video when audio fires
         let started=false;
-        const sync=()=>{ if(!started&&mySession===session){started=true;setTimeout(()=>{ if(mySession!==session)return; const el=els.media;if(el&&el.tagName==='VIDEO'){try{el.play().catch(()=>{});}catch{}} },LIP_SYNC_DELAY_MS);} };
+        const sync=()=>{
+          if(!started&&mySession===session){
+            started=true;
+            // Audio is now playing — switch to speaking video
+            if (speaker === 'Mary') {
+              setMediaForSpeaker('Mary');
+            }
+            setTimeout(()=>{ if(mySession!==session)return; const el=els.media;if(el&&el.tagName==='VIDEO'){try{el.play().catch(()=>{});}catch{}} },LIP_SYNC_DELAY_MS);
+          }
+        };
         const poll=setInterval(()=>{ if(mySession!==session){clearInterval(poll);return;} if(__audioContexts.some(c=>c.state==='running')){clearInterval(poll);sync();} },30);
         setTimeout(()=>{clearInterval(poll);sync();},500);
         await KokoroSpeech.speak(text, voice);
