@@ -976,7 +976,8 @@ function renderAvatarPicker() {
       const set=AVATAR_SETS.find(x=>x.id===card.getAttribute('data-id'));
       applyAvatarSet(set);
       els.pickerBackdrop.style.display='none';
-      renderShelf(); Metrics.refreshUI(Object.keys(SCENARIOS)[0]); playScenario(Object.keys(SCENARIOS)[0],false);
+      renderShelf(); Metrics.refreshUI(currentScenarioKey||Object.keys(SCENARIOS)[0]);
+      // Do NOT auto-launch scenario — user picks it manually from the shelf
     };
   });
   els.pickerBackdrop.style.display='flex';
