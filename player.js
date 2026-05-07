@@ -402,20 +402,22 @@ async function speak(text, speaker) {
   try {
     await Promise.race([
       (async()=>{
-        const LIP_SYNC_DELAY_MS = 50; // minimal delay — switch to speaking video when audio fires
+        // Switch to speaking video after fixed delay that matches audio start
+        // Tune SPEAKING_DELAY_MS: increase if video still leads audio, decrease if video lags
+        const SPEAKING_DELAY_MS = 1500;
         let started=false;
-        const sync=()=>{
-          if(!started&&mySession===session){
+        if (speaker === 'Mary') {
+          setTimeout(()=>{
+            if(mySession!==session) return;
             started=true;
-            // Audio is now playing — switch to speaking video
-            if (speaker === 'Mary') {
-              setMediaForSpeaker('Mary');
-            }
-            setTimeout(()=>{ if(mySession!==session)return; const el=els.media;if(el&&el.tagName==='VIDEO'){try{el.play().catch(()=>{});}catch{}} },LIP_SYNC_DELAY_MS);
-          }
-        };
-        const poll=setInterval(()=>{ if(mySession!==session){clearInterval(poll);return;} if(__audioContexts.some(c=>c.state==='running')){clearInterval(poll);sync();} },30);
-        setTimeout(()=>{clearInterval(poll);sync();},500);
+            setMediaForSpeaker('Mary');
+            const el=els.media;
+            if(el&&el.tagName==='VIDEO'){try{el.play().catch(()=>{});}catch{}}
+          }, SPEAKING_DELAY_MS);
+        }
+        const sync=()=>{ if(!started&&mySession===session){started=true;setTimeout(()=>{ if(mySession!==session)return; const el=els.media;if(el&&el.tagName==='VIDEO'){try{el.play().catch(()=>{});}catch{}} },50);} };
+        const poll=setInterval(()=>{ if(mySession!==session){clearInterval(poll);return;} if(__audioContexts.some(c=>c.state==='running')){clearInterval(poll);if(speaker!=='Mary')sync();} },30);
+        setTimeout(()=>{clearInterval(poll);if(speaker!=='Mary')sync();},500);
         await KokoroSpeech.speak(text, voice);
         clearInterval(poll);
         const doneEl=els.media;
