@@ -1,5 +1,13 @@
 {
+  "name": "eklipses",
+  "version": "1.0.0",
+  "description": "Eklipses — AI dating practice app",
+  "scripts": {
+    "test": "node scripts/test-auto.js",
+    "test:human": "node scripts/test-human.js",
+    "test:all": "npm test && npm run test:human"
+  },
   "dependencies": {
-    "dotenv": "^17.4.2"
+    "dotenv": "^16.0.0"
   }
 }
