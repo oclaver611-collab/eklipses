@@ -404,7 +404,14 @@ async function speak(text, speaker) {
         setTimeout(()=>{clearInterval(poll);sync();},500);
         await KokoroSpeech.speak(text, voice);
         clearInterval(poll);
-        const doneEl=els.media; if(doneEl&&doneEl.id==='ryan-orb') ryanOrbSetState('silent');
+        const doneEl=els.media;
+        if(doneEl&&doneEl.id==='ryan-orb') ryanOrbSetState('silent');
+        // Speech ended — immediately pause speaking video and switch to idle
+        // This prevents the speaking video from looping after audio ends
+        if (speaker === 'Mary' && doneEl && doneEl.tagName === 'VIDEO') {
+          try { doneEl.pause(); } catch {}
+          setMediaForSpeaker('User_Prompt'); // switch to idle instantly
+        }
       })(),
       new Promise((_,rej)=>{
         const chk=setInterval(()=>{ if(mySession!==session){clearInterval(chk);rej(new Error('session_changed'));} },50);
