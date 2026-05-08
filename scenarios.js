@@ -30,7 +30,7 @@ window.SCENARIOS = {
 
   beach: {
     title: "Beach — Cold Open",
-    thumb: "beach.jpg",
+    thumb: "sofia_idle.mp4",
     bg: "beach_bg.mp4",
     coldOpen: true,
     demo: [

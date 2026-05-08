@@ -977,8 +977,15 @@ function makeCard(key) {
     thumb=document.createElement('video');
     thumb.className='sc-thumb';
     thumb.src=thumbSrc;
-    thumb.autoplay=true; thumb.loop=true; thumb.muted=true; thumb.playsInline=true;
+    thumb.loop=true; thumb.muted=true; thumb.playsInline=true;
     thumb.style.objectFit='cover';
+    // Show matching jpg as poster until video can play
+    thumb.poster=thumbSrc.replace(/\.mp4$/i,'.jpg');
+    // Browsers block autoplay until user gesture — try immediately + retry on first click
+    thumb.play().catch(()=>{});
+    const tryPlay=()=>{ thumb.play().catch(()=>{}); };
+    document.addEventListener('click', tryPlay, {once:true});
+    document.addEventListener('touchstart', tryPlay, {once:true});
   } else {
     thumb=document.createElement('img');
     thumb.className='sc-thumb';
