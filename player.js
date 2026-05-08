@@ -407,30 +407,25 @@ async function speak(text, speaker) {
   try {
     await Promise.race([
       (async()=>{
-        // Switch to speaking video after fixed delay that matches audio start
-        // Tune SPEAKING_DELAY_MS: increase if video still leads audio, decrease if video lags
-        const SPEAKING_DELAY_MS = 1500;
+        // Switch to speaking video when audio ACTUALLY starts — works for both short and long TTS
         let started=false;
-        if (speaker === 'Mary') {
-          setTimeout(()=>{
-            if(mySession!==session) return;
-            started=true;
-            // Switch to speaking video specifically
+        const switchToSpeaking=()=>{
+          if(started||mySession!==session) return;
+          started=true;
+          if (speaker === 'Mary') {
             if (AVATARS._marySpeakingVideo) {
               const el=els.media;
               if(el&&el.tagName==='VIDEO'&&(el.getAttribute('src')||'')!==AVATARS._marySpeakingVideo){
                 el.src=AVATARS._marySpeakingVideo; el.load(); try{el.play().catch(()=>{});}catch{}
               }
-            } else {
-              setMediaForSpeaker('Mary');
-            }
-            const el=els.media;
-            if(el&&el.tagName==='VIDEO'){try{el.play().catch(()=>{});}catch{}}
-          }, SPEAKING_DELAY_MS);
-        }
-        const sync=()=>{ if(!started&&mySession===session){started=true;setTimeout(()=>{ if(mySession!==session)return; const el=els.media;if(el&&el.tagName==='VIDEO'){try{el.play().catch(()=>{});}catch{}} },50);} };
-        const poll=setInterval(()=>{ if(mySession!==session){clearInterval(poll);return;} if(__audioContexts.some(c=>c.state==='running')){clearInterval(poll);if(speaker!=='Mary')sync();} },30);
-        setTimeout(()=>{clearInterval(poll);if(speaker!=='Mary')sync();},500);
+            } else { setMediaForSpeaker('Mary'); }
+          } else {
+            const el=els.media; if(el&&el.tagName==='VIDEO'){try{el.play().catch(()=>{});}catch{}}
+          }
+        };
+        const sync=()=>{ switchToSpeaking(); };
+        const poll=setInterval(()=>{ if(mySession!==session){clearInterval(poll);return;} if(__audioContexts.some(c=>c.state==='running')){clearInterval(poll);sync();} },30);
+        setTimeout(()=>{clearInterval(poll);sync();},3000);
         await KokoroSpeech.speak(text, voice);
         clearInterval(poll);
         const doneEl=els.media;
