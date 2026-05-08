@@ -970,30 +970,9 @@ function renderShelf() {
 function makeCard(key) {
   const sc=SCENARIOS[key];
   const card=document.createElement('div'); card.className='sc-card';
-  const thumbSrc=sc.thumb||'Ryan.jpg';
-  const isVideo=/\.mp4$/i.test(thumbSrc);
-  let thumb;
-  if (isVideo) {
-    thumb=document.createElement('video');
-    thumb.className='sc-thumb';
-    thumb.src=thumbSrc;
-    thumb.loop=true; thumb.muted=true; thumb.playsInline=true;
-    thumb.style.objectFit='cover';
-    // Show matching jpg as poster until video can play
-    thumb.poster=thumbSrc.replace(/\.mp4$/i,'.jpg');
-    // Browsers block autoplay until user gesture — try immediately + retry on first click
-    thumb.play().catch(()=>{});
-    const tryPlay=()=>{ thumb.play().catch(()=>{}); };
-    document.addEventListener('click', tryPlay, {once:true});
-    document.addEventListener('touchstart', tryPlay, {once:true});
-  } else {
-    thumb=document.createElement('img');
-    thumb.className='sc-thumb';
-    thumb.src=thumbSrc;
-    thumb.onerror=()=>thumb.style.display='none';
-  }
+  const img=document.createElement('img'); img.className='sc-thumb'; img.src=sc.thumb||'Ryan.jpg'; img.onerror=()=>img.style.display='none';
   const title=document.createElement('div'); title.innerHTML='<div class="sc-title">'+sc.title+'</div><div class="sc-sub">Click to load</div>';
-  card.appendChild(thumb); card.appendChild(title);
+  card.appendChild(img); card.appendChild(title);
   card.onclick=()=>playScenario(key,false);
   return card;
 }
@@ -1018,8 +997,6 @@ function renderAvatarPicker() {
       // Do NOT auto-launch scenario — user picks it manually from the shelf
     };
   });
-  // Click backdrop (outside picker panel) to close
-  els.pickerBackdrop.onclick=(e)=>{ if(e.target===els.pickerBackdrop) els.pickerBackdrop.style.display='none'; };
   els.pickerBackdrop.style.display='flex';
 }
 
