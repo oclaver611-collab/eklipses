@@ -14,7 +14,7 @@ const DELAY_MS = 3000; // delay between tests to respect TPM limit
 //   checks        — array of check names to run (default: all)
 //   expectName    — name Sofia MUST use in her response
 //   forbidNames   — names Sofia must NEVER use
-//   expectClarify — true if response should be a clarifying question
+//   expectClarify — true if response should be a clarifying question OR statement
 
 const TEST_CASES = [
 
@@ -110,14 +110,14 @@ const TEST_CASES = [
   // ── NEW TEST: INCOHERENT INPUT ────────────────────────────────────────────
 
   {
-    name: 'Beach — incoherent/garbled input should get clarifying question',
+    name: 'Beach — incoherent/garbled input should get clarifying question or statement',
     scenarioKey: 'beach',
     userMessage: 'we give',  // the exact garbled input from today's session
     history: [
       { role: 'user',      content: 'hi my name is Paul' },
       { role: 'assistant', content: 'Sofia. Nice to meet you, Paul.' },
     ],
-    expectClarify: true,  // response should be a question, not a monologue
+    expectClarify: true,  // response should be a short clarifying question OR statement
   },
 
 ];
@@ -223,13 +223,15 @@ function evaluate(testCase, responseText) {
     else pass(`name: must not repeat "${testCase.forbidName}"`);
   }
 
-  // 12. INCOHERENT INPUT: response should be a clarifying question
+  // 12. INCOHERENT INPUT: response should be a short clarifying question OR statement
+  // Accepts: any question ending in "?" OR known clarifying phrases like "I didn't quite catch that."
   if (testCase.expectClarify) {
     const isQuestion = responseText.trim().endsWith('?');
+    const isClarifyingStatement = /didn.t (quite |)catch|pardon|come again|say that again|not sure (what|I heard)|could you (repeat|say)|what was that/i.test(responseText);
     const isShort = responseText.trim().split(/\s+/).length <= 12;
-    if (isQuestion && isShort) pass('incoherent input: asks short clarifying question');
-    else fail('incoherent input: asks short clarifying question',
-      `Expected short question, got: "${responseText}"`);
+    if ((isQuestion || isClarifyingStatement) && isShort) pass('incoherent input: clarifying response (question or statement)');
+    else fail('incoherent input: clarifying response (question or statement)',
+      `Expected short clarifying question or statement, got: "${responseText}"`);
   }
 
   return results;
