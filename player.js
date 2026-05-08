@@ -1134,8 +1134,7 @@ function launchApp() {
     // Render shelf BEFORE speaking — cards are clickable immediately
     renderShelf();
     Metrics.refreshUI(firstKey);
-    const existingBar = document.getElementById('ek-stat-bar');
-    if (!existingBar) {
+    if (!document.getElementById('ek-stat-bar')) {
       const bar = document.createElement('div');
       bar.id = 'ek-stat-bar';
       bar.style.cssText = 'display:none;justify-content:center;align-items:center;gap:12px;font-size:12px;color:#9aa4b2;padding:6px 0;flex-wrap:wrap';
