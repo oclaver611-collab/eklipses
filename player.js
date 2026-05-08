@@ -1077,7 +1077,7 @@ function showOnboarding(onComplete) {
 
 /* ===== Boot ===== */
 function bootDefault() {
-  const set=AVATAR_SETS[Math.floor(Math.random()*AVATAR_SETS.length)];
+  const set=AVATAR_SETS.find(s=>s.id==='sofia');
   applyAvatarSet(set);
   Metrics.bindLikeButton();
   if (!hasSeenOnboarding()) {
