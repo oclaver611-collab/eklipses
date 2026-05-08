@@ -973,7 +973,7 @@ function makeCard(key) {
   const img=document.createElement('img'); img.className='sc-thumb'; img.src=sc.thumb||'Ryan.jpg'; img.onerror=()=>img.style.display='none';
   const title=document.createElement('div'); title.innerHTML='<div class="sc-title">'+sc.title+'</div><div class="sc-sub">Click to load</div>';
   card.appendChild(img); card.appendChild(title);
-  card.onclick=()=>{ stopEverything(); setTimeout(()=>playScenario(key,false), 150); };
+  card.onclick=()=>playScenario(key,false);
   return card;
 }
 
@@ -1130,13 +1130,22 @@ function launchApp() {
     currentScenarioKey=firstKey;
     setMediaForSpeaker('Ryan');
     els.name.textContent='Ryan';
-    els.text.textContent='';
+    els.text.textContent='Choose a scenario to begin.';
+    // Render shelf BEFORE speaking — cards are clickable immediately
+    renderShelf();
+    Metrics.refreshUI(firstKey);
+    const existingBar = document.getElementById('ek-stat-bar');
+    if (!existingBar) {
+      const bar = document.createElement('div');
+      bar.id = 'ek-stat-bar';
+      bar.style.cssText = 'display:none;justify-content:center;align-items:center;gap:12px;font-size:12px;color:#9aa4b2;padding:6px 0;flex-wrap:wrap';
+      const nameEl = document.getElementById('speakerName');
+      if (nameEl && nameEl.parentNode) nameEl.parentNode.insertBefore(bar, nameEl.nextSibling);
+    }
+    Progress.refreshStatBar();
     await speak("You already know what to say. You just need to stop being afraid to say it.", 'Ryan');
     await pause(400);
     await speak("Pick a scenario. Let's find out where you're at.", 'Ryan');
-    renderShelf();
-    Metrics.refreshUI(firstKey);
-    els.text.textContent='Choose a scenario to begin.';
     ryanOrbSetState('silent');
     // Inject stat bar below Ryan name
     const existingBar = document.getElementById('ek-stat-bar');
