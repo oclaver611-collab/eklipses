@@ -1,6 +1,7 @@
 /* ===== Global state ===== */
 let currentScenarioKey = null;
-let currentCharacterId = "sofia"; // active character — changes when user picks avatar
+// Read ?model=70b from URL for A/B testing — does not affect default behaviour
+const USE_MODEL = new URLSearchParams(window.location.search).get('model') || null;
 let currentScript = null;
 let isPractice = false;
 let stepIndex = 0;
@@ -479,6 +480,7 @@ async function getCharacterResponse(userSaid) {
         scenarioKey:currentScenarioKey,
         characterId:currentCharacterId,
         history:conversationHistory,
+        ...(USE_MODEL ? {useModel:USE_MODEL} : {}),
       }),
       signal:controller.signal,
     });
