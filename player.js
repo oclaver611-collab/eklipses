@@ -1011,6 +1011,8 @@ function renderAvatarPicker() {
       // Do NOT auto-launch scenario — user picks it manually from the shelf
     };
   });
+  // Click backdrop (outside picker panel) to close
+  els.pickerBackdrop.onclick=(e)=>{ if(e.target===els.pickerBackdrop) els.pickerBackdrop.style.display='none'; };
   els.pickerBackdrop.style.display='flex';
 }
 
