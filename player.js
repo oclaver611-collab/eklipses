@@ -241,7 +241,7 @@ const Caption = (() => {
 
 /* ===== Avatar sets ===== */
 const AVATAR_SETS = [
-  { id:'sofia',    label:'Sofia',    thumb:'sofia_idle.mp4',    maryVideo:'sofia_speaking.mp4', maryIdleVideo:'sofia_idle.mp4', danielVideo:'sofia_idle.mp4',   vibe:'Direct & self-contained',  scenario:'Beach' },
+  { id:'sofia',    label:'Sofia',    thumb:'sofia_thumb.jpg',    maryVideo:'sofia_speaking.mp4', maryIdleVideo:'sofia_idle.mp4', danielVideo:'sofia_idle.mp4',   vibe:'Direct & self-contained',  scenario:'Beach' },
   { id:'maya',     label:'Maya',     thumb:'maya_thumb.jpg',     maryVideo:'julia_mary.mp4', danielVideo:'julia_daniel.mp4', vibe:'Sharp & quick-witted',     scenario:'Bar' },
   { id:'claire',   label:'Claire',   thumb:'claire_thumb.jpg',   maryVideo:'bella1.mp4',     danielVideo:'bella9.mp4',       vibe:'Warm & emotionally open',  scenario:'Wedding' },
   { id:'zoe',      label:'Zoe',      thumb:'zoe_thumb.jpg',      maryVideo:'julia_mary.mp4', danielVideo:'julia_daniel.mp4', vibe:'Direct & no-nonsense',     scenario:'Gym' },
@@ -970,9 +970,23 @@ function renderShelf() {
 function makeCard(key) {
   const sc=SCENARIOS[key];
   const card=document.createElement('div'); card.className='sc-card';
-  const img=document.createElement('img'); img.className='sc-thumb'; img.src=sc.thumb||'Ryan.jpg'; img.onerror=()=>img.style.display='none';
+  const thumbSrc=sc.thumb||'Ryan.jpg';
+  const isVideo=/\.mp4$/i.test(thumbSrc);
+  let thumb;
+  if (isVideo) {
+    thumb=document.createElement('video');
+    thumb.className='sc-thumb';
+    thumb.src=thumbSrc;
+    thumb.autoplay=true; thumb.loop=true; thumb.muted=true; thumb.playsInline=true;
+    thumb.style.objectFit='cover';
+  } else {
+    thumb=document.createElement('img');
+    thumb.className='sc-thumb';
+    thumb.src=thumbSrc;
+    thumb.onerror=()=>thumb.style.display='none';
+  }
   const title=document.createElement('div'); title.innerHTML='<div class="sc-title">'+sc.title+'</div><div class="sc-sub">Click to load</div>';
-  card.appendChild(img); card.appendChild(title);
+  card.appendChild(thumb); card.appendChild(title);
   card.onclick=()=>playScenario(key,false);
   return card;
 }
