@@ -1085,22 +1085,37 @@ function bootDefault() {
 function launchApp() {
   const overlay=document.createElement('div');
   overlay.id='ek-start-overlay';
-  overlay.style.cssText='position:fixed;inset:0;z-index:10000;background:rgba(13,14,18,0.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px';
-  overlay.innerHTML=`
-    <div style="font-size:48px;line-height:1">🎭</div>
-    <div style="font-size:26px;font-weight:800;color:#fff;letter-spacing:-0.5px">Eklipses</div>
-    <div style="font-size:15px;color:#9aa4b2;max-width:320px;text-align:center;line-height:1.9;font-style:italic">
-      "You already know what to say.<br>You just need to stop being afraid to say it."
-    </div>
-    <button id="ek-start-btn" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:14px 48px;font-size:17px;font-weight:800;cursor:pointer;margin-top:8px;transition:transform .1s ease" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''">
-      Let's go
-    </button>
+  overlay.style.cssText='position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden';
+
+  // Cinematic slideshow background
+  const slides=['https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80','https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1600&q=80','https://images.unsplash.com/photo-1519671282429-b44660ead0a7?w=1600&q=80'];
+  const bgWrap=document.createElement('div');
+  bgWrap.style.cssText='position:absolute;inset:0;z-index:0';
+  const bg1=document.createElement('div'), bg2=document.createElement('div');
+  [bg1,bg2].forEach(b=>{ b.style.cssText='position:absolute;inset:0;background-size:cover;background-position:center;transition:opacity 1.5s ease'; });
+  bg1.style.backgroundImage=`url(${slides[0]})`; bg1.style.opacity='1'; bg2.style.opacity='0';
+  bgWrap.appendChild(bg1); bgWrap.appendChild(bg2);
+  const darkOv=document.createElement('div');
+  darkOv.style.cssText='position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.78) 100%);z-index:1';
+  bgWrap.appendChild(darkOv);
+  overlay.appendChild(bgWrap);
+  let slide=0,tog=false;
+  const ssTimer=setInterval(()=>{ slide=(slide+1)%slides.length; tog=!tog; const a=tog?bg2:bg1,i=tog?bg1:bg2; a.style.backgroundImage=`url(${slides[slide]})`; a.style.opacity='1'; i.style.opacity='0'; },4000);
+
+  const inner=document.createElement('div');
+  inner.style.cssText='position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:18px;padding:32px 24px;text-align:center;max-width:480px';
+  inner.innerHTML=`
+    <div style="font-size:12px;font-weight:700;letter-spacing:4px;color:#ffb300;text-transform:uppercase;opacity:0.9">AI Conversation Training</div>
+    <div style="font-size:54px;font-weight:900;color:#fff;letter-spacing:-2px;line-height:1;text-shadow:0 4px 24px rgba(0,0,0,0.5)">Eklipses</div>
+    <div style="font-size:16px;color:rgba(255,255,255,0.8);line-height:1.7;font-style:italic;max-width:340px">"You already know what to say.<br>You just need to stop being afraid to say it."</div>
+    <button id="ek-start-btn" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:16px 56px;font-size:18px;font-weight:900;cursor:pointer;margin-top:8px;box-shadow:0 8px 32px rgba(255,179,0,0.4);letter-spacing:0.3px;transition:transform .1s ease,box-shadow .1s ease" onmouseover="this.style.transform='scale(1.05)';this.style.boxShadow='0 12px 40px rgba(255,179,0,0.6)'" onmouseout="this.style.transform='';this.style.boxShadow='0 8px 32px rgba(255,179,0,0.4)'">Let's go →</button>
     <div id="ek-prog-wrap" style="display:none;width:280px;text-align:center">
-      <div style="background:#2b2e36;border-radius:6px;height:8px;overflow:hidden;margin-bottom:8px">
+      <div style="background:rgba(255,255,255,0.15);border-radius:6px;height:6px;overflow:hidden;margin-bottom:8px">
         <div id="ek-prog-fill" style="background:#ffb300;height:100%;width:0%;border-radius:6px;transition:width 0.25s ease"></div>
       </div>
-      <div id="ek-prog-label" style="font-size:12px;color:#777">Loading AI model...</div>
+      <div id="ek-prog-label" style="font-size:12px;color:rgba(255,255,255,0.6)">Loading AI model...</div>
     </div>`;
+  overlay.appendChild(inner);
   document.body.appendChild(overlay);
 
   let _bootStarted = false;
@@ -1120,6 +1135,7 @@ function launchApp() {
       if(lbl) lbl.innerHTML='<span style="color:#ff6b6b">Failed: '+err.message+'</span>';
       return;
     }
+    clearInterval(ssTimer);
     overlay.remove();
     const firstKey=Object.keys(SCENARIOS)[0];
     currentScenarioKey=firstKey;
