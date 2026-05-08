@@ -973,7 +973,7 @@ function makeCard(key) {
   const img=document.createElement('img'); img.className='sc-thumb'; img.src=sc.thumb||'Ryan.jpg'; img.onerror=()=>img.style.display='none';
   const title=document.createElement('div'); title.innerHTML='<div class="sc-title">'+sc.title+'</div><div class="sc-sub">Click to load</div>';
   card.appendChild(img); card.appendChild(title);
-  card.onclick=()=>playScenario(key,false);
+  card.onclick=()=>{ stopEverything(); playScenario(key,false); };
   return card;
 }
 
