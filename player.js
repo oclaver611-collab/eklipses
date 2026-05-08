@@ -1088,7 +1088,7 @@ function launchApp() {
   overlay.style.cssText='position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden';
 
   // Cinematic slideshow background
-  const slides=['https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80','https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1600&q=80','https://images.unsplash.com/photo-1519671282429-b44660ead0a7?w=1600&q=80'];
+  const slides=['https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=1600&q=80','https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=1600&q=80','https://images.unsplash.com/photo-1543269865-cbf427effbad?w=1600&q=80'];
   const bgWrap=document.createElement('div');
   bgWrap.style.cssText='position:absolute;inset:0;z-index:0';
   const bg1=document.createElement('div'), bg2=document.createElement('div');
