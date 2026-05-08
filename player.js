@@ -283,6 +283,7 @@ function stopEverything() {
   if (rec) { try{rec.onresult=null;rec.onerror=null;rec.onend=null;rec.stop();}catch{}; rec=null; }
   if (listenTimer) { clearTimeout(listenTimer); listenTimer=null; }
 }
+window.stopEverything = stopEverything; // expose for netflix-rows.js
 
 /* ===== Ryan orb ===== */
 let _ryanOrbEl=null, _ryanOrbAnimFrame=null, _ryanOrbT=0;
