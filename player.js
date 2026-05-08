@@ -1,7 +1,6 @@
 /* ===== Global state ===== */
 let currentScenarioKey = null;
-// Read ?model=70b from URL for A/B testing — does not affect default behaviour
-const USE_MODEL = new URLSearchParams(window.location.search).get('model') || null;
+let currentCharacterId = "sofia"; // active character — changes when user picks avatar
 let currentScript = null;
 let isPractice = false;
 let stepIndex = 0;
@@ -283,7 +282,6 @@ function stopEverything() {
   if (rec) { try{rec.onresult=null;rec.onerror=null;rec.onend=null;rec.stop();}catch{}; rec=null; }
   if (listenTimer) { clearTimeout(listenTimer); listenTimer=null; }
 }
-window.stopEverything = stopEverything; // expose for netflix-rows.js
 
 /* ===== Ryan orb ===== */
 let _ryanOrbEl=null, _ryanOrbAnimFrame=null, _ryanOrbT=0;
@@ -481,7 +479,6 @@ async function getCharacterResponse(userSaid) {
         scenarioKey:currentScenarioKey,
         characterId:currentCharacterId,
         history:conversationHistory,
-        ...(USE_MODEL ? {useModel:USE_MODEL} : {}),
       }),
       signal:controller.signal,
     });
@@ -976,7 +973,7 @@ function makeCard(key) {
   const img=document.createElement('img'); img.className='sc-thumb'; img.src=sc.thumb||'Ryan.jpg'; img.onerror=()=>img.style.display='none';
   const title=document.createElement('div'); title.innerHTML='<div class="sc-title">'+sc.title+'</div><div class="sc-sub">Click to load</div>';
   card.appendChild(img); card.appendChild(title);
-  card.onclick=()=>{ stopEverything(); setTimeout(()=>playScenario(key,false), 150); };
+  card.onclick=()=>playScenario(key,false);
   return card;
 }
 

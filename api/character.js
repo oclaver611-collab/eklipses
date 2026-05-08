@@ -10,9 +10,8 @@ module.exports = async function handler(req, res) {
   const {
     userMessage,
     scenarioKey,
-    characterId = 'sofia',
+    characterId = 'sofia', // default character
     history: rawHistory = [],
-    useModel,
   } = req.body || {};
 
   const history = rawHistory.slice(-16);
@@ -370,7 +369,7 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: useModel === '70b' ? 'llama-3.3-70b-versatile' : 'llama-3.1-8b-instant',
+          model: 'llama-3.1-8b-instant',
           max_tokens: 120,
           messages: [
             { role: 'system', content: systemPrompt },

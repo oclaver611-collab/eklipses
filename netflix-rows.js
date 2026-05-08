@@ -157,12 +157,11 @@
     const selectScenario = () => {
       const select = document.getElementById('scenarioSelect');
       if (!select) return;
-      if (typeof window.stopEverything === 'function') window.stopEverything();
-      setTimeout(() => {
-        select.value = key;
-        select.dispatchEvent(new Event('change', { bubbles: true }));
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 150);
+      select.value = key;
+      // Fire change event so player.js picks it up
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      // Scroll up to the stage so user sees the player
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     card.addEventListener('click', selectScenario);
