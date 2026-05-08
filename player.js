@@ -838,12 +838,16 @@ async function runCoachFeedback(mySession) {
     if (coachParts.length) {
       for (let i = 0; i < coachParts.length; i++) {
         if (mySession !== session) return;
-        await speak(coachParts[i], 'Ryan');
         if (i < coachParts.length - 1) {
-          if (mySession !== session) return;
           const set = fillerSets[i] || fillerSets[fillerSets.length - 1];
           const filler = set[Math.floor(Math.random() * set.length)];
-          await speak(filler, 'Ryan');
+          // Speak current part, then filler+next part merged — eliminates reset gap
+          await speak(coachParts[i], 'Ryan');
+          if (mySession !== session) return;
+          await speak(filler + ' ' + coachParts[i + 1], 'Ryan');
+          i++; // skip next part — already spoken
+        } else {
+          await speak(coachParts[i], 'Ryan');
         }
       }
     } else {
