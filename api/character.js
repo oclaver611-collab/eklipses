@@ -30,9 +30,9 @@ module.exports = async function handler(req, res) {
   // useModel='gpt4mini' → OpenAI gpt-4o-mini (paid, best quality)
   const useGroq70b = useModel === '70b';
   const useGPT4Mini = useModel === 'gpt4mini';
-  const apiUrl = useGPT4Mini ? 'https://api.openai.com/v1/chat/completions' : 'https://api.groq.com/openai/v1/chat/completions';
-  const apiKey = useGPT4Mini ? process.env.OPENAI_API_KEY : process.env.GROQ_API_KEY;
-  const modelName = useGPT4Mini ? 'gpt-4o-mini' : useGroq70b ? 'llama-3.3-70b-versatile' : 'llama-3.1-8b-instant';
+  const apiUrl = useGroq70b ? 'https://api.groq.com/openai/v1/chat/completions' : 'https://api.openai.com/v1/chat/completions';
+  const apiKey = useGroq70b ? process.env.GROQ_API_KEY : process.env.OPENAI_API_KEY;
+  const modelName = useGroq70b ? 'llama-3.3-70b-versatile' : 'gpt-4o-mini'; // default: gpt-4o-mini
 
   // ── Name extraction ──────────────────────────────────────────────────────────
   function extractUserName(msg) {
