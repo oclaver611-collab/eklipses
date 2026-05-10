@@ -24,6 +24,15 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: 'GROQ_API_KEY not set' });
   }
 
+  // Model routing — default: groq 8b (free, fast)
+  // useModel='70b'      → groq llama-3.3-70b-versatile (free, better)
+  // useModel='gpt4mini' → OpenAI gpt-4o-mini (paid, best quality)
+  const useGroq70b = useModel === '70b';
+  const useGPT4Mini = useModel === 'gpt4mini';
+  const apiUrl = useGPT4Mini ? 'https://api.openai.com/v1/chat/completions' : 'https://api.groq.com/openai/v1/chat/completions';
+  const apiKey = useGPT4Mini ? process.env.OPENAI_API_KEY : process.env.GROQ_API_KEY;
+  const modelName = useGPT4Mini ? 'gpt-4o-mini' : useGroq70b ? 'llama-3.3-70b-versatile' : 'llama-3.1-8b-instant';
+
   // ── Name extraction ──────────────────────────────────────────────────────────
   function extractUserName(msg) {
     if (!msg) return null;
@@ -362,14 +371,14 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
 
   for (let attempt = 0; attempt <= delays.length; attempt++) {
     try {
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+          'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
+          model: modelName,
           max_tokens: 120,
           messages: [
             { role: 'system', content: systemPrompt },
