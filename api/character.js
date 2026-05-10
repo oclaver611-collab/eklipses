@@ -12,6 +12,7 @@ module.exports = async function handler(req, res) {
     scenarioKey,
     characterId = 'sofia', // default character
     history: rawHistory = [],
+    useModel,
   } = req.body || {};
 
   const history = rawHistory.slice(-16);
