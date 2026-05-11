@@ -1,6 +1,17 @@
 /* ===== Global state ===== */
 let currentScenarioKey = null;
 let currentCharacterId = "sofia"; // active character — changes when user picks avatar
+
+// Default character per scenario — overrideable by avatar picker
+const SCENARIO_CHARACTER_MAP = {
+  beach:     'sofia',
+  bar:       'maya',
+  museum:    'isabelle',
+  gym:       'zoe',
+  bookstore: 'nadia',
+  street:    'julia',
+  wedding:   'claire',
+};
 let currentScript = null;
 let isPractice = false;
 let stepIndex = 0;
@@ -622,6 +633,12 @@ async function playScenario(key, practice=false) {
 
   const mySession=session;
   currentScenarioKey=key;
+  // Auto-set default character and avatar for this scenario
+  if (SCENARIO_CHARACTER_MAP[key]) {
+    currentCharacterId = SCENARIO_CHARACTER_MAP[key];
+    const defaultSet = AVATAR_SETS.find(s => s.id === currentCharacterId);
+    if (defaultSet) applyAvatarSet(defaultSet);
+  }
   Metrics.bumpView(key); Metrics.refreshUI(key);
   setSceneBackground(key);
   const sc=SCENARIOS[key]; if(!sc) return;
