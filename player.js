@@ -383,13 +383,9 @@ function setSceneBackground(key) {
   const sc=(SCENARIOS[key])||{};
   const frameEl=els.stageFrame;
   if (!frameEl) return;
-
-  // Remove old bg element
   const old=frameEl.querySelector('.scene-bg');
   if (old) { try{if(old.tagName==='VIDEO'){old.pause();old.src='';}}catch{} old.remove(); }
-
   if (!sc.bg) { frameEl.classList.remove('has-bg'); return; }
-
   const isVideo=/\.mp4$/i.test(sc.bg);
   const bgEl=document.createElement(isVideo?'video':'img');
   bgEl.className='scene-bg';
@@ -733,7 +729,7 @@ async function freeConversation(mySession) {
   },1000);
 
   setMediaForSpeaker('Mary');
-  els.name.textContent=sc.coldOpen?'Sofia':'Mary';
+  els.name.textContent=currentCharacterId.charAt(0).toUpperCase()+currentCharacterId.slice(1);
   els.text.textContent='...';
   await pause(1200); // let any prior audio clear before first listen
 
@@ -747,7 +743,7 @@ async function freeConversation(mySession) {
       if(mySession!==session) break;
       await pause(900);
       setMediaForSpeaker('Mary');
-      els.name.textContent=sc.coldOpen?'Sofia':'Mary';
+      els.name.textContent=currentCharacterId.charAt(0).toUpperCase()+currentCharacterId.slice(1);
     }
 
     const remMs=Math.min(30000, FREE_MS-(Date.now()-start));
@@ -796,7 +792,7 @@ async function freeConversation(mySession) {
     if(mySession!==session) break;
     await pause(1500); // wait for audio to clear before next listen
     setMediaForSpeaker('Mary');
-    els.name.textContent=sc.coldOpen?'Sofia':'Mary';
+    els.name.textContent=currentCharacterId.charAt(0).toUpperCase()+currentCharacterId.slice(1);
   }
 
   clearInterval(timerInterval);
