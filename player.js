@@ -381,13 +381,24 @@ function setMediaForSpeaker(speaker) {
 
 function setSceneBackground(key) {
   const sc=(SCENARIOS[key])||{};
-  const bgEl=els.sceneBg, frameEl=els.stageFrame;
-  if (!bgEl||!frameEl) return;
-  if (sc.bg) {
-    bgEl.src=sc.bg; bgEl.classList.remove('hidden'); frameEl.classList.add('has-bg');
-  } else {
-    bgEl.classList.add('hidden'); bgEl.src=''; frameEl.classList.remove('has-bg');
-  }
+  const frameEl=els.stageFrame;
+  if (!frameEl) return;
+
+  // Remove old bg element
+  const old=frameEl.querySelector('.scene-bg');
+  if (old) { try{if(old.tagName==='VIDEO'){old.pause();old.src='';}}catch{} old.remove(); }
+
+  if (!sc.bg) { frameEl.classList.remove('has-bg'); return; }
+
+  const isVideo=/\.mp4$/i.test(sc.bg);
+  const bgEl=document.createElement(isVideo?'video':'img');
+  bgEl.className='scene-bg';
+  if (isVideo) { bgEl.autoplay=true; bgEl.loop=true; bgEl.muted=true; bgEl.playsInline=true; }
+  bgEl.src=sc.bg;
+  frameEl.insertBefore(bgEl, frameEl.firstChild);
+  frameEl.classList.add('has-bg');
+  els.sceneBg=bgEl;
+  if (isVideo) { bgEl.load(); bgEl.play().catch(()=>{}); }
 }
 
 function renderLine(line) {
@@ -722,7 +733,7 @@ async function freeConversation(mySession) {
   },1000);
 
   setMediaForSpeaker('Mary');
-  els.name.textContent=currentCharacterId.charAt(0).toUpperCase()+currentCharacterId.slice(1);
+  els.name.textContent=sc.coldOpen?'Sofia':'Mary';
   els.text.textContent='...';
   await pause(1200); // let any prior audio clear before first listen
 
@@ -736,7 +747,7 @@ async function freeConversation(mySession) {
       if(mySession!==session) break;
       await pause(900);
       setMediaForSpeaker('Mary');
-      els.name.textContent=currentCharacterId.charAt(0).toUpperCase()+currentCharacterId.slice(1);
+      els.name.textContent=sc.coldOpen?'Sofia':'Mary';
     }
 
     const remMs=Math.min(30000, FREE_MS-(Date.now()-start));
@@ -785,7 +796,7 @@ async function freeConversation(mySession) {
     if(mySession!==session) break;
     await pause(1500); // wait for audio to clear before next listen
     setMediaForSpeaker('Mary');
-    els.name.textContent=currentCharacterId.charAt(0).toUpperCase()+currentCharacterId.slice(1);
+    els.name.textContent=sc.coldOpen?'Sofia':'Mary';
   }
 
   clearInterval(timerInterval);
@@ -1009,7 +1020,6 @@ function renderAvatarPicker() {
       // Do NOT auto-launch scenario — user picks it manually from the shelf
     };
   });
-  els.pickerBackdrop.onclick=(e)=>{ if(e.target===els.pickerBackdrop) els.pickerBackdrop.style.display='none'; };
   els.pickerBackdrop.style.display='flex';
 }
 
