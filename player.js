@@ -399,7 +399,13 @@ function setSceneBackground(key) {
 
 function renderLine(line) {
   setMediaForSpeaker(line.speaker);
-  els.name.textContent = (line.speaker==='User_Prompt') ? 'Your Turn' : line.speaker;
+  if (line.speaker==='User_Prompt') {
+    els.name.textContent = 'Your Turn';
+  } else if (line.speaker==='Mary') {
+    els.name.textContent = currentCharacterId.charAt(0).toUpperCase() + currentCharacterId.slice(1);
+  } else {
+    els.name.textContent = line.speaker;
+  }
   if (line.speaker==='User_Prompt') {
     els.text.innerHTML = `<div class="practice-prompt"><strong>READ THIS OUT LOUD:</strong><br><br>"${line.text.replace('Say: ','').replace(/'/g,'')}"</div><div class="user-response-area">🎤 Speak when ready…</div>`;
   } else {
