@@ -256,8 +256,7 @@ const AVATAR_SETS = [
   { id:'isabelle', label:'Isabelle', thumb:'Isabelle_thumb.jpg',  maryVideo:'Isabelle_speaking.mp4', maryIdleVideo:'Isabelle_idle.mp4', danielVideo:'Isabelle_idle.mp4', vibe:'Intellectual & curious',   scenario:'Museum' },
   { id:'ava',      label:'Ava',      thumb:'Ava_thumb.jpg',       maryVideo:'Ava_speaking.mp4',      maryIdleVideo:'Ava_idle.mp4',      danielVideo:'Ava_idle.mp4',      vibe:'Sharp & direct',           scenario:'Bar' },
   { id:'zoe',      label:'Zoe',      thumb:'zoe_thumb.jpg',       maryVideo:'zoe_speaking.mp4',      maryIdleVideo:'zoe_idle.mp4',      danielVideo:'zoe_idle.mp4',      vibe:'Direct & no-nonsense',     scenario:'Gym' },
-  { id:'julia',    label:'Julia',    thumb:'julia_thumb.jpg',     maryVideo:'julia_mary.mp4',        maryIdleVideo:'julia_daniel.mp4',  danielVideo:'julia_daniel.mp4',  vibe:'Mysterious & confident',   scenario:'Street' },
-  { id:'nadia',    label:'Nadia',    thumb:'Nadia_thumb.jpg',     maryVideo:'julia_mary.mp4',        maryIdleVideo:'julia_daniel.mp4',  danielVideo:'julia_daniel.mp4',  vibe:'Warm & bookish',           scenario:'Bookstore' },
+  { id:'julia',    label:'Julia',    thumb:'julia_thumb.jpg',     maryVideo:'julia_mary.mp4',        danielVideo:'julia_daniel.mp4',                                       vibe:'Mysterious & confident',   scenario:'Street' },
 ];
 
 const AVATARS = {
@@ -382,13 +381,34 @@ function setMediaForSpeaker(speaker) {
 
 function setSceneBackground(key) {
   const sc=(SCENARIOS[key])||{};
-  const bgEl=els.sceneBg, frameEl=els.stageFrame;
-  if (!bgEl||!frameEl) return;
-  if (sc.bg) {
-    bgEl.src=sc.bg; bgEl.classList.remove('hidden'); frameEl.classList.add('has-bg');
+  const frameEl=els.stageFrame;
+  if (!frameEl) return;
+
+  // Remove existing background element
+  const existing = frameEl.querySelector('.scene-bg');
+  if (existing) { try{if(existing.tagName==='VIDEO')existing.pause();}catch{} existing.remove(); }
+
+  if (!sc.bg) { frameEl.classList.remove('has-bg'); return; }
+
+  const isVideo = /\.mp4$/i.test(sc.bg);
+  let bgEl;
+
+  if (isVideo) {
+    bgEl = document.createElement('video');
+    bgEl.autoplay=true; bgEl.loop=true; bgEl.muted=true; bgEl.playsInline=true;
+    bgEl.src=sc.bg;
   } else {
-    bgEl.classList.add('hidden'); bgEl.src=''; frameEl.classList.remove('has-bg');
+    bgEl = document.createElement('img');
+    bgEl.src=sc.bg;
+    bgEl.alt='';
   }
+
+  bgEl.className='scene-bg';
+  bgEl.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;filter:blur(3px) brightness(0.55);transform:scale(1.06);';
+  frameEl.insertBefore(bgEl, frameEl.firstChild);
+  frameEl.classList.add('has-bg');
+
+  if (isVideo) { bgEl.load(); bgEl.play().catch(()=>{}); }
 }
 
 function renderLine(line) {
