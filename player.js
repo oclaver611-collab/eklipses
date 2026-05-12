@@ -5,7 +5,7 @@ let currentCharacterId = "sofia"; // active character — changes when user pick
 // Default character per scenario — overrideable by avatar picker
 const SCENARIO_CHARACTER_MAP = {
   beach:     'sofia',
-  bar:       'maya',
+  bar:       'ava',
   museum:    'isabelle',
   gym:       'zoe',
   bookstore: 'nadia',
@@ -252,11 +252,11 @@ const Caption = (() => {
 
 /* ===== Avatar sets ===== */
 const AVATAR_SETS = [
-  { id:'sofia',    label:'Sofia',    thumb:'sofia_thumb.jpg',    maryVideo:'sofia_speaking.mp4', maryIdleVideo:'sofia_idle.mp4', danielVideo:'sofia_idle.mp4',   vibe:'Direct & self-contained',  scenario:'Beach' },
-  { id:'maya',     label:'Maya',     thumb:'maya_thumb.jpg',     maryVideo:'julia_mary.mp4', danielVideo:'julia_daniel.mp4', vibe:'Sharp & quick-witted',     scenario:'Bar' },
-  { id:'claire',   label:'Claire',   thumb:'claire_thumb.jpg',   maryVideo:'bella1.mp4',     danielVideo:'bella9.mp4',       vibe:'Warm & emotionally open',  scenario:'Wedding' },
-  { id:'zoe',      label:'Zoe',      thumb:'zoe_thumb.jpg',      maryVideo:'julia_mary.mp4', danielVideo:'julia_daniel.mp4', vibe:'Direct & no-nonsense',     scenario:'Gym' },
-  { id:'julia',    label:'Julia',    thumb:'julia_thumb.jpg',    maryVideo:'julia_mary.mp4', danielVideo:'julia_daniel.mp4', vibe:'Mysterious & confident',   scenario:'Street' },
+  { id:'sofia',    label:'Sofia',    thumb:'sofia_thumb.jpg',    maryVideo:'sofia_speaking.mp4',    maryIdleVideo:'sofia_idle.mp4',    danielVideo:'sofia_idle.mp4',    vibe:'Direct & self-contained',  scenario:'Beach' },
+  { id:'isabelle', label:'Isabelle', thumb:'Isabelle_thumb.jpg',  maryVideo:'Isabelle_speaking.mp4', maryIdleVideo:'Isabelle_idle.mp4', danielVideo:'Isabelle_idle.mp4', vibe:'Intellectual & curious',   scenario:'Museum' },
+  { id:'ava',      label:'Ava',      thumb:'Ava_thumb.jpg',       maryVideo:'Ava_speaking.mp4',      maryIdleVideo:'Ava_idle.mp4',      danielVideo:'Ava_idle.mp4',      vibe:'Sharp & direct',           scenario:'Bar' },
+  { id:'zoe',      label:'Zoe',      thumb:'zoe_thumb.jpg',       maryVideo:'zoe_speaking.mp4',      maryIdleVideo:'zoe_idle.mp4',      danielVideo:'zoe_idle.mp4',      vibe:'Direct & no-nonsense',     scenario:'Gym' },
+  { id:'julia',    label:'Julia',    thumb:'julia_thumb.jpg',     maryVideo:'julia_mary.mp4',        danielVideo:'julia_daniel.mp4',                                       vibe:'Mysterious & confident',   scenario:'Street' },
 ];
 
 const AVATARS = {
