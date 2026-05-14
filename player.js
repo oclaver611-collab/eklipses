@@ -1207,11 +1207,15 @@ function launchApp() {
       if (nameEl && nameEl.parentNode) nameEl.parentNode.insertBefore(bar, nameEl.nextSibling);
     }
     Progress.refreshStatBar();
-    // Render shelf immediately — playScenario calls stopEverything() which cuts Ryan audio cleanly
+    // Render shelf immediately — playScenario calls stopEverything() which increments session
     renderShelf();
+    const launchSession = session;
     await speak("You already know what to say. You just need to stop being afraid to say it.", 'Ryan');
+    if (session !== launchSession) return; // user clicked a scenario — stop here
     await pause(400);
+    if (session !== launchSession) return;
     await speak("Pick a scenario. Let's find out where you're at.", 'Ryan');
+    if (session !== launchSession) return;
     ryanOrbSetState('silent');
     // Inject stat bar below Ryan name
     const existingBar = document.getElementById('ek-stat-bar');
