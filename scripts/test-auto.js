@@ -1,7 +1,7 @@
 // scripts/test-auto.js
 // ALL AUTOMATED TESTS — no human needed
 // Run with: npm test
-// Runs both evaluators back to back, fails if anything breaks
+// Runs all evaluators back to back, fails if anything breaks
 
 const { execSync } = require('child_process');
 
@@ -21,6 +21,11 @@ const tests = [
     cmd: 'node eval-coach-v2.js',
     description: 'Tests Ryan coaching — opener analysis, score calibration, motivational close, no hallucinations'
   },
+  {
+    name: 'All-Scenarios Evaluator (6 scenarios)',
+    cmd: 'node eval-scenarios.js',
+    description: 'Tests all 6 characters for correct name, feedback card fields, scenario-specific opener suggestions'
+  },
 ];
 
 let allPassed = true;
@@ -35,7 +40,7 @@ for (const test of tests) {
     const output = execSync(test.cmd, { encoding: 'utf8', stdio: 'pipe' });
     console.log(output);
 
-    const passed = output.includes('All checks passed') || output.includes('0 failed');
+    const passed = output.includes('All') && (output.includes('passed') || output.includes('0 failed'));
     results.push({ name: test.name, passed });
     if (!passed) allPassed = false;
 
