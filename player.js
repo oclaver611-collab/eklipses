@@ -256,6 +256,7 @@ const AVATAR_SETS = [
   { id:'isabelle', label:'Isabelle', thumb:'Isabelle_thumb.jpg',  maryVideo:'Isabelle_speaking.mp4', maryIdleVideo:'Isabelle_idle.mp4', danielVideo:'Isabelle_idle.mp4', vibe:'Intellectual & curious',   scenario:'Museum' },
   { id:'ava',      label:'Ava',      thumb:'Ava_thumb.jpg',       maryVideo:'Ava_speaking.mp4',      maryIdleVideo:'Ava_idle.mp4',      danielVideo:'Ava_idle.mp4',      vibe:'Sharp & direct',           scenario:'Bar' },
   { id:'zoe',      label:'Zoe',      thumb:'zoe_thumb.jpg',       maryVideo:'zoe_speaking.mp4',      maryIdleVideo:'zoe_idle.mp4',      danielVideo:'zoe_idle.mp4',      vibe:'Direct & no-nonsense',     scenario:'Gym' },
+  { id:'nadia',    label:'Nadia',    thumb:'Nadia.jpg',            maryVideo:'nadia_speaking.mp4',    maryIdleVideo:'nadia_idle.mp4',    danielVideo:'nadia_idle.mp4',    vibe:'Warm & bookish',           scenario:'Bookstore' },
   { id:'julia',    label:'Julia',    thumb:'julia_thumb.jpg',     maryVideo:'julia_mary.mp4',        danielVideo:'julia_daniel.mp4',                                       vibe:'Mysterious & confident',   scenario:'Street' },
 ];
 
