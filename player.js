@@ -710,7 +710,7 @@ async function freeConversation(mySession) {
   let freeConvRescueUsed = null;
   if(mySession!==session) return;
   const sc=SCENARIOS[currentScenarioKey]||{};
-  const FREE_MS=10*60*1000, NUDGE_MS=8*60*1000;
+  const FREE_MS=3*60*1000, NUDGE_MS=2*60*1000;
   const start=Date.now();
   let nudged=false;
   // Reset conversation history here so coach only sees the free conversation
@@ -812,12 +812,17 @@ async function runCoachFeedback(mySession) {
   if(mySession!==session) return;
   els.name.textContent='Ryan'; els.text.textContent='Analyzing your session...';
   setMediaForSpeaker('Ryan');
+  ryanOrbSetState('speaking');
   const sc=SCENARIOS[currentScenarioKey]||{};
   // Guard: if no conversation happened, skip coaching
   if (!conversationHistory.length) {
     await speak("Looks like we didn't get enough conversation to work with. Hit Try Again and give me something to coach.", 'Ryan');
     return;
   }
+  // Speak a thinking line immediately — fills the API wait time
+  await speak("Alright, let me put this together.", 'Ryan');
+  if(mySession!==session) return;
+  els.text.textContent='Analyzing your session...';
   try {
     const coachController=new AbortController();
     const coachTimeout=setTimeout(()=>coachController.abort(),25000);
@@ -863,15 +868,19 @@ async function runCoachFeedback(mySession) {
     if (coachParts.length) {
       for (let i = 0; i < coachParts.length; i++) {
         if (mySession !== session) return;
+        // Show text immediately so screen is never blank while TTS loads
+        els.text.textContent = coachParts[i];
         await speak(coachParts[i], 'Ryan');
         if (i < coachParts.length - 1) {
           if (mySession !== session) return;
           const set = fillerSets[i] || fillerSets[fillerSets.length - 1];
           const filler = set[Math.floor(Math.random() * set.length)];
+          els.text.textContent = filler;
           await speak(filler, 'Ryan');
         }
       }
     } else {
+      els.text.textContent = f.spokenFeedback || f.spokenSummary;
       await speak(f.spokenFeedback || f.spokenSummary, 'Ryan');
     }
     if(mySession!==session) return;
@@ -1172,8 +1181,6 @@ function launchApp() {
     setMediaForSpeaker('Ryan');
     els.name.textContent='Ryan';
     els.text.textContent='Choose a scenario to begin.';
-    // Render shelf BEFORE speaking — cards are clickable immediately
-    renderShelf();
     Metrics.refreshUI(firstKey);
     if (!document.getElementById('ek-stat-bar')) {
       const bar = document.createElement('div');
@@ -1187,6 +1194,8 @@ function launchApp() {
     await pause(400);
     await speak("Pick a scenario. Let's find out where you're at.", 'Ryan');
     ryanOrbSetState('silent');
+    // Render shelf AFTER Ryan finishes — prevents voice overlap on fast clicks
+    renderShelf();
     // Inject stat bar below Ryan name
     const existingBar = document.getElementById('ek-stat-bar');
     if (!existingBar) {
