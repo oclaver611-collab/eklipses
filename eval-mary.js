@@ -156,7 +156,7 @@ function evaluate(testCase, responseText) {
   //   - relative/subordinate clauses: ", which" ", because" etc.
   //   - short trailing fragments under 4 words
   //   - participial phrases: ", mostly" ", just" ", really"
-  const TAG_PHRASES = /,\s+(I guess|I think|I suppose|I mean|I hope|I know|you know|right|maybe|actually|honestly|really|just|mostly|mostly about|for now|for sure|kind of|sort of|I\s+\'m sure)/i;
+  const TAG_PHRASES = /,\s+(I guess|I think|I suppose|I mean|I hope|I know|I\'ll|I\'d|I\'ve|you know|right|maybe|actually|honestly|really|just|mostly|mostly about|for now|for sure|kind of|sort of|I\s+\'m sure|to be honest|to be fair|admittedly)/i;
   const commaSplicePattern = /[a-z][^.!?]*,\s+(?:I|it|that|this|he|she|they|we|you|there|here)[^.!?]*[.!?]/gi;
   const splices = responseText.match(commaSplicePattern) || [];
   const realSplices = splices.filter(s => {
