@@ -924,19 +924,32 @@ function showFeedbackCard(f) {
         </div>
       </div>
     </div>` : `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-      <div style="background:#162016;border:1px solid #1e3a1e;border-radius:10px;padding:12px">
-        <div style="color:#40c770;font-size:12px;font-weight:700;margin-bottom:8px">CHECK WHAT WORKED</div>
-        ${(f.strengths||[]).map(s=>`<div style="color:#c8e6c9;font-size:13px;margin-bottom:4px">- ${s}</div>`).join('')}
+    <div style="display:grid;gap:10px;margin-bottom:14px">
+      <div style="background:#161820;border:1px solid #2b2e3a;border-radius:10px;padding:12px">
+        <div style="color:#9aa4b2;font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Your opener</div>
+        <div style="color:#cfd6e4;font-size:13px;line-height:1.6">${f.openerBreakdown||'---'}</div>
       </div>
-      <div style="background:#1e1616;border:1px solid #3a1e1e;border-radius:10px;padding:12px">
-        <div style="color:#ff6b6b;font-size:12px;font-weight:700;margin-bottom:8px">IMPROVE THIS</div>
-        ${(f.improvements||[]).map(i=>`<div style="color:#ffcdd2;font-size:13px;margin-bottom:4px">- ${i}</div>`).join('')}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:#162016;border:1px solid #1e3a1e;border-radius:10px;padding:12px">
+          <div style="color:#40c770;font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase">Best moment</div>
+          <div style="color:#c8e6c9;font-size:13px;line-height:1.6">${f.bestMoment||'---'}</div>
+        </div>
+        <div style="background:#1e1616;border:1px solid #3a1e1e;border-radius:10px;padding:12px">
+          <div style="color:#ff6b6b;font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase">Missed opportunity</div>
+          <div style="color:#ffcdd2;font-size:13px;line-height:1.6">${f.missedOpportunity||'---'}</div>
+        </div>
       </div>
-    </div>
-    <div style="background:#1a1730;border:1px solid #2e2a50;border-radius:10px;padding:12px;margin-bottom:14px">
-      <div style="color:#a78bfa;font-size:12px;font-weight:700;margin-bottom:6px">TRY THIS LINE NEXT TIME</div>
-      <div style="color:#e0d9ff;font-size:14px;font-style:italic">"${f.tryThisLine||'---'}"</div>
+      <div style="background:#1a1730;border:1px solid #2e2a50;border-radius:10px;padding:12px">
+        <div style="color:#a78bfa;font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase">Try this next time</div>
+        <div style="color:#e0d9ff;font-size:14px;font-style:italic">"${f.tryNextTime||f.tryThisLine||'---'}"</div>
+      </div>
+      <div style="background:#1a1620;border:1px solid #2e1e3a;border-radius:10px;padding:12px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:22px">${(f.wouldSheDateHim||'').startsWith('Yes')?'💜':(f.wouldSheDateHim||'').startsWith('No')?'✖':'🤔'}</div>
+        <div>
+          <div style="color:#d4a8ff;font-size:11px;font-weight:700;margin-bottom:3px;text-transform:uppercase">Would she date you?</div>
+          <div style="color:#e0d9ff;font-size:13px;line-height:1.5">${f.wouldSheDateHim||'---'}</div>
+        </div>
+      </div>
     </div>`;
 
   els.text.innerHTML=`

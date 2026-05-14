@@ -55,15 +55,26 @@ module.exports = async function handler(req, res) {
     openerWords.length <= 5
   );
   
+  // Scenario-specific better opener suggestions
+  const betterOpeners = {
+    beach:     'You look like you have found the only quiet spot on this whole beach — is this your spot?',
+    bar:       'I have been watching this end of the bar — everyone is either on their phone or trying too hard. You are the only one who looks like you are actually here.',
+    museum:    'You have been standing in front of that one longer than anyone else — what is it doing to you?',
+    gym:       'I was going to ask if that machine is free but honestly I am more curious what you are training for.',
+    bookstore: 'You look like someone who actually reads the back cover before deciding — that already makes you more interesting than most people in here.',
+    street:    'You look like you are on your way somewhere specific — I figured I had about ten seconds to say something worth your time.',
+  };
+  const betterOpener = betterOpeners[scenarioKey] || 'Something specific and observational that gives her something real to respond to.';
+
   let part1;
-  const sofiaReply = sofiaFirstResponse ? ' She responded with "' + sofiaFirstResponse + '" — she kept it short because you gave her nothing specific to work with.' : '';
-  const sofiaReplyGood = sofiaFirstResponse ? ' She came back with "' + sofiaFirstResponse + '" — that is a real response, which means the door was open.' : '';
+  const herReply = sofiaFirstResponse ? ' She responded with "' + sofiaFirstResponse + '" — she kept it short because you gave her nothing specific to work with.' : '';
+  const herReplyGood = sofiaFirstResponse ? ' She came back with "' + sofiaFirstResponse + '" — that is a real response, which means the door was open.' : '';
   if (nameOnly) {
-    part1 = 'You showed up — that already puts you ahead of the guys who freeze. But your opener was just "' + openerLine + '". One word. She has nothing to respond to — you made her do all the work. Next time try something that opens a door: "I keep walking past this spot and you are always here — what is the pull?" That is specific, curious, and gives her something real to say. You have the nerve. Now give it some substance.';
+    part1 = 'You showed up — that already puts you ahead of the guys who freeze. But your opener was just "' + openerLine + '". One word. She has nothing to respond to — you made her do all the work. Next time try something that opens a door: "' + betterOpener + '" That is specific, curious, and gives her something real to say. You have the nerve. Now give it some substance.';
   } else if (isGeneric) {
-    part1 = 'First thing — you walked up and said something. That matters. But your opener was "' + openerLine + '". That could have come from anyone.' + sofiaReply + ' A better opener: "You look like you have found the only quiet spot on this whole beach — is this your spot?" Specific, observational, gives her something real to respond to. Build on the confidence you already showed.';
+    part1 = 'First thing — you walked up and said something. That matters. But your opener was "' + openerLine + '". That could have come from anyone.' + herReply + ' A better opener: "' + betterOpener + '" Specific, observational, gives her something real to respond to. Build on the confidence you already showed.';
   } else {
-    part1 = 'Good start — you opened with "' + openerLine + '". That showed genuine intent and gave her something to respond to.' + sofiaReplyGood + ' The foundation was solid. The question is what you built on top of it.';
+    part1 = 'Good start — you opened with "' + openerLine + '". That showed genuine intent and gave her something to respond to.' + herReplyGood + ' The foundation was solid. The question is what you built on top of it.';
   }
 
   const isBeach = scenarioKey === 'beach';
