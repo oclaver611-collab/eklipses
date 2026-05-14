@@ -639,7 +639,7 @@ async function playScenario(key, practice=false) {
   stopEverything();
   resetConversation();
   firstUserOpener=null;
-  await pause(200);
+  await pause(800); // increased from 200ms — kills 1s audio bleed on fast clicks
 
   // Fire warmup ping immediately — runs in background while Ryan speaks the intro
   warmupCharacterApi(key);
