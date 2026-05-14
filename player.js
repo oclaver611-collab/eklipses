@@ -1032,6 +1032,10 @@ function renderAvatarPicker() {
     };
   });
   els.pickerBackdrop.style.display='flex';
+  // Close picker when clicking outside the grid
+  els.pickerBackdrop.onclick=(e)=>{
+    if(e.target===els.pickerBackdrop) els.pickerBackdrop.style.display='none';
+  };
 }
 
 els.enterPractice.onclick=()=>playScenario(currentScenarioKey||Object.keys(SCENARIOS)[0],true);
@@ -1190,12 +1194,12 @@ function launchApp() {
       if (nameEl && nameEl.parentNode) nameEl.parentNode.insertBefore(bar, nameEl.nextSibling);
     }
     Progress.refreshStatBar();
+    // Render shelf immediately — playScenario calls stopEverything() which cuts Ryan audio cleanly
+    renderShelf();
     await speak("You already know what to say. You just need to stop being afraid to say it.", 'Ryan');
     await pause(400);
     await speak("Pick a scenario. Let's find out where you're at.", 'Ryan');
     ryanOrbSetState('silent');
-    // Render shelf AFTER Ryan finishes — prevents voice overlap on fast clicks
-    renderShelf();
     // Inject stat bar below Ryan name
     const existingBar = document.getElementById('ek-stat-bar');
     if (!existingBar) {
