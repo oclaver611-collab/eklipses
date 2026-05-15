@@ -8,7 +8,7 @@ module.exports = async function handler(req, res) {
   if (!process.env.ELEVENLABS_API_KEY) return res.status(500).json({ error: 'ELEVENLABS_API_KEY not set' });
 
   // Only Sofia/Mary uses ElevenLabs — other speakers fall back gracefully
-  const SOFIA_VOICE_ID = 'cvpTJfe9LINpHIOmB2Hp'; // Charlotte
+  const SOFIA_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'; // Rachel — default voice, works on free tier
 
   // Clean text for TTS — remove stage directions but keep emotional cues
   // ElevenLabs v3 supports [laughs], [sighs], [whispers] natively
