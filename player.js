@@ -416,7 +416,7 @@ function renderLine(line) {
 
 /* ===== TTS ===== */
 
-// OpenAI TTS for Mary — shimmer voice, best female option
+// OpenAI TTS for Mary — streaming playback for low latency
 async function speakElevenLabs(text, onStart) {
   const res = await fetch('/api/tts', {
     method: 'POST',
@@ -424,18 +424,63 @@ async function speakElevenLabs(text, onStart) {
     body: JSON.stringify({ text, voice: 'nova' }),
   });
   if (!res.ok) throw new Error('OpenAI TTS failed: ' + res.status);
-  const arrayBuf = await res.arrayBuffer();
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  __audioContexts.push(audioCtx);
-  const audioBuf = await audioCtx.decodeAudioData(arrayBuf);
-  const source = audioCtx.createBufferSource();
-  source.buffer = audioBuf;
-  source.connect(audioCtx.destination);
-  onStart(); // switch to speaking video
-  return new Promise((resolve) => {
-    source.onended = () => { audioCtx.close(); resolve(); };
-    source.start(0);
-  });
+
+  // Use MediaSource streaming — audio starts playing as first chunks arrive
+  // Falls back to full buffer decode if MediaSource not supported
+  if (window.MediaSource && MediaSource.isTypeSupported('audio/mpeg')) {
+    return new Promise((resolve, reject) => {
+      const mediaSource = new MediaSource();
+      const audio = new Audio();
+      audio.src = URL.createObjectURL(mediaSource);
+
+      mediaSource.addEventListener('sourceopen', async () => {
+        const sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
+        const reader = res.body.getReader();
+        let started = false;
+
+        const pump = async () => {
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) {
+                if (!sourceBuffer.updating) mediaSource.endOfStream();
+                else sourceBuffer.addEventListener('updateend', () => mediaSource.endOfStream(), { once: true });
+                break;
+              }
+              // Wait if buffer is updating
+              if (sourceBuffer.updating) {
+                await new Promise(r => sourceBuffer.addEventListener('updateend', r, { once: true }));
+              }
+              sourceBuffer.appendBuffer(value);
+              // Start playing as soon as first chunk lands
+              if (!started) {
+                started = true;
+                audio.play().then(() => { onStart(); }).catch(() => {});
+              }
+            }
+          } catch(e) { reject(e); }
+        };
+        pump();
+      });
+
+      audio.onended = () => { URL.revokeObjectURL(audio.src); resolve(); };
+      audio.onerror = (e) => reject(new Error('Audio error: ' + e));
+    });
+  } else {
+    // Fallback: full buffer (Safari / older browsers)
+    const arrayBuf = await res.arrayBuffer();
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    __audioContexts.push(audioCtx);
+    const audioBuf = await audioCtx.decodeAudioData(arrayBuf);
+    const source = audioCtx.createBufferSource();
+    source.buffer = audioBuf;
+    source.connect(audioCtx.destination);
+    onStart();
+    return new Promise((resolve) => {
+      source.onended = () => { audioCtx.close(); resolve(); };
+      source.start(0);
+    });
+  }
 }
 
 async function speak(text, speaker) {
