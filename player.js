@@ -416,14 +416,14 @@ function renderLine(line) {
 
 /* ===== TTS ===== */
 
-// ElevenLabs TTS for Mary — streams audio from /api/tts
+// OpenAI TTS for Mary — shimmer voice, best female option
 async function speakElevenLabs(text, onStart) {
-  const res = await fetch('/api/elevenlabs', {
+  const res = await fetch('/api/tts', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, speaker: 'Mary' }),
+    body: JSON.stringify({ text, voice: 'shimmer' }),
   });
-  if (!res.ok) throw new Error('ElevenLabs TTS failed: ' + res.status);
+  if (!res.ok) throw new Error('OpenAI TTS failed: ' + res.status);
   const arrayBuf = await res.arrayBuffer();
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   __audioContexts.push(audioCtx);
