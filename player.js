@@ -415,6 +415,29 @@ function renderLine(line) {
 }
 
 /* ===== TTS ===== */
+
+// ElevenLabs TTS for Mary — streams audio from /api/tts
+async function speakElevenLabs(text, onStart) {
+  const res = await fetch('/api/tts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, speaker: 'Mary' }),
+  });
+  if (!res.ok) throw new Error('ElevenLabs TTS failed: ' + res.status);
+  const arrayBuf = await res.arrayBuffer();
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  __audioContexts.push(audioCtx);
+  const audioBuf = await audioCtx.decodeAudioData(arrayBuf);
+  const source = audioCtx.createBufferSource();
+  source.buffer = audioBuf;
+  source.connect(audioCtx.destination);
+  onStart(); // switch to speaking video
+  return new Promise((resolve) => {
+    source.onended = () => { audioCtx.close(); resolve(); };
+    source.start(0);
+  });
+}
+
 async function speak(text, speaker) {
   const mySession=session;
   try { __audioContexts.forEach(c=>{ try{if(c.state==='suspended')c.resume();}catch{} }); } catch {}
@@ -428,42 +451,49 @@ async function speak(text, speaker) {
     const orbEl=document.getElementById('ryan-orb'); if(orbEl) ryanOrbSetState('speaking');
   }
   if (mySession!==session) return;
-  const voice=getKokoroVoice(speaker);
+
+  const switchToSpeaking=()=>{
+    if(mySession!==session) return;
+    if (speaker === 'Mary') {
+      if (AVATARS._marySpeakingVideo) {
+        const el=els.media;
+        if(el&&el.tagName==='VIDEO'&&(el.getAttribute('src')||'')!==AVATARS._marySpeakingVideo){
+          el.src=AVATARS._marySpeakingVideo; el.load(); try{el.play().catch(()=>{});}catch{}
+        }
+      } else { setMediaForSpeaker('Mary'); }
+    } else {
+      const el=els.media; if(el&&el.tagName==='VIDEO'){try{el.play().catch(()=>{});}catch{}}
+    }
+  };
+
+  const switchToIdle=()=>{
+    const doneEl=els.media;
+    if(doneEl&&doneEl.id==='ryan-orb') ryanOrbSetState('silent');
+    if (speaker === 'Mary' && doneEl && doneEl.tagName === 'VIDEO') {
+      try { doneEl.pause(); } catch {}
+      const idleSrc = AVATARS._maryIdleVideo || AVATARS.User_Prompt.src;
+      if(idleSrc && (doneEl.getAttribute('src')||'')!==idleSrc){
+        doneEl.src=idleSrc; doneEl.load(); try{doneEl.play().catch(()=>{});}catch{}
+      }
+    }
+  };
+
   try {
     await Promise.race([
       (async()=>{
-        // Switch to speaking video when audio ACTUALLY starts — works for both short and long TTS
-        let started=false;
-        const switchToSpeaking=()=>{
-          if(started||mySession!==session) return;
-          started=true;
-          if (speaker === 'Mary') {
-            if (AVATARS._marySpeakingVideo) {
-              const el=els.media;
-              if(el&&el.tagName==='VIDEO'&&(el.getAttribute('src')||'')!==AVATARS._marySpeakingVideo){
-                el.src=AVATARS._marySpeakingVideo; el.load(); try{el.play().catch(()=>{});}catch{}
-              }
-            } else { setMediaForSpeaker('Mary'); }
-          } else {
-            const el=els.media; if(el&&el.tagName==='VIDEO'){try{el.play().catch(()=>{});}catch{}}
-          }
-        };
-        const sync=()=>{ switchToSpeaking(); };
-        const poll=setInterval(()=>{ if(mySession!==session){clearInterval(poll);return;} if(__audioContexts.some(c=>c.state==='running')){clearInterval(poll);sync();} },30);
-        setTimeout(()=>{clearInterval(poll);sync();},3000);
-        await KokoroSpeech.speak(text, voice);
-        clearInterval(poll);
-        const doneEl=els.media;
-        if(doneEl&&doneEl.id==='ryan-orb') ryanOrbSetState('silent');
-        // Speech ended — immediately pause speaking video and switch to idle
-        // This prevents the speaking video from looping after audio ends
-        if (speaker === 'Mary' && doneEl && doneEl.tagName === 'VIDEO') {
-          try { doneEl.pause(); } catch {}
-          // Switch back to idle video
-          const idleSrc = AVATARS._maryIdleVideo || AVATARS.User_Prompt.src;
-          if(idleSrc && (doneEl.getAttribute('src')||'')!==idleSrc){
-            doneEl.src=idleSrc; doneEl.load(); try{doneEl.play().catch(()=>{});}catch{}
-          }
+        if (speaker === 'Mary') {
+          // Use ElevenLabs for Sofia — richer, more human voice
+          await speakElevenLabs(text, switchToSpeaking);
+          switchToIdle();
+        } else {
+          // Ryan and others stay on Kokoro
+          const voice=getKokoroVoice(speaker);
+          let started=false;
+          const poll=setInterval(()=>{ if(mySession!==session){clearInterval(poll);return;} if(__audioContexts.some(c=>c.state==='running')){clearInterval(poll);if(!started){started=true;switchToSpeaking();}} },30);
+          setTimeout(()=>{clearInterval(poll);if(!started){started=true;switchToSpeaking();}},3000);
+          await KokoroSpeech.speak(text, voice);
+          clearInterval(poll);
+          switchToIdle();
         }
       })(),
       new Promise((_,rej)=>{
@@ -471,9 +501,10 @@ async function speak(text, speaker) {
         setTimeout(()=>clearInterval(chk),120000);
       })
     ]);
-  } catch {}
+  } catch(e) { if(e.message!=='session_changed') console.warn('speak error:',e.message); }
   if (mySession!==session) return;
 }
+
 
 function getKokoroVoice(speaker) {
   if (speaker==='Mary') return 'af_nicole';
