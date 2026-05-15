@@ -906,6 +906,12 @@ async function runCoachFeedback(mySession) {
 }
 
 function showFeedbackCard(f) {
+  // Fallback for missing card fields — GPT sometimes omits them on short conversations
+  if (!f.openerBreakdown || f.openerBreakdown === '---') f.openerBreakdown = f.part1 ? f.part1.split('.')[0] + '.' : 'Opener not captured.';
+  if (!f.bestMoment || f.bestMoment === '---') f.bestMoment = 'Keep building — more reps will show your best moments.';
+  if (!f.missedOpportunity || f.missedOpportunity === '---') f.missedOpportunity = 'Focus on asking specific questions about her world.';
+  if (!f.tryNextTime || f.tryNextTime === '---') f.tryNextTime = 'What made you choose this spot today?';
+  if (!f.wouldSheDateHim || f.wouldSheDateHim === '---') f.wouldSheDateHim = 'Maybe — show more genuine curiosity next time.';
   // Record this session in progress history
   if (f.score >= 1 && f.score <= 10) Progress.recordSession(f.score, currentScenarioKey);
   const scoreColor=f.score>=7?'#40c770':f.score>=5?'#ffb300':'#ff6b6b';

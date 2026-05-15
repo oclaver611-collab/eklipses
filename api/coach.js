@@ -1,4 +1,4 @@
-// api/coach.js — Ryan's post-session coaching via OpenAI
+// api/coach.js — Ryan's post-session coaching via Groq
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -10,8 +10,8 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'No conversation provided' });
   }
 
-  if (!process.env.OPENAI_API_KEY) {
-    return res.status(500).json({ error: 'OPENAI_API_KEY not set' });
+  if (!process.env.GROQ_API_KEY) {
+    return res.status(500).json({ error: 'GROQ_API_KEY not set' });
   }
 
   // Use the opener passed directly from player.js — this is the true first thing the user said
@@ -128,18 +128,19 @@ RULES — non-negotiable:
 - wouldSheDateHim is ${girlName} speaking in first person.
 - tryNextTime is actual words he can say, not a mindset concept.
 - Only reference details that appear in the transcript. Do not hallucinate props or context.
+- ALL FIVE card fields (openerBreakdown, bestMoment, missedOpportunity, tryNextTime, wouldSheDateHim) MUST be populated. Never return empty strings or null for these fields.
 - The transcript labels HIM lines as HIM_2, HIM_3 etc. (HIM_1 was the opener — already handled separately above the transcript). Navigate chronologically from HIM_2 onward.
 - Do not reference or quote HIM_1 — it is not in the transcript. Start analysis from HIM_2.`;
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'llama-3.3-70b-versatile',
         max_tokens: 2000,
         messages: [
           { role: 'system', content: systemPrompt },
@@ -151,7 +152,7 @@ RULES — non-negotiable:
 
     if (!response.ok) {
       const err = await response.text();
-      return res.status(500).json({ error: 'OpenAI error: ' + err });
+      return res.status(500).json({ error: 'Groq error: ' + err });
     }
 
     const data = await response.json();
