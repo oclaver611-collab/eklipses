@@ -825,14 +825,27 @@ async function runCoachFeedback(mySession) {
   if(mySession!==session) return;
   els.text.textContent='Analyzing your session...';
   try {
-    const coachController=new AbortController();
-    const coachTimeout=setTimeout(()=>coachController.abort(),25000);
-    const res=await fetch('/api/coach',{
-      signal:coachController.signal,
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ conversation:conversationHistory, scenarioTitle:sc.title||'Dating scenario', scenarioKey:currentScenarioKey||'', opener:firstUserOpener||'' }),
-    });
-    clearTimeout(coachTimeout);
+    const coachPayload=JSON.stringify({ conversation:conversationHistory, scenarioTitle:sc.title||'Dating scenario', scenarioKey:currentScenarioKey||'', opener:firstUserOpener||'' });
+    let res;
+    for (let attempt=1; attempt<=2; attempt++) {
+      const coachController=new AbortController();
+      const coachTimeout=setTimeout(()=>coachController.abort(),45000);
+      try {
+        res=await fetch('/api/coach',{
+          signal:coachController.signal,
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:coachPayload,
+        });
+        clearTimeout(coachTimeout);
+        break;
+      } catch(fetchErr) {
+        clearTimeout(coachTimeout);
+        if(attempt===2) throw fetchErr;
+        console.warn('Coach timeout on attempt 1, retrying...');
+        await new Promise(r=>setTimeout(r,1500));
+        if(mySession!==session) return;
+      }
+    }
     if(!res.ok) {
       const errText = await res.text().catch(()=>'');
       console.error('Coach API error:', res.status, errText);
