@@ -418,7 +418,7 @@ function renderLine(line) {
 
 // ElevenLabs TTS for Mary — streams audio from /api/tts
 async function speakElevenLabs(text, onStart) {
-  const res = await fetch('/api/tts', {
+  const res = await fetch('/api/elevenlabs', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text, speaker: 'Mary' }),
