@@ -1,69 +1,45 @@
-// api/tts.js — ElevenLabs TTS for Sofia (Mary speaker)
-// Ryan stays on Kokoro in the browser — only Mary uses this endpoint
+// api/tts.js — Vercel serverless function, CommonJS syntax
 module.exports = async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-  const { text, speaker } = req.body || {};
-  if (!text) return res.status(400).json({ error: 'No text provided' });
-  if (!process.env.ELEVENLABS_API_KEY) return res.status(500).json({ error: 'ELEVENLABS_API_KEY not set' });
+  const { text, voice = 'nova' } = req.body || {};
 
-  // Only Sofia/Mary uses ElevenLabs — other speakers fall back gracefully
-  const SOFIA_VOICE_ID = 'cvpTJfe9LINpHIOmB2Hp'; // Charlotte
+  if (!text?.trim()) {
+    return res.status(400).json({ error: 'No text provided' });
+  }
 
-  // Clean text for TTS — remove stage directions but keep emotional cues
-  // ElevenLabs v3 supports [laughs], [sighs], [whispers] natively
-  const cleanText = text
-    .replace(/\*[^*]+\*/g, '') // remove *stage directions*
-    .trim();
-
-  if (!cleanText) return res.status(400).json({ error: 'Empty text after cleaning' });
+  if (!process.env.OPENAI_API_KEY) {
+    return res.status(500).json({ error: 'OPENAI_API_KEY not set in Vercel env vars' });
+  }
 
   try {
-    const response = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${SOFIA_VOICE_ID}/stream`,
-      {
-        method: 'POST',
-        headers: {
-          'xi-api-key': process.env.ELEVENLABS_API_KEY,
-          'Content-Type': 'application/json',
-          'Accept': 'audio/mpeg',
-        },
-        body: JSON.stringify({
-          text: cleanText,
-          model_id: 'eleven_turbo_v2_5', // fastest + most natural, low latency
-          voice_settings: {
-            stability: 0.4,        // lower = more expressive, varied
-            similarity_boost: 0.8, // stays true to the voice
-            style: 0.3,            // slight style exaggeration — more personality
-            use_speaker_boost: true,
-          },
-          // Optimize for streaming latency
-          optimize_streaming_latency: 3,
-        }),
-      }
-    );
+    const response = await fetch('https://api.openai.com/v1/audio/speech', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'tts-1',
+        input: text,
+        voice: voice,
+        response_format: 'mp3',
+      }),
+    });
 
     if (!response.ok) {
       const err = await response.text();
-      console.error('ElevenLabs error:', response.status, err);
-      return res.status(500).json({ error: 'ElevenLabs error: ' + response.status });
+      return res.status(500).json({ error: 'OpenAI error: ' + err });
     }
 
-    // Stream audio directly to client
+    const buffer = await response.arrayBuffer();
     res.setHeader('Content-Type', 'audio/mpeg');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Transfer-Encoding', 'chunked');
-
-    const reader = response.body.getReader();
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      res.write(Buffer.from(value));
-    }
-    res.end();
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.send(Buffer.from(buffer));
 
   } catch (err) {
-    console.error('TTS error:', err.message);
     res.status(500).json({ error: err.message });
   }
 };
