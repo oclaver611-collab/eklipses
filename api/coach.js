@@ -73,15 +73,44 @@ module.exports = async function handler(req, res) {
   };
   const betterOpener = betterOpeners[scenarioKey] || 'Something specific and observational that gives her something real to respond to.';
 
+  // Multiple variations to avoid identical phrasing every session
+  const herReplyVariants = sofiaFirstResponse ? [
+    ` She came back with "${sofiaFirstResponse}" — short answer, because the opener didn't give her much to work with.`,
+    ` She responded with "${sofiaFirstResponse}" — she stayed brief because there was nothing specific to grab onto.`,
+    ` Her reply: "${sofiaFirstResponse}" — polite, but she's waiting for something real.`,
+  ] : [''];
+  const herReplyGoodVariants = sofiaFirstResponse ? [
+    ` She came back with "${sofiaFirstResponse}" — the door was open.`,
+    ` She replied "${sofiaFirstResponse}" — real engagement, which means you had something to build on.`,
+    ` Her response: "${sofiaFirstResponse}" — that's a green light. The question is what came next.`,
+  ] : [''];
+  const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+  const herReply = pick(herReplyVariants);
+  const herReplyGood = pick(herReplyGoodVariants);
+
+  const nameOnlyVariants = [
+    `You showed up — that already puts you ahead of the guys who freeze. But your opener was just "${openerLine}". One word. She has nothing to respond to — you made her do all the work. Try something that opens a door instead: "${betterOpener}" Specific, curious, gives her something real to say. You have the nerve. Now give it some substance.`,
+    `Walking up takes guts. But "${openerLine}" leaves her with nothing — she has to carry the whole thing from zero. Next time give her something to react to: "${betterOpener}" That's the difference between a door and a wall.`,
+    `You went for it — good. But "${openerLine}" is a dead end. She can only say hi back. Give her something to work with: "${betterOpener}" One specific observation beats ten generic openers every time.`,
+  ];
+  const genericVariants = [
+    `You walked up and said something — that matters. But "${openerLine}" could have come from anyone in that room.${herReply} Compare that to: "${betterOpener}" — specific, observational, gives her something real to respond to. The nerve was there. Build on it.`,
+    `Showing up is step one and you did it. The opener — "${openerLine}" — was the step that needed work.${herReply} Something like "${betterOpener}" would have given her an actual reason to turn toward you. Keep the confidence, sharpen the entry.`,
+    `You opened. That counts. But "${openerLine}" is generic — she's heard a version of that before.${herReply} The fix: "${betterOpener}" Specific beats smooth every time with her. You've got the foundation. Work on what you build on top of it.`,
+  ];
+  const goodVariants = [
+    `Solid opener — "${openerLine}" showed genuine intent and gave her something to react to.${herReplyGood} The start was real. The question is whether you kept that energy through the middle.`,
+    `Good start. "${openerLine}" — that's specific enough to feel like you actually noticed her.${herReplyGood} The foundation was there. Let's talk about what you built on top of it.`,
+    `You opened well — "${openerLine}" is the kind of thing that doesn't sound rehearsed.${herReplyGood} That's the hardest part for most guys. Now let's look at what came after.`,
+  ];
+
   let part1;
-  const herReply = sofiaFirstResponse ? ' She responded with "' + sofiaFirstResponse + '" — she kept it short because you gave her nothing specific to work with.' : '';
-  const herReplyGood = sofiaFirstResponse ? ' She came back with "' + sofiaFirstResponse + '" — that is a real response, which means the door was open.' : '';
   if (nameOnly) {
-    part1 = 'You showed up — that already puts you ahead of the guys who freeze. But your opener was just "' + openerLine + '". One word. She has nothing to respond to — you made her do all the work. Next time try something that opens a door: "' + betterOpener + '" That is specific, curious, and gives her something real to say. You have the nerve. Now give it some substance.';
+    part1 = pick(nameOnlyVariants);
   } else if (isGeneric) {
-    part1 = 'First thing — you walked up and said something. That matters. But your opener was "' + openerLine + '". That could have come from anyone.' + herReply + ' A better opener: "' + betterOpener + '" Specific, observational, gives her something real to respond to. Build on the confidence you already showed.';
+    part1 = pick(genericVariants);
   } else {
-    part1 = 'Good start — you opened with "' + openerLine + '". That showed genuine intent and gave her something to respond to.' + herReplyGood + ' The foundation was solid. The question is what you built on top of it.';
+    part1 = pick(goodVariants);
   }
 
   // Character profiles — who she is, what she responds to, what kills it
@@ -177,17 +206,26 @@ Respond ONLY with valid JSON — no markdown, no preamble:
 
 Scoring — be honest but generous with effort:
 1-2: Froze completely, barely spoke, let it die with zero recovery
-3-4: Went fully generic the whole way, only compliments and approval-seeking, zero real curiosity or genuine moment at any point
-5-6: Got through it, showed some real curiosity or one genuine moment, but missed key escalation or relied too much on approval-seeking
-7-8: Specific, held frame, genuine energy, made her work a little, clear moments of real connection
-9-10: She is thinking about him after — earned real interest, not just kept the conversation alive
+3: Almost entirely generic — only compliments and approval-seeking, circled the point without ever saying anything real, she had to ask him to be direct four times and he never was
+4: Mostly generic with one small genuine moment — still mostly approval-seeking, didn't follow any door she opened
+5-6: Had a real conversation — asked at least one genuine question, followed at least one thread she opened, showed some actual curiosity even if the close was weak
+7-8: Specific throughout, held frame when she pushed back, made her work a little, clear moments of connection
+9-10: She is thinking about him after — earned real interest, not just survived the conversation
 
-CALIBRATION — THIS IS IMPORTANT:
-Most users are beginners. If someone showed up, had a full conversation, asked at least one real question, and made a genuine attempt — that is a 5 minimum.
-Reserve 3-4 for conversations that were almost entirely generic with zero genuine moments.
-A 4 should feel like a wake-up call, not a default score.
-Score generously when effort is visible. Score honestly when it wasn't.
-If he pushed back on her at any point, held frame, or said something specific — that's worth points.
+CALIBRATION — THIS IS THE MOST IMPORTANT SECTION:
+Default score for someone who showed up and had a full conversation: 5.
+The score goes DOWN from 5 if he was mostly generic or approval-seeking.
+The score goes UP from 5 if he said something specific, followed a thread, held frame, or made her laugh.
+A 3 is a failing grade — reserve it for conversations where he genuinely said nothing real the entire time.
+A 4 means he tried but barely landed anything. Use it sparingly.
+Most beginners who complete a full session land between 5-6. That is correct and honest.
+Never default to 3-4 just because he didn't nail the close. Scoring too low kills motivation and they leave.
+A score that's slightly generous but accurate to effort keeps them coming back — that's the goal.
+
+LANGUAGE VARIABILITY — MANDATORY:
+Never use the same transition phrases twice across part1, part2, part3, part4.
+Do NOT use: "Right, so here's where", "Now watch this moment", "Now here's the thing", "So — putting it all together", "That could have come from anyone", "she kept it short because".
+Every debrief must sound fresh. Vary your openers, transitions, and closes. You are a coach, not a script.
 
 RULES — non-negotiable:
 - QUOTE actual lines verbatim. Do not paraphrase or invent.
