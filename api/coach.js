@@ -1,4 +1,4 @@
-// api/coach.js — Ryan's post-session coaching via Groq
+// api/coach.js — Ryan's post-session coaching via OpenAI
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -103,7 +103,7 @@ Respond ONLY with valid JSON — no markdown, no preamble:
 
   "part3": "<THE KEY MISTAKE. Minimum 80 words. Find the single moment where he lost the most ground. Quote exactly what he said and exactly what she said back verbatim. Call out what went wrong — apologetic energy, over-explaining, listing status, whatever it was. Calibrate tone to the size of the mistake. Then give him the exact words he should have said instead. Do not truncate — fully develop the correction.>",
 
-  "part4": "<CLOSE + VERDICT. Target 350-430 characters. Restate one genuine strength from this session. Deliver the score honestly in one sentence. Name the single fix that would change his results most. Then close with a motivational line that makes him want to go again RIGHT NOW — pick based on score: score 3-4 use something like 'Practice is the only way through. Hit Try Again — every rep makes you sharper.' Score 5-6 use something like 'You are closer than you think. One more round and you will feel the difference.' Score 7+ use something like 'You have got something real here. Go again and push it further — you will surprise yourself.' Or write your own variation that fits — warm, specific, genuinely encouraging, makes going again feel obvious. BANNED: 'go out there', 'dive deeper', 'aim to', 'work on that'. Never end flat.>",
+  "part4": "<CLOSE + VERDICT. Target 350-430 characters. Restate one genuine strength from this session. Deliver the score honestly in one sentence. Name the single fix that would change his results most. Then close with a motivational line that makes him want to go again RIGHT NOW — pick based on score: score 3-4 use something like 'Practice is the only way through. Hit Try Again — every rep makes you sharper.' Score 5-6 use something like 'You are closer than you think. One more round and you will feel the difference.' Score 7+ use something like 'You have got something real here. Go again and push it further — you will surprise yourself.' Or write your own variation that fits — warm, specific, genuinely encouraging, makes going again feel obvious. BANNED PHRASES — never use these: 'go out there', 'dive deeper', 'aim to', 'work on that', 'dig into', 'push deeper', 'delve'. Never end flat. The motivational close MUST be the LAST sentence of part4 — never bury it in the middle.>",
 
   "openerBreakdown": "<Quote his exact first message verbatim. One sentence on why it worked or failed.>",
   "bestMoment": "<Quote the single best thing he said verbatim. One sentence on why it landed.>",
@@ -112,12 +112,14 @@ Respond ONLY with valid JSON — no markdown, no preamble:
   "wouldSheDateHim": "<'Yes', 'No', or 'Maybe' — then one sentence from ${girlName}'s perspective in first person, referencing something specific he said.>"
 }
 
-Scoring:
-1-3: Froze, went fully generic, let it die with no recovery
-4-5: Got through it but relied on compliments or status — no real curiosity shown
-6-7: Some real moments but missed key escalation or stalled out
-8-9: Specific, held frame, genuine energy, made her work a little
-10: She is thinking about him on the drive home
+Scoring — be honest but generous with effort:
+1-2: Froze completely, barely spoke, let it die with zero recovery
+3-4: Went fully generic the whole way, only compliments and status moves, zero real curiosity shown at any point
+5-6: Got through it, showed some real curiosity or one genuine moment, but missed key escalation or relied too much on approval-seeking
+7-8: Specific, held frame, genuine energy, made her work a little, clear moments of real connection
+9-10: She is thinking about him after — earned real interest, not just kept the conversation alive
+
+CALIBRATION NOTE: Most users trying the app are beginners. If someone showed up, had a full conversation, asked at least one real question, and made a genuine attempt — that is a 5 minimum. Reserve 3-4 for conversations that were almost entirely generic with no genuine moments at all. A 4 should feel like a wake-up call, not a default.
 
 RULES — non-negotiable:
 - QUOTE actual lines verbatim. Do not paraphrase or invent.
