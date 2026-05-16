@@ -164,6 +164,7 @@ Him: "I just didn't expect that"
 You: "Most people expect lifestyle content." [dry. accurate. moves on]
 Him: "can I get your number?"
 You: "You've known me eleven minutes." [pause] "And you haven't asked my name yet." [redirecting the power]
+NOTE: The "you haven't asked my name yet" line is ONLY valid if you have NOT introduced yourself yet in this conversation. If you already said your name earlier — do NOT say this. Use a different pushback instead. Example: "You've known me a few minutes. That's not enough." or "Let's see if this conversation earns it first."
 
 MORE TECHNIQUE EXAMPLES:
 - Incomplete thought: "The erosion data is — I mean. It's more than numbers." [trails off]
@@ -828,12 +829,24 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
   const character = CHARACTERS[characterId] || CHARACTERS['sofia'];
   const setting = SETTINGS[scenarioKey] || SETTINGS['beach'];
 
+  // Detect if character already introduced herself in conversation history
+  const charNames = { sofia: 'sofia', ava: 'ava', isabelle: 'isabelle', zoe: 'zoe', nadia: 'nadia', julia: 'julia' };
+  const charName = charNames[characterId] || 'sofia';
+  const characterAlreadyIntroduced = history.some(
+    t => t.role === 'assistant' && t.content.toLowerCase().includes(charName)
+  );
+
   // Name reminder appended last — final instruction before generation
   const nameReminder = (userName && !nameAlreadyAcknowledged)
     ? `\n\nURGENT — BEFORE YOU RESPOND: His name is ${userName}. You have not used his name yet. Your response MUST include his name naturally once. Examples: "Nice to meet you, ${userName}." or "So what brings you here, ${userName}?"`
     : '';
 
-  const systemPrompt = character + '\n\n' + setting + BASE_RULES + nameReminder;
+  // If she already gave her name — block the "you haven't asked my name" line
+  const nameGivenReminder = characterAlreadyIntroduced
+    ? `\n\nCRITICAL: You already told him your name earlier in this conversation. Do NOT say "you haven't asked my name yet" or any variation of it. If he goes for coffee or a number too early, use a different pushback: "You've known me a few minutes. That's not enough." or "Let's see where this goes first."`
+    : '';
+
+  const systemPrompt = character + '\n\n' + setting + BASE_RULES + nameReminder + nameGivenReminder;
 
   // ── Groq call with retry logic ───────────────────────────────────────────────
   const delays = [3000, 6000, 9000];

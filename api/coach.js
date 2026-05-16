@@ -326,6 +326,13 @@ RULES:
     feedback.transition3 = transition3;
     feedback.transition4 = transition4;
 
+    // Enforce score floor — if conversation had 4+ turns, minimum score is 5
+    // The model consistently under-scores; this corrects it at the code level
+    const turnCount = conversation.length;
+    if (turnCount >= 4 && feedback.score < 5) {
+      feedback.score = 5;
+    }
+
     res.json(feedback);
 
   } catch (err) {
