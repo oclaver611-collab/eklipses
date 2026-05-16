@@ -732,6 +732,8 @@ async function playScenario(key, practice=false) {
   Metrics.bumpView(key); Metrics.refreshUI(key);
   setSceneBackground(key);
   const sc=SCENARIOS[key]; if(!sc) return;
+  // PostHog — scenario started
+  if (window.posthog) posthog.capture('scenario_started', { scenario: key, mode: practice ? 'practice' : 'demo' });
   // Cold open scenarios skip demo entirely — throw user straight into practice
   if (sc.coldOpen) practice=true;
   isPractice=practice;
@@ -990,6 +992,10 @@ function showFeedbackCard(f) {
   if (!f.wouldSheDateHim || f.wouldSheDateHim === '---') f.wouldSheDateHim = 'Maybe — show more genuine curiosity next time.';
   // Record this session in progress history
   if (f.score >= 1 && f.score <= 10) Progress.recordSession(f.score, currentScenarioKey);
+  // PostHog — session completed
+  if (window.posthog) posthog.capture('session_completed', { scenario: currentScenarioKey, score: f.score });
+  // PostHog — coach feedback viewed
+  if (window.posthog) posthog.capture('coach_viewed', { scenario: currentScenarioKey, score: f.score });
   const scoreColor=f.score>=7?'#40c770':f.score>=5?'#ffb300':'#ff6b6b';
   const isBeach=currentScenarioKey==='beach';
   const bodyHTML=isBeach?`
@@ -1057,7 +1063,7 @@ function showFeedbackCard(f) {
       ${bodyHTML}
       ${Progress.getHistoryHTML()}
       <div style="text-align:center;margin-top:14px">
-        <button onclick="playScenario('${currentScenarioKey}',true)" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:10px 28px;font-size:14px;font-weight:800;cursor:pointer;margin-right:8px">
+        <button onclick="if(window.posthog) posthog.capture('try_again_clicked', {scenario:'${currentScenarioKey}'}); playScenario('${currentScenarioKey}',true)" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:10px 28px;font-size:14px;font-weight:800;cursor:pointer;margin-right:8px">
           Try Again
         </button>
         <button onclick="playScenario(Object.keys(SCENARIOS).find(k=>k!=='${currentScenarioKey}'),false)" style="background:#2a2e36;color:#fff;border:1px solid #3a3f4b;border-radius:999px;padding:10px 28px;font-size:14px;font-weight:700;cursor:pointer">
