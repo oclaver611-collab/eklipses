@@ -73,7 +73,19 @@ module.exports = async function handler(req, res) {
   };
   const betterOpener = betterOpeners[scenarioKey] || 'Something specific and observational that gives her something real to respond to.';
 
-  // Multiple variations to avoid identical phrasing every session
+  // isNonSequitur = references something that doesn't exist in the scenario (boat on a beach, etc.)
+  const nonSequiturTerms = {
+    beach: ['boat', 'car', 'dog', 'coffee', 'drink'],
+    bar: ['book', 'dog', 'boat'],
+    museum: ['dog', 'boat', 'car'],
+    gym: ['dog', 'boat', 'car'],
+    bookstore: ['dog', 'boat', 'car'],
+    street: ['dog', 'boat', 'car'],
+  };
+  const scenarioNonSequiturs = nonSequiturTerms[scenarioKey] || [];
+  const isNonSequitur = scenarioNonSequiturs.some(term => openerLower.includes(term));
+
+
   const herReplyVariants = sofiaFirstResponse ? [
     ` She came back with "${sofiaFirstResponse}" — short answer, because the opener didn't give her much to work with.`,
     ` She responded with "${sofiaFirstResponse}" — she stayed brief because there was nothing specific to grab onto.`,
@@ -107,7 +119,7 @@ module.exports = async function handler(req, res) {
   let part1;
   if (nameOnly) {
     part1 = pick(nameOnlyVariants);
-  } else if (isGeneric) {
+  } else if (isNonSequitur || isGeneric) {
     part1 = pick(genericVariants);
   } else {
     part1 = pick(goodVariants);
@@ -193,7 +205,7 @@ Respond ONLY with valid JSON — no markdown, no preamble:
 
   "part2": "<MIDDLE OF CONVERSATION. Minimum 70 words, maximum 90 words. Pick the most revealing exchange in the middle — quote what he said and what ${girlName} said back verbatim. Explain what that moment showed about his approach: was he chasing approval, going generic, or did he show something real? Connect your analysis to who ${girlName} specifically is — what was she waiting for that he didn't give her? What door did she open that he walked past? Stay in the transcript. No generic advice.>",
 
-  "part3": "<THE KEY MISTAKE. Minimum 80 words. Find the single moment where he lost the most ground with ${girlName} specifically. Quote exactly what he said and exactly what she said back verbatim. Call out what went wrong and WHY it doesn't work with her in particular — not just generally. Then give him the exact words he should have said instead, calibrated to ${girlName}'s personality. Do not truncate — fully develop the correction.>",
+  "part3": "<THE KEY MISTAKE. Minimum 80 words. Find the single moment where he lost the most ground with ${girlName} specifically. Priority order for key mistakes: (1) Going for the close — coffee, number, meeting — before the conversation earned it. If this happened, this is ALWAYS the key mistake. Quote her exact rejection response. Explain what was missing from the conversation that would have made the ask land. Give him the exact words or moment that needed to happen first. (2) If no premature close, find the biggest missed door she opened. Quote exactly what he said and exactly what she said back verbatim. Call out what went wrong and WHY it doesn't work with her in particular — not just generally. Then give him the exact words he should have said instead, calibrated to ${girlName}'s personality. Do not truncate — fully develop the correction.>",
 
   "part4": "<CLOSE + VERDICT. Target 350-430 characters. Restate one genuine strength from this session. Deliver the score honestly in one sentence. Name the single fix that would change his results most with ${girlName} specifically. Then close with a motivational line that makes him want to go again RIGHT NOW — pick based on score: score 3-4: 'Practice is the only way through. Hit Try Again — every rep makes you sharper.' Score 5-6: 'You are closer than you think. One more round and you will feel the difference.' Score 7+: 'You have got something real here. Go again and push it further — you will surprise yourself.' Or write your own variation that fits. BANNED PHRASES: 'go out there', 'dive deeper', 'aim to', 'work on that', 'dig into', 'push deeper', 'delve'. The motivational close MUST be the LAST sentence of part4.>",
 
@@ -224,8 +236,11 @@ A score that's slightly generous but accurate to effort keeps them coming back �
 
 LANGUAGE VARIABILITY — MANDATORY:
 Never use the same transition phrases twice across part1, part2, part3, part4.
-Do NOT use: "Right, so here's where", "Now watch this moment", "Now here's the thing", "So — putting it all together", "That could have come from anyone", "she kept it short because".
 Every debrief must sound fresh. Vary your openers, transitions, and closes. You are a coach, not a script.
+
+BANNED PHRASES — HARD RULE: if ANY of these appear anywhere in your output, the debrief is a failure. Check every sentence before writing it:
+"Right, so here's where", "Now watch this moment", "Now here's the thing", "So — putting it all together", "That could have come from anyone", "she kept it short because", "this is where the conversation shifted", "this is the moment I want you to remember", "here's the bottom line", "Now watch this", "Here's where", "let's talk about", "let's look at", "putting it all together", "the bottom line".
+Before finalizing each part, re-read it. If a banned phrase appears — rewrite that sentence entirely.
 
 RULES — non-negotiable:
 - QUOTE actual lines verbatim. Do not paraphrase or invent.
