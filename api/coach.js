@@ -135,8 +135,8 @@ module.exports = async function handler(req, res) {
     'The biggest mistake.',
     'One moment cost you the most.',
     'Here is the thing that hurt you.',
-    'This is what I want you to remember for next time.',
     'One moment. This is the one.',
+    'Here is what I want to focus on.',
   ];
   const transitions4 = [
     'Alright — the verdict.',
@@ -276,7 +276,7 @@ BANNED PHRASES AND WORDS — if any of these appear anywhere in your output, rew
 "this is the moment I want you to remember", "here's the bottom line", "Now watch this", "Here's where",
 "let's talk about", "let's look at", "putting it all together", "the bottom line", "Here's where it",
 "what we have here", "at the end of the day", "the fact of the matter",
-"dig deeper", "dive deeper", "seizing", "effectively", "engage", "dynamic", "showcase", "demonstrate",
+"dig deeper", "dive deeper", "dive into", "seizing", "effectively", "engage", "dynamic", "showcase", "demonstrate",
 "connection" (say "moment" or "something real" instead), "approach" (say "what you did" instead),
 "generic" (say "flat" or "safe" or "by the book" instead), "specific" (say "real" or "particular" instead).
 Read every sentence before you write it. If a banned phrase or word is in there — rewrite it.
@@ -326,12 +326,11 @@ RULES:
     feedback.transition3 = transition3;
     feedback.transition4 = transition4;
 
-    // Enforce score floor — if conversation had 4+ turns, minimum score is 5
-    // The model consistently under-scores; this corrects it at the code level
+    // Enforce score floor — full conversation always gets minimum 5
+    // Model consistently under-scores; corrected at code level
     const turnCount = conversation.length;
-    if (turnCount >= 4 && feedback.score < 5) {
-      feedback.score = 5;
-    }
+    const rawScore = Number(feedback.score) || 4;
+    feedback.score = (turnCount >= 4 && rawScore < 5) ? 5 : rawScore;
 
     res.json(feedback);
 
