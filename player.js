@@ -801,6 +801,7 @@ async function playLoop(mySession) {
 async function freeConversation(mySession) {
   let freeConvRescueUsed = null;
   let firstExchangeDone = false; // rescue lines only fire before first real exchange
+  let silenceCount = 0; // track consecutive silence timeouts mid-conversation
   if(mySession!==session) return;
   const sc=SCENARIOS[currentScenarioKey]||{};
   const FREE_MS=3*60*1000, NUDGE_MS=2*60*1000;
@@ -920,13 +921,33 @@ async function freeConversation(mySession) {
         if(mySession!==session) break;
         await pause(1800); // wait for audio to clear before listening
       } else {
-        await pause(500);
+        // Mid-conversation silence — after 2 consecutive timeouts (60s), Julia reacts
+        silenceCount++;
+        if (firstExchangeDone && silenceCount >= 2) {
+          silenceCount = 0;
+          const impatience = {
+            street: ["Still there?", "I do have somewhere to be.", "You went quiet.", "Was there something else?"],
+            beach:  ["Still there?", "You went quiet.", "Was there something else?", "Take your time."],
+            bar:    ["Still there?", "You went quiet.", "Was there something else?"],
+            gym:    ["Still there?", "You went quiet.", "Was there something else?"],
+            museum: ["Still there?", "You went quiet.", "Was there something else?"],
+            bookstore: ["Still there?", "You went quiet.", "Was there something else?"],
+          };
+          const pool = impatience[currentScenarioKey] || impatience.beach;
+          const line = pool[Math.floor(Math.random() * pool.length)];
+          await speak(line, 'Mary');
+          if(mySession!==session) break;
+          await pause(1000);
+        } else {
+          await pause(500);
+        }
       }
       continue;
     }
 
     const reply=await getCharacterResponse(said);
     firstExchangeDone = true; // after first real exchange, no more rescue lines
+    silenceCount = 0; // reset silence counter on successful speech
     if(mySession!==session) break;
 
     if(reply) {
