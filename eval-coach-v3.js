@@ -210,7 +210,7 @@ function evaluate(testCase, feedback) {
   else fail('part4: score number not spoken', `part4 contains score number — should be on card only`);
 
   // 8. Motivational close in part4
-  const motivational = ['try again', 'hit try', 'one more round', 'go again', 'feel the difference', 'surprise yourself', 'sharper', 'keep going', 'keep pushing', 'closer than you think', 'get her interested', 'will respond', 'you have got this', 'you got this', 'pay off', 'next time'];
+  const motivational = ['try again', 'hit try', 'one more round', 'go again', 'feel the difference', 'surprise yourself', 'sharper', 'keep going', 'keep pushing', 'closer than you think', 'get her interested', 'will respond', 'you have got this', 'you got this', "you've got this", 'pay off', 'next time', 'you are learning', "you're learning"];
   const hasMotivation = motivational.some(p => (feedback.part4||'').toLowerCase().includes(p));
   if (hasMotivation) pass('part4: motivational close present');
   else fail('part4: motivational close present', `part4: "${(feedback.part4||'').slice(-80)}"`);
