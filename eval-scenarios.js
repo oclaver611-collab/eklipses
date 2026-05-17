@@ -5,7 +5,7 @@
 require('dotenv').config();
 
 const VERCEL_URL = process.env.VERCEL_URL || 'https://eklipses.vercel.app';
-const DELAY_MS = 8000; // 8s between tests to avoid rate limits
+const DELAY_MS = 12000; // 12s between tests to avoid rate limits
 
 // ─── SCENARIO DEFINITIONS ────────────────────────────────────────────────────
 
@@ -91,7 +91,7 @@ async function callCoach(scenarioKey, scenarioTitle, characterName, retries = 2)
   for (let attempt = 0; attempt <= retries; attempt++) {
     if (attempt > 0) {
       process.stdout.write(`  (retry ${attempt})... `);
-      await delay(8000); // wait longer on retry
+      await delay(12000); // wait longer on retry
     }
     try {
       const res = await fetch(`${VERCEL_URL}/api/coach`, {
@@ -108,7 +108,12 @@ async function callCoach(scenarioKey, scenarioTitle, characterName, retries = 2)
         if (attempt < retries) continue; // retry
         throw new Error(`coach API ${res.status}`);
       }
-      return res.json();
+      const data = await res.json();
+      // If card fields are undefined, treat as failed and retry
+      if (!data.bestMoment || data.bestMoment === 'undefined') {
+        if (attempt < retries) continue;
+      }
+      return data;
     } catch (err) {
       if (attempt < retries) continue;
       throw err;
