@@ -327,12 +327,57 @@ RULES:
     feedback.transition4 = transition4;
 
     // Enforce score floor — full conversation always gets minimum 5
-    // Model consistently under-scores; corrected at code level
     const turnCount = conversation.length;
     const rawScore = Number(feedback.score) || 4;
     const finalScore = (turnCount >= 4 && rawScore < 5) ? 5 : rawScore;
     console.log(`[coach] turns=${turnCount} rawScore=${rawScore} finalScore=${finalScore}`);
     feedback.score = finalScore;
+
+    // Post-process — guaranteed banned phrase removal
+    // Model keeps regenerating these regardless of prompt instructions
+    // JS replace is the only 100% reliable fix
+    const cleanText = (text) => {
+      if (!text || typeof text !== 'string') return text;
+      return text
+        // Banned transition phrases
+        .replace(/right,?\s*so here['']s where\b/gi, 'Here is where')
+        .replace(/now watch this moment[^.!?]*/gi, 'One moment stands out.')
+        .replace(/now here['']s the thing/gi, 'The thing is')
+        .replace(/so\s*[—-]\s*putting it all together/gi, 'To wrap it up')
+        .replace(/here['']s the bottom line/gi, 'The verdict')
+        .replace(/this is where the conversation shifted/gi, 'The conversation changed here')
+        .replace(/this is the moment I want you to remember/gi, 'This is the one to remember')
+        .replace(/at the end of the day/gi, 'ultimately')
+        .replace(/the fact of the matter/gi, 'the truth')
+        // Banned vocabulary
+        .replace(/\bdive deeper\b/gi, 'go further')
+        .replace(/\bdig deeper\b/gi, 'go further')
+        .replace(/\bdive into\b/gi, 'get into')
+        .replace(/\bdelved?\b/gi, 'got into')
+        .replace(/\bengage(?:d|s|ment)?\b/gi, 'connect')
+        .replace(/\bdynamic\b/gi, 'situation')
+        .replace(/\bshowcase(?:d|s)?\b/gi, 'show')
+        .replace(/\bdemonstrate(?:d|s)?\b/gi, 'show')
+        .replace(/\bseizing\b/gi, 'taking')
+        .replace(/\beffectively\b/gi, 'well')
+        // Score mentions in spoken parts
+        .replace(/\bI['']m giving you a \d+\b/gi, '')
+        .replace(/\byour score is a? \d+\b/gi, '')
+        .replace(/\bI give you a \d+\b/gi, '')
+        .replace(/\ba score of \d+\b/gi, '')
+        // Clean up double spaces from removals
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+    };
+
+    // Apply to all spoken fields
+    feedback.part2 = cleanText(feedback.part2);
+    feedback.part3 = cleanText(feedback.part3);
+    feedback.part4 = cleanText(feedback.part4);
+    feedback.spokenSummary = cleanText(feedback.spokenSummary);
+    feedback.missedOpportunity = cleanText(feedback.missedOpportunity);
+    feedback.bestMoment = cleanText(feedback.bestMoment);
+    feedback.wouldSheDateHim = cleanText(feedback.wouldSheDateHim);
 
     res.json(feedback);
 
