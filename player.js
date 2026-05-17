@@ -276,6 +276,19 @@ function applyAvatarSet(set) {
   // Store speaking video separately for use during speech
   AVATARS._marySpeakingVideo = set.maryVideo || null;
   AVATARS._maryIdleVideo = set.maryIdleVideo || set.danielVideo || null;
+
+  // Preload speaking video in background to eliminate flicker on first speech
+  if (set.maryVideo && set.maryVideo !== set.maryIdleVideo) {
+    const preload = document.createElement('video');
+    preload.src = set.maryVideo;
+    preload.preload = 'auto';
+    preload.muted = true;
+    preload.style.display = 'none';
+    preload.load();
+    // Remove after preload to avoid memory leak
+    preload.oncanplaythrough = () => { try { preload.remove(); } catch {} };
+    document.body.appendChild(preload);
+  }
 }
 
 /* ===== Stop everything ===== */
@@ -839,18 +852,61 @@ async function freeConversation(mySession) {
 
     if (!said) {
       if (sc.coldOpen) {
-        const rescues=[
-          "You walked all the way over here. Might as well say something.",
-          "I don't bite. Usually.",
-          "The waves aren't that interesting, I promise.",
-          "Most people just walk past. You didn't.",
-          "You can sit if you want. I don't mind.",
-          "The quiet is better when someone breaks it well.",
-          "I saw you walk by earlier.",
-          "You look like you had something to say.",
-          "Take your time.",
-          "Still working up to it?",
-        ];
+        // Scenario-specific rescue lines — no cross-contamination
+        const rescuesByScenario = {
+          beach: [
+            "You walked all the way over here. Might as well say something.",
+            "I don't bite. Usually.",
+            "The waves aren't that interesting, I promise.",
+            "Most people just walk past. You didn't.",
+            "You can sit if you want. I don't mind.",
+            "The quiet is better when someone breaks it well.",
+            "I saw you walk by earlier.",
+            "You look like you had something to say.",
+            "Take your time.",
+            "Still working up to it?",
+          ],
+          street: [
+            "You stopped for a reason.",
+            "I have somewhere to be, just so you know.",
+            "Clock's ticking.",
+            "Most people just walk past.",
+            "You look like you had something to say.",
+            "Take your time. But not too much.",
+            "Still working up to it?",
+            "This is the part where you say something.",
+          ],
+          bar: [
+            "You came over for a reason.",
+            "I don't bite. Usually.",
+            "Most people just stand at the bar.",
+            "You look like you had something to say.",
+            "Take your time.",
+            "Still working up to it?",
+          ],
+          gym: [
+            "You came over for a reason.",
+            "I'm between sets, not retired.",
+            "Clock's ticking.",
+            "You look like you had something to say.",
+            "Take your time.",
+          ],
+          museum: [
+            "You stopped here for a reason.",
+            "Most people just walk past.",
+            "You look like you had something to say.",
+            "Take your time.",
+            "Still working up to it?",
+          ],
+          bookstore: [
+            "You came down this aisle for a reason.",
+            "Most people just browse.",
+            "You look like you had something to say.",
+            "Take your time.",
+            "Still working up to it?",
+          ],
+        };
+        const rescues = rescuesByScenario[currentScenarioKey] || rescuesByScenario.beach;
         if (!freeConvRescueUsed) freeConvRescueUsed = new Set();
         const available = rescues.filter(r => !freeConvRescueUsed.has(r));
         const pool = available.length > 0 ? available : rescues;
@@ -899,14 +955,7 @@ async function runCoachFeedback(mySession) {
     return;
   }
   // Speak a thinking line immediately — fills the API wait time
-  const thinkingLines = [
-    "Give me a second.",
-    "Okay. Let me think about that.",
-    "Alright. One moment.",
-    "Let me go through that.",
-    "Give me a moment.",
-  ];
-  await speak(thinkingLines[Math.floor(Math.random() * thinkingLines.length)], 'Ryan');
+  await speak("Alright, let me put this together.", 'Ryan');
   if(mySession!==session) return;
   els.text.textContent='Analyzing your session...';
   try {
@@ -940,8 +989,30 @@ async function runCoachFeedback(mySession) {
     if(mySession!==session) return;
     // 4-part chronological coaching — opener, middle, mistake, verdict
     const coachParts = [f.part1, f.part2, f.part3, f.part4].filter(Boolean);
-    // Transitions come from coach.js — generated server-side, never banned phrases
-    const transitions = [f.transition2, f.transition3, f.transition4];
+    // Positionally-aware fillers — each transition has its own set
+    const fillerSets = [
+      // After part1 → into part2 (middle of conversation)
+      [
+        "Now here's the thing — this is where the middle gets interesting.",
+        "Alright, let me show you what happened next.",
+        "Right, so here's where the conversation shifted.",
+        "Okay — this next part tells me a lot about your approach.",
+      ],
+      // After part2 → into part3 (the key mistake)
+      [
+        "Now watch this moment — this one matters.",
+        "Here's where it cost you.",
+        "This is the moment I want you to remember.",
+        "Okay, this is the one.",
+      ],
+      // After part3 → into part4 (verdict)
+      [
+        "So here's where I land on all of that.",
+        "Alright, let me give you the verdict.",
+        "Here's the bottom line.",
+        "So — putting it all together.",
+      ],
+    ];
     if (coachParts.length) {
       for (let i = 0; i < coachParts.length; i++) {
         if (mySession !== session) return;
@@ -950,11 +1021,10 @@ async function runCoachFeedback(mySession) {
         await speak(coachParts[i], 'Ryan');
         if (i < coachParts.length - 1) {
           if (mySession !== session) return;
-          const transition = transitions[i];
-          if (transition) {
-            els.text.textContent = transition;
-            await speak(transition, 'Ryan');
-          }
+          const set = fillerSets[i] || fillerSets[fillerSets.length - 1];
+          const filler = set[Math.floor(Math.random() * set.length)];
+          els.text.textContent = filler;
+          await speak(filler, 'Ryan');
         }
       }
     } else {
