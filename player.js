@@ -829,7 +829,9 @@ async function freeConversation(mySession) {
   setMediaForSpeaker('Mary');
   els.name.textContent=currentCharacterId.charAt(0).toUpperCase()+currentCharacterId.slice(1);
   els.text.textContent='...';
-  await pause(1200); // let any prior audio clear before first listen
+  // Street scenario needs extra warm-up time — Ryan intro is short and speech API isn't ready
+  const warmupMs = currentScenarioKey === 'street' ? 2500 : 1200;
+  await pause(warmupMs); // let any prior audio clear before first listen
 
   while(mySession===session) {
     const elapsed=Date.now()-start;
