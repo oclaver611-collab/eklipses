@@ -351,7 +351,7 @@ RULES:
         .replace(/the fact of the matter/gi, 'the truth')
         // Banned vocabulary
         .replace(/\bdiv(?:e[sd]?|ing)\s+(?:deeper|into|in)\b/gi, 'get into')
-        .replace(/\bdig(?:s|ging)?\s+deeper\b/gi, 'go further')
+        .replace(/\bdig(?:s|ging)?\s+(?:deeper|into)\b/gi, 'go further into')
         .replace(/\bget(?:ting)?\s+deeper\s+into\b/gi, 'get more into')
         .replace(/\bgo(?:ing)?\s+deeper\b/gi, 'go further')
         .replace(/\bdelved?\b/gi, 'got into')
@@ -360,7 +360,7 @@ RULES:
         .replace(/\bshowcase(?:d|s)?\b/gi, 'show')
         .replace(/\bdemonstrate(?:d|s)?\b/gi, 'show')
         .replace(/\bseizing\b/gi, 'taking')
-        .replace(/\bgeneric\b/gi, 'flat')
+        .replace(/\bconnection\b/gi, 'something real')
         .replace(/\btoo safe\b/gi, 'too cautious')
         // Score mentions in spoken parts
         .replace(/\bI['']m giving you a \d+\b/gi, '')

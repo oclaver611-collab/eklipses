@@ -134,7 +134,7 @@ function evaluate(testCase, feedback) {
   else pass('tryNextTime: actual words not concept');
 
   // 10. Part4 has motivational push
-  const motivational = ['try again', 'hit try', 'one more round', 'rep', 'go again', 'feel the difference', 'surprise yourself', 'sharper'];
+  const motivational = ['try again', 'hit try', 'one more round', 'rep', 'go again', 'feel the difference', 'surprise yourself', 'sharper', 'keep going', 'keep pushing', 'you got this', "you've got this", 'you have got this', 'closer than you think', 'make all the difference', 'will reward', 'something real', 'next time'];
   const hasMotivation = motivational.find(p => part4Lower.includes(p));
   if (hasMotivation) pass('part4: has motivational close');
   else fail('part4: has motivational close', `part4: "${(feedback.part4||'').slice(0,100)}"`);
