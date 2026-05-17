@@ -800,6 +800,7 @@ async function playLoop(mySession) {
 /* ===== Free Conversation ===== */
 async function freeConversation(mySession) {
   let freeConvRescueUsed = null;
+  let firstExchangeDone = false; // rescue lines only fire before first real exchange
   if(mySession!==session) return;
   const sc=SCENARIOS[currentScenarioKey]||{};
   const FREE_MS=3*60*1000, NUDGE_MS=2*60*1000;
@@ -853,8 +854,8 @@ async function freeConversation(mySession) {
     if(mySession!==session) break;
 
     if (!said) {
-      if (sc.coldOpen) {
-        // Scenario-specific rescue lines — no cross-contamination
+      if (sc.coldOpen && !firstExchangeDone) {
+        // Rescue lines only fire before first real exchange — not mid-conversation
         const rescuesByScenario = {
           beach: [
             "You walked all the way over here. Might as well say something.",
@@ -925,6 +926,7 @@ async function freeConversation(mySession) {
     }
 
     const reply=await getCharacterResponse(said);
+    firstExchangeDone = true; // after first real exchange, no more rescue lines
     if(mySession!==session) break;
 
     if(reply) {
@@ -957,7 +959,14 @@ async function runCoachFeedback(mySession) {
     return;
   }
   // Speak a thinking line immediately — fills the API wait time
-  await speak("Alright, let me put this together.", 'Ryan');
+  const thinkingLines = [
+    "Give me a second.",
+    "Okay. Let me think about that.",
+    "Alright. One moment.",
+    "Let me go through that.",
+    "Give me a moment.",
+  ];
+  await speak(thinkingLines[Math.floor(Math.random() * thinkingLines.length)], 'Ryan');
   if(mySession!==session) return;
   els.text.textContent='Analyzing your session...';
   try {
@@ -991,30 +1000,8 @@ async function runCoachFeedback(mySession) {
     if(mySession!==session) return;
     // 4-part chronological coaching — opener, middle, mistake, verdict
     const coachParts = [f.part1, f.part2, f.part3, f.part4].filter(Boolean);
-    // Positionally-aware fillers — each transition has its own set
-    const fillerSets = [
-      // After part1 → into part2 (middle of conversation)
-      [
-        "Now here's the thing — this is where the middle gets interesting.",
-        "Alright, let me show you what happened next.",
-        "Right, so here's where the conversation shifted.",
-        "Okay — this next part tells me a lot about your approach.",
-      ],
-      // After part2 → into part3 (the key mistake)
-      [
-        "Now watch this moment — this one matters.",
-        "Here's where it cost you.",
-        "This is the moment I want you to remember.",
-        "Okay, this is the one.",
-      ],
-      // After part3 → into part4 (verdict)
-      [
-        "So here's where I land on all of that.",
-        "Alright, let me give you the verdict.",
-        "Here's the bottom line.",
-        "So — putting it all together.",
-      ],
-    ];
+    // Transitions come from coach.js — generated server-side, never banned phrases
+    const transitions = [f.transition2, f.transition3, f.transition4];
     if (coachParts.length) {
       for (let i = 0; i < coachParts.length; i++) {
         if (mySession !== session) return;
@@ -1023,9 +1010,14 @@ async function runCoachFeedback(mySession) {
         await speak(coachParts[i], 'Ryan');
         if (i < coachParts.length - 1) {
           if (mySession !== session) return;
-          const set = fillerSets[i] || fillerSets[fillerSets.length - 1];
-          const filler = set[Math.floor(Math.random() * set.length)];
-          els.text.textContent = filler;
+          const transition = transitions[i];
+          if (transition) {
+            els.text.textContent = transition;
+            await speak(transition, 'Ryan');
+          }
+        }
+      }
+    } else {
           await speak(filler, 'Ryan');
         }
       }
