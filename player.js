@@ -1018,10 +1018,6 @@ async function runCoachFeedback(mySession) {
         }
       }
     } else {
-          await speak(filler, 'Ryan');
-        }
-      }
-    } else {
       els.text.textContent = f.spokenFeedback || f.spokenSummary;
       await speak(f.spokenFeedback || f.spokenSummary, 'Ryan');
     }
