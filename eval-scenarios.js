@@ -5,7 +5,7 @@
 require('dotenv').config();
 
 const VERCEL_URL = process.env.VERCEL_URL || 'https://eklipses.vercel.app';
-const DELAY_MS = 5000; // 5s between tests to avoid Groq rate limits
+const DELAY_MS = 8000; // 8s between tests to avoid rate limits
 
 // ─── SCENARIO DEFINITIONS ────────────────────────────────────────────────────
 
@@ -65,7 +65,9 @@ function makeConversation(characterName) {
     { role: 'assistant', content: 'Just passing time. What about you?' },
     { role: 'user',      content: 'same here I work in IT pretty busy but I like to relax sometimes' },
     { role: 'assistant', content: 'That sounds like a lot. What do you do to unwind?' },
-    { role: 'user',      content: 'I come to places like this to meet interesting people like you maybe we can grab coffee sometime' },
+    { role: 'user',      content: 'I come to places like this honestly you seem interesting what do you do' },
+    { role: 'assistant', content: 'I have my own thing going on. What made you come over?' },
+    { role: 'user',      content: 'I just thought you seemed interesting and wanted to talk maybe we can grab coffee sometime' },
     { role: 'assistant', content: 'Maybe. Let\'s see how this goes first.' },
   ];
 }
