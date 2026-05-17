@@ -242,13 +242,13 @@ Respond ONLY with valid JSON — no markdown, no preamble:
 
   "part3": "<THE KEY MISTAKE. Min 80 words. Find the single moment that cost him the most with ${girlName}. PRIORITY: (1) If he asked for coffee, a number, or to meet up before he earned it — that is ALWAYS the key mistake. Quote her exact response to it. Tell him what was missing. What needed to happen first before that ask would have landed? Give him the exact words he should have used instead. (2) If no premature close happened, find the biggest door she opened that he walked past. Quote both lines exactly. Tell him what went wrong and why it doesn't work with ${girlName} in particular. Then give him the exact words he should have said. Write it out fully — do not cut it short.>",
 
-  "part4": "<CLOSE + VERDICT. Target 350-430 characters. Name one real thing he did well. Give the score in one honest sentence. Name the one thing that would change his results most with ${girlName}. End with a motivational line that makes him want to go again right now. Score 3-4: 'Practice is the only way through. Hit Try Again — every rep makes you sharper.' Score 5-6: 'You are closer than you think. One more round and you will feel the difference.' Score 7+: 'You have got something real here. Go again and push it further — you will surprise yourself.' Or write your own that fits. BANNED WORDS IN PART4: 'go out there', 'dive deeper', 'aim to', 'work on that', 'dig into', 'push deeper', 'delve', 'engage', 'dynamic', 'showcase'. The motivational line MUST be the last sentence.>",
+  "part4": "<CLOSE + VERDICT. Target 350-430 characters. Name one real thing he did well. DO NOT say the score number — it is shown separately on the card. Give one honest sentence about the overall effort. Name the one thing that would change his results most with ${girlName}. End with a motivational line that makes him want to go again right now. If session was weak: 'Practice is the only way through. Hit Try Again — every rep makes you sharper.' If session was decent: 'You are closer than you think. One more round and you will feel the difference.' If session was strong: 'You have got something real here. Go again and push it further — you will surprise yourself.' Or write your own that fits. BANNED WORDS IN PART4: 'go out there', 'dive deeper', 'aim to', 'work on that', 'dig into', 'push deeper', 'delve', 'delved', 'engage', 'dynamic', 'showcase', 'score is a', 'giving you a', 'I give you'. The motivational line MUST be the last sentence.>",
 
-  "openerBreakdown": "<Quote his exact first message. One sentence on why it worked or didn't with ${girlName}.>",
-  "bestMoment": "<Quote the single best thing he said verbatim. One sentence on why it landed with ${girlName}.>",
-  "missedOpportunity": "<Quote the moment he lost the most ground — his line and ${girlName}'s response. One sentence on what he should have done.>",
-  "tryNextTime": "<One real line he can actually say next time in this scenario. Real words that would work with ${girlName}, not a concept.>",
-  "wouldSheDateHim": "<'Yes', 'No', or 'Maybe' — then one sentence from ${girlName}'s point of view in first person, about something specific he said or did.>"
+  "openerBreakdown": "<The opener was: '${openerLine}'. One sentence on why it worked or didn't with ${girlName}. Do not use HIM_1 label. No banned words.>",
+  "bestMoment": "<Quote the single best thing he said verbatim. One sentence on why it landed with ${girlName}. No banned words.>",
+  "missedOpportunity": "<Quote the moment he lost the most ground — his line and ${girlName}'s response. One sentence on what he should have done. No banned words — say 'gone deeper into' as 'asked more about', say 'delved' as 'got into'.>",
+  "tryNextTime": "<One real line he can actually say next time in this scenario. Real words that would work with ${girlName}, not a concept. No banned words.>",
+  "wouldSheDateHim": "<'Yes', 'No', or 'Maybe' — then one sentence from ${girlName}'s point of view in first person, about something specific he said or did. No banned words.>"
 }
 
 SCORING:
@@ -276,7 +276,7 @@ BANNED PHRASES AND WORDS — if any of these appear anywhere in your output, rew
 "this is the moment I want you to remember", "here's the bottom line", "Now watch this", "Here's where",
 "let's talk about", "let's look at", "putting it all together", "the bottom line", "Here's where it",
 "what we have here", "at the end of the day", "the fact of the matter",
-"dig deeper", "dive deeper", "dive into", "seizing", "effectively", "engage", "dynamic", "showcase", "demonstrate",
+"dig deeper", "dive deeper", "dive into", "delve", "delved", "seizing", "effectively", "engage", "dynamic", "showcase", "demonstrate",
 "connection" (say "moment" or "something real" instead), "approach" (say "what you did" instead),
 "generic" (say "flat" or "safe" or "by the book" instead), "specific" (say "real" or "particular" instead).
 Read every sentence before you write it. If a banned phrase or word is in there — rewrite it.
@@ -330,7 +330,9 @@ RULES:
     // Model consistently under-scores; corrected at code level
     const turnCount = conversation.length;
     const rawScore = Number(feedback.score) || 4;
-    feedback.score = (turnCount >= 4 && rawScore < 5) ? 5 : rawScore;
+    const finalScore = (turnCount >= 4 && rawScore < 5) ? 5 : rawScore;
+    console.log(`[coach] turns=${turnCount} rawScore=${rawScore} finalScore=${finalScore}`);
+    feedback.score = finalScore;
 
     res.json(feedback);
 
