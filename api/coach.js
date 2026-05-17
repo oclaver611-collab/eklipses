@@ -350,7 +350,7 @@ RULES:
         .replace(/at the end of the day/gi, 'ultimately')
         .replace(/the fact of the matter/gi, 'the truth')
         // Banned vocabulary
-        .replace(/\bdive(?:s|d|ing)?\s+(?:deeper|into|in)\b/gi, 'get into')
+        .replace(/\bdiv(?:e[sd]?|ing)\s+(?:deeper|into|in)\b/gi, 'get into')
         .replace(/\bdig(?:s|ging)?\s+deeper\b/gi, 'go further')
         .replace(/\bget(?:ting)?\s+deeper\s+into\b/gi, 'get more into')
         .replace(/\bgo(?:ing)?\s+deeper\b/gi, 'go further')
