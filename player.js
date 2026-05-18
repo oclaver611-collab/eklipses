@@ -252,19 +252,19 @@ const Caption = (() => {
 
 /* ===== Avatar sets ===== */
 const AVATAR_SETS = [
-  { id:'sofia',    label:'Sofia',    thumb:'sofia_thumb.jpg',    maryVideo:'sofia_speaking.mp4',    maryIdleVideo:'sofia_idle.mp4',    danielVideo:'sofia_idle.mp4',    vibe:'Direct & self-contained',  scenario:'Beach' },
-  { id:'isabelle', label:'Isabelle', thumb:'Isabelle_thumb.jpg',  maryVideo:'Isabelle_speaking.mp4', maryIdleVideo:'Isabelle_idle.mp4', danielVideo:'Isabelle_idle.mp4', vibe:'Intellectual & curious',   scenario:'Museum' },
-  { id:'ava',      label:'Ava',      thumb:'Ava_thumb.jpg',       maryVideo:'Ava_speaking.mp4',      maryIdleVideo:'Ava_idle.mp4',      danielVideo:'Ava_idle.mp4',      vibe:'Sharp & direct',           scenario:'Bar' },
-  { id:'zoe',      label:'Zoe',      thumb:'zoe_thumb.jpg',       maryVideo:'zoe_speaking.mp4',      maryIdleVideo:'zoe_idle.mp4',      danielVideo:'zoe_idle.mp4',      vibe:'Direct & no-nonsense',     scenario:'Gym' },
-  { id:'nadia',    label:'Nadia',    thumb:'Nadia.jpg',            maryVideo:'nadia_speaking.mp4',    maryIdleVideo:'nadia_idle.mp4',    danielVideo:'nadia_idle.mp4',    vibe:'Warm & bookish',           scenario:'Bookstore' },
-  { id:'julia',    label:'Julia',    thumb:'julia_thumb.jpg',     maryVideo:'julia_mary.mp4',        maryIdleVideo:'julia_daniel.mp4',  danielVideo:'julia_daniel.mp4',                                       vibe:'Mysterious & confident',   scenario:'Street' },
+  { id:'sofia',    label:'Sofia',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_thumb.jpg',    maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_speaking.mp4',    maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_idle.mp4',    danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_idle.mp4',    vibe:'Direct & self-contained',  scenario:'Beach' },
+  { id:'isabelle', label:'Isabelle', thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Isabelle_thumb.jpg',  maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Isabelle_speaking.mp4', maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Isabelle_idle.mp4', danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Isabelle_idle.mp4', vibe:'Intellectual & curious',   scenario:'Museum' },
+  { id:'ava',      label:'Ava',      thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_thumb.jpg',       maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_speaking.mp4',      maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_idle.mp4',      danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_idle.mp4',      vibe:'Sharp & direct',           scenario:'Bar' },
+  { id:'zoe',      label:'Zoe',      thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/zoe_thumb.jpg',       maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/zoe_speaking.mp4',      maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/zoe_idle.mp4',      danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/zoe_idle.mp4',      vibe:'Direct & no-nonsense',     scenario:'Gym' },
+  { id:'nadia',    label:'Nadia',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Nadia.jpg',            maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/nadia_speaking.mp4',    maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/nadia_idle.mp4',    danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/nadia_idle.mp4',    vibe:'Warm & bookish',           scenario:'Bookstore' },
+  { id:'julia',    label:'Julia',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/julia_thumb.jpg',     maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/julia_mary.mp4',        maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/julia_daniel.mp4',  danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/julia_daniel.mp4',                                       vibe:'Mysterious & confident',   scenario:'Street' },
 ];
 
 const AVATARS = {
-  Daniel:      { type:'video', src:'bella9.mp4' },
-  Mary:        { type:'video', src:'bella1.mp4' },
+  Daniel:      { type:'video', src:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/bella9.mp4' },
+  Mary:        { type:'video', src:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/bella1.mp4' },
   Ryan:        { type:'orb' },
-  User_Prompt: { type:'video', src:'bella9.mp4' },
+  User_Prompt: { type:'video', src:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/bella9.mp4' },
 };
 
 function applyAvatarSet(set) {
@@ -1186,7 +1186,7 @@ function renderShelf() {
 function makeCard(key) {
   const sc=SCENARIOS[key];
   const card=document.createElement('div'); card.className='sc-card';
-  const img=document.createElement('img'); img.className='sc-thumb'; img.src=sc.thumb||'Ryan.jpg'; img.onerror=()=>img.style.display='none';
+  const img=document.createElement('img'); img.className='sc-thumb'; img.src=sc.thumb||'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/ryan.jpg'; img.onerror=()=>img.style.display='none';
   const title=document.createElement('div'); title.innerHTML='<div class="sc-title">'+sc.title+'</div><div class="sc-sub">Click to load</div>';
   card.appendChild(img); card.appendChild(title);
   card.onclick=()=>playScenario(key,false);
@@ -1197,7 +1197,7 @@ function renderAvatarPicker() {
   if(!els.pickerBackdrop) return;
   els.pickerGrid.innerHTML=AVATAR_SETS.map(s=>`
     <div class="pick-card" data-id="${s.id}">
-      <img class="pick-img" src="${s.thumb||'Ryan.jpg'}" alt="${s.label}" style="height:160px;object-fit:cover;">
+      <img class="pick-img" src="${s.thumb||'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/ryan.jpg'}" alt="${s.label}" style="height:160px;object-fit:cover;">
       <div class="pick-meta">
         <b style="font-size:15px">${s.label}</b>
         <div style="color:#9aa4b2;font-size:12px;margin-top:3px">${s.vibe||''}</div>
@@ -1295,11 +1295,36 @@ function showOnboarding(onComplete) {
   renderScreen(0);
 }
 
+/* ===== Fullscreen ===== */
+function initFullscreen() {
+  const btn = document.createElement('button');
+  btn.id = 'ek-fullscreen-btn';
+  btn.title = 'Toggle fullscreen';
+  btn.innerHTML = '⛶';
+  btn.style.cssText = 'position:fixed;top:10px;right:12px;z-index:9999;background:rgba(0,0,0,0.5);color:#fff;border:none;border-radius:8px;width:36px;height:36px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s';
+  btn.onmouseenter = () => btn.style.background = 'rgba(255,179,0,0.8)';
+  btn.onmouseleave = () => btn.style.background = 'rgba(0,0,0,0.5)';
+  btn.onclick = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+      btn.innerHTML = '✕';
+    } else {
+      document.exitFullscreen().catch(() => {});
+      btn.innerHTML = '⛶';
+    }
+  };
+  document.addEventListener('fullscreenchange', () => {
+    btn.innerHTML = document.fullscreenElement ? '✕' : '⛶';
+  });
+  document.body.appendChild(btn);
+}
+
 /* ===== Boot ===== */
 function bootDefault() {
   const set=AVATAR_SETS.find(s=>s.id==='sofia');
   applyAvatarSet(set);
   Metrics.bindLikeButton();
+  initFullscreen();
   if (!hasSeenOnboarding()) {
     showOnboarding(() => launchApp());
   } else {
@@ -1313,7 +1338,7 @@ function launchApp() {
   overlay.style.cssText='position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden';
 
   // Cinematic slideshow background
-  const slides=['slide5.jpg','slide6.jpg','slide3.jpg','slide7.jpg'];
+  const slides=['https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/slide5.jpg','https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/slide6.jpg','https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/slide3.jpg','https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/slide7.jpg'];
   const bgWrap=document.createElement('div');
   bgWrap.style.cssText='position:absolute;inset:0;z-index:0';
   const bg1=document.createElement('div'), bg2=document.createElement('div');
