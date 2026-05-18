@@ -753,6 +753,7 @@ async function playScenario(key, practice=false) {
   currentScript=practice?sc.practice:sc.demo;
   stepIndex=0;
   if(els.select.value!==key) els.select.value=key;
+  if (window.showFullscreenBtn) window.showFullscreenBtn();
   await playLoop(mySession);
 }
 
@@ -1051,6 +1052,7 @@ async function runCoachFeedback(mySession) {
 }
 
 function showFeedbackCard(f) {
+  if (window.hideFullscreenBtn) window.hideFullscreenBtn();
   // Fallback for missing card fields — GPT sometimes omits them on short conversations
   if (!f.openerBreakdown || f.openerBreakdown === '---') f.openerBreakdown = f.part1 ? f.part1.split('.')[0] + '.' : 'Opener not captured.';
   if (!f.bestMoment || f.bestMoment === '---') f.bestMoment = 'Keep building — more reps will show your best moments.';
@@ -1297,26 +1299,57 @@ function showOnboarding(onComplete) {
 
 /* ===== Fullscreen ===== */
 function initFullscreen() {
+  // Create fullscreen button that sits over the video frame
   const btn = document.createElement('button');
   btn.id = 'ek-fullscreen-btn';
   btn.title = 'Toggle fullscreen';
   btn.innerHTML = '⛶';
-  btn.style.cssText = 'position:fixed;top:10px;right:12px;z-index:9999;background:rgba(0,0,0,0.5);color:#fff;border:none;border-radius:8px;width:36px;height:36px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s';
-  btn.onmouseenter = () => btn.style.background = 'rgba(255,179,0,0.8)';
-  btn.onmouseleave = () => btn.style.background = 'rgba(0,0,0,0.5)';
+  btn.style.cssText = [
+    'position:absolute',
+    'bottom:12px',
+    'right:12px',
+    'z-index:999',
+    'background:rgba(0,0,0,0.55)',
+    'color:#fff',
+    'border:none',
+    'border-radius:8px',
+    'width:36px',
+    'height:36px',
+    'font-size:18px',
+    'cursor:pointer',
+    'display:none', // hidden until session starts
+    'align-items:center',
+    'justify-content:center',
+    'transition:background 0.2s',
+  ].join(';');
+
+  btn.onmouseenter = () => btn.style.background = 'rgba(255,179,0,0.85)';
+  btn.onmouseleave = () => btn.style.background = 'rgba(0,0,0,0.55)';
+
   btn.onclick = () => {
+    const frame = document.getElementById('stageFrame');
+    if (!frame) return;
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-      btn.innerHTML = '✕';
+      frame.requestFullscreen().catch(() => {});
     } else {
       document.exitFullscreen().catch(() => {});
-      btn.innerHTML = '⛶';
     }
   };
+
   document.addEventListener('fullscreenchange', () => {
     btn.innerHTML = document.fullscreenElement ? '✕' : '⛶';
   });
-  document.body.appendChild(btn);
+
+  // Add button inside stageFrame so it sits over the video
+  const frame = document.getElementById('stageFrame');
+  if (frame) {
+    frame.style.position = 'relative';
+    frame.appendChild(btn);
+  }
+
+  // Show button when session is active, hide on home screen
+  window.showFullscreenBtn = () => { btn.style.display = 'flex'; };
+  window.hideFullscreenBtn = () => { btn.style.display = 'none'; btn.innerHTML = '⛶'; };
 }
 
 /* ===== Boot ===== */
