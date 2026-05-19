@@ -1,2 +1,6 @@
 node_modules/  
 .env 
+.wrangler/ 
+player_current.js 
+test-bar-card.js 
+test-bar.js 
