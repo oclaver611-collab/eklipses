@@ -4,13 +4,23 @@ let currentCharacterId = "sofia"; // active character — changes when user pick
 
 // Default character per scenario — overrideable by avatar picker
 const SCENARIO_CHARACTER_MAP = {
-  beach:     'sofia',
-  bar:       'ava',
-  museum:    'isabelle',
-  gym:       'zoe',
-  bookstore: 'nadia',
-  street:    'julia',
-  wedding:   'claire',
+  beach:        'sofia',
+  bar:          'ava',
+  museum:       'isabelle',
+  gym:          'zoe',
+  bookstore:    'nadia',
+  street:       'julia',
+  wedding:      'claire',
+  // Wave 2 — May 2026
+  rooftop:      'sanna',
+  house_party:  'sarah',
+  coffee_shop:  'anna',
+  art_gallery:  'leila',
+  yoga_studio:  'fatou',
+  airport:      'elena',
+  supermarket:  'eden',
+  office_lobby: 'maya_office',
+  train:        'erika',
 };
 let currentScript = null;
 let isPractice = false;
@@ -252,12 +262,22 @@ const Caption = (() => {
 
 /* ===== Avatar sets ===== */
 const AVATAR_SETS = [
-  { id:'sofia',    label:'Sofia',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_thumb.jpg',    maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_speaking.mp4',    maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_idle.mp4',    danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_idle.mp4',    vibe:'Direct & self-contained',  scenario:'Beach' },
-  { id:'isabelle', label:'Isabelle', thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Isabelle_thumb.jpg',  maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Isabelle_speaking.mp4', maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Isabelle_idle.mp4', danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Isabelle_idle.mp4', vibe:'Intellectual & curious',   scenario:'Museum' },
-  { id:'ava',      label:'Ava',      thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_thumb.jpg',       maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_speaking.mp4',      maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_idle.mp4',      danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_idle.mp4',      vibe:'Sharp & direct',           scenario:'Bar' },
-  { id:'zoe',      label:'Zoe',      thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/zoe_thumb.jpg',       maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/zoe_speaking.mp4',      maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/zoe_idle.mp4',      danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/zoe_idle.mp4',      vibe:'Direct & no-nonsense',     scenario:'Gym' },
-  { id:'nadia',    label:'Nadia',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Nadia.jpg',            maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/nadia_speaking.mp4',    maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/nadia_idle.mp4',    danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/nadia_idle.mp4',    vibe:'Warm & bookish',           scenario:'Bookstore' },
-  { id:'julia',    label:'Julia',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/julia_thumb.jpg',     maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/julia_mary.mp4',        maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/julia_daniel.mp4',  danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/julia_daniel.mp4',                                       vibe:'Mysterious & confident',   scenario:'Street' },
+  { id:'sofia',       label:'Sofia',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_thumb.jpg',    maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_speaking.mp4',    maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_idle.mp4',    danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_idle.mp4',    vibe:'Direct & self-contained',  scenario:'Beach' },
+  { id:'isabelle',    label:'Isabelle', thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Isabelle_thumb.jpg', maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Isabelle_speaking.mp4', maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Isabelle_idle.mp4', danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Isabelle_idle.mp4', vibe:'Intellectual & curious',   scenario:'Museum' },
+  { id:'ava',         label:'Ava',      thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_thumb.jpg',      maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_speaking.mp4',      maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_idle.mp4',      danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_idle.mp4',      vibe:'Sharp & direct',           scenario:'Bar' },
+  { id:'zoe',         label:'Zoe',      thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/zoe_thumb.jpg',      maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/zoe_speaking.mp4',      maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/zoe_idle.mp4',      danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/zoe_idle.mp4',      vibe:'Direct & no-nonsense',     scenario:'Gym' },
+  { id:'nadia',       label:'Nadia',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Nadia.jpg',          maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/nadia_speaking.mp4',    maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/nadia_idle.mp4',    danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/nadia_idle.mp4',    vibe:'Warm & bookish',           scenario:'Bookstore' },
+  { id:'julia',       label:'Julia',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/julia_thumb.jpg',    maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/julia_mary.mp4',        maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/julia_daniel.mp4',  danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/julia_daniel.mp4',  vibe:'Mysterious & confident',   scenario:'Street' },
+  // ── Wave 2 — May 2026 — replace _thumb.jpg/_speaking.mp4/_idle.mp4 with real R2 URLs after HeyGen ──
+  { id:'sanna',       label:'Sanna',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Sanna_thumb.jpg',    maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sanna_speaking.mp4',    maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sanna_idle.mp4',    danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sanna_idle.mp4',    vibe:'Sharp & composed',         scenario:'Rooftop' },
+  { id:'sarah',       label:'Sarah',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Sarah_thumb.jpg',    maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sarah_speaking.mp4',    maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sarah_idle.mp4',    danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sarah_idle.mp4',    vibe:'Warm & guarded',           scenario:'House Party' },
+  { id:'anna',        label:'Anna',     thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Anna_thumb.jpg',     maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/anna_speaking.mp4',     maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/anna_idle.mp4',     danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/anna_idle.mp4',     vibe:'Creative & deflects',      scenario:'Coffee Shop' },
+  { id:'leila',       label:'Leila',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Leila_thumb.jpg',    maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/leila_speaking.mp4',    maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/leila_idle.mp4',    danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/leila_idle.mp4',    vibe:'Quiet & present',          scenario:'Art Gallery' },
+  { id:'fatou',       label:'Fatou',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Fatou_thumb.jpg',    maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/fatou_speaking.mp4',    maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/fatou_idle.mp4',    danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/fatou_idle.mp4',    vibe:'Direct & honest',          scenario:'Yoga Studio' },
+  { id:'elena',       label:'Elena',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Elena_thumb.jpg',    maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/elena_speaking.mp4',    maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/elena_idle.mp4',    danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/elena_idle.mp4',    vibe:'Witty & bantery',          scenario:'Airport' },
+  { id:'eden',        label:'Eden',     thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Eden_thumb.jpg',     maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/eden_speaking.mp4',     maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/eden_idle.mp4',     danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/eden_idle.mp4',     vibe:'Warm & straight-talking',  scenario:'Supermarket' },
+  { id:'maya_office', label:'Maya',     thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Maya_thumb.jpg',     maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/maya_speaking.mp4',     maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/maya_idle.mp4',     danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/maya_idle.mp4',     vibe:'Grounded & sharp',         scenario:'Office Lobby' },
+  { id:'erika',       label:'Erika',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Erika_thumb.jpg',    maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/erika_speaking.mp4',    maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/erika_idle.mp4',    danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/erika_idle.mp4',    vibe:'Chaotic & fun',            scenario:'Train' },
 ];
 
 const AVATARS = {
@@ -910,6 +930,77 @@ async function freeConversation(mySession) {
             "Take your time.",
             "Still working up to it?",
           ],
+          // ── Wave 2 rescue lines ──────────────────────────────────────────
+          rooftop: [
+            "You came all the way over here.",
+            "The view isn't going anywhere.",
+            "Most people just stay on their side.",
+            "You look like you had something to say.",
+            "Take your time.",
+            "Still working up to it?",
+          ],
+          house_party: [
+            "You came over for a reason.",
+            "I don't bite. I'm at a party.",
+            "Most people just stay in their group.",
+            "You look like you had something to say.",
+            "Take your time.",
+            "Still working up to it?",
+          ],
+          coffee_shop: [
+            "You stopped at this table for a reason.",
+            "I'm not that focused on the notebook.",
+            "Most people just walk past.",
+            "You look like you had something to say.",
+            "Take your time.",
+            "Still working up to it?",
+          ],
+          art_gallery: [
+            "You stopped at this piece for a reason.",
+            "Most people walked past it.",
+            "You look like you had something to say.",
+            "Take your time.",
+            "Still working up to it?",
+            "The painting isn't going anywhere.",
+          ],
+          yoga_studio: [
+            "You came over for a reason.",
+            "I'm stretching, not meditating.",
+            "Clock's ticking — I'll finish and leave.",
+            "You look like you had something to say.",
+            "Take your time.",
+          ],
+          airport: [
+            "We've got time. Flight's delayed.",
+            "Most people just stay in their seat.",
+            "You look like you had something to say.",
+            "Take your time.",
+            "Still working up to it?",
+            "The board hasn't changed.",
+          ],
+          supermarket: [
+            "You stopped in this aisle for a reason.",
+            "Most people just keep moving.",
+            "You look like you had something to say.",
+            "Take your time.",
+            "Still working up to it?",
+          ],
+          office_lobby: [
+            "You came over for a reason.",
+            "The elevator's taking its time.",
+            "Most people just look at their phones.",
+            "You look like you had something to say.",
+            "Take your time.",
+            "Still working up to it?",
+          ],
+          train: [
+            "You're still here.",
+            "The train has a few more stops.",
+            "Most people just look out the window.",
+            "You look like you had something to say.",
+            "Take your time.",
+            "Still working up to it?",
+          ],
         };
         const rescues = rescuesByScenario[currentScenarioKey] || rescuesByScenario.beach;
         if (!freeConvRescueUsed) freeConvRescueUsed = new Set();
@@ -927,12 +1018,22 @@ async function freeConversation(mySession) {
         if (firstExchangeDone && silenceCount >= 2) {
           silenceCount = 0;
           const impatience = {
-            street: ["Still there?", "I do have somewhere to be.", "You went quiet.", "Was there something else?"],
-            beach:  ["Still there?", "You went quiet.", "Was there something else?", "Take your time."],
-            bar:    ["Still there?", "You went quiet.", "Was there something else?"],
-            gym:    ["Still there?", "You went quiet.", "Was there something else?"],
-            museum: ["Still there?", "You went quiet.", "Was there something else?"],
-            bookstore: ["Still there?", "You went quiet.", "Was there something else?"],
+            street:      ["Still there?", "I do have somewhere to be.", "You went quiet.", "Was there something else?"],
+            beach:       ["Still there?", "You went quiet.", "Was there something else?", "Take your time."],
+            bar:         ["Still there?", "You went quiet.", "Was there something else?"],
+            gym:         ["Still there?", "You went quiet.", "Was there something else?"],
+            museum:      ["Still there?", "You went quiet.", "Was there something else?"],
+            bookstore:   ["Still there?", "You went quiet.", "Was there something else?"],
+            // Wave 2
+            rooftop:     ["Still there?", "You went quiet.", "Was there something else?"],
+            house_party: ["Still there?", "You went quiet.", "Was there something else?"],
+            coffee_shop: ["Still there?", "You went quiet.", "Was there something else?"],
+            art_gallery: ["Still there?", "You went quiet.", "Was there something else?"],
+            yoga_studio: ["Still there?", "You went quiet.", "Was there something else?"],
+            airport:     ["Still there?", "You went quiet.", "Was there something else?", "The board still hasn't changed."],
+            supermarket: ["Still there?", "You went quiet.", "Was there something else?"],
+            office_lobby:["Still there?", "You went quiet.", "Was there something else?"],
+            train:       ["Still there?", "You went quiet.", "Was there something else?", "Few more stops."],
           };
           const pool = impatience[currentScenarioKey] || impatience.beach;
           const line = pool[Math.floor(Math.random() * pool.length)];
