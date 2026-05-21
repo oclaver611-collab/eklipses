@@ -413,6 +413,35 @@ function setMediaForSpeaker(speaker) {
   }
 }
 
+/* Ken Burns keyframes — injected once */
+(function injectKenBurnsStyles() {
+  if (document.getElementById('ek-kb-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'ek-kb-styles';
+  style.textContent = `
+    @keyframes kenBurns1 { 0%{transform:scale(1)    translateX(0%)    translateY(0%)}    100%{transform:scale(1.12) translateX(-2%)   translateY(-1.5%)} }
+    @keyframes kenBurns2 { 0%{transform:scale(1.08) translateX(-1.5%) translateY(-1%)}  100%{transform:scale(1)    translateX(1.5%)  translateY(1%)}    }
+    @keyframes kenBurns3 { 0%{transform:scale(1)    translateX(1%)    translateY(0%)}    100%{transform:scale(1.1)  translateX(-1%)   translateY(-2%)}   }
+    @keyframes kenBurns4 { 0%{transform:scale(1.06) translateX(0%)    translateY(-1.5%)} 100%{transform:scale(1)    translateX(-1.5%) translateY(1%)}    }
+    .scene-bg {
+      position:absolute;inset:0;width:100%;height:100%;
+      object-fit:cover;z-index:0;
+      transform-origin:center center;
+      will-change:transform;
+    }
+    .scene-bg.kb-active {
+      animation-duration:14s;
+      animation-timing-function:ease-in-out;
+      animation-iteration-count:infinite;
+      animation-direction:alternate;
+    }
+  `;
+  document.head.appendChild(style);
+})();
+
+const KB_ANIMS = ['kenBurns1','kenBurns2','kenBurns3','kenBurns4'];
+let _kbIndex = 0;
+
 function setSceneBackground(key) {
   const sc=(SCENARIOS[key])||{};
   const frameEl=els.stageFrame;
@@ -423,7 +452,17 @@ function setSceneBackground(key) {
   const isVideo=/\.mp4$/i.test(sc.bg);
   const bgEl=document.createElement(isVideo?'video':'img');
   bgEl.className='scene-bg';
-  if (isVideo) { bgEl.autoplay=true; bgEl.loop=true; bgEl.muted=true; bgEl.playsInline=true; }
+  if (isVideo) {
+    bgEl.autoplay=true; bgEl.loop=true; bgEl.muted=true; bgEl.playsInline=true;
+  } else {
+    // Apply Ken Burns — pick next animation in rotation so each scenario feels different
+    const anim = KB_ANIMS[_kbIndex % KB_ANIMS.length];
+    _kbIndex++;
+    bgEl.onload = () => {
+      bgEl.classList.add('kb-active');
+      bgEl.style.animationName = anim;
+    };
+  }
   bgEl.src=sc.bg;
   frameEl.insertBefore(bgEl, frameEl.firstChild);
   frameEl.classList.add('has-bg');
