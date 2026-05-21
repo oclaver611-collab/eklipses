@@ -22,9 +22,14 @@ const tests = [
     description: 'Tests Ryan coaching — opener analysis, score calibration, motivational close, no hallucinations'
   },
   {
-    name: 'All-Scenarios Evaluator (6 scenarios)',
+    name: 'All-Scenarios Evaluator — Wave 1 (6 scenarios)',
     cmd: 'node eval-scenarios.js',
-    description: 'Tests all 6 characters for correct name, feedback card fields, scenario-specific opener suggestions'
+    description: 'Tests all 6 Wave 1 characters for correct name, feedback card fields, scenario-specific opener suggestions'
+  },
+  {
+    name: 'All-Scenarios Evaluator — Wave 2 (9 scenarios)',
+    cmd: 'node eval-wave2.js',
+    description: 'Tests all 9 Wave 2 characters for correct name, feedback card fields, no scenario bleed'
   },
 ];
 
@@ -37,7 +42,7 @@ for (const test of tests) {
   console.log('─'.repeat(58));
 
   try {
-    const output = execSync(test.cmd, { encoding: 'utf8', stdio: 'pipe' });
+    const output = execSync(test.cmd, { encoding: 'utf8', stdio: 'pipe', timeout: 300000 });
     console.log(output);
 
     const passed = output.includes('All') && (output.includes('passed') || output.includes('0 failed'));
