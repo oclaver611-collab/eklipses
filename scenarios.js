@@ -187,7 +187,7 @@ window.SCENARIOS = {
   rooftop: {
     title: "Rooftop — After Dark",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Sanna_thumb.jpg",
-    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/rooftop_bg.jpg",
+    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/rooftop_bg.jpg?v=2",
     coldOpen: true,
     category: "dating",
     difficulty: 3,
@@ -219,7 +219,7 @@ window.SCENARIOS = {
   house_party: {
     title: "House Party — Mutual Friend",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Sarah_thumb.jpg",
-    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/party_bg.jpg",
+    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/party_bg.jpg?v=2",
     coldOpen: true,
     category: "dating",
     difficulty: 2,
@@ -251,7 +251,7 @@ window.SCENARIOS = {
   coffee_shop: {
     title: "Coffee Shop — Afternoon",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Anna_thumb.jpg",
-    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/coffee_bg.jpg",
+    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/coffee_bg.jpg?v=2",
     coldOpen: true,
     category: "dating",
     difficulty: 2,
@@ -286,7 +286,7 @@ window.SCENARIOS = {
   art_gallery: {
     title: "Art Gallery — Opening Night",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Leila_thumb.jpg",
-    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/gallery_bg.jpg",
+    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/gallery_bg.jpg?v=2",
     coldOpen: true,
     category: "dating",
     difficulty: 4,
@@ -318,7 +318,7 @@ window.SCENARIOS = {
   yoga_studio: {
     title: "Yoga Studio — After Class",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Fatou_thumb.jpg",
-    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/yoga_bg.jpg",
+    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/yoga_bg.jpg?v=2",
     coldOpen: true,
     category: "dating",
     difficulty: 3,
@@ -351,7 +351,7 @@ window.SCENARIOS = {
   airport: {
     title: "Airport — Flight Delayed",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Elena_thumb.jpg",
-    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/airport_bg.jpg",
+    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/airport_bg.jpg?v=2",
     coldOpen: true,
     category: "dating",
     difficulty: 3,
@@ -384,7 +384,7 @@ window.SCENARIOS = {
   supermarket: {
     title: "Supermarket — Sunday Shop",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Eden_thumb.jpg",
-    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/supermarket_bg.jpg",
+    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/supermarket_bg.jpg?v=2",
     coldOpen: true,
     category: "dating",
     difficulty: 2,
@@ -417,7 +417,7 @@ window.SCENARIOS = {
   office_lobby: {
     title: "Office Lobby — Same Building",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Maya_thumb.jpg",
-    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/office_bg.jpg",
+    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/office_bg.jpg?v=2",
     coldOpen: true,
     category: "dating",
     difficulty: 3,
@@ -449,7 +449,7 @@ window.SCENARIOS = {
   train: {
     title: "Train — Commute Home",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Erika_thumb.jpg",
-    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/train_bg.jpg",
+    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/train_bg.jpg?v=2",
     coldOpen: true,
     category: "dating",
     difficulty: 2,
