@@ -1,117 +1,160 @@
 // batch_kling_idle.js
-// Generates idle videos for all 9 Wave 2 characters
+// Generates idle videos for all characters using fal.ai Kling Avatar v2 Pro
+// Correct endpoint: fal-ai/kling-video/ai-avatar/v2/pro
+// Correct result path: result.data.video.url
 // Run: node batch_kling_idle.js
 
-import { fal } from "@fal-ai/client";
-import fs from "fs";
-import path from "path";
-import https from "https";
-import http from "http";
+require("dotenv").config();
+const fs = require("fs");
+const https = require("https");
+const path = require("path");
+const { fal } = require("@fal-ai/client");
 
-const FAL_KEY = "97361853-c81a-4722-a1b0-8c60cc2b6657:a94ebac79d379106fc4e559ad2b07cff";
-const PHOTOS_DIR = "C:\\Users\\serge\\Downloads\\dames";
-const SILENT_AUDIO = "C:\\Users\\serge\\Downloads\\silent_10s.wav";
-const OUTPUT_DIR = "C:\\Users\\serge\\Downloads\\dames";
+const FAL_API_KEY = process.env.FAL_API_KEY || "97361853-c81a-4722-a1b0-8c60cc2b6657:a94ebac79d379106fc4e559ad2b07cff";
+const PHOTO_DIR   = "C:\\Users\\serge\\Downloads\\dames";
+const OUTPUT_DIR  = "C:\\Users\\serge\\Downloads\\dames";
+const SILENT_AUDIO = path.join(__dirname, "silent_10s.wav");
 
-const CHARACTERS = [
-  { name: "Sanna",  photo: "Sanna.png"  },
-  { name: "Sarah",  photo: "Sarah.png"  },
-  { name: "Anna",   photo: "Anna.png"   },
-  { name: "Leila",  photo: "Leila.png"  },
-  { name: "Fatou",  photo: "Fatou.png"  },
-  { name: "Elena",  photo: "Elena.png"  },
-  { name: "Eden",   photo: "Eden.png"   },
-  { name: "Maya",   photo: "Maya.jpg"   },
-  { name: "Erika",  photo: "Erika.png"  },
+// Best prompt — confirmed working (attentive listening, no lip movement, forward gaze)
+const IDLE_PROMPT = "woman listening attentively, eyes looking straight forward at all times, direct forward gaze, mouth completely closed, lips sealed shut, no speaking, no lip movement whatsoever, subtle natural breathing through nose only, slow natural eyelid blinking, slight gentle head stillness, calm composed expression, fully engaged and listening, no hand movement, no shoulder movement, photorealistic";
+
+const characters = [
+  { name: "sanna",  photo: "Sanna.png",  output: "Sanna_idle.mp4"  },
+  { name: "sarah",  photo: "Sarah.png",  output: "Sarah_idle.mp4"  },
+  { name: "anna",   photo: "Anna.png",   output: "Anna_idle.mp4"   },
+  { name: "leila",  photo: "Leila.png",  output: "Leila_idle.mp4"  },
+  { name: "fatou",  photo: "Fatou.png",  output: "Fatou_idle.mp4"  },
+  { name: "elena",  photo: "Elena.png",  output: "Elena_idle.mp4"  },
+  { name: "eden",   photo: "Eden.png",   output: "Eden_idle.mp4"   },
+  { name: "maya",   photo: "Maya.jpg",   output: "Maya_idle.mp4"   },
+  { name: "erika",  photo: "Erika.png",  output: "Erika_idle.mp4"  },
 ];
 
-const IDLE_PROMPT = "mouth closed at all times, lips sealed, no speaking, no lip movement, subtle breathing through nose, natural eye blinks, slight head movement, still shoulders, no hand movement, calm and composed, listening";
-
-fal.config({ credentials: FAL_KEY });
-
-async function uploadFile(filePath, mimeType) {
-  const fileName = path.basename(filePath);
-  const file = new File([fs.readFileSync(filePath)], fileName, { type: mimeType });
-  const url = await fal.storage.upload(file);
-  return url;
+function toDataUrl(filePath, mimeType) {
+  const base64 = fs.readFileSync(filePath).toString("base64");
+  return `data:${mimeType};base64,${base64}`;
 }
 
-function downloadFile(url, outputPath) {
+function downloadFile(url, dest, redirects) {
+  redirects = redirects || 0;
+  if (redirects > 5) return Promise.reject(new Error("Too many redirects"));
   return new Promise((resolve, reject) => {
-    const protocol = url.startsWith("https") ? https : http;
-    const file = fs.createWriteStream(outputPath);
-    protocol.get(url, (response) => {
-      response.pipe(file);
+    const file = fs.createWriteStream(dest);
+    https.get(url, (res) => {
+      if ([301, 302, 307].includes(res.statusCode)) {
+        file.close();
+        try { fs.unlinkSync(dest); } catch(e) {}
+        downloadFile(res.headers.location, dest, redirects + 1).then(resolve).catch(reject);
+        return;
+      }
+      if (res.statusCode !== 200) {
+        file.close();
+        reject(new Error(`HTTP ${res.statusCode}`));
+        return;
+      }
+      res.pipe(file);
       file.on("finish", () => { file.close(); resolve(); });
-    }).on("error", reject);
+    }).on("error", err => { try { fs.unlinkSync(dest); } catch(e) {} reject(err); });
   });
 }
 
-async function generateIdle(character) {
-  const photoPath = path.join(PHOTOS_DIR, character.photo);
-  const outputPath = path.join(OUTPUT_DIR, `${character.name}_idle.mp4`);
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-  console.log(`\n[${character.name}] Starting...`);
+async function generateIdle(char) {
+  const photoPath  = path.join(PHOTO_DIR, char.photo);
+  const outputPath = path.join(OUTPUT_DIR, char.output);
 
-  // Skip if already done
+  // Skip if already exists
   if (fs.existsSync(outputPath)) {
-    console.log(`[${character.name}] ✅ Already exists, skipping.`);
-    return;
+    console.log(`  ⏭️  Skipping ${char.name} — ${char.output} already exists`);
+    return true;
   }
 
-  const mimeType = character.photo.endsWith(".jpg") ? "image/jpeg" : "image/png";
+  if (!fs.existsSync(photoPath)) {
+    console.error(`  ❌ Photo not found: ${photoPath}`);
+    return false;
+  }
 
-  console.log(`[${character.name}] Uploading photo...`);
-  const imageUrl = await uploadFile(photoPath, mimeType);
+  const mimeType = char.photo.endsWith(".jpg") ? "image/jpeg" : "image/png";
+  const imageDataUrl = toDataUrl(photoPath, mimeType);
+  const audioDataUrl = toDataUrl(SILENT_AUDIO, "audio/wav");
 
-  console.log(`[${character.name}] Uploading silent audio...`);
-  const audioUrl = await uploadFile(SILENT_AUDIO, "audio/wav");
+  console.log(`  🚀 Submitting ${char.name}...`);
 
-  console.log(`[${character.name}] Submitting to Kling Avatar v2 Pro...`);
+  try {
+    const result = await fal.subscribe("fal-ai/kling-video/ai-avatar/v2/pro", {
+      input: {
+        image_url: imageDataUrl,
+        audio_url: audioDataUrl,
+        prompt: IDLE_PROMPT,
+        duration: "10",
+        aspect_ratio: "16:9",
+      },
+      logs: false,
+      onQueueUpdate: (update) => {
+        process.stdout.write(`\r  Status: ${update.status}${update.queue_position !== undefined ? ` (pos: ${update.queue_position})` : ''}    `);
+      },
+    });
 
-  const result = await fal.subscribe("fal-ai/kling-video/ai-avatar/v2/pro", {
-    input: {
-      image_url: imageUrl,
-      audio_url: audioUrl,
-      prompt: IDLE_PROMPT,
-    },
-    logs: false,
-    onQueueUpdate: (update) => {
-      process.stdout.write(`\r[${character.name}] Status: ${update.status}     `);
-    },
-  });
+    console.log(`\n  ✅ Generation complete`);
 
-  const videoUrl = result?.data?.video?.url || result?.video?.url;
-  if (videoUrl) {
-    console.log(`\n[${character.name}] Downloading...`);
+    const videoUrl = result?.data?.video?.url || result?.video?.url || result?.output?.video?.url;
+    if (!videoUrl) {
+      console.error(`  ❌ No video URL. Result: ${JSON.stringify(result).slice(0, 200)}`);
+      return false;
+    }
+
+    console.log(`  ⬇️  Downloading...`);
     await downloadFile(videoUrl, outputPath);
-    console.log(`[${character.name}] ✅ Saved: ${outputPath}`);
-  } else {
-    console.log(`\n[${character.name}] ⚠️ No video URL. Result: ${JSON.stringify(result)}`);
+    const size = (fs.statSync(outputPath).size / 1024 / 1024).toFixed(1);
+    console.log(`  ✅ Saved: ${char.output} (${size} MB)`);
+    return true;
+
+  } catch (err) {
+    console.error(`\n  ❌ Error for ${char.name}: ${err.message}`);
+    return false;
   }
 }
 
 async function main() {
-  console.log("=== Kling Idle Batch — All 9 Wave 2 Characters ===\n");
-  console.log(`Processing ${CHARACTERS.length} characters sequentially...\n`);
+  console.log("=== Eklipses — Batch Idle Generator ===");
+  console.log(`Endpoint: fal-ai/kling-video/ai-avatar/v2/pro`);
+  console.log(`Cost: ~$1.15 per video\n`);
 
-  const results = { success: [], failed: [] };
-
-  for (const character of CHARACTERS) {
-    try {
-      await generateIdle(character);
-      results.success.push(character.name);
-    } catch (err) {
-      console.error(`\n[${character.name}] ❌ Error: ${err.message}`);
-      results.failed.push(character.name);
-    }
+  if (!fs.existsSync(SILENT_AUDIO)) {
+    console.error(`❌ silent_10s.wav not found. Run: node make_silent_v2.js first`);
+    process.exit(1);
   }
 
-  console.log("\n=== BATCH COMPLETE ===");
-  console.log(`✅ Success: ${results.success.join(", ")}`);
-  if (results.failed.length > 0) {
-    console.log(`❌ Failed: ${results.failed.join(", ")}`);
+  fal.config({ credentials: FAL_API_KEY });
+
+  let passed = 0;
+  let failed = 0;
+  let skipped = 0;
+
+  for (const char of characters) {
+    console.log(`\n--- ${char.name.toUpperCase()} ---`);
+    const existed = fs.existsSync(path.join(OUTPUT_DIR, char.output));
+    const ok = await generateIdle(char);
+    if (existed) { skipped++; }
+    else if (ok) { passed++; }
+    else { failed++; }
+
+    // Wait between submissions to avoid rate limits
+    if (!existed) await sleep(3000);
+  }
+
+  console.log("\n=== Batch Complete ===");
+  console.log(`✅ Generated: ${passed}`);
+  console.log(`⏭️  Skipped:   ${skipped}`);
+  console.log(`❌ Failed:    ${failed}`);
+
+  if (passed > 0) {
+    console.log("\nUpload all to R2:");
+    for (const char of characters) {
+      console.log(`  wrangler r2 object put eklipses-videos/${char.name}_idle.mp4 --file="${path.join(OUTPUT_DIR, char.output)}" --remote`);
+    }
   }
 }
 
-main();
+main().catch(err => { console.error("Fatal:", err.message); process.exit(1); });
