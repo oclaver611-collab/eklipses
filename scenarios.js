@@ -478,36 +478,6 @@ window.SCENARIOS = {
       { speaker:"Ryan", text:"Notice something specific. Say it. See if she runs with it." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
-  },
-
-  park: {
-    title: "Park — Afternoon",
-    thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Sanna_thumb.jpg",
-    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/rooftop_bg.jpg",
-    coldOpen: true,
-    category: "dating",
-    difficulty: 2,
-    duration_min: 10,
-    demo: [
-      { speaker:"Ryan",   text:"Late afternoon. A quiet park." },
-      { speaker:"Ryan",   text:"She's on a bench with a notebook open. She designed this park two years ago — she knows every corner of it." },
-      { speaker:"Ryan",   text:"She comes here to think. She's not looking for company." },
-      { speaker:"Ryan",   text:"Watch how this goes." },
-      { speaker:"Daniel", text:"You look like you're checking something, not just sitting." },
-      { speaker:"Mary",   text:"I designed it. I come and see if people use it the way I imagined." },
-      { speaker:"Daniel", text:"Do they?" },
-      { speaker:"Mary",   text:"Mostly not. Which is fine. It means they found something I didn't plan." },
-      { speaker:"Daniel", text:"That's a generous way to look at it. I'm Daniel." },
-      { speaker:"Mary",   text:"Camille. It took me a while to get there." },
-      { speaker:"Ryan",   text:"See that? He asked a real follow-up instead of a compliment. Camille opens up when someone is genuinely curious about her work — not impressed by it. Curiosity beats flattery every time." }
-    ],
-    practice: [
-      { speaker:"Ryan", text:"Late afternoon. A quiet park." },
-      { speaker:"Ryan", text:"She's sitting on a bench with a notebook. She looks like she belongs here." },
-      { speaker:"Ryan", text:"She's warm underneath but careful. She doesn't give herself away easily." },
-      { speaker:"Ryan", text:"Be curious. Be real. Don't try to impress her." },
-      { speaker:"Ryan", text:"What do you do?" }
-    ]
   }
 
 };
