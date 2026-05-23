@@ -493,7 +493,7 @@ async function speakElevenLabs(text, onStart) {
   const res = await fetch('/api/tts', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, voice: 'nova' }),
+    body: JSON.stringify({ text, voice: 'nova', characterId: currentCharacterId }),
   });
   if (!res.ok) throw new Error('OpenAI TTS failed: ' + res.status);
 
