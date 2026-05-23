@@ -7,33 +7,26 @@ module.exports = async function handler(req, res) {
   if (!process.env.OPENAI_API_KEY) return res.status(500).json({ error: 'OPENAI_API_KEY not set' });
 
   // ── Per-character voice mapping ───────────────────────────────────────────
-  // All OpenAI voices — same price ($15/1M chars), zero extra cost.
-  // Grouped by personality energy:
-  //   nova    — warm, natural, approachable      (Sofia, Anna, Sarah, Eden)
-  //   shimmer — cooler, composed, precise        (Sanna, Isabelle, Leila, Maya)
-  //   fable   — expressive, quicker energy       (Ava, Elena, Erika)
-  //   echo    — direct, grounded, no-nonsense    (Zoe, Fatou)
-  //   alloy   — neutral, thoughtful, measured    (Nadia, Julia)
-  // onyx reserved for future male characters
+  // nova  — warm, natural, expressive  (most characters)
+  // alloy — cooler, composed, precise  (intellectual / guarded characters)
   const CHARACTER_VOICES = {
     sofia:       'nova',
     anna:        'nova',
     sarah:       'nova',
     eden:        'nova',
-    sanna:       'shimmer',
-    isabelle:    'shimmer',
-    leila:       'shimmer',
-    maya_office: 'shimmer',
-    ava:         'fable',
-    elena:       'fable',
-    erika:       'fable',
-    zoe:         'echo',
-    fatou:       'echo',
+    ava:         'nova',
+    elena:       'nova',
+    erika:       'nova',
+    fatou:       'nova',
+    zoe:         'nova',
+    sanna:       'alloy',
+    isabelle:    'alloy',
+    leila:       'alloy',
+    maya_office: 'alloy',
     nadia:       'alloy',
     julia:       'alloy',
   };
 
-  // Resolve voice: characterId lookup → explicit voice param → default nova
   const resolvedVoice = (characterId && CHARACTER_VOICES[characterId]) || voice || 'nova';
 
   try {
