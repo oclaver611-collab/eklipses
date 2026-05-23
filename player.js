@@ -21,6 +21,7 @@ const SCENARIO_CHARACTER_MAP = {
   supermarket:  'eden',
   office_lobby: 'maya_office',
   train:        'erika',
+  park:         'camille',
 };
 let currentScript = null;
 let isPractice = false;
@@ -278,6 +279,8 @@ const AVATAR_SETS = [
   { id:'eden',        label:'Eden',     thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Eden_thumb.jpg',     maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/eden_speaking.mp4',     maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/eden_idle.mp4',     danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/eden_idle.mp4',     vibe:'Warm & straight-talking',  scenario:'Supermarket' },
   { id:'maya_office', label:'Maya',     thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Maya_thumb.jpg',     maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/maya_speaking.mp4',     maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/maya_idle.mp4',     danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/maya_idle.mp4',     vibe:'Grounded & sharp',         scenario:'Office Lobby' },
   { id:'erika',       label:'Erika',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Erika_thumb.jpg',    maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/erika_speaking.mp4',    maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/erika_idle.mp4',    danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/erika_idle.mp4',    vibe:'Chaotic & fun',            scenario:'Train' },
+  // ── Photo mode test character — no video files needed, just a photo ──
+  { id:'camille',     label:'Camille',  thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Sanna_thumb.jpg',    photoSrc:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Sanna_thumb.jpg',                                                                                        vibe:'Sharp & composed',         scenario:'Park' },
 ];
 
 const AVATARS = {
@@ -289,15 +292,28 @@ const AVATARS = {
 
 function applyAvatarSet(set) {
   if (!set) return;
-  // Mary defaults to idle video — speaking video only loads during speech
+
+  // ── Photo mode: character has photoSrc but no maryVideo ──────────────────
+  AVATARS._photoMode = !!(set.photoSrc && !set.maryVideo);
+  AVATARS._photoSrc  = set.photoSrc || null;
+
+  if (AVATARS._photoMode) {
+    // Store nulls so speak() doesn't try to swap video files
+    AVATARS._marySpeakingVideo = null;
+    AVATARS._maryIdleVideo     = null;
+    // Mount the photo avatar — replaces the video element in the DOM
+    _mountPhotoAvatar(set.photoSrc);
+    return;
+  }
+
+  // ── Video mode (existing logic) ───────────────────────────────────────────
+  _unmountPhotoAvatar(); // remove photo element if previously in photo mode
   if (set.maryIdleVideo) AVATARS.Mary.src = set.maryIdleVideo;
   else if (set.maryVideo) AVATARS.Mary.src = set.maryVideo;
   if (set.danielVideo) { AVATARS.Daniel.src = set.danielVideo; AVATARS.User_Prompt.src = set.danielVideo; }
-  // Store speaking video separately for use during speech
   AVATARS._marySpeakingVideo = set.maryVideo || null;
   AVATARS._maryIdleVideo = set.maryIdleVideo || set.danielVideo || null;
 
-  // Preload speaking video in background to eliminate flicker on first speech
   if (set.maryVideo && set.maryVideo !== set.maryIdleVideo) {
     const preload = document.createElement('video');
     preload.src = set.maryVideo;
@@ -305,10 +321,114 @@ function applyAvatarSet(set) {
     preload.muted = true;
     preload.style.display = 'none';
     preload.load();
-    // Remove after preload to avoid memory leak
     preload.oncanplaythrough = () => { try { preload.remove(); } catch {} };
     document.body.appendChild(preload);
   }
+}
+
+// ── Photo avatar DOM helpers ──────────────────────────────────────────────────
+
+function _injectPhotoStyles() {
+  if (document.getElementById('ek-photo-styles')) return;
+  const s = document.createElement('style');
+  s.id = 'ek-photo-styles';
+  s.textContent = `
+    #ek-photo-wrap {
+      position:relative; width:100%; height:440px;
+      overflow:hidden; background:#0a0b0d;
+    }
+    #ek-photo-img {
+      width:100%; height:100%;
+      object-fit:cover; object-position:center top;
+      display:block; transform-origin:center center;
+      will-change:transform,filter;
+    }
+    @keyframes _ekBreathe {
+      0%,100% { transform:scale(1)     translateX(0px)    rotate(0deg);    filter:brightness(1); }
+      25%      { transform:scale(1.006) translateX(0.8px)  rotate(0.08deg); filter:brightness(1.01); }
+      50%      { transform:scale(1.009) translateX(1.2px)  rotate(0.12deg); filter:brightness(1.015); }
+      75%      { transform:scale(1.005) translateX(0.4px)  rotate(0.04deg); filter:brightness(1.005); }
+    }
+    @keyframes _ekSpeaking {
+      0%,100% { transform:scale(1.010) translateX(0px)    translateY(-1px); filter:brightness(1.02); }
+      30%      { transform:scale(1.015) translateX(0.6px)  translateY(-2px); filter:brightness(1.04); }
+      60%      { transform:scale(1.012) translateX(-0.4px) translateY(-1px); filter:brightness(1.03); }
+    }
+    @keyframes _ekThinking {
+      0%,100% { transform:scale(0.998) translateX(0px);  filter:brightness(0.97); }
+      50%      { transform:scale(0.996) translateX(-0.5px); filter:brightness(0.95); }
+    }
+    #ek-photo-img.pa-idle     { animation:_ekBreathe  4.5s ease-in-out infinite; }
+    #ek-photo-img.pa-speaking { animation:_ekSpeaking 1.8s ease-in-out infinite; }
+    #ek-photo-img.pa-thinking { animation:_ekThinking 2.2s ease-in-out infinite; }
+    #ek-photo-wrap::after {
+      content:''; position:absolute; inset:0; pointer-events:none; z-index:1;
+      background:radial-gradient(ellipse 90% 100% at 50% 60%, transparent 40%, rgba(0,0,0,0.45) 100%);
+    }
+    @keyframes _ekShimmer { 0%{background-position:100% 0} 100%{background-position:-100% 0} }
+    #ek-photo-shimmer {
+      position:absolute; bottom:0; left:0; right:0; height:3px; z-index:2;
+      pointer-events:none; opacity:0; transition:opacity 0.3s ease;
+      background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.15) 30%,rgba(255,255,255,0.35) 50%,rgba(255,255,255,0.15) 70%,transparent 100%);
+      background-size:200% 100%;
+    }
+    #ek-photo-shimmer.active { opacity:1; animation:_ekShimmer 1.4s linear infinite; }
+  `;
+  document.head.appendChild(s);
+}
+
+function _mountPhotoAvatar(photoSrc) {
+  _injectPhotoStyles();
+  // If already mounted with same src — just reset state
+  const existing = document.getElementById('ek-photo-wrap');
+  if (existing) {
+    const img = document.getElementById('ek-photo-img');
+    if (img) { img.src = photoSrc; _setPhotoState('idle'); }
+    return;
+  }
+  // Find the current media element and replace it
+  const current = document.getElementById('media') || document.querySelector('.media');
+  if (!current) return;
+  if (current.tagName === 'VIDEO') { try { current.pause(); current.src = ''; } catch {} }
+
+  const wrap = document.createElement('div');
+  wrap.id = 'ek-photo-wrap';
+  // Preserve id + class so the rest of player.js still finds it
+  wrap.className = current.className || '';
+
+  const img = document.createElement('img');
+  img.id = 'ek-photo-img';
+  img.src = photoSrc;
+  img.alt = '';
+  img.className = 'pa-idle';
+
+  const shimmer = document.createElement('div');
+  shimmer.id = 'ek-photo-shimmer';
+
+  wrap.appendChild(img);
+  wrap.appendChild(shimmer);
+  current.replaceWith(wrap);
+  els.media = wrap;
+}
+
+function _unmountPhotoAvatar() {
+  const wrap = document.getElementById('ek-photo-wrap');
+  if (!wrap) return;
+  const vid = document.createElement('video');
+  vid.id = 'media';
+  vid.className = wrap.className || 'media';
+  vid.autoplay = true; vid.loop = true; vid.muted = true; vid.playsInline = true;
+  vid.style.cssText = 'width:100%;height:440px;object-fit:cover;';
+  wrap.replaceWith(vid);
+  els.media = vid;
+}
+
+function _setPhotoState(state) {
+  const img = document.getElementById('ek-photo-img');
+  if (!img) return;
+  img.className = 'pa-' + state;
+  const shimmer = document.getElementById('ek-photo-shimmer');
+  if (shimmer) shimmer.classList.toggle('active', state === 'speaking');
 }
 
 /* ===== Stop everything ===== */
@@ -398,6 +518,12 @@ function setMediaForSpeaker(speaker) {
   }
 
   if (_ryanOrbAnimFrame) { cancelAnimationFrame(_ryanOrbAnimFrame); _ryanOrbAnimFrame=null; }
+
+  // ── Photo mode: skip all video src swaps, just drive animation state ──────
+  if (AVATARS._photoMode) {
+    if (speaker === 'Mary') _setPhotoState('idle');
+    return;
+  }
 
   if (current.tagName!=='VIDEO') {
     const vid=document.createElement('video');
@@ -572,12 +698,23 @@ async function speak(text, speaker) {
   const switchToSpeaking=()=>{
     if(mySession!==session) return;
     if (speaker === 'Mary') {
-      if (AVATARS._marySpeakingVideo) {
+      if (AVATARS._photoMode) {
+        // Photo mode: drive animation state, show text
+        _setPhotoState('speaking');
+        els.text.textContent = text;
+        Caption.show(text);
+      } else if (AVATARS._marySpeakingVideo) {
+        els.text.textContent = text;
+        Caption.show(text);
         const el=els.media;
         if(el&&el.tagName==='VIDEO'&&(el.getAttribute('src')||'')!==AVATARS._marySpeakingVideo){
           el.src=AVATARS._marySpeakingVideo; el.load(); try{el.play().catch(()=>{});}catch{}
         }
-      } else { setMediaForSpeaker('Mary'); }
+      } else {
+        els.text.textContent = text;
+        Caption.show(text);
+        setMediaForSpeaker('Mary');
+      }
     } else {
       const el=els.media; if(el&&el.tagName==='VIDEO'){try{el.play().catch(()=>{});}catch{}}
     }
@@ -586,11 +723,16 @@ async function speak(text, speaker) {
   const switchToIdle=()=>{
     const doneEl=els.media;
     if(doneEl&&doneEl.id==='ryan-orb') ryanOrbSetState('silent');
-    if (speaker === 'Mary' && doneEl && doneEl.tagName === 'VIDEO') {
-      try { doneEl.pause(); } catch {}
-      const idleSrc = AVATARS._maryIdleVideo || AVATARS.User_Prompt.src;
-      if(idleSrc && (doneEl.getAttribute('src')||'')!==idleSrc){
-        doneEl.src=idleSrc; doneEl.load(); try{doneEl.play().catch(()=>{});}catch{}
+    if (speaker === 'Mary') {
+      Caption.hide();
+      if (AVATARS._photoMode) {
+        _setPhotoState('idle');
+      } else if (doneEl && doneEl.tagName === 'VIDEO') {
+        try { doneEl.pause(); } catch {}
+        const idleSrc = AVATARS._maryIdleVideo || AVATARS.User_Prompt.src;
+        if(idleSrc && (doneEl.getAttribute('src')||'')!==idleSrc){
+          doneEl.src=idleSrc; doneEl.load(); try{doneEl.play().catch(()=>{});}catch{}
+        }
       }
     }
   };
@@ -636,7 +778,9 @@ function resetConversation() { conversationHistory=[]; }
 
 async function getCharacterResponse(userSaid) {
   const sc=SCENARIOS[currentScenarioKey]||{};
-  els.name.textContent=currentCharacterId.charAt(0).toUpperCase()+currentCharacterId.slice(1); els.text.textContent='...';
+  els.name.textContent=currentCharacterId.charAt(0).toUpperCase()+currentCharacterId.slice(1);
+  els.text.textContent='...';
+  if (AVATARS._photoMode) _setPhotoState('thinking');
   const controller=new AbortController();
   const timeout=setTimeout(()=>controller.abort(),8000);
   try {
@@ -1040,6 +1184,14 @@ async function freeConversation(mySession) {
             "Take your time.",
             "Still working up to it?",
           ],
+          park: [
+            "You walked over here.",
+            "The bench isn't going anywhere.",
+            "Most people just keep walking.",
+            "You look like you had something to say.",
+            "Take your time.",
+            "Still working up to it?",
+          ],
         };
         const rescues = rescuesByScenario[currentScenarioKey] || rescuesByScenario.beach;
         if (!freeConvRescueUsed) freeConvRescueUsed = new Set();
@@ -1073,6 +1225,7 @@ async function freeConversation(mySession) {
             supermarket: ["Still there?", "You went quiet.", "Was there something else?"],
             office_lobby:["Still there?", "You went quiet.", "Was there something else?"],
             train:       ["Still there?", "You went quiet.", "Was there something else?", "Few more stops."],
+            park:        ["Still there?", "You went quiet.", "Was there something else?"],
           };
           const pool = impatience[currentScenarioKey] || impatience.beach;
           const line = pool[Math.floor(Math.random() * pool.length)];
