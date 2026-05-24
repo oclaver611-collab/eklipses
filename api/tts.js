@@ -1,6 +1,12 @@
-// api/tts.js — OpenAI TTS with streaming + per-character voice mapping
+// api/tts.js — OpenAI TTS with streaming + per-character voice mapping + rate limiting
+const { checkRateLimit } = require('./ratelimit');
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  // ── Rate limiting (IP-based, dev bypass via x-dev-key header) ──
+  const rl = checkRateLimit(req, res);
+  if (!rl.allowed) return;
 
   const { text, voice = 'nova', characterId } = req.body || {};
   if (!text?.trim()) return res.status(400).json({ error: 'No text provided' });

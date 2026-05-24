@@ -2,10 +2,16 @@
 // Architecture: CHARACTERS (who she is) + SETTINGS (where she is) + BASE_RULES
 // Any character can appear in any setting. Add new characters and settings independently.
 
+const { checkRateLimit } = require('./ratelimit');
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  // ── Rate limiting (IP-based, dev bypass via x-dev-key header) ──
+  const rl = checkRateLimit(req, res);
+  if (!rl.allowed) return;
 
   const {
     userMessage,

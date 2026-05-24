@@ -187,6 +187,186 @@ const Progress = (() => {
   return { recordSession, refreshStatBar, getHistoryHTML, getStreak, getBest, getTotal };
 })();
 
+/* ===== Daily Session Limit ===== */
+// Three-layer gate: localStorage + FingerprintJS + server-side IP (in api/character.js + api/tts.js)
+// Dev bypass: visit ?dev=YOUR_SECRET once — sets a 1-year cookie, unlimited on that device forever
+// Reset dev cookie: visit ?resetdev=true
+
+const DailyLimit = (() => {
+  const LIMIT = 3;
+  const KEY = 'ek-daily-v1';
+  const DEV_COOKIE = 'ek_dev_bypass';
+  const DEV_KEY_STORAGE = 'ek-dev-key';
+
+  // ── Cookie helpers ──────────────────────────────────────────────────────
+  function setCookie(name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
+    document.cookie = name + '=' + value + ';expires=' + d.toUTCString() + ';path=/;SameSite=Strict';
+  }
+  function getCookie(name) {
+    const v = document.cookie.match('(^|;)\s*' + name + '\s*=\s*([^;]+)');
+    return v ? v.pop() : null;
+  }
+  function deleteCookie(name) {
+    document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/';
+  }
+
+  // ── Handle ?dev=SECRET and ?resetdev=true in URL ────────────────────────
+  function handleURLParams() {
+    const params = new URLSearchParams(window.location.search);
+    const devKey = params.get('dev');
+    const reset = params.get('resetdev');
+
+    if (reset === 'true') {
+      deleteCookie(DEV_COOKIE);
+      localStorage.removeItem(DEV_KEY_STORAGE);
+      console.log('[DailyLimit] Dev bypass cleared.');
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+      return;
+    }
+
+    if (devKey) {
+      // Store in cookie (1 year) and localStorage for API header
+      setCookie(DEV_COOKIE, devKey, 365);
+      localStorage.setItem(DEV_KEY_STORAGE, devKey);
+      console.log('[DailyLimit] Dev bypass activated on this device.');
+      // Clean URL so secret doesn't stay visible
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }
+
+  // ── Check if dev bypass is active on this device ────────────────────────
+  function isDevBypass() {
+    return !!(getCookie(DEV_COOKIE) || localStorage.getItem(DEV_KEY_STORAGE));
+  }
+
+  // ── Get dev key for API header ───────────────────────────────────────────
+  function getDevKey() {
+    return getCookie(DEV_COOKIE) || localStorage.getItem(DEV_KEY_STORAGE) || null;
+  }
+
+  // ── localStorage session counter ─────────────────────────────────────────
+  function getTodayKey() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function getLocalCount() {
+    try {
+      const d = JSON.parse(localStorage.getItem(KEY)) || {};
+      return d.date === getTodayKey() ? (d.count || 0) : 0;
+    } catch { return 0; }
+  }
+
+  function incrementLocal() {
+    try {
+      const count = getLocalCount() + 1;
+      localStorage.setItem(KEY, JSON.stringify({ date: getTodayKey(), count }));
+      return count;
+    } catch { return 1; }
+  }
+
+  // ── FingerprintJS check (async, best-effort) ─────────────────────────────
+  async function getFingerprintCount() {
+    try {
+      if (typeof FingerprintJS === 'undefined') return 0;
+      const fp = await FingerprintJS.load();
+      const result = await fp.get();
+      const fpKey = 'ek-fp-' + getTodayKey() + '-' + result.visitorId;
+      const count = parseInt(localStorage.getItem(fpKey) || '0', 10);
+      localStorage.setItem(fpKey, String(count + 1));
+      return count;
+    } catch { return 0; }
+  }
+
+  // ── Show paywall overlay ──────────────────────────────────────────────────
+  function showPaywall() {
+    const existing = document.getElementById('ek-paywall');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'ek-paywall';
+    overlay.style.cssText = [
+      'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99999',
+      'display:flex;flex-direction:column;align-items:center;justify-content:center',
+      'font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:24px;text-align:center'
+    ].join(';');
+
+    overlay.innerHTML = `
+      <div style="font-size:40px;margin-bottom:16px">⏱️</div>
+      <div style="color:#fff;font-size:22px;font-weight:800;margin-bottom:10px">
+        You've used your 3 free sessions today
+      </div>
+      <div style="color:#9aa4b2;font-size:15px;max-width:340px;margin-bottom:28px;line-height:1.5">
+        Come back tomorrow for 3 more — or go unlimited with Eklipses Pro.
+      </div>
+      <div style="background:#ffb300;color:#000;font-size:15px;font-weight:800;
+                  padding:14px 32px;border-radius:999px;cursor:pointer;margin-bottom:12px"
+           onclick="document.getElementById('ek-paywall').remove()">
+        Upgrade to Pro — $19.99/month
+      </div>
+      <div style="color:#666;font-size:13px;cursor:pointer"
+           onclick="document.getElementById('ek-paywall').remove()">
+        Come back tomorrow
+      </div>
+    `;
+    document.body.appendChild(overlay);
+  }
+
+  // ── Main check — call before starting a practice session ─────────────────
+  async function canPlay() {
+    handleURLParams(); // process ?dev= and ?resetdev= on every check
+
+    if (isDevBypass()) return true;
+
+    // Layer 1: localStorage
+    const localCount = getLocalCount();
+    if (localCount >= LIMIT) {
+      showPaywall();
+      return false;
+    }
+
+    // Layer 2: FingerprintJS (async, non-blocking — if it fails we still proceed)
+    const fpCount = await getFingerprintCount();
+    if (fpCount >= LIMIT) {
+      showPaywall();
+      return false;
+    }
+
+    // Passed — increment and allow
+    incrementLocal();
+    return true;
+  }
+
+  // ── Inject dev key into all API fetch calls via monkey-patch ─────────────
+  // This adds x-dev-key header to /api/character and /api/tts automatically
+  function patchFetch() {
+    const _originalFetch = window.fetch;
+    window.fetch = function(url, options = {}) {
+      if (typeof url === 'string' && (url.includes('/api/character') || url.includes('/api/tts'))) {
+        const devKey = getDevKey();
+        if (devKey) {
+          options.headers = options.headers || {};
+          if (options.headers instanceof Headers) {
+            options.headers.set('x-dev-key', devKey);
+          } else {
+            options.headers['x-dev-key'] = devKey;
+          }
+        }
+      }
+      return _originalFetch.call(this, url, options);
+    };
+  }
+
+  return { canPlay, isDevBypass, patchFetch, handleURLParams };
+})();
+
+// Patch fetch immediately so dev key is always sent
+DailyLimit.patchFetch();
+// Handle URL params on load
+DailyLimit.handleURLParams();
+
 /* ===== Caption Overlay ===== */
 // When Sofia speaks: play speaking video + show caption bar over her mouth
 // When user speaks: play idle video + hide caption bar
@@ -493,7 +673,7 @@ async function speakElevenLabs(text, onStart) {
   const res = await fetch('/api/tts', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, voice: 'nova', characterId: currentCharacterId }),
+    body: JSON.stringify({ text, voice: 'nova' }),
   });
   if (!res.ok) throw new Error('OpenAI TTS failed: ' + res.status);
 
@@ -785,6 +965,12 @@ function warmupCharacterApi(key) {
 
 /* ===== Scenario engine ===== */
 async function playScenario(key, practice=false) {
+  // ── Daily session gate (practice only — demos always free) ────────────────
+  if (practice) {
+    const allowed = await DailyLimit.canPlay();
+    if (!allowed) return; // paywall shown by canPlay()
+  }
+
   stopEverything();
   resetConversation();
   firstUserOpener=null;
