@@ -402,7 +402,6 @@ const Caption = (() => {
       'font-weight:500',
       'line-height:1.5',
       'letter-spacing:0.01em',
-      'min-height:200px',
       'display:flex',
       'align-items:center',
       'justify-content:center',
@@ -662,7 +661,7 @@ function renderLine(line) {
   if (line.speaker==='User_Prompt') {
     els.text.innerHTML = `<div class="practice-prompt"><strong>READ THIS OUT LOUD:</strong><br><br>"${line.text.replace('Say: ','').replace(/'/g,'')}"</div><div class="user-response-area">🎤 Speak when ready…</div>`;
   } else {
-    els.text.textContent = '...'; // text shown in switchToSpeaking when audio fires
+    els.text.textContent = line.text;
   }
 }
 
@@ -751,8 +750,6 @@ async function speak(text, speaker) {
 
   const switchToSpeaking=()=>{
     if(mySession!==session) return;
-    // Show text exactly when audio starts — not before
-    els.text.textContent = text;
     if (speaker === 'Mary') {
       if (AVATARS._marySpeakingVideo) {
         const el=els.media;
