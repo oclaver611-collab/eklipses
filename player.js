@@ -662,9 +662,7 @@ function renderLine(line) {
   if (line.speaker==='User_Prompt') {
     els.text.innerHTML = `<div class="practice-prompt"><strong>READ THIS OUT LOUD:</strong><br><br>"${line.text.replace('Say: ','').replace(/'/g,'')}"</div><div class="user-response-area">🎤 Speak when ready…</div>`;
   } else {
-    // Text is set in speak() when audio actually starts — not here
-    // This avoids text appearing 1-2s before the voice is heard
-    els.text.textContent = '...';
+    els.text.textContent = line.text;
   }
 }
 
@@ -754,9 +752,6 @@ async function speak(text, speaker) {
   const switchToSpeaking=()=>{
     if(mySession!==session) return;
     if (speaker === 'Mary') {
-      // Show text exactly when audio starts — never before
-      els.text.textContent = text;
-      if (typeof Caption !== 'undefined') Caption.show(text);
       if (AVATARS._marySpeakingVideo) {
         const el=els.media;
         if(el&&el.tagName==='VIDEO'&&(el.getAttribute('src')||'')!==AVATARS._marySpeakingVideo){
@@ -764,8 +759,6 @@ async function speak(text, speaker) {
         }
       } else { setMediaForSpeaker('Mary'); }
     } else {
-      // For Ryan: show text when audio fires too
-      els.text.textContent = text;
       const el=els.media; if(el&&el.tagName==='VIDEO'){try{el.play().catch(()=>{});}catch{}}
     }
   };
@@ -773,14 +766,11 @@ async function speak(text, speaker) {
   const switchToIdle=()=>{
     const doneEl=els.media;
     if(doneEl&&doneEl.id==='ryan-orb') ryanOrbSetState('silent');
-    if (speaker === 'Mary') {
-      if (typeof Caption !== 'undefined') Caption.hide();
-      if (doneEl && doneEl.tagName === 'VIDEO') {
-        try { doneEl.pause(); } catch {}
-        const idleSrc = AVATARS._maryIdleVideo || AVATARS.User_Prompt.src;
-        if(idleSrc && (doneEl.getAttribute('src')||'')!==idleSrc){
-          doneEl.src=idleSrc; doneEl.load(); try{doneEl.play().catch(()=>{});}catch{}
-        }
+    if (speaker === 'Mary' && doneEl && doneEl.tagName === 'VIDEO') {
+      try { doneEl.pause(); } catch {}
+      const idleSrc = AVATARS._maryIdleVideo || AVATARS.User_Prompt.src;
+      if(idleSrc && (doneEl.getAttribute('src')||'')!==idleSrc){
+        doneEl.src=idleSrc; doneEl.load(); try{doneEl.play().catch(()=>{});}catch{}
       }
     }
   };
