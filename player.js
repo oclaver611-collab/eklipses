@@ -402,7 +402,6 @@ const Caption = (() => {
       'font-weight:500',
       'line-height:1.5',
       'letter-spacing:0.01em',
-      'min-height:200px',
       'display:flex',
       'align-items:center',
       'justify-content:center',
