@@ -1377,6 +1377,73 @@ async function runCoachFeedback(mySession) {
   }
 }
 
+/* ===== EkComments — per-scenario community comments ===== */
+const EkComments = (() => {
+
+  function renderList(comments, containerId) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    if (!comments || comments.length === 0) {
+      el.innerHTML = '<div style="color:#555;font-size:13px;text-align:center;padding:8px 0">No comments yet — be the first.</div>';
+      return;
+    }
+    el.innerHTML = comments.slice().reverse().map(c => {
+      const ts = new Date(c.ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const scoreTag = c.score ? `<span style="background:#1a2a1a;color:#40c770;font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;margin-left:6px">${c.score}/10</span>` : '';
+      return `
+        <div style="background:#161820;border:1px solid #2b2e36;border-radius:10px;padding:12px">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+            <span style="font-size:13px;font-weight:700;color:#cfd6e4">${c.name || 'Anonymous'}</span>
+            ${scoreTag}
+            <span style="margin-left:auto;font-size:11px;color:#555">${ts}</span>
+          </div>
+          <div style="font-size:13px;color:#9aa4b2;line-height:1.6">${c.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+        </div>`;
+    }).join('');
+  }
+
+  async function load(scenarioKey) {
+    try {
+      const res = await fetch('/api/comments?scenario=' + scenarioKey);
+      if (!res.ok) throw new Error('fetch failed');
+      const data = await res.json();
+      renderList(data.comments || [], 'ek-comments-list');
+    } catch {
+      const el = document.getElementById('ek-comments-list');
+      if (el) el.innerHTML = '<div style="color:#555;font-size:13px;text-align:center">Comments unavailable.</div>';
+    }
+  }
+
+  async function submit(scenarioKey, score) {
+    const nameEl = document.getElementById('ek-comment-name');
+    const inputEl = document.getElementById('ek-comment-input');
+    if (!inputEl) return;
+    const text = inputEl.value.trim();
+    if (!text) { inputEl.style.border = '1px solid #ff6b6b'; setTimeout(() => inputEl.style.border = '1px solid #2b2e36', 1500); return; }
+    const name = nameEl ? nameEl.value.trim() : '';
+    const listEl = document.getElementById('ek-comments-list');
+    const tempEl = document.createElement('div');
+    tempEl.style.cssText = 'background:#161820;border:1px solid #2b2e36;border-radius:10px;padding:12px;opacity:0.6';
+    tempEl.innerHTML = `<div style="font-size:13px;color:#9aa4b2">${text.replace(/</g,'&lt;')}</div>`;
+    if (listEl) listEl.prepend(tempEl);
+    inputEl.value = '';
+    if (nameEl) nameEl.value = '';
+    try {
+      await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scenarioKey, text, name, score }),
+      });
+      await load(scenarioKey);
+    } catch {
+      if (tempEl) tempEl.style.opacity = '1';
+    }
+  }
+
+  return { load, submit };
+})();
+window.EkComments = EkComments;
+
 function showFeedbackCard(f) {
   if (window.hideFullscreenBtn) window.hideFullscreenBtn();
   // Fallback for missing card fields — GPT sometimes omits them on short conversations
@@ -1465,18 +1532,17 @@ function showFeedbackCard(f) {
           Next Scenario
         </button>
       </div>
-      <!-- ── Comment section ── -->
       <div id="ek-comments-section" style="margin-top:20px;border-top:1px solid #2b2e36;padding-top:16px">
         <div style="font-size:13px;font-weight:700;color:#9aa4b2;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">💬 Community — ${SCENARIOS[currentScenarioKey]?.title || 'This scenario'}</div>
         <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
           <input id="ek-comment-name" type="text" maxlength="30" placeholder="Your name (optional)" style="background:#161820;border:1px solid #2b2e36;border-radius:8px;padding:8px 12px;color:#e9ecf1;font-size:13px;outline:none" />
           <textarea id="ek-comment-input" maxlength="500" rows="3" placeholder="Share your experience — what worked, what didn't, what surprised you..." style="background:#161820;border:1px solid #2b2e36;border-radius:8px;padding:10px 12px;color:#e9ecf1;font-size:13px;resize:none;outline:none;font-family:inherit"></textarea>
-          <button id="ek-post-btn" data-scenario="${currentScenarioKey}" data-score="${f.score}" onclick="EkComments.submit(this.dataset.scenario, parseInt(this.dataset.score)||0)" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:9px 24px;font-size:13px;font-weight:800;cursor:pointer;align-self:flex-end">Post comment</button>
+          <button id="ek-post-btn" data-scenario="${currentScenarioKey}" data-score="${f.score}" onclick="window.EkComments.submit(this.dataset.scenario, parseInt(this.dataset.score)||0)" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:9px 24px;font-size:13px;font-weight:800;cursor:pointer;align-self:flex-end">Post comment</button>
         </div>
         <div id="ek-comments-list" style="display:flex;flex-direction:column;gap:10px"><div style="color:#666;font-size:13px;text-align:center">Loading comments…</div></div>
       </div>
     </div>`;
-  setTimeout(() => EkComments.load('${currentScenarioKey}'), 100);
+  setTimeout(() => window.EkComments.load('${currentScenarioKey}'), 100);
 }
 
 /* ===== After demo ===== */
