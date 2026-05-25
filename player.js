@@ -402,6 +402,7 @@ const Caption = (() => {
       'font-weight:500',
       'line-height:1.5',
       'letter-spacing:0.01em',
+      'min-height:200px',
       'display:flex',
       'align-items:center',
       'justify-content:center',
@@ -1464,7 +1465,18 @@ function showFeedbackCard(f) {
           Next Scenario
         </button>
       </div>
+      <!-- ── Comment section ── -->
+      <div id="ek-comments-section" style="margin-top:20px;border-top:1px solid #2b2e36;padding-top:16px">
+        <div style="font-size:13px;font-weight:700;color:#9aa4b2;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">💬 Community — ${SCENARIOS[currentScenarioKey]?.title || 'This scenario'}</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+          <input id="ek-comment-name" type="text" maxlength="30" placeholder="Your name (optional)" style="background:#161820;border:1px solid #2b2e36;border-radius:8px;padding:8px 12px;color:#e9ecf1;font-size:13px;outline:none" />
+          <textarea id="ek-comment-input" maxlength="500" rows="3" placeholder="Share your experience — what worked, what didn't, what surprised you..." style="background:#161820;border:1px solid #2b2e36;border-radius:8px;padding:10px 12px;color:#e9ecf1;font-size:13px;resize:none;outline:none;font-family:inherit"></textarea>
+          <button onclick="EkComments.submit('${currentScenarioKey}', ${f.score})" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:9px 24px;font-size:13px;font-weight:800;cursor:pointer;align-self:flex-end">Post comment</button>
+        </div>
+        <div id="ek-comments-list" style="display:flex;flex-direction:column;gap:10px"><div style="color:#666;font-size:13px;text-align:center">Loading comments…</div></div>
+      </div>
     </div>`;
+  setTimeout(() => EkComments.load('${currentScenarioKey}'), 100);
 }
 
 /* ===== After demo ===== */
