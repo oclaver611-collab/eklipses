@@ -1471,7 +1471,7 @@ function showFeedbackCard(f) {
         <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
           <input id="ek-comment-name" type="text" maxlength="30" placeholder="Your name (optional)" style="background:#161820;border:1px solid #2b2e36;border-radius:8px;padding:8px 12px;color:#e9ecf1;font-size:13px;outline:none" />
           <textarea id="ek-comment-input" maxlength="500" rows="3" placeholder="Share your experience — what worked, what didn't, what surprised you..." style="background:#161820;border:1px solid #2b2e36;border-radius:8px;padding:10px 12px;color:#e9ecf1;font-size:13px;resize:none;outline:none;font-family:inherit"></textarea>
-          <button onclick="EkComments.submit('${currentScenarioKey}', ${f.score})" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:9px 24px;font-size:13px;font-weight:800;cursor:pointer;align-self:flex-end">Post comment</button>
+          <button id="ek-post-btn" data-scenario="${currentScenarioKey}" data-score="${f.score}" onclick="EkComments.submit(this.dataset.scenario, parseInt(this.dataset.score)||0)" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:9px 24px;font-size:13px;font-weight:800;cursor:pointer;align-self:flex-end">Post comment</button>
         </div>
         <div id="ek-comments-list" style="display:flex;flex-direction:column;gap:10px"><div style="color:#666;font-size:13px;text-align:center">Loading comments…</div></div>
       </div>
