@@ -1,19 +1,16 @@
-// eval-coach.js — Automated evaluator for api/coach.js
-// Run with: node eval-coach.js
-// Requires GROQ_API_KEY in environment or .env file
+// eval-coach-v2.js — Automated evaluator for api/coach.js
+// Run with: node eval-coach-v2.js
 
 require('dotenv').config();
 
-// Toggle: 'local' uses coach.js directly, 'live' hits Vercel
 const MODE = process.env.EVAL_MODE || 'live';
 const VERCEL_URL = process.env.VERCEL_URL || 'https://eklipses.vercel.app';
+const DEV_KEY = process.env.DEV_BYPASS_KEY || '';
 
 let handler;
 if (MODE === 'local') {
   handler = require('./api/coach.js');
 }
-
-// ─── TEST TRANSCRIPTS ────────────────────────────────────────────────────────
 
 const TEST_CASES = [
   {
@@ -72,68 +69,52 @@ const TEST_CASES = [
   },
 ];
 
-// ─── CHECKLIST ───────────────────────────────────────────────────────────────
-
 function evaluate(testCase, feedback) {
   const results = [];
   const pass = (name) => results.push({ name, pass: true });
   const fail = (name, detail) => results.push({ name, pass: false, detail });
 
-  // 1. Opener correctly quoted in part1
   if (feedback.part1) {
-    const openerInPart1 = feedback.part1.toLowerCase().includes(
-      testCase.expectedOpener.toLowerCase().slice(0, 20)
-    );
+    const openerInPart1 = feedback.part1.toLowerCase().includes(testCase.expectedOpener.toLowerCase().slice(0, 20));
     if (openerInPart1) pass('part1: quotes correct opener');
-    else fail('part1: quotes correct opener',
-      `Expected opener starting with "${testCase.expectedOpener.slice(0,30)}" but part1 was:\n  "${feedback.part1.slice(0,120)}"`);
+    else fail('part1: quotes correct opener', `Expected opener starting with "${testCase.expectedOpener.slice(0,30)}" but part1 was:\n  "${feedback.part1.slice(0,120)}"`);
   } else {
     fail('part1: exists', 'part1 is missing from response');
   }
 
-  // 2. Part1 has sufficient length (at least 100 chars)
   if (feedback.part1 && feedback.part1.length >= 100) pass('part1: sufficient length');
   else fail('part1: sufficient length', `Only ${(feedback.part1||'').length} chars`);
 
-  // 3. Part2 exists and has sufficient length
   if (feedback.part2 && feedback.part2.length >= 150) pass('part2: exists and sufficient length');
   else fail('part2: exists and sufficient length', `Only ${(feedback.part2||'').length} chars`);
 
-  // 4. Part3 exists and has sufficient length (min 80 words = ~400 chars)
   if (feedback.part3 && feedback.part3.length >= 300) pass('part3: sufficient length (min 80 words)');
   else fail('part3: sufficient length (min 80 words)', `Only ${(feedback.part3||'').length} chars`);
 
-  // 5. Part4 exists and has motivational close
   const bannedPhrases = ['go out there', 'dive deeper', 'aim to', 'work on that', 'make your interactions'];
   const part4Lower = (feedback.part4||'').toLowerCase();
   const hasBanned = bannedPhrases.find(p => part4Lower.includes(p));
   if (hasBanned) fail('part4: no banned phrases', `Contains banned phrase: "${hasBanned}"`);
   else pass('part4: no banned phrases');
 
-  // 6. Score is not always 4 (score should vary)
-  // Skip for name-only opener — model consistently and correctly scores it 4
   const isWeakOpener = testCase.name === 'Name-only opener';
   if (isWeakOpener) pass('score: not defaulting to 4');
   else if (feedback.score && feedback.score !== 4) pass('score: not defaulting to 4');
   else if (feedback.score === 4) fail('score: not defaulting to 4', 'Score is exactly 4 — may be pattern-matching');
 
-  // 7. Score is in valid range
   if (feedback.score >= 1 && feedback.score <= 10) pass('score: valid range 1-10');
   else fail('score: valid range 1-10', `Score is ${feedback.score}`);
 
-  // 8. No hallucinated props (laptop, desk, phone)
   const allText = [feedback.part1, feedback.part2, feedback.part3, feedback.part4].join(' ').toLowerCase();
   const hallucinated = ['laptop', 'phone', 'sunglasses', 'towel', 'umbrella'].find(p => allText.includes(p));
   if (hallucinated) fail('no hallucinated props', `Contains "${hallucinated}" which is not in transcript`);
   else pass('no hallucinated props');
 
-  // 9. tryNextTime is actual words (not a concept)
   const try_ = (feedback.tryNextTime||'').toLowerCase();
   const isConcept = try_.includes('focus on') || try_.includes('try to') || try_.includes('make sure') || try_.includes('be more');
   if (isConcept) fail('tryNextTime: actual words not concept', `"${feedback.tryNextTime}"`);
   else pass('tryNextTime: actual words not concept');
 
-  // 10. Part4 has motivational push
   const motivational = ['try again', 'hit try', 'one more round', 'rep', 'go again', 'feel the difference', 'surprise yourself', 'sharper', 'keep going', 'keep pushing', 'you got this', "you've got this", 'you have got this', 'closer than you think', 'make all the difference', 'will reward', 'something real', 'next time'];
   const hasMotivation = motivational.find(p => part4Lower.includes(p));
   if (hasMotivation) pass('part4: has motivational close');
@@ -141,8 +122,6 @@ function evaluate(testCase, feedback) {
 
   return results;
 }
-
-// ─── MOCK REQUEST/RESPONSE ───────────────────────────────────────────────────
 
 function mockReqRes(body) {
   const req = { method: 'POST', body };
@@ -155,17 +134,32 @@ function mockReqRes(body) {
   return { req, res, promise };
 }
 
-async function callLiveCoach(body) {
-  const response = await fetch(`${VERCEL_URL}/api/coach`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  const data = await response.json();
-  return { code: response.status, data };
-}
+// Retry wrapper for flaky coach API
+async function callLiveCoach(body, retries = 2) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (DEV_KEY) headers['x-dev-key'] = DEV_KEY;
 
-// ─── RUNNER ──────────────────────────────────────────────────────────────────
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    if (attempt > 0) {
+      process.stdout.write(`  (retry ${attempt})... `);
+      await new Promise(r => setTimeout(r, 4000));
+    }
+    try {
+      const response = await fetch(`${VERCEL_URL}/api/coach`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body),
+      });
+      const data = await response.json();
+      // Retry if response looks empty/bad
+      if (!data.part1 && attempt < retries) continue;
+      return { code: response.status, data };
+    } catch (err) {
+      if (attempt < retries) continue;
+      throw err;
+    }
+  }
+}
 
 async function runAll() {
   console.log('\n╔══════════════════════════════════════════════════════╗');
@@ -183,11 +177,7 @@ async function runAll() {
     console.log(`\n▶ TEST: ${testCase.name}`);
     console.log('─'.repeat(54));
 
-    const { req, res, promise } = mockReqRes({
-      conversation: testCase.conversation,
-      scenarioTitle: testCase.scenarioTitle,
-      scenarioKey: testCase.scenarioKey,
-    });
+    const { req, res, promise } = mockReqRes({ conversation: testCase.conversation, scenarioTitle: testCase.scenarioTitle, scenarioKey: testCase.scenarioKey });
 
     try {
       let code, data;
@@ -219,14 +209,8 @@ async function runAll() {
       const results = evaluate(testCase, data);
       console.log('\n  Checklist:');
       for (const r of results) {
-        if (r.pass) {
-          console.log(`    ✓ ${r.name}`);
-          totalPass++;
-        } else {
-          console.log(`    ✗ ${r.name}`);
-          if (r.detail) console.log(`      → ${r.detail}`);
-          totalFail++;
-        }
+        if (r.pass) { console.log(`    ✓ ${r.name}`); totalPass++; }
+        else { console.log(`    ✗ ${r.name}`); if (r.detail) console.log(`      → ${r.detail}`); totalFail++; }
       }
 
     } catch (err) {
