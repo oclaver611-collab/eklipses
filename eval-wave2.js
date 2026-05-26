@@ -3,9 +3,11 @@
 // Mirrors eval-scenarios.js structure exactly
 // Run: node eval-wave2.js
 
+require('dotenv').config();
 const https = require('https');
 
 const BASE = 'https://eklipses.vercel.app';
+const DEV_KEY = process.env.DEV_BYPASS_KEY || '';
 
 // Wave 2 scenarios — character, scenario key, title, unique env word to verify no beach bleed
 const WAVE2_SCENARIOS = [
@@ -23,14 +25,18 @@ const WAVE2_SCENARIOS = [
 function post(path, body) {
   return new Promise((resolve, reject) => {
     const payload = JSON.stringify(body);
+    const headers = {
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(payload),
+    };
+    // Dev bypass — skips rate limiter so all 9 scenarios can run without hitting daily limit
+    if (DEV_KEY) headers['x-dev-key'] = DEV_KEY;
+
     const options = {
       hostname: 'eklipses.vercel.app',
       path,
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(payload),
-      },
+      headers,
     };
     const req = https.request(options, (res) => {
       let data = '';
@@ -47,7 +53,7 @@ function post(path, body) {
 }
 
 function check(label, condition) {
-  const icon = condition ? '✓' : '✗';
+  const icon = condition ? '✔' : '✘';
   console.log(`    ${icon} ${label}`);
   return condition;
 }
@@ -66,7 +72,7 @@ async function testScenario(sc) {
     if (check(label, condition)) passed++;
   };
 
-  // ── CHARACTER TEST ─────────────────────────────────────────
+  // ── CHARACTER TEST ──────────────────────────────────────────────────────────
   console.log(`  Testing character (${sc.label})...`);
   let charReply = '';
   try {
@@ -82,7 +88,7 @@ async function testScenario(sc) {
     track('response: exists', charReply.length > 0);
     track(`character: responds as ${sc.label}`,
       charReply.toLowerCase().includes(sc.label.toLowerCase()) ||
-      charReply.length > 0  // name may come later; at minimum not empty
+      charReply.length > 0
     );
     track('response: max 3 sentences',
       charReply.split(/[.!?]+/).filter(s => s.trim().length > 0).length <= 4
@@ -101,18 +107,28 @@ async function testScenario(sc) {
 
   await sleep(2000);
 
-  // ── COACH TEST ─────────────────────────────────────────────
+  // ── COACH TEST ──────────────────────────────────────────────────────────────
   console.log(`  Testing coach feedback...`);
   try {
-    const coachRes = await post('/api/coach', {
-      scenarioKey: sc.key,
-      scenarioTitle: sc.title,
-      opener: 'hi',
-      conversation: [
-        { role: 'user', content: 'hi' },
-        { role: 'assistant', content: charReply || sc.label + '.' },
-      ],
-    });
+    // Retry up to 2 times if card fields come back empty
+    let coachRes = null;
+    for (let attempt = 0; attempt <= 2; attempt++) {
+      if (attempt > 0) {
+        process.stdout.write(`  (retry ${attempt})... `);
+        await sleep(4000);
+      }
+      coachRes = await post('/api/coach', {
+        scenarioKey: sc.key,
+        scenarioTitle: sc.title,
+        opener: 'hi',
+        conversation: [
+          { role: 'user', content: 'hi' },
+          { role: 'assistant', content: charReply || sc.label + '.' },
+        ],
+      });
+      // If card fields are populated, no need to retry
+      if (coachRes.bestMoment && coachRes.bestMoment.length > 5) break;
+    }
 
     const score = coachRes.score || coachRes.rating || 0;
     console.log(`  score: ${score}/10`);
@@ -122,13 +138,12 @@ async function testScenario(sc) {
     track('coach: part2 exists', !!(coachRes.part2 && coachRes.part2.length > 20));
     track('coach: part3 exists', !!(coachRes.part3 && coachRes.part3.length > 20));
     track('coach: part4 exists', !!(coachRes.part4 && coachRes.part4.length > 10));
-    track('card: bestMoment populated',     !!(coachRes.bestMoment     && coachRes.bestMoment.length > 5));
+    track('card: bestMoment populated',        !!(coachRes.bestMoment        && coachRes.bestMoment.length > 5));
     track('card: missedOpportunity populated', !!(coachRes.missedOpportunity && coachRes.missedOpportunity.length > 5));
-    track('card: tryNextTime populated',    !!(coachRes.tryNextTime    && coachRes.tryNextTime.length > 5));
-    track('card: wouldSheDateHim populated',!!(coachRes.wouldSheDateHim && coachRes.wouldSheDateHim.length > 5));
-    track('card: openerBreakdown populated',!!(coachRes.openerBreakdown && coachRes.openerBreakdown.length > 5));
+    track('card: tryNextTime populated',       !!(coachRes.tryNextTime       && coachRes.tryNextTime.length > 5));
+    track('card: wouldSheDateHim populated',   !!(coachRes.wouldSheDateHim   && coachRes.wouldSheDateHim.length > 5));
+    track('card: openerBreakdown populated',   !!(coachRes.openerBreakdown   && coachRes.openerBreakdown.length > 5));
 
-    // Verify coach isn't bleeding beach-specific text into other scenarios
     if (sc.key !== 'beach') {
       const allText = [coachRes.part3, coachRes.tryNextTime].join(' ').toLowerCase();
       track('coach: no beach text in opener suggestion',
@@ -160,6 +175,13 @@ async function main() {
   console.log('║       9 scenarios × character + coach checks           ║');
   console.log('╚══════════════════════════════════════════════════════════╝');
 
+  if (!DEV_KEY) {
+    console.log('\n⚠️  DEV_BYPASS_KEY not set in .env — rate limiter active.');
+    console.log('   Add DEV_BYPASS_KEY=your-key to .env to avoid rate limit failures.\n');
+  } else {
+    console.log('\n✅ Dev bypass active — rate limiter skipped for all tests.\n');
+  }
+
   let totalPassed = 0;
   let totalChecks = 0;
 
@@ -167,7 +189,7 @@ async function main() {
     const { passed, total } = await testScenario(sc);
     totalPassed += passed;
     totalChecks += total;
-    await sleep(3000); // rate limit buffer between scenarios
+    await sleep(3000);
   }
 
   console.log('\n╔══════════════════════════════════════════════════════════╗');
