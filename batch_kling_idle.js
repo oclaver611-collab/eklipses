@@ -1,6 +1,6 @@
 // batch_kling_idle.js
-// Generates idle videos for all characters using fal.ai Kling Avatar v2 Pro
-// Correct endpoint: fal-ai/kling-video/ai-avatar/v2/pro
+// Generates idle videos for all characters using fal.ai Kling Avatar v2 Standard
+// Endpoint: fal-ai/kling-video/ai-avatar/v2/standard (~$0.56/video vs $1.15 for Pro)
 // Correct result path: result.data.video.url
 // Run: node batch_kling_idle.js
 
@@ -66,7 +66,7 @@ async function generateIdle(char) {
 
   // Skip if already exists
   if (fs.existsSync(outputPath)) {
-    console.log(`  ⏭️  Skipping ${char.name} — ${char.output} already exists`);
+    console.log(`  ✅  Skipping ${char.name} — ${char.output} already exists`);
     return true;
   }
 
@@ -82,7 +82,8 @@ async function generateIdle(char) {
   console.log(`  🚀 Submitting ${char.name}...`);
 
   try {
-    const result = await fal.subscribe("fal-ai/kling-video/ai-avatar/v2/pro", {
+    // CHANGED: using v2/standard instead of v2/pro — saves ~49% per video (~$0.56 vs $1.15)
+    const result = await fal.subscribe("fal-ai/kling-video/ai-avatar/v2/standard", {
       input: {
         image_url: imageDataUrl,
         audio_url: audioDataUrl,
@@ -96,7 +97,7 @@ async function generateIdle(char) {
       },
     });
 
-    console.log(`\n  ✅ Generation complete`);
+    console.log(`\n  ✓ Generation complete`);
 
     const videoUrl = result?.data?.video?.url || result?.video?.url || result?.output?.video?.url;
     if (!videoUrl) {
@@ -107,7 +108,7 @@ async function generateIdle(char) {
     console.log(`  ⬇️  Downloading...`);
     await downloadFile(videoUrl, outputPath);
     const size = (fs.statSync(outputPath).size / 1024 / 1024).toFixed(1);
-    console.log(`  ✅ Saved: ${char.output} (${size} MB)`);
+    console.log(`  ✓ Saved: ${char.output} (${size} MB)`);
     return true;
 
   } catch (err) {
@@ -118,8 +119,8 @@ async function generateIdle(char) {
 
 async function main() {
   console.log("=== Eklipses — Batch Idle Generator ===");
-  console.log(`Endpoint: fal-ai/kling-video/ai-avatar/v2/pro`);
-  console.log(`Cost: ~$1.15 per video\n`);
+  console.log(`Endpoint: fal-ai/kling-video/ai-avatar/v2/standard`);
+  console.log(`Cost: ~$0.56 per video (was $1.15 with Pro — 49% cheaper)\n`);
 
   if (!fs.existsSync(SILENT_AUDIO)) {
     console.error(`❌ silent_10s.wav not found. Run: node make_silent_v2.js first`);
@@ -145,8 +146,8 @@ async function main() {
   }
 
   console.log("\n=== Batch Complete ===");
-  console.log(`✅ Generated: ${passed}`);
-  console.log(`⏭️  Skipped:   ${skipped}`);
+  console.log(`✓ Generated: ${passed}`);
+  console.log(`✅  Skipped:   ${skipped}`);
   console.log(`❌ Failed:    ${failed}`);
 
   if (passed > 0) {

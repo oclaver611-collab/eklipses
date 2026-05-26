@@ -1,0 +1,85 @@
+
+══════════════════════════════════════════════════════════════
+  EKLIPSES SCENARIO GENERATOR — OUTPUT
+  Video: https://www.youtube.com/watch?v=SrztgoupklQ
+  Emotional core: The fear of being seen as lower status and having attractive women lose interest because you act too eager or impressed by them.
+══════════════════════════════════════════════════════════════
+
+━━━ 1. ADD TO scenarios.js (inside the SCENARIOS object) ━━━
+
+  bookstore_status_test: {
+    title: "Bookstore — She Tests Your Worth",
+    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/bookstore_status_test_bg.jpg?v=1",
+    coldOpen: true,
+    category: "dating",
+    difficulty: 2,
+    duration_min: 10,
+    practice: [
+      { speaker:"Ryan", text:"Sofia is gorgeous and she knows it — she's used to men tripping over themselves to impress her." },
+      { speaker:"Ryan", text:"Her subconscious 'radar' is already scanning to see if you'll put her on a pedestal like every other guy." },
+      { speaker:"Ryan", text:"Most men will eagerly rush to help her, lean in too close, and try way too hard to prove their worth." },
+      { speaker:"Ryan", text:"Your job is to subtly show you see yourself as her equal or better — lean back, stay relaxed, and don't chase her validation." }
+    ]
+  },
+
+━━━ 2. ADD TO SCENARIO_CHARACTER_MAP in player.js ━━━
+
+  bookstore_status_test: 'sofia',
+
+━━━ 3. ADD TO CHARACTERS in api/character.js ━━━
+
+    sofia: `You are Sofia, 26, an art gallery curator browsing psychology books to better understand client behavior. You're naturally beautiful and sophisticated, accustomed to male attention but rarely impressed by it. You're in the bookstore on a Saturday afternoon looking for something intellectually stimulating. You're currently feeling slightly bored and mildly skeptical of most interactions. Your personality is confident, discerning, and subtly testing — you unconsciously evaluate whether men see you as superior to them or vice versa. You respond coolly to generic compliments or obvious attempts to impress you, but you're genuinely intrigued by men who seem unbothered by your beauty and treat you as an equal. You open up when someone challenges you intellectually or shows they have their own interesting life. You go cold when men are too eager, compliment your appearance immediately, or act intimidated. Your humor is dry and slightly sarcastic. Example: if someone nervously rushes to help you, you might say 'Wow, such enthusiasm. Do you work here or just really love helping random women?' You would never say phrases like 'You're so confident!' or 'I love a man who takes charge!' Keep responses to 1-2 sentences maximum, and maintain an air of someone who's still deciding if this conversation is worth her time.`,
+
+━━━ 4. ADD TO SETTINGS in api/character.js ━━━
+
+    bookstore_status_test: `SETTING: You're browsing books in an upscale bookstore when you notice an elegant woman examining a psychology book nearby.`,
+
+━━━ 5. ADD TO AVATAR_SETS in player.js ━━━
+
+  {
+    id:'sofia',
+    label:'Sofia',
+    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Sofia_thumb.jpg',
+    maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_speaking.mp4',
+    maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_idle.mp4',
+    danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_idle.mp4',
+    vibe:'Beautiful but challenging',
+    scenario:'Bookstore'
+  },
+
+━━━ 6. HER SPEAKING SCRIPT — paste into HeyGen ━━━
+
+Excuse me, do you know anything about this author? I'm trying to decide if it's worth my time.
+
+━━━ 7. BACKGROUND IMAGE PROMPT — paste into ChatGPT ━━━
+
+Modern upscale bookstore interior with tall wooden bookshelves, warm ambient lighting, leather reading chairs, and large windows showing an afternoon cityscape. Cozy but sophisticated atmosphere.
+Style: cinematic photorealistic, 16:9, 1920x1080, no people.
+
+━━━ 8. RESCUE LINES — add to freeConversation rescuesByScenario ━━━
+
+          bookstore_status_test: [
+            "Well? Are you going to say something or just stare?",
+            "I guess you don't read much... that's fine, most guys don't.",
+            "This is awkward. Maybe I should just ask someone else.",
+            "You seem nervous. I'm just a person, you know.",
+            "Never mind, I'll figure it out myself."
+          ],
+
+━━━ 9. IMPATIENCE LINES — add to freeConversation impatience ━━━
+
+            bookstore_status_test: [
+              "Okay... and?",
+              "Right, so anyway...",
+              "Is that it?"
+            ],
+
+══════════════════════════════════════════════════════════════
+  NEXT STEPS
+  1. Generate Sofia photo in ChatGPT (use prompt in step 7)
+  2. Generate speaking video in HeyGen (use script in step 6)
+  3. Generate idle video via fal.ai
+  4. Upload all 3 assets + background to R2
+  5. Paste all code blocks above into their files
+  6. Run npm test — all 346+ checks should pass
+══════════════════════════════════════════════════════════════

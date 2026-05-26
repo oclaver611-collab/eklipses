@@ -1,0 +1,85 @@
+
+══════════════════════════════════════════════════════════════
+  EKLIPSES SCENARIO GENERATOR — OUTPUT
+  Video: https://www.youtube.com/watch?v=https://www.youtube.com/watch?v=F-wZLl-LSMA
+  Emotional core: Men fear showing contrasting sides of themselves, staying one-dimensional and predictable instead of creating the mystery that makes women think about them constantly.
+══════════════════════════════════════════════════════════════
+
+━━━ 1. ADD TO scenarios.js (inside the SCENARIOS object) ━━━
+
+  bookstore_contrasting_personality: {
+    title: "Bookstore — She Craves Depth",
+    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/bookstore_contrasting_personality_bg.jpg?v=1",
+    coldOpen: true,
+    category: "dating",
+    difficulty: 2,
+    duration_min: 10,
+    practice: [
+      { speaker:"Ryan", text:"Maya is the kind of woman who thinks deeply about everything and craves men who surprise her with contrasting layers." },
+      { speaker:"Ryan", text:"She's testing whether you're just another predictable guy or someone with genuine depth and mystery." },
+      { speaker:"Ryan", text:"Most men will either try too hard to impress her intellectually or stay boringly consistent throughout the conversation." },
+      { speaker:"Ryan", text:"Show her one side of your personality strongly, then surprise her with something completely different about yourself." }
+    ]
+  },
+
+━━━ 2. ADD TO SCENARIO_CHARACTER_MAP in player.js ━━━
+
+  bookstore_contrasting_personality: 'maya',
+
+━━━ 3. ADD TO CHARACTERS in api/character.js ━━━
+
+    maya: `You are Maya, 26, a psychology graduate student who works part-time at an art gallery. You're in this bookstore today browsing philosophy and fiction, seeking intellectual stimulation on a boring Saturday. You're naturally introspective and overthink everything - when someone says something intriguing, you'll analyze it for hours later. You're attracted to men who show contrasting personalities - someone who seems intellectual but then reveals a wild side, or appears serious but shows unexpected humor. You get bored quickly with one-dimensional guys who try to maintain a single persona. You respond coldly to generic compliments or obvious lines, but you light up when someone shows genuine contradictions in their personality. Your humor is dry and observational. You speak in 1-2 sentences maximum, often with subtle tests or probing questions. When genuinely interested, you might say something like 'Wait, so you read Nietzsche but you also... skateboard? That doesn't make sense, tell me more.' You go cold when men are too consistent or predictable. You would never say 'That's so cool!' or 'You're so funny!' - you're more subtle and thoughtful in your reactions.`,
+
+━━━ 4. ADD TO SETTINGS in api/character.js ━━━
+
+    bookstore_contrasting_personality: `SETTING: A quiet independent bookstore on a rainy Saturday afternoon, where intellectual conversations flow as naturally as the coffee.`,
+
+━━━ 5. ADD TO AVATAR_SETS in player.js ━━━
+
+  {
+    id:'maya',
+    label:'Maya',
+    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Maya_thumb.jpg',
+    maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/maya_speaking.mp4',
+    maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/maya_idle.mp4',
+    danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/maya_idle.mp4',
+    vibe:'Thoughtful but easily bored',
+    scenario:'Bookstore'
+  },
+
+━━━ 6. HER SPEAKING SCRIPT — paste into HeyGen ━━━
+
+You seem like the type who has strong opinions about books... am I right?
+
+━━━ 7. BACKGROUND IMAGE PROMPT — paste into ChatGPT ━━━
+
+Cozy independent bookstore interior with tall wooden shelves filled with books, warm ambient lighting from vintage lamps, comfortable reading chairs scattered around, large rain-streaked windows showing the grey afternoon outside, steaming coffee cups on small tables.
+Style: cinematic photorealistic, 16:9, 1920x1080, no people.
+
+━━━ 8. RESCUE LINES — add to freeConversation rescuesByScenario ━━━
+
+          bookstore_contrasting_personality: [
+            "Not much of a talker, huh? That's... interesting.",
+            "I'm starting to think you're more mysterious than you let on.",
+            "The strong silent type, or just thinking of what to say?",
+            "You know, some of the best conversations start with awkward silences.",
+            "Well, this is either going to be fascinating or I'm grabbing my book and leaving."
+          ],
+
+━━━ 9. IMPATIENCE LINES — add to freeConversation impatience ━━━
+
+            bookstore_contrasting_personality: [
+              "I was expecting more depth from you...",
+              "You're being pretty predictable right now.",
+              "This conversation needs some spark."
+            ],
+
+══════════════════════════════════════════════════════════════
+  NEXT STEPS
+  1. Generate Maya photo in ChatGPT (use prompt in step 7)
+  2. Generate speaking video in HeyGen (use script in step 6)
+  3. Generate idle video via fal.ai
+  4. Upload all 3 assets + background to R2
+  5. Paste all code blocks above into their files
+  6. Run npm test — all 346+ checks should pass
+══════════════════════════════════════════════════════════════
