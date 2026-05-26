@@ -369,13 +369,19 @@ function patchScenariosJs(content, scenario) {
     seedLikes: ${Math.floor(Math.random() * 80) + 20},
   },`;
 
-  // Insert before closing }; of window.SCENARIOS
-  const target = `\n};\n`;
   if (content.includes(`  ${scenarioKey}:`)) {
     console.log(`  ⚠️  ${scenarioKey} already in scenarios.js — skipping`);
     return content;
   }
-  return content.replace(target, newScenario + `\n};\n`);
+
+  // Handle both Windows (CRLF) and Unix (LF) line endings
+  // Find the last }; in the file and insert before it
+  const lastBrace = content.lastIndexOf('};');
+  if (lastBrace === -1) {
+    console.error('  ❌ Could not find closing }; in scenarios.js');
+    return content;
+  }
+  return content.slice(0, lastBrace) + newScenario + '\n};\n';
 }
 
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
@@ -466,10 +472,23 @@ async function main() {
   console.log(`\n📦 Committing and pushing...`);
   try {
     const borrowNote = borrowId ? ` (test: borrowed ${borrowId} avatar)` : '';
-    execSync(`git add -A && git commit -m "feat: add ${scenario.scenarioKey} scenario — ${scenario.charName}${borrowNote}" && git push`, { stdio: 'inherit' });
-    console.log(`✅ Pushed to Vercel!`);
+    execSync(`git add -A && git commit -m "feat: add ${scenario.scenarioKey} scenario — ${scenario.charName}${borrowNote}" && git push origin HEAD`, { stdio: 'inherit' });
+    console.log(`✅ Pushed to GitHub!`);
   } catch (e) {
     console.error(`⚠️  Git push failed: ${e.message}`);
+  }
+
+  // Trigger Vercel deploy hook
+  const deployHook = process.env.VERCEL_DEPLOY_HOOK;
+  if (deployHook) {
+    try {
+      execSync(`curl -s -X POST "${deployHook}"`, { stdio: 'pipe' });
+      console.log(`✅ Vercel deployment triggered!`);
+    } catch (e) {
+      console.error(`⚠️  Deploy hook failed: ${e.message}`);
+    }
+  } else {
+    console.log(`⚠️  VERCEL_DEPLOY_HOOK not set in .env — trigger manually`);
   }
 
   // 9. Summary

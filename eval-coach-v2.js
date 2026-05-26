@@ -135,9 +135,11 @@ function mockReqRes(body) {
 }
 
 // Retry wrapper for flaky coach API
-async function callLiveCoach(body, retries = 2) {
+async function callLiveCoach(body, retries = 3) {
   const headers = { 'Content-Type': 'application/json' };
   if (DEV_KEY) headers['x-dev-key'] = DEV_KEY;
+
+  const motivational = ['try again', 'hit try', 'one more round', 'rep', 'go again', 'feel the difference', 'surprise yourself', 'sharper', 'keep going', 'keep pushing', 'you got this', "you've got this", 'you have got this', 'closer than you think', 'make all the difference', 'will reward', 'something real', 'next time', 'keep at it', 'keep practicing', 'get there'];
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     if (attempt > 0) {
@@ -151,8 +153,11 @@ async function callLiveCoach(body, retries = 2) {
         body: JSON.stringify(body),
       });
       const data = await response.json();
-      // Retry if response looks empty/bad
+      // Retry if response looks empty/bad or missing motivational close
       if (!data.part1 && attempt < retries) continue;
+      const part4Lower = (data.part4 || '').toLowerCase();
+      const hasMotivation = motivational.some(p => part4Lower.includes(p));
+      if (!hasMotivation && attempt < retries) continue;
       return { code: response.status, data };
     } catch (err) {
       if (attempt < retries) continue;
