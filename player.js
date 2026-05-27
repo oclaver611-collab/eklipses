@@ -344,7 +344,10 @@ const DailyLimit = (() => {
   function patchFetch() {
     const _originalFetch = window.fetch;
     window.fetch = function(url, options = {}) {
-      if (typeof url === 'string' && (url.includes('/api/character') || url.includes('/api/tts'))) {
+      if (typeof url === 'string' && (
+        url.includes('/api/character') ||   // covers /api/character AND /api/character-stream
+        url.includes('/api/tts')
+      )) {
         const devKey = getDevKey();
         if (devKey) {
           options.headers = options.headers || {};
@@ -814,32 +817,173 @@ let conversationHistory=[];
 let firstUserOpener=null;
 function resetConversation() { conversationHistory=[]; }
 
-async function getCharacterResponse(userSaid) {
-  const sc=SCENARIOS[currentScenarioKey]||{};
-  els.name.textContent=currentCharacterId.charAt(0).toUpperCase()+currentCharacterId.slice(1); els.text.textContent='...';
-  const controller=new AbortController();
-  const timeout=setTimeout(()=>controller.abort(),8000);
+async function streamCharacterAndSpeak(userSaid, mySession) {
+  // Show thinking state immediately
+  els.name.textContent = currentCharacterId.charAt(0).toUpperCase() + currentCharacterId.slice(1);
+  els.text.textContent = '...';
+
+  // Switch to idle video while we wait for first audio
+  setMediaForSpeaker('User_Prompt');
+
+  let fullText = '';
+  const sentenceQueue = [];
+  let isPlayingAudio = false;
+  let streamDone = false;
+  let resolveStream;
+  const streamPromise = new Promise(r => { resolveStream = r; });
+
+  // Audio queue processor — plays sentences back-to-back
+  async function processQueue() {
+    if (isPlayingAudio) return;
+    isPlayingAudio = true;
+
+    while (true) {
+      if (mySession !== session) break;
+
+      if (sentenceQueue.length === 0) {
+        if (streamDone) break;
+        await pause(20);
+        continue;
+      }
+
+      const sentence = sentenceQueue.shift();
+      els.text.textContent = sentence;
+
+      try {
+        await speakElevenLabs(sentence, () => {
+          if (mySession !== session) return;
+          if (AVATARS._marySpeakingVideo) {
+            const el = els.media;
+            if (el && el.tagName === 'VIDEO' && (el.getAttribute('src') || '') !== AVATARS._marySpeakingVideo) {
+              el.src = AVATARS._marySpeakingVideo;
+              el.load();
+              try { el.play().catch(() => {}); } catch {}
+            }
+          } else {
+            setMediaForSpeaker('Mary');
+          }
+        });
+      } catch (e) {
+        if (e.message !== 'session_changed') console.warn('TTS error:', e.message);
+      }
+
+      if (mySession !== session) break;
+    }
+
+    // Switch back to idle after all audio done
+    if (mySession === session) {
+      const doneEl = els.media;
+      if (doneEl && doneEl.tagName === 'VIDEO') {
+        const idleSrc = AVATARS._maryIdleVideo || AVATARS.User_Prompt.src;
+        if (idleSrc && (doneEl.getAttribute('src') || '') !== idleSrc) {
+          doneEl.src = idleSrc;
+          doneEl.load();
+          try { doneEl.play().catch(() => {}); } catch {}
+        }
+      }
+    }
+
+    isPlayingAudio = false;
+    resolveStream();
+  }
+
+  // SSE stream reader
   try {
-    const res=await fetch('/api/character',{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        userMessage:userSaid,
-        scenarioKey:currentScenarioKey,
-        characterId:currentCharacterId,
-        history:conversationHistory,
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+
+    const res = await fetch('/api/character-stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userMessage: userSaid,
+        scenarioKey: currentScenarioKey,
+        characterId: currentCharacterId,
+        history: conversationHistory,
       }),
-      signal:controller.signal,
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      return await getCharacterResponseFallback(userSaid);
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    // Start queue processor immediately
+    processQueue();
+
+    while (true) {
+      if (mySession !== session) { reader.cancel(); break; }
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const payload = JSON.parse(line.slice(6));
+          if (payload.error) { console.warn('Stream error:', payload.error); break; }
+          if (payload.sentence) sentenceQueue.push(payload.sentence);
+          if (payload.done) { fullText = payload.full || fullText; streamDone = true; }
+        } catch {}
+      }
+    }
+
+    streamDone = true;
+
+  } catch (err) {
+    streamDone = true;
+    if (err.name !== 'AbortError') console.warn('Stream fetch error:', err.message);
+    if (!fullText && sentenceQueue.length === 0) {
+      return await getCharacterResponseFallback(userSaid);
+    }
+  }
+
+  await streamPromise;
+
+  if (fullText && mySession === session) {
+    if (!firstUserOpener) firstUserOpener = userSaid;
+    conversationHistory.push({ role: 'user', content: userSaid });
+    conversationHistory.push({ role: 'assistant', content: fullText });
+    if (conversationHistory.length > 12) conversationHistory = conversationHistory.slice(-12);
+  }
+
+  return fullText || null;
+}
+
+async function getCharacterResponseFallback(userSaid) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  try {
+    const res = await fetch('/api/character', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userMessage: userSaid,
+        scenarioKey: currentScenarioKey,
+        characterId: currentCharacterId,
+        history: conversationHistory,
+      }),
+      signal: controller.signal,
     });
     clearTimeout(timeout);
-    if(!res.ok) return null;
-    const data=await res.json();
-    const maryText=data.response;
-    if(!firstUserOpener) firstUserOpener=userSaid;
-    conversationHistory.push({role:'user',content:userSaid});
-    conversationHistory.push({role:'assistant',content:maryText});
-    if(conversationHistory.length>12) conversationHistory=conversationHistory.slice(-12);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const maryText = data.response;
+    if (!firstUserOpener) firstUserOpener = userSaid;
+    conversationHistory.push({ role: 'user', content: userSaid });
+    conversationHistory.push({ role: 'assistant', content: maryText });
+    if (conversationHistory.length > 12) conversationHistory = conversationHistory.slice(-12);
     return maryText;
-  } catch(err) {
+  } catch (err) {
     clearTimeout(timeout);
     return null;
   }
@@ -1003,229 +1147,118 @@ async function playScenario(key, practice=false) {
 }
 
 async function playLoop(mySession) {
-  while (stepIndex<currentScript.length) {
-    if(mySession!==session) return;
-    const line=currentScript[stepIndex];
+  while (stepIndex < currentScript.length) {
+    if (mySession !== session) return;
+    const line = currentScript[stepIndex];
     renderLine(line);
 
-    if (line.speaker==='User_Prompt') {
-      const said=await listenForUser(mySession, 60000);
-      if(mySession!==session) return;
+    if (line.speaker === 'User_Prompt') {
+      const said = await listenForUser(mySession, 60000);
+      if (mySession !== session) return;
 
       if (said && isPractice) {
-        const reply=await getCharacterResponse(said);
-        if(mySession!==session) return;
-        if(reply) {
-          if(stepIndex+1<currentScript.length && currentScript[stepIndex+1].speaker==='Mary') stepIndex++;
-          await speak(reply,'Mary');
-          setMediaForSpeaker('User_Prompt');
-          let look=stepIndex+1;
-          while(look<currentScript.length && currentScript[look].speaker==='Ryan') look++;
-          if(look<currentScript.length && currentScript[look].speaker==='User_Prompt') stepIndex=look-1;
-        } else {
-          await speak(randomChoice(['Sorry, say that again?','Hmm, what was that?','Say that again?']),'Mary');
-          setMediaForSpeaker('User_Prompt');
+        if (stepIndex + 1 < currentScript.length && currentScript[stepIndex + 1].speaker === 'Mary') stepIndex++;
+        const reply = await streamCharacterAndSpeak(said, mySession);
+        if (mySession !== session) return;
+        if (!reply) {
+          await speak(randomChoice(['Sorry, say that again?', 'Hmm, what was that?', 'Say that again?']), 'Mary');
         }
+        setMediaForSpeaker('User_Prompt');
+        let look = stepIndex + 1;
+        while (look < currentScript.length && currentScript[look].speaker === 'Ryan') look++;
+        if (look < currentScript.length && currentScript[look].speaker === 'User_Prompt') stepIndex = look - 1;
       } else if (!said) {
-        await speak("No worries, let's keep going.",'Ryan');
+        await speak("No worries, let's keep going.", 'Ryan');
       }
-      stepIndex++; continue;
+      stepIndex++;
+      continue;
     }
 
     await speak(line.text, line.speaker);
-    if(mySession!==session) return;
+    if (mySession !== session) return;
     await pause(250);
     stepIndex++;
   }
 
-  if(!isPractice) renderAskToPractice(mySession);
+  if (!isPractice) renderAskToPractice(mySession);
   else await freeConversation(mySession);
-  // Note: coldOpen scenarios always have isPractice=true so they always go to freeConversation
 }
 
 /* ===== Free Conversation ===== */
 async function freeConversation(mySession) {
   let freeConvRescueUsed = null;
-  let firstExchangeDone = false; // rescue lines only fire before first real exchange
-  let silenceCount = 0; // track consecutive silence timeouts mid-conversation
-  if(mySession!==session) return;
-  const sc=SCENARIOS[currentScenarioKey]||{};
-  const FREE_MS=3*60*1000, NUDGE_MS=2*60*1000;
-  const start=Date.now();
-  let nudged=false;
-  // Reset conversation history here so coach only sees the free conversation
-  // not the scripted demo/practice exchanges that happened before
+  let firstExchangeDone = false;
+  let silenceCount = 0;
+  if (mySession !== session) return;
+  const sc = SCENARIOS[currentScenarioKey] || {};
+  const FREE_MS = 3 * 60 * 1000, NUDGE_MS = 2 * 60 * 1000;
+  const start = Date.now();
+  let nudged = false;
   resetConversation();
 
   if (!sc.coldOpen) {
-    await speak("Great work! Now let's have a real conversation -- no script, just talk to her naturally for ten minutes. I'll give you feedback at the end.",'Ryan');
-    if(mySession!==session) return;
+    await speak("Great work! Now let's have a real conversation -- no script, just talk to her naturally for ten minutes. I'll give you feedback at the end.", 'Ryan');
+    if (mySession !== session) return;
     await pause(900);
   }
 
-  const timerEl=document.createElement('div');
-  timerEl.id='free-timer';
-  timerEl.style.cssText='position:fixed;top:70px;right:20px;background:#1a1c22;border:1px solid #2b2e36;border-radius:999px;padding:6px 16px;font-size:13px;font-weight:700;color:#ffb300;z-index:9999';
+  const timerEl = document.createElement('div');
+  timerEl.id = 'free-timer';
+  timerEl.style.cssText = 'position:fixed;top:70px;right:20px;background:#1a1c22;border:1px solid #2b2e36;border-radius:999px;padding:6px 16px;font-size:13px;font-weight:700;color:#ffb300;z-index:9999';
   document.body.appendChild(timerEl);
-  const timerInterval=setInterval(()=>{
-    if(mySession!==session){clearInterval(timerInterval);timerEl.remove();return;}
-    const rem=Math.max(0,FREE_MS-(Date.now()-start));
-    timerEl.textContent=Math.floor(rem/60000)+':'+String(Math.floor((rem%60000)/1000)).padStart(2,'0')+' left';
-    if(rem<=0) clearInterval(timerInterval);
-  },1000);
+  const timerInterval = setInterval(() => {
+    if (mySession !== session) { clearInterval(timerInterval); timerEl.remove(); return; }
+    const rem = Math.max(0, FREE_MS - (Date.now() - start));
+    timerEl.textContent = Math.floor(rem / 60000) + ':' + String(Math.floor((rem % 60000) / 1000)).padStart(2, '0') + ' left';
+    if (rem <= 0) clearInterval(timerInterval);
+  }, 1000);
 
   setMediaForSpeaker('Mary');
-  els.name.textContent=currentCharacterId.charAt(0).toUpperCase()+currentCharacterId.slice(1);
-  els.text.textContent='...';
-  // Street scenario needs extra warm-up time — Ryan intro is short and speech API isn't ready
+  els.name.textContent = currentCharacterId.charAt(0).toUpperCase() + currentCharacterId.slice(1);
+  els.text.textContent = '...';
   const warmupMs = currentScenarioKey === 'street' ? 2500 : 1200;
-  await pause(warmupMs); // let any prior audio clear before first listen
+  await pause(warmupMs);
 
-  while(mySession===session) {
-    const elapsed=Date.now()-start;
-    if(elapsed>=FREE_MS) { await speak("That's time. Let me put together your feedback.",'Ryan'); break; }
-
-    if(!nudged&&elapsed>=NUDGE_MS) {
-      nudged=true;
-      await speak("Two minutes left -- make it count.",'Ryan');
-      if(mySession!==session) break;
-      await pause(900);
-      setMediaForSpeaker('Mary');
-      els.name.textContent=currentCharacterId.charAt(0).toUpperCase()+currentCharacterId.slice(1);
+  while (mySession === session) {
+    const elapsed = Date.now() - start;
+    if (elapsed >= FREE_MS) {
+      await speak("That's time. Let me put together your feedback.", 'Ryan');
+      break;
     }
 
-    const remMs=Math.min(30000, FREE_MS-(Date.now()-start));
-    if(remMs<2000) break;
+    if (!nudged && elapsed >= NUDGE_MS) {
+      nudged = true;
+      await speak("Two minutes left -- make it count.", 'Ryan');
+      if (mySession !== session) break;
+      await pause(900);
+      setMediaForSpeaker('Mary');
+      els.name.textContent = currentCharacterId.charAt(0).toUpperCase() + currentCharacterId.slice(1);
+    }
 
-    const said=await listenForUser(mySession, remMs);
-    if(mySession!==session) break;
+    const remMs = Math.min(30000, FREE_MS - (Date.now() - start));
+    if (remMs < 2000) break;
+
+    const said = await listenForUser(mySession, remMs);
+    if (mySession !== session) break;
 
     if (!said) {
       if (sc.coldOpen && !firstExchangeDone) {
-        // Rescue lines only fire before first real exchange — not mid-conversation
         const rescuesByScenario = {
-          beach: [
-            "You walked all the way over here. Might as well say something.",
-            "I don't bite. Usually.",
-            "The waves aren't that interesting, I promise.",
-            "Most people just walk past. You didn't.",
-            "You can sit if you want. I don't mind.",
-            "The quiet is better when someone breaks it well.",
-            "I saw you walk by earlier.",
-            "You look like you had something to say.",
-            "Take your time.",
-            "Still working up to it?",
-          ],
-          street: [
-            "You stopped for a reason.",
-            "I have somewhere to be, just so you know.",
-            "Clock's ticking.",
-            "Most people just walk past.",
-            "You look like you had something to say.",
-            "Take your time. But not too much.",
-            "Still working up to it?",
-            "This is the part where you say something.",
-          ],
-          bar: [
-            "You came over for a reason.",
-            "I don't bite. Usually.",
-            "Most people just stand at the bar.",
-            "You look like you had something to say.",
-            "Take your time.",
-            "Still working up to it?",
-          ],
-          gym: [
-            "You came over for a reason.",
-            "I'm between sets, not retired.",
-            "Clock's ticking.",
-            "You look like you had something to say.",
-            "Take your time.",
-          ],
-          museum: [
-            "You stopped here for a reason.",
-            "Most people just walk past.",
-            "You look like you had something to say.",
-            "Take your time.",
-            "Still working up to it?",
-          ],
-          bookstore: [
-            "You came down this aisle for a reason.",
-            "Most people just browse.",
-            "You look like you had something to say.",
-            "Take your time.",
-            "Still working up to it?",
-          ],
-          // ── Wave 2 rescue lines ──────────────────────────────────────────
-          rooftop: [
-            "You came all the way over here.",
-            "The view isn't going anywhere.",
-            "Most people just stay on their side.",
-            "You look like you had something to say.",
-            "Take your time.",
-            "Still working up to it?",
-          ],
-          house_party: [
-            "You came over for a reason.",
-            "I don't bite. I'm at a party.",
-            "Most people just stay in their group.",
-            "You look like you had something to say.",
-            "Take your time.",
-            "Still working up to it?",
-          ],
-          coffee_shop: [
-            "You stopped at this table for a reason.",
-            "I'm not that focused on the notebook.",
-            "Most people just walk past.",
-            "You look like you had something to say.",
-            "Take your time.",
-            "Still working up to it?",
-          ],
-          art_gallery: [
-            "You stopped at this piece for a reason.",
-            "Most people walked past it.",
-            "You look like you had something to say.",
-            "Take your time.",
-            "Still working up to it?",
-            "The painting isn't going anywhere.",
-          ],
-          yoga_studio: [
-            "You came over for a reason.",
-            "I'm stretching, not meditating.",
-            "Clock's ticking — I'll finish and leave.",
-            "You look like you had something to say.",
-            "Take your time.",
-          ],
-          airport: [
-            "We've got time. Flight's delayed.",
-            "Most people just stay in their seat.",
-            "You look like you had something to say.",
-            "Take your time.",
-            "Still working up to it?",
-            "The board hasn't changed.",
-          ],
-          supermarket: [
-            "You stopped in this aisle for a reason.",
-            "Most people just keep moving.",
-            "You look like you had something to say.",
-            "Take your time.",
-            "Still working up to it?",
-          ],
-          office_lobby: [
-            "You came over for a reason.",
-            "The elevator's taking its time.",
-            "Most people just look at their phones.",
-            "You look like you had something to say.",
-            "Take your time.",
-            "Still working up to it?",
-          ],
-          train: [
-            "You're still here.",
-            "The train has a few more stops.",
-            "Most people just look out the window.",
-            "You look like you had something to say.",
-            "Take your time.",
-            "Still working up to it?",
-          ],
+          beach:        ["You walked all the way over here. Might as well say something.", "I don't bite. Usually.", "The waves aren't that interesting, I promise.", "Most people just walk past. You didn't.", "You can sit if you want. I don't mind.", "The quiet is better when someone breaks it well.", "I saw you walk by earlier.", "You look like you had something to say.", "Take your time.", "Still working up to it?"],
+          street:       ["You stopped for a reason.", "I have somewhere to be, just so you know.", "Clock's ticking.", "Most people just walk past.", "You look like you had something to say.", "Take your time. But not too much.", "Still working up to it?", "This is the part where you say something."],
+          bar:          ["You came over for a reason.", "I don't bite. Usually.", "Most people just stand at the bar.", "You look like you had something to say.", "Take your time.", "Still working up to it?"],
+          gym:          ["You came over for a reason.", "I'm between sets, not retired.", "Clock's ticking.", "You look like you had something to say.", "Take your time."],
+          museum:       ["You stopped here for a reason.", "Most people just walk past.", "You look like you had something to say.", "Take your time.", "Still working up to it?"],
+          bookstore:    ["You came down this aisle for a reason.", "Most people just browse.", "You look like you had something to say.", "Take your time.", "Still working up to it?"],
+          rooftop:      ["You came all the way over here.", "The view isn't going anywhere.", "Most people just stay on their side.", "You look like you had something to say.", "Take your time.", "Still working up to it?"],
+          house_party:  ["You came over for a reason.", "I don't bite. I'm at a party.", "Most people just stay in their group.", "You look like you had something to say.", "Take your time.", "Still working up to it?"],
+          coffee_shop:  ["You stopped at this table for a reason.", "I'm not that focused on the notebook.", "Most people just walk past.", "You look like you had something to say.", "Take your time.", "Still working up to it?"],
+          art_gallery:  ["You stopped at this piece for a reason.", "Most people walked past it.", "You look like you had something to say.", "Take your time.", "Still working up to it?", "The painting isn't going anywhere."],
+          yoga_studio:  ["You came over for a reason.", "I'm stretching, not meditating.", "Clock's ticking — I'll finish and leave.", "You look like you had something to say.", "Take your time."],
+          airport:      ["We've got time. Flight's delayed.", "Most people just stay in their seat.", "You look like you had something to say.", "Take your time.", "Still working up to it?", "The board hasn't changed."],
+          supermarket:  ["You stopped in this aisle for a reason.", "Most people just keep moving.", "You look like you had something to say.", "Take your time.", "Still working up to it?"],
+          office_lobby: ["You came over for a reason.", "The elevator's taking its time.", "Most people just look at their phones.", "You look like you had something to say.", "Take your time.", "Still working up to it?"],
+          train:        ["You're still here.", "The train has a few more stops.", "Most people just look out the window.", "You look like you had something to say.", "Take your time.", "Still working up to it?"],
         };
         const rescues = rescuesByScenario[currentScenarioKey] || rescuesByScenario.beach;
         if (!freeConvRescueUsed) freeConvRescueUsed = new Set();
@@ -1234,36 +1267,34 @@ async function freeConversation(mySession) {
         const chosen = pool[Math.floor(Math.random() * pool.length)];
         freeConvRescueUsed.add(chosen);
         if (freeConvRescueUsed.size >= rescues.length) freeConvRescueUsed.clear();
-        await speak(chosen,'Mary');
-        if(mySession!==session) break;
-        await pause(1800); // wait for audio to clear before listening
+        await speak(chosen, 'Mary');
+        if (mySession !== session) break;
+        await pause(1800);
       } else {
-        // Mid-conversation silence — after 2 consecutive timeouts (60s), Julia reacts
         silenceCount++;
         if (firstExchangeDone && silenceCount >= 2) {
           silenceCount = 0;
           const impatience = {
-            street:      ["Still there?", "I do have somewhere to be.", "You went quiet.", "Was there something else?"],
-            beach:       ["Still there?", "You went quiet.", "Was there something else?", "Take your time."],
-            bar:         ["Still there?", "You went quiet.", "Was there something else?"],
-            gym:         ["Still there?", "You went quiet.", "Was there something else?"],
-            museum:      ["Still there?", "You went quiet.", "Was there something else?"],
-            bookstore:   ["Still there?", "You went quiet.", "Was there something else?"],
-            // Wave 2
-            rooftop:     ["Still there?", "You went quiet.", "Was there something else?"],
-            house_party: ["Still there?", "You went quiet.", "Was there something else?"],
-            coffee_shop: ["Still there?", "You went quiet.", "Was there something else?"],
-            art_gallery: ["Still there?", "You went quiet.", "Was there something else?"],
-            yoga_studio: ["Still there?", "You went quiet.", "Was there something else?"],
-            airport:     ["Still there?", "You went quiet.", "Was there something else?", "The board still hasn't changed."],
-            supermarket: ["Still there?", "You went quiet.", "Was there something else?"],
-            office_lobby:["Still there?", "You went quiet.", "Was there something else?"],
-            train:       ["Still there?", "You went quiet.", "Was there something else?", "Few more stops."],
+            street:       ["Still there?", "I do have somewhere to be.", "You went quiet.", "Was there something else?"],
+            beach:        ["Still there?", "You went quiet.", "Was there something else?", "Take your time."],
+            bar:          ["Still there?", "You went quiet.", "Was there something else?"],
+            gym:          ["Still there?", "You went quiet.", "Was there something else?"],
+            museum:       ["Still there?", "You went quiet.", "Was there something else?"],
+            bookstore:    ["Still there?", "You went quiet.", "Was there something else?"],
+            rooftop:      ["Still there?", "You went quiet.", "Was there something else?"],
+            house_party:  ["Still there?", "You went quiet.", "Was there something else?"],
+            coffee_shop:  ["Still there?", "You went quiet.", "Was there something else?"],
+            art_gallery:  ["Still there?", "You went quiet.", "Was there something else?"],
+            yoga_studio:  ["Still there?", "You went quiet.", "Was there something else?"],
+            airport:      ["Still there?", "You went quiet.", "Was there something else?", "The board still hasn't changed."],
+            supermarket:  ["Still there?", "You went quiet.", "Was there something else?"],
+            office_lobby: ["Still there?", "You went quiet.", "Was there something else?"],
+            train:        ["Still there?", "You went quiet.", "Was there something else?", "Few more stops."],
           };
           const pool = impatience[currentScenarioKey] || impatience.beach;
           const line = pool[Math.floor(Math.random() * pool.length)];
           await speak(line, 'Mary');
-          if(mySession!==session) break;
+          if (mySession !== session) break;
           await pause(1000);
         } else {
           await pause(500);
@@ -1272,25 +1303,23 @@ async function freeConversation(mySession) {
       continue;
     }
 
-    const reply=await getCharacterResponse(said);
-    firstExchangeDone = true; // after first real exchange, no more rescue lines
-    silenceCount = 0; // reset silence counter on successful speech
-    if(mySession!==session) break;
-
-    if(reply) {
-      await speak(reply,'Mary');
-    } else {
-      await speak(randomChoice(["Hmm?","Say that again?","What was that?"]),'Mary');
+    const reply = await streamCharacterAndSpeak(said, mySession);
+    firstExchangeDone = true;
+    silenceCount = 0;
+    if (mySession !== session) break;
+    if (!reply) {
+      await speak(randomChoice(["Hmm?", "Say that again?", "What was that?"]), 'Mary');
     }
-    if(mySession!==session) break;
-    await pause(1500); // wait for audio to clear before next listen
+    if (mySession !== session) break;
+    await pause(300);
     setMediaForSpeaker('Mary');
-    els.name.textContent=currentCharacterId.charAt(0).toUpperCase()+currentCharacterId.slice(1);
+    els.name.textContent = currentCharacterId.charAt(0).toUpperCase() + currentCharacterId.slice(1);
   }
 
   clearInterval(timerInterval);
-  const te=document.getElementById('free-timer'); if(te) te.remove();
-  if(mySession!==session) return;
+  const te = document.getElementById('free-timer');
+  if (te) te.remove();
+  if (mySession !== session) return;
   await runCoachFeedback(mySession);
 }
 
