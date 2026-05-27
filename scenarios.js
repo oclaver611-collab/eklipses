@@ -21,10 +21,10 @@ window.SCENARIOS = {
       { speaker:"Ryan",   text:"See that? Situational. Specific. He didn't lead with her looks — he noticed something real. That's what opens a door." }
     ],
     practice: [
-      { speaker:"Ryan", text:"Late afternoon. The beach is almost empty." },
-      { speaker:"Ryan", text:"She's been sitting there for twenty minutes. You've walked past once already." },
-      { speaker:"Ryan", text:"She noticed." },
-      { speaker:"Ryan", text:"You have about thirty seconds before the moment passes for good." },
+      { speaker:"Ryan", text:"Most guys see a beautiful woman alone on a beach and freeze. Or worse — they walk past and spend the rest of the day wondering what would have happened." },
+      { speaker:"Ryan", text:"She's been sitting there for twenty minutes. She noticed you walk by once already." },
+      { speaker:"Ryan", text:"Here's what you need to know: she already has an opinion of you. What happens in the next thirty seconds either confirms it or changes it completely." },
+      { speaker:"Ryan", text:"You won't get a better setup than this. Empty beach. Nobody watching. Just you and the moment." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
   },
@@ -51,10 +51,10 @@ window.SCENARIOS = {
       { speaker:"Ryan",   text:"Notice that? He made an observation about her behavior — not her looks. That's what gets a real response in a noisy bar." }
     ],
     practice: [
-      { speaker:"Ryan", text:"Friday night. The bar is busy but not packed." },
-      { speaker:"Ryan", text:"She's standing near the end of the bar, drink in hand, half-watching the room." },
-      { speaker:"Ryan", text:"She's been there about ten minutes. Nobody has approached her." },
-      { speaker:"Ryan", text:"You have about thirty seconds before someone else does." },
+      { speaker:"Ryan", text:"She's been standing at that bar for ten minutes. Three guys have clocked her. None of them moved." },
+      { speaker:"Ryan", text:"You know why? Because approaching a woman alone at a bar feels like walking into a spotlight. Every excuse sounds reasonable. And then she leaves." },
+      { speaker:"Ryan", text:"Here's what changes everything: she's not waiting to be impressed. She's waiting to be surprised." },
+      { speaker:"Ryan", text:"You have maybe thirty seconds before someone else decides to find out what she's like." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
   },
@@ -81,10 +81,10 @@ window.SCENARIOS = {
       { speaker:"Ryan",   text:"See that? He led with the painting, not with her. In a museum, the environment is your best opener." }
     ],
     practice: [
-      { speaker:"Ryan", text:"Saturday afternoon. A quiet art museum." },
-      { speaker:"Ryan", text:"She's been standing in front of the same painting for five minutes." },
-      { speaker:"Ryan", text:"Alone. Completely absorbed." },
-      { speaker:"Ryan", text:"This one takes patience and intelligence." },
+      { speaker:"Ryan", text:"She's been in front of that same painting for five minutes. She hasn't moved." },
+      { speaker:"Ryan", text:"Most guys would walk past. Some would say something obvious about the art. Both are wrong." },
+      { speaker:"Ryan", text:"This is actually the easiest environment to start a real conversation in — if you know what to do. Most people don't." },
+      { speaker:"Ryan", text:"By the end of this session you'll know exactly what kind of opener works here — and why generic ones kill the moment instantly." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
   },
@@ -111,10 +111,10 @@ window.SCENARIOS = {
       { speaker:"Ryan",   text:"Notice that? He opened on something specific she was doing — and showed he understood it. In a gym, knowledge earns respect faster than anything." }
     ],
     practice: [
-      { speaker:"Ryan", text:"Weekday afternoon. The gym is half empty." },
-      { speaker:"Ryan", text:"She's between sets, one earbud out, resting." },
-      { speaker:"Ryan", text:"People guard their space at the gym. You need to be quick and real." },
-      { speaker:"Ryan", text:"You have one shot before she puts the earbud back in." },
+      { speaker:"Ryan", text:"The gym is the hardest place to approach someone. She has earphones in. She's focused. And she's heard every bad opener twice this week already." },
+      { speaker:"Ryan", text:"Most men don't even try. The ones who do usually say something about her workout and make it weird." },
+      { speaker:"Ryan", text:"But there's a way in that almost nobody uses — and when it works, it works completely." },
+      { speaker:"Ryan", text:"She has one earbud out right now. You have about five seconds before it goes back in." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
   },
@@ -141,10 +141,10 @@ window.SCENARIOS = {
       { speaker:"Ryan",   text:"See that? He had an actual opinion about a book. In a bookstore, a real take is worth more than any opener." }
     ],
     practice: [
-      { speaker:"Ryan", text:"Rainy Saturday afternoon. A small independent bookstore." },
-      { speaker:"Ryan", text:"She's browsing the fiction shelves, coffee in hand." },
-      { speaker:"Ryan", text:"Relaxed environment — but she's in her own world." },
-      { speaker:"Ryan", text:"You have a natural opening here if you use your surroundings." },
+      { speaker:"Ryan", text:"She's browsing alone. In her own world. Not looking to be interrupted." },
+      { speaker:"Ryan", text:"Most guys either don't approach at all — or say something so generic she gives a polite smile and walks to another aisle." },
+      { speaker:"Ryan", text:"But a bookstore gives you something most places don't: a shared context. Something you can both have an opinion about." },
+      { speaker:"Ryan", text:"The guy who gets her attention here won't ask what she's looking for. He'll already have a take." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
   },
@@ -171,10 +171,10 @@ window.SCENARIOS = {
       { speaker:"Ryan",   text:"See that? Direct, honest, respectful of her time. On the street, confidence and brevity are everything." }
     ],
     practice: [
-      { speaker:"Ryan", text:"Weekday afternoon. Busy downtown sidewalk." },
-      { speaker:"Ryan", text:"She's walking past. Not rushing but she has somewhere to be." },
-      { speaker:"Ryan", text:"This is the hardest scenario — you have five seconds." },
-      { speaker:"Ryan", text:"If you hesitate she's gone." },
+      { speaker:"Ryan", text:"She's walking toward you right now. In about four seconds she'll be past you." },
+      { speaker:"Ryan", text:"Most men let it happen. They think of something to say three steps too late. They don't sleep well." },
+      { speaker:"Ryan", text:"Here's the truth: you don't need a perfect line. You need the nerve to say something real before the moment expires." },
+      { speaker:"Ryan", text:"You have four seconds. Maybe five if she's not rushing." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
   },
@@ -208,10 +208,10 @@ window.SCENARIOS = {
       { speaker:"Ryan",   text:"See that? He didn't try to impress her. He was honest about what he was doing. With Sanna — that's the only move that works." }
     ],
     practice: [
-      { speaker:"Ryan", text:"Evening. Rooftop bar. City skyline behind her." },
-      { speaker:"Ryan", text:"She's standing slightly apart. Two guys already tried." },
-      { speaker:"Ryan", text:"She's sharp. She'll see through anything performed." },
-      { speaker:"Ryan", text:"You have one shot. Make it real." },
+      { speaker:"Ryan", text:"She's at a rooftop bar, slightly apart from everyone else. Two guys already approached her tonight. She turned both of them down without looking up." },
+      { speaker:"Ryan", text:"She's not cold. She's just seen enough performed confidence to recognize it immediately." },
+      { speaker:"Ryan", text:"What she hasn't seen tonight is someone who didn't try to impress her. Someone who just said something true." },
+      { speaker:"Ryan", text:"That's the gap. And right now you're standing in it." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
   },
@@ -240,10 +240,10 @@ window.SCENARIOS = {
       { speaker:"Ryan",   text:"See that? He said something that matched what she was actually feeling. That's the move with Sarah. She doesn't need charm — she needs to feel understood." }
     ],
     practice: [
-      { speaker:"Ryan", text:"House party. She's stepped away from the main group." },
-      { speaker:"Ryan", text:"Not sad. Not waiting. Just taking a moment." },
-      { speaker:"Ryan", text:"She's warm underneath but she doesn't give it away easily." },
-      { speaker:"Ryan", text:"The wrong opener and she politely disappears back into the crowd." },
+      { speaker:"Ryan", text:"She stepped away from the main group for a reason. She's not hiding — she's breathing." },
+      { speaker:"Ryan", text:"You could stay with the crowd and wonder about her all night. Or you could walk over and find out who she actually is." },
+      { speaker:"Ryan", text:"She's warm underneath. But she doesn't give that away fast. She needs to see something genuine first." },
+      { speaker:"Ryan", text:"The wrong opener sends her politely back to the party. The right one starts something real." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
   },
@@ -275,10 +275,10 @@ window.SCENARIOS = {
       { speaker:"Ryan",   text:"See that? He pushed past her deflection. He didn't accept the self-deprecation — he kept going. That's what Anna responds to." }
     ],
     practice: [
-      { speaker:"Ryan", text:"Small coffee shop. She's working on something — not going well." },
-      { speaker:"Ryan", text:"Headphones around her neck, not in. She's open to being interrupted." },
-      { speaker:"Ryan", text:"She'll deflect your first compliment automatically. Don't let it land as a full stop." },
-      { speaker:"Ryan", text:"Push past it." },
+      { speaker:"Ryan", text:"She's sitting alone with a notebook. Working — or trying to. The coffee is going cold." },
+      { speaker:"Ryan", text:"The headphones are around her neck, not in her ears. That's not an accident." },
+      { speaker:"Ryan", text:"This is what people miss: she's open. Not waiting — but open. There's a difference." },
+      { speaker:"Ryan", text:"By the end of this session you'll know exactly how to step into someone's world without crashing it." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
   },
@@ -307,10 +307,10 @@ window.SCENARIOS = {
       { speaker:"Ryan",   text:"See that? He asked before he told. With Leila, showing genuine curiosity about her view opens everything. Lead with your opinion and you'll lose her." }
     ],
     practice: [
-      { speaker:"Ryan", text:"Gallery opening. She's standing in front of a piece nobody else stopped for." },
-      { speaker:"Ryan", text:"She works here. She's been thinking about this piece for weeks." },
-      { speaker:"Ryan", text:"Say the wrong thing about the art and she's done with you in one sentence." },
-      { speaker:"Ryan", text:"Silence is fine. Genuine curiosity is better." },
+      { speaker:"Ryan", text:"Opening night at an art gallery. She's the curator. She's used to being approached by people trying to impress her." },
+      { speaker:"Ryan", text:"She can tell in about eight seconds if someone is performing or actually present." },
+      { speaker:"Ryan", text:"Most men talk about the art to seem cultured. She finds it transparent. What she responds to is someone who genuinely notices something — and has a real reaction to it." },
+      { speaker:"Ryan", text:"You have one shot at a first impression that sticks." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
   },
@@ -340,10 +340,10 @@ window.SCENARIOS = {
       { speaker:"Ryan",   text:"See that? He asked about the physical work — specifically. Not about how she looked doing it. With Fatou, directness about the practice earns respect. Everything else gets shut down." }
     ],
     practice: [
-      { speaker:"Ryan", text:"Yoga studio. She stayed after class to stretch." },
-      { speaker:"Ryan", text:"She's a professional dancer. She's direct in ways that will surprise you." },
-      { speaker:"Ryan", text:"Any comment about how she looks in that position and you're done." },
-      { speaker:"Ryan", text:"Ask about the work. Be specific. Be direct." },
+      { speaker:"Ryan", text:"She just finished class. She's calm, unhurried, still in that post-practice headspace where the usual defenses are slightly lower." },
+      { speaker:"Ryan", text:"This is one of the few moments where someone is genuinely open — and almost nobody knows how to use it right." },
+      { speaker:"Ryan", text:"You're not going to talk about the class. You're not going to compliment her form. You're going to notice something real." },
+      { speaker:"Ryan", text:"The next sixty seconds could be the start of an actual conversation — or just another moment that didn't happen." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
   },
@@ -373,10 +373,10 @@ window.SCENARIOS = {
       { speaker:"Ryan",   text:"See that? He made a specific observation — he'd been watching the room, not just her. Then he asked a real question. Elena responds to wit and genuine curiosity. Generic opener and she goes back to the book." }
     ],
     practice: [
-      { speaker:"Ryan", text:"Airport gate. Flight delayed. She's been here longer than planned." },
-      { speaker:"Ryan", text:"Book open, not reading. She's somewhere else in her head." },
-      { speaker:"Ryan", text:"You have time. That's the point. Don't waste it on obvious small talk." },
-      { speaker:"Ryan", text:"Say something that proves you've actually been paying attention." },
+      { speaker:"Ryan", text:"The flight is delayed two hours. You're both stuck at the same gate. She's got a book open but she hasn't turned a page in fifteen minutes." },
+      { speaker:"Ryan", text:"This is one of the best situations to meet someone in — shared inconvenience, nowhere to be, no pressure to perform." },
+      { speaker:"Ryan", text:"Almost everyone wastes it by complaining about the delay or asking where she's headed. Both are dead ends." },
+      { speaker:"Ryan", text:"There's a specific type of opener that works in this exact situation. By the end of this session, you'll know what it is." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
   },
@@ -406,10 +406,10 @@ window.SCENARIOS = {
       { speaker:"Ryan",   text:"See that? He made a real observation and kept it light. Eden responds to honesty and warmth. She'll give you real feedback fast — make sure you're ready for it." }
     ],
     practice: [
-      { speaker:"Ryan", text:"Supermarket. Sunday. She's in the same aisle, slightly off her plan." },
-      { speaker:"Ryan", text:"There's no obvious hook here — that's the whole point." },
-      { speaker:"Ryan", text:"She reads people for a living. She'll know immediately if you're performing." },
-      { speaker:"Ryan", text:"Be real. Be specific. Be warm." },
+      { speaker:"Ryan", text:"This is the scenario nobody talks about. No mood lighting. No social excuse. Just two people in a grocery aisle on a Sunday afternoon." },
+      { speaker:"Ryan", text:"Most guys don't even consider approaching here. It feels too ordinary. Too exposed." },
+      { speaker:"Ryan", text:"But that's exactly why it works — when you do it right. She's off her guard. She's being real. And so can you." },
+      { speaker:"Ryan", text:"She reads people instantly. You'll know within thirty seconds if you landed it." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
   },
@@ -438,10 +438,10 @@ window.SCENARIOS = {
       { speaker:"Ryan",   text:"See that? He acknowledged the awkward reality directly — that they'd been ignoring each other for months. That honesty made her laugh. With Maya, wit and directness open the door. Trying to be impressive closes it." }
     ],
     practice: [
-      { speaker:"Ryan", text:"Corporate lobby. You've seen her before — she works in the building." },
-      { speaker:"Ryan", text:"The stakes feel high because you'll see her again if it goes wrong." },
-      { speaker:"Ryan", text:"She's warm but she doesn't hand it out. She needs to see something real first." },
-      { speaker:"Ryan", text:"Don't try to impress her. Just be honest about the situation." },
+      { speaker:"Ryan", text:"You've walked past each other in this building for months. You've made eye contact. You've both looked away." },
+      { speaker:"Ryan", text:"Today feels different. Maybe it's the broken elevator. Maybe it's just time." },
+      { speaker:"Ryan", text:"Here's what makes this situation different from every other one: you'll see her again. Which means this conversation has actual weight." },
+      { speaker:"Ryan", text:"Say something real. Say something that proves you've actually noticed her — not just what she looks like." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
   },
@@ -472,48 +472,12 @@ window.SCENARIOS = {
       { speaker:"Ryan",   text:"See that? He noticed something specific in their shared environment and made it a real observation. With Erika — someone who bonds over shared absurdity — that's the exact move. She'll match your energy and raise it if you give her something real to work with." }
     ],
     practice: [
-      { speaker:"Ryan", text:"Commuter train. She's next to you or nearby. In transit — between places." },
-      { speaker:"Ryan", text:"She's slightly more open than usual. Transit does that." },
-      { speaker:"Ryan", text:"She bonds over shared observations about the world around her." },
-      { speaker:"Ryan", text:"Notice something specific. Say it. See if she runs with it." },
+      { speaker:"Ryan", text:"You're both on the same commuter train. She's looking out the window but not really seeing anything." },
+      { speaker:"Ryan", text:"Transit does something to people. They're between places. Between things. Slightly more open than usual." },
+      { speaker:"Ryan", text:"You have the whole ride. That's either a gift or a pressure — depending on how you use it." },
+      { speaker:"Ryan", text:"She bonds over shared observations. The right thing to say isn't about her. It's about something you've both just noticed." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
-  }
-  ,
-  bookshopRemi: {
-    title: "She Figured You Out",
-    subtitle: "Keep her guessing — or watch her go cold",
-    thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_thumb.jpg",
-    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/bookshopRemi_bg.jpg?v=2",
-    coldOpen: true,
-    category: "dating",
-    difficulty: 3,
-    duration_min: 10,
-    demo: [
-      { speaker:"Ryan", text:"An independent bookshop, late Saturday afternoon." },
-      { speaker:"Ryan", text:"Remi works here two days a week. She noticed you come in before." },
-      { speaker:"Ryan", text:"Watch how this goes." }
-    ],
-    practice: [
-      { speaker:"Ryan", text:"An independent bookshop, late Saturday afternoon." },
-      { speaker:"Ryan", text:"Remi is restocking the foreign literature shelf when she spots you." },
-      { speaker:"Ryan", text:"She recognized you. The moment is yours." },
-      { speaker:"Ryan", text:"What do you do?" }
-    ],
-    freeConversation: {
-      rescueLines: [
-        "I keep putting this one back on the shelf and picking it up again.",
-        "There is something strange about working here — you notice what people pick up and put down.",
-        "Do you ever buy books you know you probably will not read?"
-      ],
-      impatienceLines: [
-        "You went quiet. I can never tell if that means someone is thinking or has run out of things to say.",
-        "I should probably finish restocking this shelf. So — was there something?",
-        "It is fine if you do not have an answer. I just usually know within thirty seconds whether a conversation is going somewhere."
-      ]
-    },
-    seedViews: 412,
-    seedLikes: 38
   }
 
 };
