@@ -479,42 +479,5 @@ window.SCENARIOS = {
       { speaker:"Ryan", text:"What do you do?" }
     ]
   }
-,
-  bookshopRemi: {
-    title: "She Figured You Out",
-    subtitle: "Keep her guessing — or watch her go cold",
-    thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Remi_thumb.jpg",
-    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/bookshopRemi_bg.jpg?v=2",
-    coldOpen: true,
-    category: "dating",
-    difficulty: 3,
-    duration_min: 10,
-    demo: [
-      { speaker:"Ryan",   text:"You" },
-      { speaker:"Ryan",   text:"Watch how this goes." },
-      { speaker:"Mary",   text:"'You're back. I was starting to think you had a system — 
-travel section first, then languages, then you leave without 
-buying anything. Am I close, o" },
-      { speaker:"Ryan",   text:"Pay attention to how she opened. What does it tell you about her?" }
-    ],
-    practice: [
-      { speaker:"Ryan", text:"You" },
-      { speaker:"Ryan", text:"Remi is right there. The moment is yours." },
-      { speaker:"Ryan", text:"What do you do?" }
-    ],
-    freeConversation: {
-      rescueLines: [
-            "I keep putting this one back on the shelf and picking it up again. I think that means I",
-            "m scared it",
-            "s something strange about working here — you start to notice the books people pick up and immediately put down. Says a lot, actually."
-      ],
-      impatienceLines: [
-            "You went quiet. I can never tell if that means someone",
-            "ve just run out of things to say.",
-            "I should probably finish restocking this shelf before my boss notices I"
-      ],
-    },
-    seedViews: 682,
-    seedLikes: 84,
-  },
+
 };
