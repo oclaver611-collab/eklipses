@@ -478,6 +478,42 @@ window.SCENARIOS = {
       { speaker:"Ryan", text:"Notice something specific. Say it. See if she runs with it." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
+  },
+  bookshopRemi: {
+    title: "She Figured You Out",
+    subtitle: "Keep her guessing — or watch her go cold",
+    thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_thumb.jpg",
+    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/bookshopRemi_bg.jpg?v=2",
+    coldOpen: true,
+    category: "dating",
+    difficulty: 3,
+    duration_min: 10,
+    demo: [
+      { speaker:"Ryan", text:"An independent bookshop, late Saturday afternoon." },
+      { speaker:"Ryan", text:"Remi works here two days a week. She noticed you come in before." },
+      { speaker:"Ryan", text:"Watch how this goes." }
+    ],
+    practice: [
+      { speaker:"Ryan", text:"An independent bookshop, late Saturday afternoon." },
+      { speaker:"Ryan", text:"Remi is restocking the foreign literature shelf when she spots you." },
+      { speaker:"Ryan", text:"She recognized you. The moment is yours." },
+      { speaker:"Ryan", text:"What do you do?" }
+    ],
+    freeConversation: {
+      rescueLines: [
+        "I keep putting this one back on the shelf and picking it up again.",
+        "There's something strange about working here — you notice what people pick up and put down.",
+        "Do you ever buy books you know you probably won't read?"
+      ],
+      impatienceLines: [
+        "You went quiet. I can never tell if that means someone's thinking or they've run out of things to say.",
+        "I should probably finish restocking this shelf. So — was there something?",
+        "It's fine if you don't have an answer. I just usually know within thirty seconds whether a conversation is going somewhere."
+      ]
+    },
+    seedViews: 412,
+    seedLikes: 38
   }
+};
 
 };
