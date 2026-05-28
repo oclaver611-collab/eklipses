@@ -323,13 +323,13 @@ Go through the conversation in order — like watching it back on film. Quote hi
 Respond ONLY with valid JSON — no markdown, no preamble:
 {
   "score": <number 1-10>,
-  "spokenSummary": "<One punchy sentence. Max 20 words. Reference something that actually happened in the session.>",
+  "spokenSummary": "<One punchy sentence. Max 20 words. MUST quote or directly reference a specific line from the transcript — his words or her words. No general statements about confidence or effort. If you cannot find a specific line to reference, describe the most concrete moment that happened.>",
 
   "part2": "<MIDDLE OF CONVERSATION. Min 70 words, max 90 words. Pick the most telling exchange from the middle — quote exactly what he said and exactly what ${girlName} said back. Tell him what that moment showed. Was he trying too hard to impress her? Did he miss something she handed him? Connect it to who ${girlName} is — what was she waiting for? What did she open up and he walked past? Stay in the transcript. No general advice.>",
 
   "part3": "<THE KEY MISTAKE. Min 80 words. Find the single moment that cost him the most with ${girlName}. PRIORITY: (1) If he asked for coffee, a number, or to meet up before he earned it — that is ALWAYS the key mistake. Quote her exact response to it. Tell him what was missing. What needed to happen first before that ask would have landed? Give him the exact words he should have used instead. (2) If no premature close happened, find the biggest door she opened that he walked past. Quote both lines exactly. Tell him what went wrong and why it doesn't work with ${girlName} in particular. Then give him the exact words he should have said. Write it out fully — do not cut it short.>",
 
-  "part4": "<CLOSE + VERDICT. Target 350-430 characters. Name one real thing he did well. DO NOT say the score number — it is shown separately on the card. Give one honest sentence about the overall effort. Name the one thing that would change his results most with ${girlName}. End with a motivational line that makes him want to go again right now. If session was weak: 'Practice is the only way through. Hit Try Again — every rep makes you sharper.' If session was decent: 'You are closer than you think. One more round and you will feel the difference.' If session was strong: 'You have got something real here. Go again and push it further — you will surprise yourself.' Or write your own that fits. BANNED WORDS IN PART4: 'go out there', 'dive deeper', 'aim to', 'work on that', 'dig into', 'push deeper', 'delve', 'delved', 'engage', 'dynamic', 'showcase', 'score is a', 'giving you a', 'I give you'. The motivational line MUST be the last sentence.>",
+  "part4": "<CLOSE + VERDICT. Target 350-430 characters. Name one real thing he did well — quote something specific from the transcript, not a concept. Give one honest sentence about the overall effort. Name the one thing that would change his results most with ${girlName} — make it concrete, not generic. End with ONE motivational line. BANNED ENDINGS — NEVER use these exact phrases: 'Practice is the only way through', 'every rep makes you sharper', 'you are closer than you think', 'one more round', 'you will feel the difference', 'you have got something real here', 'push it further', 'you will surprise yourself', 'keep at it', 'practice makes perfect', 'keep pushing'. Write a motivational line that references something SPECIFIC from THIS session — his best moment, her best response, the exact scenario. Make it personal to what just happened. BANNED WORDS IN PART4: 'go out there', 'dive deeper', 'aim to', 'work on that', 'dig into', 'push deeper', 'delve', 'delved', 'engage', 'dynamic', 'showcase', 'score is a', 'giving you a', 'I give you'. The motivational line MUST be the last sentence.>",
 
   "openerBreakdown": "<The opener was: '${openerLine}'. One sentence on why it worked or didn't with ${girlName}. Do not use HIM_1 label. No banned words.>",
   "bestMoment": "<Quote the single best thing he said verbatim. One sentence on why it landed with ${girlName}. No banned words.>",
@@ -405,7 +405,44 @@ RULES:
 
     const data = await response.json();
     const raw = data.choices?.[0]?.message?.content;
-    const feedback = JSON.parse(raw);
+    let feedback;
+    try {
+      feedback = JSON.parse(raw);
+    } catch(parseErr) {
+      // Model returned malformed JSON — retry once with stricter instruction
+      console.warn('[coach] JSON parse failed, retrying with stricter prompt...');
+      const retryResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          max_tokens: 2000,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: `Scenario: ${scenarioTitle}\n\nNote: HIM_1 (the opener) was already handled separately. The transcript below starts from HIM_2 onward.\n\nFull conversation transcript:\n${transcript}\n\nCRITICAL: Return ONLY valid JSON. No markdown, no backticks, no preamble. Start with { and end with }.` }
+          ],
+          response_format: { type: 'json_object' }
+        }),
+      });
+      const retryData = await retryResponse.json();
+      const retryRaw = retryData.choices?.[0]?.message?.content;
+      feedback = JSON.parse(retryRaw);
+    }
+
+    // Guard: if card fields came back undefined/null, fill with fallbacks
+    const cardFields = ['openerBreakdown', 'bestMoment', 'missedOpportunity', 'tryNextTime', 'wouldSheDateHim', 'spokenSummary'];
+    for (const field of cardFields) {
+      if (!feedback[field] || feedback[field] === 'undefined' || feedback[field].length < 5) {
+        console.warn(\`[coach] Field "\${field}" missing — filling fallback\`);
+        if (field === 'wouldSheDateHim') feedback[field] = 'Maybe. You had some real moments but you needed to go deeper into what she opened.';
+        else if (field === 'tryNextTime') feedback[field] = \`Tell me more about that — what made you get into it?\`;
+        else if (field === 'spokenSummary') feedback[field] = \`You showed up and had a real conversation — now let\'s make it sharper.\`;
+        else feedback[field] = 'See the feedback above.';
+      }
+    }
 
     // Inject JS-generated part1 and hardcoded transitions — model never touches these
     feedback.part1 = part1;
@@ -454,6 +491,17 @@ RULES:
         .replace(/\byour score is a? \d+\b/gi, '')
         .replace(/\bI give you a \d+\b/gi, '')
         .replace(/\ba score of \d+\b/gi, '')
+        // FIX A: Stock endings — replace with placeholder, model regenerates on retry
+        // These leak through despite prompt bans — JS replace is the only reliable fix
+        .replace(/you have got something real here[^.!?]*[.!?]/gi, 'Go again — the next rep will be sharper.')
+        .replace(/you are closer than you think[^.!?]*[.!?]/gi, 'The gap is smaller than it feels — go again.')
+        .replace(/one more round and you will feel the difference[^.!?]*/gi, 'One more session and you will notice the shift.')
+        .replace(/push it further[^.!?]*[.!?]/gi, 'Take what worked here and build on it.')
+        .replace(/you will surprise yourself[^.!?]*[.!?]/gi, 'Go again and see what lands differently.')
+        .replace(/every rep makes you sharper[^.!?]*/gi, 'Each session builds on the last.')
+        .replace(/practice is the only way through[^.!?]*/gi, 'The only way forward is another rep.')
+        .replace(/keep at it[^.!?]*[.!?]/gi, 'Go again.')
+        .replace(/practice makes perfect[^.!?]*[.!?]/gi, 'Another session, another step.')
         // Clean up double spaces from removals
         .replace(/\s{2,}/g, ' ')
         .trim();
