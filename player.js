@@ -1016,270 +1016,194 @@ function showListening(on=true) {
 }
 
 /* ===== listenForUser — Deepgram Nova-3 ===== */
-// Records audio via MediaRecorder, sends chunks to /api/stt (Deepgram proxy)
-// Silence detection: 900ms after complete sentence, 1600ms otherwise
-// Falls back to Chrome Web Speech API if microphone/MediaRecorder unavailable
-//
-// Expected latency: ~300-400ms from stop speaking to transcript ready
-// vs Chrome STT: ~2000-3500ms
+// Simple approach: record until silence, send full blob to Deepgram, return transcript
+// Falls back to Chrome STT if mic unavailable
 
 function listenForUser(mySession, maxTotalMs) {
   return new Promise(async resolve => {
     maxTotalMs = maxTotalMs || 30000;
+
+    // ── Try Deepgram ─────────────────────────────────────────────────────
+    let stream = null;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: { channelCount:1, echoCancellation:true, noiseSuppression:true, autoGainControl:true }
+      });
+    } catch(e) {
+      // Mic denied — fall back to Chrome STT
+      return resolve(await listenChromeFallback(mySession, maxTotalMs));
+    }
+
     let resolved = false;
     let mediaRecorder = null;
-    let audioStream = null;
     let chunks = [];
-    let silenceTimer = null;
     let hardTimer = null;
-    let lastSoundTime = Date.now();
-    let accumulatedTranscript = '';
-    let isRecording = false;
-    let chunkInterval = null;
-    let audioContext = null;
-    let analyser = null;
-    let silenceCheckInterval = null;
+    let silenceTimer = null;
 
-    const SILENCE_SHORT = 900;
-    const SILENCE_LONG = 1600;
-    const CHUNK_MS = 1500;        // send audio to Deepgram every 1.5s
-    const SILENCE_THRESHOLD = 8; // audio level below this = silence
+    // Audio level analyser for silence detection
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioCtx.createMediaStreamSource(stream);
+    const analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    source.connect(analyser);
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-    function isCompleteSentence(text) {
-      if (!text) return false;
-      const t = text.trim().toLowerCase();
-      if (/[.!?]$/.test(t)) return true;
-      if (/\b(thanks|please|okay|ok|sure|right|exactly|anyway|anyways|yes|no|maybe|later|now|today|here|there|good|great|fine|cool|true|agreed)$/.test(t)) return true;
-      if (t.split(/\s+/).length >= 6) return true;
-      return false;
-    }
-
-    function getSilenceMs() {
-      return isCompleteSentence(accumulatedTranscript) ? SILENCE_SHORT : SILENCE_LONG;
-    }
-
-    function finish(result) {
-      if (resolved) return;
-      resolved = true;
-      clearTimeout(silenceTimer);
+    function cleanup() {
       clearTimeout(hardTimer);
-      clearInterval(chunkInterval);
-      clearInterval(silenceCheckInterval);
+      clearTimeout(silenceTimer);
       if (listenTimer) { clearTimeout(listenTimer); listenTimer = null; }
       if (mediaRecorder && mediaRecorder.state !== 'inactive') {
         try { mediaRecorder.stop(); } catch {}
       }
-      if (audioStream) {
-        audioStream.getTracks().forEach(t => t.stop());
-      }
-      if (audioContext) {
-        try { audioContext.close(); } catch {}
-      }
+      stream.getTracks().forEach(t => t.stop());
+      try { audioCtx.close(); } catch {}
       showListening(false);
-      resolve(accumulatedTranscript.trim() || null);
     }
 
-    // ── Send accumulated audio chunks to Deepgram ─────────────────────────
-    async function flushChunks() {
-      if (chunks.length === 0) return;
-      const toSend = chunks.splice(0);
-      const blob = new Blob(toSend, { type: mediaRecorder?.mimeType || 'audio/webm' });
-      if (blob.size < 200) return; // too small — likely silence
+    async function finish() {
+      if (resolved) return;
+      resolved = true;
+      // Force final data collection
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        await new Promise(r => {
+          mediaRecorder.onstop = r;
+          try { mediaRecorder.stop(); } catch { r(); }
+        });
+      }
+      cleanup();
+
+      if (chunks.length === 0) { resolve(null); return; }
+
+      // Send to Deepgram
+      const mimeType = mediaRecorder?.mimeType || 'audio/webm';
+      const blob = new Blob(chunks, { type: mimeType });
+      if (blob.size < 500) { resolve(null); return; }
 
       try {
-        const devKey = getDevKey ? getDevKey() : '';
-        const headers = { 'Content-Type': blob.type };
+        const devKey = typeof getDevKey === 'function' ? getDevKey() : '';
+        const headers = { 'Content-Type': mimeType };
         if (devKey) headers['x-dev-key'] = devKey;
 
-        const res = await fetch('/api/stt', {
-          method: 'POST',
-          headers,
-          body: blob,
-        });
-
-        if (!res.ok) return;
+        const res = await fetch('/api/stt', { method:'POST', headers, body: blob });
+        if (!res.ok) { resolve(null); return; }
         const data = await res.json();
-        const t = data.transcript?.trim();
-
-        if (t) {
-          lastSoundTime = Date.now();
-          accumulatedTranscript = (accumulatedTranscript + ' ' + t).trim();
-          // Reset silence timer with new speech
-          clearTimeout(silenceTimer);
-          const ms = getSilenceMs();
-          silenceTimer = setTimeout(() => finish('silence'), ms);
-        }
-      } catch (err) {
-        // Silent fail — don't crash listening on network error
+        resolve(data.transcript?.trim() || null);
+      } catch(e) {
+        resolve(null);
       }
     }
 
-    // ── Try Deepgram via MediaRecorder ───────────────────────────────────
-    async function startDeepgram() {
-      try {
-        audioStream = await navigator.mediaDevices.getUserMedia({
-          audio: {
-            channelCount: 1,
-            sampleRate: 16000,
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
-          }
-        });
+    // Set up MediaRecorder — collect all audio into chunks[]
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+      ? 'audio/webm;codecs=opus'
+      : 'audio/webm';
+    mediaRecorder = new MediaRecorder(stream, { mimeType });
+    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+    mediaRecorder.start(500); // collect data every 500ms
+    showListening(true);
 
-        // Set up audio level analyser for silence detection UI
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const source = audioContext.createMediaStreamSource(audioStream);
-        analyser = audioContext.createAnalyser();
-        analyser.fftSize = 256;
-        source.connect(analyser);
+    // Silence detection — watch audio levels
+    let hasSpeech = false;
+    let silentMs = 0;
+    const CHECK_INTERVAL = 100;
+    const SOUND_THRESHOLD = 6;
+    const SILENCE_AFTER_SPEECH_MS = 1200; // stop after 1.2s of silence post-speech
 
-        const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-          ? 'audio/webm;codecs=opus'
-          : MediaRecorder.isTypeSupported('audio/webm')
-            ? 'audio/webm'
-            : 'audio/ogg;codecs=opus';
-
-        mediaRecorder = new MediaRecorder(audioStream, { mimeType });
-        mediaRecorder.ondataavailable = e => {
-          if (e.data.size > 0) chunks.push(e.data);
-        };
-
-        mediaRecorder.start(CHUNK_MS); // collect data every 1.5s
-        isRecording = true;
-        showListening(true);
-
-        // Flush chunks to Deepgram on each timeslice
-        chunkInterval = setInterval(() => {
-          if (!resolved && mySession === session) {
-            flushChunks();
-          }
-        }, CHUNK_MS);
-
-        // Silence detection via audio level
-        const dataArray = new Uint8Array(analyser.frequencyBinCount);
-        let silentFrames = 0;
-        const SILENT_FRAMES_NEEDED = 20; // ~1000ms of silence at 50ms intervals
-        const startTime = Date.now();
-        const MIN_RECORDING_MS = 1500; // must record at least 1.5s before silence can trigger
-        let hasSpeech = false;
-
-        silenceCheckInterval = setInterval(() => {
-          if (resolved || mySession !== session) return;
-          analyser.getByteFrequencyData(dataArray);
-          const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-          const elapsed = Date.now() - startTime;
-
-          if (avg >= SILENCE_THRESHOLD) {
-            // Sound detected
-            silentFrames = 0;
-            hasSpeech = true;
-            lastSoundTime = Date.now();
-          } else {
-            // Silence
-            if (!hasSpeech || elapsed < MIN_RECORDING_MS) return; // too early
-            silentFrames++;
-            if (silentFrames >= SILENT_FRAMES_NEEDED && accumulatedTranscript) {
-              // Detected silence after speech — flush remaining chunks immediately
-              clearInterval(silenceCheckInterval);
-              silenceCheckInterval = null;
-              if (mediaRecorder && mediaRecorder.state === 'recording') {
-                try { mediaRecorder.requestData(); } catch {} // force flush
-              }
-              setTimeout(() => flushChunks().then(() => {
-                if (!resolved && accumulatedTranscript) {
-                  const ms = getSilenceMs();
-                  clearTimeout(silenceTimer);
-                  silenceTimer = setTimeout(() => finish('silence'), ms);
-                }
-              }), 150);
-            }
-          }
-        }, 50);
-
-        hardTimer = setTimeout(() => finish('hard_timeout'), maxTotalMs);
-        listenTimer = hardTimer;
-
-      } catch (err) {
-        // Microphone denied or MediaRecorder not available — fall back to Chrome STT
-        console.warn('[STT] Deepgram fallback to Chrome STT:', err.message);
-        startChromeFallback();
+    const silenceCheck = setInterval(() => {
+      if (resolved || mySession !== session) {
+        clearInterval(silenceCheck);
+        if (!resolved) finish();
+        return;
       }
+      analyser.getByteFrequencyData(dataArray);
+      const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+
+      if (avg > SOUND_THRESHOLD) {
+        hasSpeech = true;
+        silentMs = 0;
+        clearTimeout(silenceTimer);
+      } else if (hasSpeech) {
+        silentMs += CHECK_INTERVAL;
+        if (silentMs >= SILENCE_AFTER_SPEECH_MS) {
+          clearInterval(silenceCheck);
+          finish();
+        }
+      }
+    }, CHECK_INTERVAL);
+
+    hardTimer = setTimeout(() => {
+      clearInterval(silenceCheck);
+      finish();
+    }, maxTotalMs);
+    listenTimer = hardTimer;
+  });
+}
+
+// Chrome Web Speech API fallback
+function listenChromeFallback(mySession, maxTotalMs) {
+  return new Promise(resolve => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { resolve(null); return; }
+
+    let accumulated = '', interim = '', resolved = false;
+    let silenceTimer = null, hardTimer = null, currentRec = null;
+    let restarts = 0;
+    const SILENCE_MS = 1800;
+
+    function finish() {
+      if (resolved) return;
+      resolved = true;
+      clearTimeout(silenceTimer); clearTimeout(hardTimer);
+      if (listenTimer) { clearTimeout(listenTimer); listenTimer = null; }
+      if (currentRec) { try { currentRec.stop(); } catch {} }
+      showListening(false);
+      let final = accumulated.trim();
+      if (interim.trim() && !final.toLowerCase().includes(interim.trim().toLowerCase()))
+        final = (final + ' ' + interim).trim();
+      resolve(final || null);
     }
 
-    // ── Chrome Web Speech API fallback ───────────────────────────────────
-    function startChromeFallback() {
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) { finish(null); return; }
+    function startRec() {
+      if (resolved || mySession !== session) return;
+      if (restarts >= 8) restarts = 0;
+      restarts++;
+      const r = new SR();
+      r.lang = 'en-US'; r.interimResults = true; r.continuous = true;
+      currentRec = r; rec = r; interim = '';
 
-      const SILENCE_MS_FALLBACK = 1800;
-      let accumulated = '', interim = '', silenceTimerFB = null, currentRec = null;
-      let restarts = 0;
-      const MAX_RESTARTS = 8;
-
-      function finishFB(val) {
-        if (resolved) return;
-        clearTimeout(silenceTimerFB);
-        clearTimeout(hardTimer);
-        if (listenTimer) { clearTimeout(listenTimer); listenTimer = null; }
-        if (currentRec) { try { currentRec.stop(); } catch {} }
-        showListening(false);
-        let final = accumulated.trim();
-        if (interim.trim() && !final.toLowerCase().includes(interim.trim().toLowerCase())) {
-          final = (final + ' ' + interim).trim();
+      r.onresult = e => {
+        if (resolved || mySession !== session) { finish(); return; }
+        let finals = '', lat = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const t = e.results[i][0].transcript;
+          e.results[i].isFinal ? finals += (finals?' ':'')+t.trim() : lat = t.trim();
         }
-        resolved = true;
-        resolve(final || null);
-      }
-
-      function startRec() {
+        if (finals) accumulated = (accumulated+' '+finals).trim();
+        interim = lat;
+        clearTimeout(silenceTimer);
+        silenceTimer = setTimeout(finish, SILENCE_MS);
+      };
+      r.onerror = e => {
+        if (e.error === 'aborted') return;
+        if (e.error === 'no-speech') {
+          restarts = Math.max(0, restarts-1);
+          setTimeout(() => { if (!resolved && mySession===session) startRec(); }, 500);
+          return;
+        }
+        finish();
+      };
+      r.onend = () => {
         if (resolved || mySession !== session) return;
-        if (restarts >= MAX_RESTARTS) restarts = 0;
-        restarts++;
-        const r = new SR();
-        r.lang = 'en-US'; r.interimResults = true; r.continuous = true;
-        currentRec = r; rec = r; interim = '';
-
-        r.onresult = e => {
-          if (resolved || mySession !== session) { finishFB('session'); return; }
-          let finals = '', lat = '';
-          for (let i = e.resultIndex; i < e.results.length; i++) {
-            const t = e.results[i][0].transcript;
-            e.results[i].isFinal ? finals += (finals ? ' ' : '') + t.trim() : lat = t.trim();
-          }
-          if (finals) accumulated = (accumulated + ' ' + finals).trim();
-          interim = lat;
-          clearTimeout(silenceTimerFB);
-          silenceTimerFB = setTimeout(() => finishFB('silence'), SILENCE_MS_FALLBACK);
-        };
-
-        r.onerror = e => {
-          if (e.error === 'aborted') return;
-          if (e.error === 'no-speech') {
-            restarts = Math.max(0, restarts - 1);
-            setTimeout(() => { if (!resolved && mySession === session) startRec(); }, 500);
-            return;
-          }
-          finishFB('err_' + e.error);
-        };
-
-        r.onend = () => {
-          if (resolved || mySession !== session) return;
-          if (accumulated || interim) { finishFB(accumulated || interim); return; }
-          setTimeout(() => { if (!resolved && mySession === session) startRec(); }, 300);
-        };
-
-        try { r.start(); showListening(true); }
-        catch { setTimeout(() => { if (!resolved) startRec(); }, 500); }
-      }
-
-      hardTimer = setTimeout(() => finishFB('hard_timeout'), maxTotalMs);
-      listenTimer = hardTimer;
-      startRec();
+        if (accumulated || interim) { finish(); return; }
+        setTimeout(() => { if (!resolved && mySession===session) startRec(); }, 300);
+      };
+      try { r.start(); showListening(true); }
+      catch { setTimeout(() => { if (!resolved) startRec(); }, 500); }
     }
 
-    // Start with Deepgram
-    startDeepgram();
+    hardTimer = setTimeout(finish, maxTotalMs);
+    listenTimer = hardTimer;
+    startRec();
   });
 }
 
