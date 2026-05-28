@@ -1016,12 +1016,36 @@ function showListening(on=true) {
 }
 
 /* ===== listenForUser — robust continuous ===== */
+// LATENCY FIX: Dynamic silence detection
+//   SILENCE_SHORT = 900ms  — fires when last word ends with . ! ? or common sentence-enders
+//   SILENCE_LONG  = 1800ms — fires otherwise (mid-thought, comma pause, etc.)
+//   Was: 2800ms flat. This cuts ~1-2s of dead air every single turn.
 function listenForUser(mySession, maxTotalMs) {
   return new Promise(resolve=>{
     maxTotalMs=maxTotalMs||30000;
     let accumulated='', interim='', silenceTimer=null, hardTimer=null, currentRec=null;
     let resolved=false, lastSpeech=Date.now(), restarts=0;
-    const MAX_RESTARTS=8, SILENCE_MS=2800;
+    const MAX_RESTARTS=8;
+    const SILENCE_SHORT=900;   // after sentence-ending punctuation or clear sentence end
+    const SILENCE_LONG=1800;   // mid-thought, trailing off, comma pause
+
+    // Detect if text looks like a complete sentence
+    function isCompleteSentence(text) {
+      if (!text) return false;
+      const t = text.trim().toLowerCase();
+      // Ends with sentence-ending word or punctuation
+      if (/[.!?]$/.test(t)) return true;
+      // Ends with common sentence-closing words
+      if (/(thanks|please|okay|ok|sure|right|exactly|anyway|anyways|bye|hello|hi|hey|yes|no|maybe|later|now|today|here|there|that|this|you|me|us|them|it|him|her|too|though|though|well|fine|good|great|nice|cool|true|false|agree|agreed)$/.test(t)) return true;
+      // Long enough utterance (6+ words) — probably done
+      if (t.split(/\s+/).length >= 6) return true;
+      return false;
+    }
+
+    function getSilenceMs() {
+      const text = (accumulated + ' ' + interim).trim();
+      return isCompleteSentence(text) ? SILENCE_SHORT : SILENCE_LONG;
+    }
 
     function finish(val) {
       if (resolved) return;
@@ -1037,12 +1061,12 @@ function listenForUser(mySession, maxTotalMs) {
 
     function scheduleSilence() {
       clearTimeout(silenceTimer);
-      silenceTimer=setTimeout(()=>{ if(Date.now()-lastSpeech>=SILENCE_MS-100) finish('silence'); }, SILENCE_MS);
+      const ms = getSilenceMs();
+      silenceTimer=setTimeout(()=>{ if(Date.now()-lastSpeech>=ms-100) finish('silence'); }, ms);
     }
 
     function startRec() {
       if (resolved||mySession!==session) return;
-      // Reset restart counter when it maxes out — keep listening indefinitely until hard timeout
       if (restarts>=MAX_RESTARTS) restarts=0;
       restarts++;
       const r=createRecognition(); if(!r){finish('no_sr');return;}
@@ -1065,7 +1089,6 @@ function listenForUser(mySession, maxTotalMs) {
       r.onerror=e=>{
         if(e.error==='aborted') return;
         if(e.error==='no-speech'){
-          // Heard nothing — wait 500ms then try again, don't burn a restart slot
           restarts=Math.max(0,restarts-1);
           setTimeout(()=>{ if(!resolved&&mySession===session) startRec(); }, 500);
           return;
@@ -1076,7 +1099,6 @@ function listenForUser(mySession, maxTotalMs) {
       r.onend=()=>{
         if(resolved||mySession!==session) return;
         if(accumulated||interim) { finish(accumulated||interim); return; }
-        // No speech yet — restart after short delay
         setTimeout(()=>{ if(!resolved&&mySession===session) startRec(); }, 300);
       };
 
