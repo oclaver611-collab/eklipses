@@ -1467,80 +1467,123 @@ async function runCoachFeedback(mySession) {
   setMediaForSpeaker('Ryan');
   ryanOrbSetState('speaking');
   const sc=SCENARIOS[currentScenarioKey]||{};
+
   // Guard: if no conversation happened, skip coaching
   if (!conversationHistory.length) {
     await speak("Looks like we didn't get enough conversation to work with. Hit Try Again and give me something to coach.", 'Ryan');
     return;
   }
-  // Speak a thinking line immediately — fills the API wait time
-  const thinkingLines = [
-    "Give me a second.",
-    "Okay. Let me think about that.",
-    "Alright. One moment.",
-    "Let me go through that.",
-    "Give me a moment.",
-  ];
-  await speak(thinkingLines[Math.floor(Math.random() * thinkingLines.length)], 'Ryan');
-  if(mySession!==session) return;
-  els.text.textContent='Analyzing your session...';
-  try {
-    const coachPayload=JSON.stringify({ conversation:conversationHistory, scenarioTitle:sc.title||'Dating scenario', scenarioKey:currentScenarioKey||'', opener:firstUserOpener||'' });
-    let res;
-    for (let attempt=1; attempt<=2; attempt++) {
-      const coachController=new AbortController();
-      const coachTimeout=setTimeout(()=>coachController.abort(),45000);
+
+  // FIX 4: Fire API call and thinking line IN PARALLEL — no more dead silence
+  // Both start at the same time. Thinking line plays while API is in flight.
+  const coachPayload = JSON.stringify({
+    conversation: conversationHistory,
+    scenarioTitle: sc.title || 'Dating scenario',
+    scenarioKey: currentScenarioKey || '',
+    opener: firstUserOpener || ''
+  });
+
+  // Start API call immediately (don't await yet)
+  const coachPromise = (async () => {
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      const coachController = new AbortController();
+      const coachTimeout = setTimeout(() => coachController.abort(), 45000);
       try {
-        res=await fetch('/api/coach',{
-          signal:coachController.signal,
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body:coachPayload,
+        const res = await fetch('/api/coach', {
+          signal: coachController.signal,
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: coachPayload,
         });
         clearTimeout(coachTimeout);
-        break;
+        if (!res.ok) throw new Error('Coach API returned ' + res.status);
+        return await res.json();
       } catch(fetchErr) {
         clearTimeout(coachTimeout);
-        if(attempt===2) throw fetchErr;
+        if (attempt === 2) throw fetchErr;
         console.warn('Coach timeout on attempt 1, retrying...');
-        await new Promise(r=>setTimeout(r,1500));
-        if(mySession!==session) return;
+        await new Promise(r => setTimeout(r, 1500));
       }
     }
-    if(!res.ok) {
-      const errText = await res.text().catch(()=>'');
-      console.error('Coach API error:', res.status, errText);
-      throw new Error('Coach API returned ' + res.status);
-    }
-    const f=await res.json();
-    if(mySession!==session) return;
-    // 4-part chronological coaching — opener, middle, mistake, verdict
-    const coachParts = [f.part1, f.part2, f.part3, f.part4].filter(Boolean);
-    // Transitions come from coach.js — generated server-side, never banned phrases
-    const transitions = [f.transition2, f.transition3, f.transition4];
-    if (coachParts.length) {
-      for (let i = 0; i < coachParts.length; i++) {
-        if (mySession !== session) return;
-        // Show text immediately so screen is never blank while TTS loads
-        els.text.textContent = coachParts[i];
-        await speak(coachParts[i], 'Ryan');
-        if (i < coachParts.length - 1) {
-          if (mySession !== session) return;
-          const transition = transitions[i];
-          if (transition) {
-            els.text.textContent = transition;
-            await speak(transition, 'Ryan');
-          }
-        }
-      }
-    } else {
-      els.text.textContent = f.spokenFeedback || f.spokenSummary;
-      await speak(f.spokenFeedback || f.spokenSummary, 'Ryan');
-    }
-    if(mySession!==session) return;
-    showFeedbackCard(f);
+  })();
+
+  // Play thinking lines while API is in flight
+  const thinkingLines = [
+    "Alright. Let me put together your feedback.",
+    "Okay. Give me a moment.",
+    "Let me go through that.",
+    "Alright. One moment.",
+    "Give me a moment.",
+  ];
+  const thinkingLine = thinkingLines[Math.floor(Math.random() * thinkingLines.length)];
+  els.text.textContent = thinkingLine;
+  await speak(thinkingLine, 'Ryan');
+  if(mySession!==session) return;
+
+  // Now wait for API — if it's already done, this resolves instantly
+  let f;
+  try {
+    f = await coachPromise;
   } catch(err) {
     console.error('Coach feedback error:', err.message);
-    await speak("Something went wrong pulling your feedback — the session was good though. Hit Try Again and let's go again.",'Ryan');
+    await speak("Something went wrong pulling your feedback — the session was good though. Hit Try Again and let's go again.", 'Ryan');
+    return;
   }
+
+  if(mySession!==session) return;
+
+  // FIX 3: Announce score out loud before parts start
+  const scoreAnnouncements = [
+    `I'm giving you a ${f.score} out of 10.`,
+    `Your score — ${f.score} out of 10.`,
+    `${f.score} out of 10.`,
+  ];
+  const scoreAnnouncement = scoreAnnouncements[Math.floor(Math.random() * scoreAnnouncements.length)];
+  els.text.textContent = scoreAnnouncement;
+  await speak(scoreAnnouncement, 'Ryan');
+  if(mySession!==session) return;
+
+  // FIX 1: Breathing room between parts — 1.5s pause after each part + transition
+  // FIX 5: Speak tryNextTime after part4 as a final actionable line
+  const coachParts = [f.part1, f.part2, f.part3, f.part4].filter(Boolean);
+  const transitions = [f.transition2, f.transition3, f.transition4];
+
+  if (coachParts.length) {
+    for (let i = 0; i < coachParts.length; i++) {
+      if (mySession !== session) return;
+      els.text.textContent = coachParts[i];
+      await speak(coachParts[i], 'Ryan');
+      if(mySession!==session) return;
+
+      if (i < coachParts.length - 1) {
+        // FIX 1: Pause between parts — feels like Ryan is thinking, not a machine
+        await pause(1500);
+        if(mySession!==session) return;
+        const transition = transitions[i];
+        if (transition) {
+          els.text.textContent = transition;
+          await speak(transition, 'Ryan');
+          if(mySession!==session) return;
+          await pause(800);
+        }
+      }
+    }
+
+    // FIX 5: Speak the actionable try-next-time line
+    if (f.tryNextTime && mySession === session) {
+      await pause(1500);
+      const tryLine = `Next time, try this exact line: "${f.tryNextTime}"`;
+      els.text.textContent = tryLine;
+      await speak(tryLine, 'Ryan');
+    }
+
+  } else {
+    els.text.textContent = f.spokenFeedback || f.spokenSummary;
+    await speak(f.spokenFeedback || f.spokenSummary, 'Ryan');
+  }
+
+  if(mySession!==session) return;
+  showFeedbackCard(f);
 }
 
 /* ===== EkComments — per-scenario community comments ===== */
