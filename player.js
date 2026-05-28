@@ -1112,11 +1112,11 @@ function listenForUser(mySession, maxTotalMs) {
   });
 }
 
-/* ===== Mary API warmup — fires silently when a scenario loads ===== */
-// Primes the Groq cold start so the user's first real message never hits a timeout.
-// Fire-and-forget: we discard the response entirely.
+/* ===== Mary API + TTS warmup — fires silently when a scenario loads ===== */
+// Primes Groq cold start AND OpenAI TTS cold start so first real response has no extra latency.
+// Fire-and-forget: responses discarded entirely.
 function warmupCharacterApi(key) {
-  const sc = (SCENARIOS[key]) || {};
+  // Warm up character API (Groq)
   fetch('/api/character', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1126,7 +1126,26 @@ function warmupCharacterApi(key) {
       characterId: currentCharacterId,
       history: [],
     }),
-  }).catch(() => {}); // silent — failure is fine, this is just a warm-up
+  }).catch(() => {});
+
+  // Warm up character-stream endpoint (Groq via SSE)
+  fetch('/api/character-stream', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      userMessage: 'hi',
+      scenarioKey: key,
+      characterId: currentCharacterId,
+      history: [],
+    }),
+  }).then(r => r.body?.cancel()).catch(() => {});
+
+  // Warm up OpenAI TTS — fires a silent 1-word request to prime the connection
+  fetch('/api/tts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: 'Hi', voice: 'nova', characterId: currentCharacterId }),
+  }).then(r => r.body?.cancel()).catch(() => {});
 }
 
 /* ===== Scenario engine ===== */

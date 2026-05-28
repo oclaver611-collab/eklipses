@@ -1844,7 +1844,7 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
         },
         body: JSON.stringify({
           model: 'llama-3.3-70b-versatile',
-          max_tokens: 120,
+          max_tokens: 150,
           messages: [
             { role: 'system', content: systemPrompt },
             ...history,
