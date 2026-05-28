@@ -1042,7 +1042,7 @@ function listenForUser(mySession, maxTotalMs) {
 
     const SILENCE_SHORT = 900;
     const SILENCE_LONG = 1600;
-    const CHUNK_MS = 2500;        // send audio to Deepgram every 2.5s
+    const CHUNK_MS = 1500;        // send audio to Deepgram every 1.5s
     const SILENCE_THRESHOLD = 8; // audio level below this = silence
 
     function isCompleteSentence(text) {
@@ -1084,7 +1084,7 @@ function listenForUser(mySession, maxTotalMs) {
       if (chunks.length === 0) return;
       const toSend = chunks.splice(0);
       const blob = new Blob(toSend, { type: mediaRecorder?.mimeType || 'audio/webm' });
-      if (blob.size < 500) return; // too small — likely silence
+      if (blob.size < 200) return; // too small — likely silence
 
       try {
         const devKey = getDevKey ? getDevKey() : '';
@@ -1145,7 +1145,7 @@ function listenForUser(mySession, maxTotalMs) {
           if (e.data.size > 0) chunks.push(e.data);
         };
 
-        mediaRecorder.start(CHUNK_MS); // collect data every 2.5s
+        mediaRecorder.start(CHUNK_MS); // collect data every 1.5s
         isRecording = true;
         showListening(true);
 
@@ -1159,21 +1159,32 @@ function listenForUser(mySession, maxTotalMs) {
         // Silence detection via audio level
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
         let silentFrames = 0;
-        const SILENT_FRAMES_NEEDED = 12; // ~600ms of silence at 50ms intervals
+        const SILENT_FRAMES_NEEDED = 20; // ~1000ms of silence at 50ms intervals
+        const startTime = Date.now();
+        const MIN_RECORDING_MS = 1500; // must record at least 1.5s before silence can trigger
+        let hasSpeech = false;
 
         silenceCheckInterval = setInterval(() => {
           if (resolved || mySession !== session) return;
           analyser.getByteFrequencyData(dataArray);
           const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+          const elapsed = Date.now() - startTime;
 
-          if (avg < SILENCE_THRESHOLD) {
+          if (avg >= SILENCE_THRESHOLD) {
+            // Sound detected
+            silentFrames = 0;
+            hasSpeech = true;
+            lastSoundTime = Date.now();
+          } else {
+            // Silence
+            if (!hasSpeech || elapsed < MIN_RECORDING_MS) return; // too early
             silentFrames++;
             if (silentFrames >= SILENT_FRAMES_NEEDED && accumulatedTranscript) {
               // Detected silence after speech — flush remaining chunks immediately
               clearInterval(silenceCheckInterval);
               silenceCheckInterval = null;
               if (mediaRecorder && mediaRecorder.state === 'recording') {
-                mediaRecorder.requestData(); // force flush
+                try { mediaRecorder.requestData(); } catch {} // force flush
               }
               setTimeout(() => flushChunks().then(() => {
                 if (!resolved && accumulatedTranscript) {
@@ -1181,11 +1192,8 @@ function listenForUser(mySession, maxTotalMs) {
                   clearTimeout(silenceTimer);
                   silenceTimer = setTimeout(() => finish('silence'), ms);
                 }
-              }), 100);
+              }), 150);
             }
-          } else {
-            silentFrames = 0;
-            lastSoundTime = Date.now();
           }
         }, 50);
 
