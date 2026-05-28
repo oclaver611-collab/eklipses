@@ -436,10 +436,10 @@ RULES:
     const cardFields = ['openerBreakdown', 'bestMoment', 'missedOpportunity', 'tryNextTime', 'wouldSheDateHim', 'spokenSummary'];
     for (const field of cardFields) {
       if (!feedback[field] || feedback[field] === 'undefined' || feedback[field].length < 5) {
-        console.warn(\`[coach] Field "\${field}" missing — filling fallback\`);
-        if (field === 'wouldSheDateHim') feedback[field] = 'Maybe. You had some real moments but you needed to go deeper into what she opened.';
-        else if (field === 'tryNextTime') feedback[field] = \`Tell me more about that — what made you get into it?\`;
-        else if (field === 'spokenSummary') feedback[field] = \`You showed up and had a real conversation — now let\'s make it sharper.\`;
+        console.warn(`[coach] Field "${field}" missing — filling fallback`);
+        if (field === 'wouldSheDateHim') feedback[field] = 'Maybe. You had some real moments but needed to go further into what she opened.';
+        else if (field === 'tryNextTime') feedback[field] = 'Tell me more about that — what made you get into it?';
+        else if (field === 'spokenSummary') feedback[field] = 'You showed up and had a real conversation — now make it sharper.';
         else feedback[field] = 'See the feedback above.';
       }
     }
