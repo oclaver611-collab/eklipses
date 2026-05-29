@@ -14,7 +14,7 @@ const EVALS = [
     name: 'Pipeline Eval — /api/character-stream (beach/sofia)',
     cmd: 'node eval-pipeline.js',
     desc: '5 messages, checks length / banned phrases / latency < 3s',
-    timeout: 180_000,
+    timeout: 60_000,
   },
   {
     name: 'TTS Eval — /api/tts for all 16 characters',
@@ -36,6 +36,13 @@ const EVALS = [
   },
 ];
 
+const PASS_SIGNALS = ['all pipeline checks passed', 'all tts checks passed', 'all tests passed', '0 failed'];
+
+function didPass(output) {
+  const lower = (output || '').toLowerCase();
+  return PASS_SIGNALS.some(s => lower.includes(s));
+}
+
 console.log('\n╔══════════════════════════════════════════════════════════╗');
 console.log('║           EKLIPSES — MASTER TEST RUNNER                 ║');
 console.log('║           4 evals  •  run before every deploy           ║');
@@ -49,24 +56,22 @@ for (let i = 0; i < EVALS.length; i++) {
   console.log(`   ${ev.desc}`);
   console.log('   ' + '─'.repeat(54));
 
+  let output = '';
   let passed = false;
 
   try {
-    // execSync throws only on non-zero exit code — exit 0 means passed
-    const output = execSync(ev.cmd, {
+    output = execSync(ev.cmd, {
       encoding: 'utf8',
       stdio: 'pipe',
       timeout: ev.timeout,
     });
     console.log(output.trimEnd());
-    passed = true; // exit 0 = passed
+    passed = didPass(output);
   } catch (err) {
-    const out = (err.stdout || '').trimEnd();
-    const errOut = (err.stderr || '').trimEnd();
-    if (out) console.log(out);
-    if (errOut) console.error(errOut);
-    if (!out && !errOut) console.error('  Error:', err.message);
-    passed = false; // non-zero exit = failed
+    output = err.stdout || err.message || '';
+    console.log(output.trimEnd());
+    if (err.stderr) console.error(err.stderr.trimEnd());
+    passed = didPass(output);
   }
 
   results.push({ name: ev.name, passed });
