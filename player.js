@@ -778,70 +778,108 @@ function renderLine(line) {
 /* ===== TTS ===== */
 
 // OpenAI TTS for Mary — streaming playback for low latency
-async function speakElevenLabs(text, onStart) {
-  const res = await fetch('/api/tts', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, voice: 'nova' }),
-  });
-  if (!res.ok) throw new Error('OpenAI TTS failed: ' + res.status);
-
-  // Use MediaSource streaming — audio starts playing as first chunks arrive
-  // Falls back to full buffer decode if MediaSource not supported
-  if (window.MediaSource && MediaSource.isTypeSupported('audio/mpeg')) {
-    return new Promise((resolve, reject) => {
-      const mediaSource = new MediaSource();
-      const audio = new Audio();
-      audio.src = URL.createObjectURL(mediaSource);
-
-      mediaSource.addEventListener('sourceopen', async () => {
-        const sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
-        const reader = res.body.getReader();
-        let started = false;
-
-        const pump = async () => {
-          try {
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) {
-                if (!sourceBuffer.updating) mediaSource.endOfStream();
-                else sourceBuffer.addEventListener('updateend', () => mediaSource.endOfStream(), { once: true });
-                break;
-              }
-              // Wait if buffer is updating
-              if (sourceBuffer.updating) {
-                await new Promise(r => sourceBuffer.addEventListener('updateend', r, { once: true }));
-              }
-              sourceBuffer.appendBuffer(value);
-              // Start playing as soon as first chunk lands
-              if (!started) {
-                started = true;
-                audio.play().then(() => { onStart(); }).catch(() => {});
-              }
-            }
-          } catch(e) { reject(e); }
-        };
-        pump();
-      });
-
-      audio.onended = () => { URL.revokeObjectURL(audio.src); resolve(); };
-      audio.onerror = (e) => reject(new Error('Audio error: ' + e));
+async function speakElevenLabs(text, onStart, characterId) {
+  // ── Fetch TTS audio with 12s timeout ────────────────────────────────────
+  const fetchCtrl = new AbortController();
+  const fetchTimeout = setTimeout(() => fetchCtrl.abort(), 12000);
+  let res;
+  try {
+    res = await fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, characterId: characterId || null }),
+      signal: fetchCtrl.signal,
     });
-  } else {
-    // Fallback: full buffer (Safari / older browsers)
-    const arrayBuf = await res.arrayBuffer();
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    __audioContexts.push(audioCtx);
-    const audioBuf = await audioCtx.decodeAudioData(arrayBuf);
-    const source = audioCtx.createBufferSource();
-    source.buffer = audioBuf;
-    source.connect(audioCtx.destination);
-    onStart();
-    return new Promise((resolve) => {
-      source.onended = () => { audioCtx.close(); resolve(); };
-      source.start(0);
-    });
+  } catch (e) {
+    clearTimeout(fetchTimeout);
+    console.error('[speakElevenLabs] fetch failed:', e.message, '| char:', characterId, '| text:', text.slice(0, 60));
+    throw e;
   }
+  clearTimeout(fetchTimeout);
+
+  if (!res.ok) {
+    const errBody = await res.text().catch(() => String(res.status));
+    console.error('[speakElevenLabs] TTS HTTP', res.status, '| char:', characterId, '|', errBody.slice(0, 120));
+    throw new Error('TTS failed ' + res.status);
+  }
+
+  // ── Play audio with 20s watchdog so a hung stream can't freeze the queue ─
+  const AUDIO_WATCHDOG = 20000;
+
+  const playPromise = (() => {
+    // Use MediaSource streaming — audio starts playing as first chunks arrive
+    // Falls back to full buffer decode if MediaSource not supported
+    if (window.MediaSource && MediaSource.isTypeSupported('audio/mpeg')) {
+      return new Promise((resolve, reject) => {
+        const mediaSource = new MediaSource();
+        const audio = new Audio();
+        audio.src = URL.createObjectURL(mediaSource);
+
+        mediaSource.addEventListener('sourceopen', async () => {
+          const sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
+          const reader = res.body.getReader();
+          let started = false;
+
+          const pump = async () => {
+            try {
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) {
+                  if (!sourceBuffer.updating) mediaSource.endOfStream();
+                  else sourceBuffer.addEventListener('updateend', () => mediaSource.endOfStream(), { once: true });
+                  break;
+                }
+                if (sourceBuffer.updating) {
+                  await new Promise(r => sourceBuffer.addEventListener('updateend', r, { once: true }));
+                }
+                sourceBuffer.appendBuffer(value);
+                if (!started) {
+                  started = true;
+                  audio.play().then(() => { onStart(); }).catch(() => {});
+                }
+              }
+            } catch(e) {
+              console.error('[speakElevenLabs] MediaSource pump error:', e.message);
+              reject(e);
+            }
+          };
+          pump();
+        });
+
+        audio.onended = () => { URL.revokeObjectURL(audio.src); resolve(); };
+        audio.onerror = (e) => {
+          console.error('[speakElevenLabs] Audio element error:', e);
+          reject(new Error('Audio playback error'));
+        };
+      });
+    } else {
+      // Fallback: full buffer (Safari / older browsers)
+      return (async () => {
+        const arrayBuf = await res.arrayBuffer();
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        __audioContexts.push(audioCtx);
+        const audioBuf = await audioCtx.decodeAudioData(arrayBuf);
+        const source = audioCtx.createBufferSource();
+        source.buffer = audioBuf;
+        source.connect(audioCtx.destination);
+        onStart();
+        return new Promise((resolve) => {
+          source.onended = () => { audioCtx.close(); resolve(); };
+          source.start(0);
+        });
+      })();
+    }
+  })();
+
+  return Promise.race([
+    playPromise,
+    new Promise((_, reject) =>
+      setTimeout(() => {
+        console.error('[speakElevenLabs] audio watchdog fired — stream hung for', AUDIO_WATCHDOG, 'ms | char:', characterId);
+        reject(new Error('TTS audio timeout'));
+      }, AUDIO_WATCHDOG)
+    ),
+  ]);
 }
 
 async function speak(text, speaker) {
@@ -888,8 +926,8 @@ async function speak(text, speaker) {
     await Promise.race([
       (async()=>{
         if (speaker === 'Mary') {
-          // Use ElevenLabs for Sofia — richer, more human voice
-          await speakElevenLabs(text, switchToSpeaking);
+          // Use ElevenLabs for character voice — pass currentCharacterId for correct voice mapping
+          await speakElevenLabs(text, switchToSpeaking, currentCharacterId);
           switchToIdle();
         } else {
           // Ryan and others stay on Kokoro
@@ -968,9 +1006,12 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
           } else {
             setMediaForSpeaker('Mary');
           }
-        });
+        }, currentCharacterId);
       } catch (e) {
-        if (e.message !== 'session_changed') console.warn('TTS error:', e.message);
+        if (e.message !== 'session_changed') {
+          console.error('[processQueue] TTS error for "' + sentence.slice(0, 60) + '":', e.message);
+        }
+        // Continue processing — one failed sentence must not freeze the queue
       }
 
       if (mySession !== session) break;
@@ -1013,8 +1054,11 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
     clearTimeout(timeout);
 
     if (!res.ok) {
+      console.error('[streamCharacterAndSpeak] character-stream HTTP', res.status, '| char:', currentCharacterId);
       return await getCharacterResponseFallback(userSaid);
     }
+
+    console.log('[streamCharacterAndSpeak] SSE connected | char:', currentCharacterId, '| scenario:', currentScenarioKey);
 
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
@@ -1036,8 +1080,8 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
         if (!line.startsWith('data: ')) continue;
         try {
           const payload = JSON.parse(line.slice(6));
-          if (payload.error) { console.warn('Stream error:', payload.error); break; }
-          if (payload.sentence) sentenceQueue.push(payload.sentence);
+          if (payload.error) { console.error('[streamCharacterAndSpeak] SSE payload error:', payload.error); break; }
+          if (payload.sentence) { console.log('[SSE] sentence received:', payload.sentence.slice(0, 60)); sentenceQueue.push(payload.sentence); }
           if (payload.done) { fullText = payload.full || fullText; streamDone = true; }
         } catch {}
       }
@@ -1047,7 +1091,8 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
 
   } catch (err) {
     streamDone = true;
-    if (err.name !== 'AbortError') console.warn('Stream fetch error:', err.message);
+    if (err.name !== 'AbortError') console.error('[streamCharacterAndSpeak] SSE fetch error:', err.message, '| char:', currentCharacterId);
+    else console.error('[streamCharacterAndSpeak] SSE timed out (AbortError) | char:', currentCharacterId);
     if (!fullText && sentenceQueue.length === 0) {
       return await getCharacterResponseFallback(userSaid);
     }
