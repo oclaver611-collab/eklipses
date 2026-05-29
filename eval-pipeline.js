@@ -54,6 +54,8 @@ const TESTS = [
   },
 ];
 
+const DEV_KEY = process.env.DEV_BYPASS_KEY || '';
+
 // ─── SSE STREAM READER ────────────────────────────────────────────────────────
 async function callStream(userMessage, history = []) {
   const start = Date.now();
@@ -62,7 +64,10 @@ async function callStream(userMessage, history = []) {
   try {
     res = await fetch(`${BASE}/api/character-stream`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(DEV_KEY ? { 'x-dev-key': DEV_KEY } : {}),
+      },
       body: JSON.stringify({
         userMessage,
         scenarioKey: 'beach',
@@ -83,7 +88,9 @@ async function callStream(userMessage, history = []) {
   const decoder = new TextDecoder();
   let buffer = '';
   let fullText = '';
+  const sentences = [];
   let firstMs = null;
+  let sseError = null;
 
   while (true) {
     let chunk;
@@ -98,13 +105,20 @@ async function callStream(userMessage, history = []) {
       if (!line.startsWith('data: ')) continue;
       try {
         const payload = JSON.parse(line.slice(6));
-        if (payload.sentence && firstMs === null) firstMs = Date.now() - start;
+        if (payload.error) { sseError = payload.error; }
+        if (payload.sentence) {
+          if (firstMs === null) firstMs = Date.now() - start;
+          sentences.push(payload.sentence);
+        }
         if (payload.done && payload.full) fullText = payload.full;
       } catch {}
     }
   }
 
-  return { fullText, firstMs, totalMs: Date.now() - start };
+  // Fallback: if done.full was empty but we got sentence events, join them
+  if (!fullText && sentences.length > 0) fullText = sentences.join(' ');
+
+  return { fullText, firstMs, totalMs: Date.now() - start, sseError };
 }
 
 // ─── ASSERTIONS ───────────────────────────────────────────────────────────────
@@ -129,11 +143,21 @@ function check(label, pass, detail) {
     const t = TESTS[i];
     console.log(`\n[${i + 1}/${TESTS.length}] "${t.msg}"  (${t.label})`);
 
-    const { fullText, firstMs, totalMs, error } = await callStream(t.msg, history);
+    const { fullText, firstMs, totalMs, error, sseError } = await callStream(t.msg, history);
 
+    // Hard fetch/HTTP error
     if (error) {
       check('Request succeeded', false, error);
       failed++;
+      if (i < TESTS.length - 1) await new Promise(r => setTimeout(r, 2000));
+      continue;
+    }
+
+    // SSE-level error (e.g. Groq rate limit)
+    if (sseError) {
+      check('No API error', false, sseError);
+      failed++;
+      if (i < TESTS.length - 1) await new Promise(r => setTimeout(r, 3000));
       continue;
     }
 
@@ -164,6 +188,9 @@ function check(label, pass, detail) {
     }
 
     if (testPassed) passed++; else failed++;
+
+    // Pause between requests to avoid Groq per-minute rate limits
+    if (i < TESTS.length - 1) await new Promise(r => setTimeout(r, 3000));
   }
 
   // ── Summary ─────────────────────────────────────────────────────────────────

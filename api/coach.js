@@ -486,6 +486,8 @@ RULES:
         .replace(/\bseizing\b/gi, 'taking')
         .replace(/\bconnection\b/gi, 'something real')
         .replace(/\btoo safe\b/gi, 'too cautious')
+        .replace(/\baim to\b/gi, 'try to')
+        .replace(/\bwork on that\b/gi, 'fix that')
         // Score mentions in spoken parts
         .replace(/\bI['']m giving you a \d+\b/gi, '')
         .replace(/\byour score is a? \d+\b/gi, '')
