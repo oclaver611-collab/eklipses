@@ -1,28 +1,29 @@
 // api/tts.js — ElevenLabs Flash TTS (primary) + OpenAI TTS (fallback) + per-character voice mapping
 const { checkRateLimit } = require('./ratelimit');
 
-// ElevenLabs premade American English female voice IDs per character
-// Bella  (EXAVITQu...) — warm, natural
-// Rachel (21m00T...)   — friendly, open
-// Lily   (pFZP5J...)   — sharp, direct
-// Charlotte (XB0fDU...) — composed, thoughtful
+// ElevenLabs premade American English female voices (5 distinct voices, 16 characters)
+// Rachel    21m00Tcm4TlvDq8ikWAM — warm, conversational
+// Bella     EXAVITQu4vr4xnSDxMaL — soft, natural
+// Elli      MF3mGyEYCl7XYWbV9V6O — bright, expressive
+// Charlotte XB0fDUnXU5powFXDhCwa — composed, mature
+// Lily      pFZP5JQG7iQjIQuC4Bku — sharp, direct
 const ELEVENLABS_VOICES = {
-  sofia:       'EXAVITQu4vr4xnSDxMaL', // Bella
-  anna:        'jsCqWAovK2LkecY7zXl4',  // Charlotte — warm, thoughtful
-  sarah:       'jsCqWAovK2LkecY7zXl4',  // Charlotte
-  eden:        '21m00Tcm4TlvDq8ikWAM',  // Rachel — friendly, open
-  ava:         'pFZP5JQG7iQjIQuC4Bku',  // Lily — sharp, direct
-  elena:       'pFZP5JQG7iQjIQuC4Bku',  // Lily
-  erika:       'EXAVITQu4vr4xnSDxMaL',  // Bella
-  fatou:       '21m00Tcm4TlvDq8ikWAM',  // Rachel
-  zoe:         'pFZP5JQG7iQjIQuC4Bku',  // Lily
-  sanna:       'XB0fDUnXU5powFXDhCwa',  // Charlotte — composed
-  isabelle:    'XB0fDUnXU5powFXDhCwa',  // Charlotte
-  leila:       'XB0fDUnXU5powFXDhCwa',  // Charlotte
-  maya_office: 'XB0fDUnXU5powFXDhCwa',  // Charlotte
-  nadia:       'jsCqWAovK2LkecY7zXl4',  // Charlotte
-  julia:       'pFZP5JQG7iQjIQuC4Bku',  // Lily
-  remi:        'jsCqWAovK2LkecY7zXl4',  // Charlotte
+  sofia:       'EXAVITQu4vr4xnSDxMaL', // Bella     — soft, natural (main character)
+  anna:        '21m00Tcm4TlvDq8ikWAM',  // Rachel    — warm, conversational
+  sarah:       'MF3mGyEYCl7XYWbV9V6O',  // Elli      — bright, expressive
+  eden:        'pFZP5JQG7iQjIQuC4Bku',  // Lily      — sharp, direct
+  ava:         'XB0fDUnXU5powFXDhCwa',  // Charlotte — composed, confident
+  elena:       '21m00Tcm4TlvDq8ikWAM',  // Rachel    — warm, open
+  erika:       'MF3mGyEYCl7XYWbV9V6O',  // Elli      — bright, energetic
+  fatou:       'pFZP5JQG7iQjIQuC4Bku',  // Lily      — direct, grounded
+  zoe:         'EXAVITQu4vr4xnSDxMaL',  // Bella     — soft, playful
+  sanna:       'XB0fDUnXU5powFXDhCwa',  // Charlotte — composed, cool
+  isabelle:    'MF3mGyEYCl7XYWbV9V6O',  // Elli      — expressive, intellectual
+  leila:       '21m00Tcm4TlvDq8ikWAM',  // Rachel    — warm, guarded
+  maya_office: 'pFZP5JQG7iQjIQuC4Bku',  // Lily      — sharp, professional
+  nadia:       'EXAVITQu4vr4xnSDxMaL',  // Bella     — soft, reserved
+  julia:       'XB0fDUnXU5powFXDhCwa',  // Charlotte — composed, precise
+  remi:        'MF3mGyEYCl7XYWbV9V6O',  // Elli      — bright, curious
 };
 
 const DEFAULT_ELEVENLABS_VOICE = 'EXAVITQu4vr4xnSDxMaL'; // Bella
@@ -33,7 +34,7 @@ const OPENAI_VOICES = {
   anna:        'nova',
   sarah:       'nova',
   eden:        'nova',
-  ava:         'nova',
+  ava:         'alloy',
   elena:       'nova',
   erika:       'nova',
   fatou:       'nova',
