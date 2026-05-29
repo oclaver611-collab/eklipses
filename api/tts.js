@@ -1,28 +1,31 @@
 // api/tts.js — ElevenLabs Flash TTS (primary) + OpenAI TTS (fallback) + per-character voice mapping
 const { checkRateLimit } = require('./ratelimit');
 
-// ElevenLabs voice IDs per character
-// Rachel (21m00...) — warm, natural, expressive  (most characters)
-// Charlotte (XB0f...) — cooler, composed, mature (intellectual / guarded characters)
+// ElevenLabs premade American English female voice IDs per character
+// Bella  (EXAVITQu...) — warm, natural
+// Rachel (21m00T...)   — friendly, open
+// Lily   (pFZP5J...)   — sharp, direct
+// Charlotte (XB0fDU...) — composed, thoughtful
 const ELEVENLABS_VOICES = {
-  sofia:       '21m00Tcm4TlvDq8ikWAM',
-  anna:        '21m00Tcm4TlvDq8ikWAM',
-  sarah:       '21m00Tcm4TlvDq8ikWAM',
-  eden:        '21m00Tcm4TlvDq8ikWAM',
-  ava:         '21m00Tcm4TlvDq8ikWAM',
-  elena:       '21m00Tcm4TlvDq8ikWAM',
-  erika:       '21m00Tcm4TlvDq8ikWAM',
-  fatou:       '21m00Tcm4TlvDq8ikWAM',
-  zoe:         '21m00Tcm4TlvDq8ikWAM',
-  sanna:       'XB0fDUnXU5powFXDhCwa',
-  isabelle:    'XB0fDUnXU5powFXDhCwa',
-  leila:       'XB0fDUnXU5powFXDhCwa',
-  maya_office: 'XB0fDUnXU5powFXDhCwa',
-  nadia:       'XB0fDUnXU5powFXDhCwa',
-  julia:       'XB0fDUnXU5powFXDhCwa',
+  sofia:       'EXAVITQu4vr4xnSDxMaL', // Bella
+  anna:        'jsCqWAovK2LkecY7zXl4',  // Charlotte — warm, thoughtful
+  sarah:       'jsCqWAovK2LkecY7zXl4',  // Charlotte
+  eden:        '21m00Tcm4TlvDq8ikWAM',  // Rachel — friendly, open
+  ava:         'pFZP5JQG7iQjIQuC4Bku',  // Lily — sharp, direct
+  elena:       'pFZP5JQG7iQjIQuC4Bku',  // Lily
+  erika:       'EXAVITQu4vr4xnSDxMaL',  // Bella
+  fatou:       '21m00Tcm4TlvDq8ikWAM',  // Rachel
+  zoe:         'pFZP5JQG7iQjIQuC4Bku',  // Lily
+  sanna:       'XB0fDUnXU5powFXDhCwa',  // Charlotte — composed
+  isabelle:    'XB0fDUnXU5powFXDhCwa',  // Charlotte
+  leila:       'XB0fDUnXU5powFXDhCwa',  // Charlotte
+  maya_office: 'XB0fDUnXU5powFXDhCwa',  // Charlotte
+  nadia:       'jsCqWAovK2LkecY7zXl4',  // Charlotte
+  julia:       'pFZP5JQG7iQjIQuC4Bku',  // Lily
+  remi:        'jsCqWAovK2LkecY7zXl4',  // Charlotte
 };
 
-const DEFAULT_ELEVENLABS_VOICE = '21m00Tcm4TlvDq8ikWAM'; // Rachel
+const DEFAULT_ELEVENLABS_VOICE = 'EXAVITQu4vr4xnSDxMaL'; // Bella
 
 // OpenAI fallback voices
 const OPENAI_VOICES = {
@@ -41,6 +44,7 @@ const OPENAI_VOICES = {
   maya_office: 'alloy',
   nadia:       'alloy',
   julia:       'alloy',
+  remi:        'nova',
 };
 
 module.exports = async function handler(req, res) {
