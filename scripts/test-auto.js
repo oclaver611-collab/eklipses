@@ -12,6 +12,16 @@ console.log('╚═════════════════════�
 
 const tests = [
   {
+    name: 'Pipeline Eval — /api/character-stream (beach/sofia)',
+    cmd: 'node eval-pipeline.js',
+    description: '5 messages — length, banned phrases, latency < 3s per response'
+  },
+  {
+    name: 'TTS Eval — /api/tts for all 16 characters',
+    cmd: 'node eval-tts.js',
+    description: 'Content-Type: audio/mpeg, body size > 0 per character'
+  },
+  {
     name: 'Sofia / Character Evaluator (84 checks)',
     cmd: 'node eval-mary.js',
     description: 'Tests Sofia responses — comma splices, name handling, incoherent input, length, character break'
