@@ -63,15 +63,15 @@ function isDevBypass(req) {
 }
 
 function checkIPLimit(req) {
-  const limit = parseInt(process.env.DAILY_SESSION_LIMIT || '3', 10);
+  const limit = parseInt(process.env.DAILY_SESSION_LIMIT || '500', 10);
   const ip = getClientIP(req);
   const today = getTodayKey();
   const key = `${ip}:${today}`;
 
   const current = ipStore.get(key) || 0;
 
-  if (current >= limit * 8) {
-    // limit * 8 = max API calls per day (limit sessions × ~8 exchanges each)
+  if (current >= limit * 50) {
+    // limit * 50 = max API calls per day (limit sessions × ~50 exchanges each)
     return { allowed: false, remaining: 0, ip };
   }
 
@@ -82,7 +82,7 @@ function checkIPLimit(req) {
     if (!k.endsWith(today)) ipStore.delete(k);
   }
 
-  return { allowed: true, remaining: limit * 8 - current - 1, ip };
+  return { allowed: true, remaining: limit * 50 - current - 1, ip };
 }
 
 // Main export — call at top of any API handler
