@@ -616,36 +616,40 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
 
   const systemPrompt = character + '\n\n' + setting + BASE_RULES + nameReminder + nameGivenReminder;
 
-  // ── Groq call with retry logic ───────────────────────────────────────────────
-  const delays = [3000, 6000, 9000];
-  let lastError = null;
+  // ── Helper: post-process name acknowledgment ─────────────────────────────
+  function applyNameAck(text) {
+    if (!userName || nameAlreadyAcknowledged) return text;
+    if (text.toLowerCase().includes(userName.toLowerCase())) return text;
+    const acks = [`Nice to meet you, ${userName}.`, `Good to meet you, ${userName}.`, `${userName} — got it.`];
+    const ack = acks[Math.floor(Math.random() * acks.length)];
+    return text.replace(/[.!?]?\s*$/, '') + '. ' + ack;
+  }
 
-  for (let attempt = 0; attempt <= delays.length; attempt++) {
+  // ── Groq call with exponential backoff (5 retries), then OpenAI fallback ─
+  const groqDelays = [2000, 4000, 8000, 16000, 30000];
+  let lastError = null;
+  let groqRateLimited = false;
+
+  for (let attempt = 0; attempt <= groqDelays.length; attempt++) {
     try {
       const response = await fetch(apiUrl, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: modelName,
           max_tokens: 120,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...history,
-            { role: 'user', content: userMessage },
-          ],
+          messages: [{ role: 'system', content: systemPrompt }, ...history, { role: 'user', content: userMessage }],
         }),
       });
 
       if (response.status === 429) {
         lastError = '429';
-        if (attempt < delays.length) {
-          await new Promise(r => setTimeout(r, delays[attempt]));
+        if (attempt < groqDelays.length) {
+          await new Promise(r => setTimeout(r, groqDelays[attempt]));
           continue;
         }
-        return res.status(429).json({ error: 'Rate limit — all retries exhausted' });
+        groqRateLimited = true;
+        break; // fall through to OpenAI fallback
       }
 
       if (!response.ok) {
@@ -655,34 +659,45 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
 
       const data = await response.json();
       let characterResponse = data.choices?.[0]?.message?.content?.trim();
+      if (!characterResponse) return res.status(500).json({ error: 'Empty response' });
 
-      if (!characterResponse) {
-        return res.status(500).json({ error: 'Empty response' });
-      }
-
-      // ── Name post-processor ───────────────────────────────────────────────
-      if (userName && !nameAlreadyAcknowledged) {
-        const alreadyUsed = characterResponse.toLowerCase().includes(userName.toLowerCase());
-        if (!alreadyUsed) {
-          const acknowledgments = [
-            `Nice to meet you, ${userName}.`,
-            `Good to meet you, ${userName}.`,
-            `${userName} — got it.`,
-          ];
-          const ack = acknowledgments[Math.floor(Math.random() * acknowledgments.length)];
-          characterResponse = characterResponse.replace(/[.!?]?\s*$/, '') + '. ' + ack;
-        }
-      }
-
-      return res.json({ response: characterResponse });
+      return res.json({ response: applyNameAck(characterResponse) });
 
     } catch (err) {
       lastError = err.message;
-      if (attempt < delays.length) {
-        await new Promise(r => setTimeout(r, delays[attempt]));
+      if (attempt < groqDelays.length) {
+        await new Promise(r => setTimeout(r, groqDelays[attempt]));
         continue;
       }
       return res.status(500).json({ error: lastError });
+    }
+  }
+
+  // ── OpenAI gpt-4o-mini fallback (only reached when Groq 429s all retries) ─
+  if (groqRateLimited && !useGPT4Mini) {
+    const openaiKey = process.env.OPENAI_API_KEY;
+    if (!openaiKey) return res.status(429).json({ error: 'Rate limit — all retries exhausted, no OpenAI fallback configured' });
+    try {
+      console.log('[character] Groq exhausted — falling back to gpt-4o-mini');
+      const fbRes = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${openaiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          max_tokens: 120,
+          messages: [{ role: 'system', content: systemPrompt }, ...history, { role: 'user', content: userMessage }],
+        }),
+      });
+      if (!fbRes.ok) {
+        const err = await fbRes.text();
+        return res.status(500).json({ error: 'OpenAI fallback error: ' + err });
+      }
+      const fbData = await fbRes.json();
+      const fbText = fbData.choices?.[0]?.message?.content?.trim();
+      if (!fbText) return res.status(500).json({ error: 'OpenAI fallback empty' });
+      return res.json({ response: applyNameAck(fbText) });
+    } catch (err) {
+      return res.status(500).json({ error: 'OpenAI fallback failed: ' + err.message });
     }
   }
 };
