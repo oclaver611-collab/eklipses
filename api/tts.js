@@ -61,7 +61,8 @@ module.exports = async function handler(req, res) {
   const openaiVoice = (characterId && OPENAI_VOICES[characterId]) || voice || 'nova';
 
   // ── ElevenLabs Flash (primary) — 8s timeout, falls back to OpenAI on hang ─
-  if (process.env.ELEVENLABS_API_KEY) {
+  const useElevenLabs = false; // TEMP DISABLED — force OpenAI TTS until ElevenLabs hang is resolved
+  if (useElevenLabs && process.env.ELEVENLABS_API_KEY) {
     const elCtrl = new AbortController();
     const elTimeout = setTimeout(() => elCtrl.abort(), 8000);
     try {
