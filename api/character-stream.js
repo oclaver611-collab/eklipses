@@ -24,7 +24,7 @@ function splitSentences(text) {
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const rl = await checkRateLimit(req, res);
+  const rl = checkRateLimit(req, res);
   if (!rl.allowed) return;
 
   const {

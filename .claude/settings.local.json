@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls D:/BUSINESS/executables/love/eklipses/EK7/.env*)",
+      "Bash(claude config:*)",
+      "Skill(update-config)",
+      "Bash(curl -s -H \"xi-api-key: sk_491d78fa778be0ff7cab71ff62c285c6b5c6da0ec36e7452\" \"https://api.elevenlabs.io/v1/voices\")",
+      "Bash(python3 -c ':*)",
+      "Bash(node -e ':*)",
+      "Bash(curl -s -H \"xi-api-key: sk_491d78fa778be0ff7cab71ff62c285c6b5c6da0ec36e7452\" \"https://api.elevenlabs.io/v1/voices\" -o /tmp/el_voices.json)",
+      "Bash(curl -s -H \"xi-api-key: sk_491d78fa778be0ff7cab71ff62c285c6b5c6da0ec36e7452\" \"https://api.elevenlabs.io/v1/voices\" -o \"D:/BUSINESS/executables/love/eklipses/EK7/el_voices_tmp.json\")",
+      "Bash(del \"D:\\\\BUSINESS\\\\executables\\\\love\\\\eklipses\\\\EK7\\\\el_voices_tmp.json\")",
+      "Bash(node -e \"const d=require\\('./el_voices_tmp.json'\\); console.log\\(Object.keys\\(d\\)\\);\")",
+      "Bash(node:*)",
+      "Bash(curl -v -X POST https://eklipses.vercel.app/api/character-stream -H 'Content-Type: application/json' -d '{\"userMessage\":\"hey\",\"scenarioKey\":\"beach\",\"characterId\":\"sofia\",\"history\":[]}' --max-time 20)",
+      "Bash(curl -s -X POST https://eklipses.vercel.app/api/character-stream -H 'Content-Type: application/json' -d '{\"userMessage\":\"hey\",\"scenarioKey\":\"beach\",\"characterId\":\"sofia\",\"history\":[]}' --max-time 25)",
+      "Bash(vercel --prod)",
+      "Bash(npx vercel:*)",
+      "Bash(npm install:*)",
+      "Bash(curl -s \"https://api.vercel.com/v9/deployments?projectId=prj_l6CBJ6apO3R4vIkcoaXzZO89zXFH&limit=3\" -H \"Authorization: Bearer $\\(grep VERCEL_TOKEN .env)",
+      "Bash(curl -s \"https://api.vercel.com/v9/deployments?projectId=prj_l6CBJ6apO3R4vIkcoaXzZO89zXFH&limit=3\" -H \"Authorization: Bearer $\\(cat .env)",
+      "Bash(curl:*)"
+    ]
+  }
+}
