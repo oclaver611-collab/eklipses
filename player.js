@@ -101,10 +101,10 @@ const Progress = (() => {
 
   const save = d => { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch {} };
 
-  const recordSession = (score, scenarioKey, characterId) => {
+  const recordSession = (score, scenarioKey) => {
     const d = load();
     const today = new Date().toDateString();
-    d.sessions.push({ score, scenarioKey, characterId: characterId || 'sofia', date: today, ts: Date.now() });
+    d.sessions.push({ score, scenarioKey, date: today, ts: Date.now() });
     if (d.sessions.length > 50) d.sessions = d.sessions.slice(-50); // keep last 50
     d.lastSessionDate = today;
     save(d);
@@ -156,95 +156,10 @@ const Progress = (() => {
     const total = getTotal();
     if (!total) { bar.style.display = 'none'; return; }
     bar.style.display = 'flex';
-    bar.style.cursor = 'pointer';
-    bar.title = 'View progress dashboard';
     bar.innerHTML =
       (streak > 0 ? '<span>&#128293; ' + streak + '-day streak</span><span style="color:#2b2e36">•</span>' : '') +
       (best !== null ? '<span>&#127942; Best: ' + best + '/10</span><span style="color:#2b2e36">•</span>' : '') +
-      '<span>&#127919; Sessions: ' + total + '</span>' +
-      '<span style="color:#9ec1ff;font-size:11px">&#9660; details</span>';
-    bar.onclick = showDashboard;
-  };
-
-  const showDashboard = () => {
-    const existing = document.getElementById('ek-dashboard-modal');
-    if (existing) { existing.remove(); return; }
-
-    const d = load();
-    if (!d.sessions.length) return;
-
-    const streak = getStreak();
-    const best = getBest();
-    const total = getTotal();
-
-    // Last 10 sessions, chronological for chart, reversed for list
-    const chartSessions = d.sessions.slice(-10);
-    const listSessions  = d.sessions.slice(-10).reverse();
-
-    // Bar chart
-    const maxH = 52;
-    const bars = chartSessions.map(s => {
-      const h = Math.max(6, Math.round((s.score / 10) * maxH));
-      const color = s.score >= 7 ? '#40c770' : s.score >= 5 ? '#ffb300' : '#ff6b6b';
-      return '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1">' +
-        '<div style="font-size:10px;color:#9aa4b2;font-weight:700">' + s.score + '</div>' +
-        '<div style="width:100%;height:' + h + 'px;background:' + color + ';border-radius:3px 3px 0 0"></div>' +
-        '</div>';
-    }).join('');
-
-    // Session rows
-    const rows = listSessions.map(s => {
-      const scoreColor = s.score >= 7 ? '#40c770' : s.score >= 5 ? '#ffb300' : '#ff6b6b';
-      const charRaw = s.characterId || 'sofia';
-      const charLabel = charRaw.charAt(0).toUpperCase() + charRaw.slice(1).replace(/_/g, ' ');
-      const scLabel = (s.scenarioKey || 'session').replace(/_/g, ' ');
-      return '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #23252e">' +
-        '<div style="background:' + scoreColor + ';color:#000;font-weight:800;font-size:14px;border-radius:7px;' +
-        'width:34px;height:34px;display:flex;align-items:center;justify-content:center;flex-shrink:0">' + s.score + '</div>' +
-        '<div style="flex:1;min-width:0">' +
-        '<div style="font-size:13px;color:#e9ecf1;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' +
-        charLabel + ' &mdash; ' + scLabel + '</div>' +
-        '<div style="font-size:11px;color:#9aa4b2;margin-top:1px">' + (s.date || '') + '</div>' +
-        '</div></div>';
-    }).join('');
-
-    // Stat chips
-    const chips =
-      (streak > 0 ? '<div style="flex:1;background:#1d2026;border:1px solid #2b2e36;border-radius:10px;padding:10px 6px;text-align:center">' +
-        '<div style="font-size:18px">&#128293;</div><div style="font-size:17px;font-weight:800;color:#ffb300;margin:2px 0">' + streak + '</div>' +
-        '<div style="font-size:10px;color:#9aa4b2;text-transform:uppercase">Day streak</div></div>' : '') +
-      (best !== null ? '<div style="flex:1;background:#1d2026;border:1px solid #2b2e36;border-radius:10px;padding:10px 6px;text-align:center">' +
-        '<div style="font-size:18px">&#127942;</div><div style="font-size:17px;font-weight:800;color:#40c770;margin:2px 0">' + best + '/10</div>' +
-        '<div style="font-size:10px;color:#9aa4b2;text-transform:uppercase">Best</div></div>' : '') +
-      '<div style="flex:1;background:#1d2026;border:1px solid #2b2e36;border-radius:10px;padding:10px 6px;text-align:center">' +
-      '<div style="font-size:18px">&#127919;</div><div style="font-size:17px;font-weight:800;color:#9ec1ff;margin:2px 0">' + total + '</div>' +
-      '<div style="font-size:10px;color:#9aa4b2;text-transform:uppercase">Sessions</div></div>';
-
-    const modal = document.createElement('div');
-    modal.id = 'ek-dashboard-modal';
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px';
-    modal.innerHTML =
-      '<div style="background:#1a1c22;border:1px solid #2b2e36;border-radius:16px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto;padding:20px">' +
-        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">' +
-          '<div style="font-size:18px;font-weight:800;color:#e9ecf1">Your Progress</div>' +
-          '<button id="ek-dash-close" style="background:none;border:none;color:#9aa4b2;font-size:22px;cursor:pointer;padding:0;line-height:1">&times;</button>' +
-        '</div>' +
-        '<div style="display:flex;gap:8px;margin-bottom:20px">' + chips + '</div>' +
-        (chartSessions.length >= 2 ?
-          '<div style="margin-bottom:20px">' +
-            '<div style="font-size:11px;color:#9aa4b2;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">' +
-            'Last ' + chartSessions.length + ' sessions</div>' +
-            '<div style="display:flex;align-items:flex-end;gap:5px;height:72px;border-bottom:2px solid #2b2e36;padding-bottom:0">' + bars + '</div>' +
-          '</div>' : '') +
-        '<div>' +
-          '<div style="font-size:11px;color:#9aa4b2;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Recent sessions</div>' +
-          rows +
-        '</div>' +
-      '</div>';
-
-    document.body.appendChild(modal);
-    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
-    document.getElementById('ek-dash-close').addEventListener('click', () => modal.remove());
+      '<span>&#127919; Sessions: ' + total + '</span>';
   };
 
   const getHistoryHTML = () => {
@@ -269,7 +184,7 @@ const Progress = (() => {
       '</div>';
   };
 
-  return { recordSession, refreshStatBar, getHistoryHTML, getStreak, getBest, getTotal, showDashboard };
+  return { recordSession, refreshStatBar, getHistoryHTML, getStreak, getBest, getTotal };
 })();
 
 /* ===== Daily Session Limit ===== */
@@ -1647,7 +1562,7 @@ function showFeedbackCard(f) {
   if (!f.tryNextTime || f.tryNextTime === '---') f.tryNextTime = 'What made you choose this spot today?';
   if (!f.wouldSheDateHim || f.wouldSheDateHim === '---') f.wouldSheDateHim = 'Maybe — show more genuine curiosity next time.';
   // Record this session in progress history
-  if (f.score >= 1 && f.score <= 10) Progress.recordSession(f.score, currentScenarioKey, currentCharacterId);
+  if (f.score >= 1 && f.score <= 10) Progress.recordSession(f.score, currentScenarioKey);
   // PostHog — session completed
   if (window.posthog) posthog.capture('session_completed', { scenario: currentScenarioKey, score: f.score });
   // PostHog — coach feedback viewed
