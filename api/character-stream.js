@@ -24,7 +24,7 @@ function splitSentences(text) {
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const rl = await checkRateLimit(req, res);
+  const rl = checkRateLimit(req, res);
   if (!rl.allowed) return;
 
   const {
@@ -80,42 +80,6 @@ module.exports = async function handler(req, res) {
   }
 
   // ════════════════════════════════════════════════════════════════════════
-  // SOFIA MOOD VARIATION — one of 5, selected randomly each session
-  // ════════════════════════════════════════════════════════════════════════
-
-  const SOFIA_MOODS = {
-    focused: `YOUR CURRENT STATE:
-You have been here two hours and you are deep in the work — one paragraph you actually like.
-You are in the zone, or close enough. Your attention is hard to pull away.
-Generic questions won't reach you today. Something unexpected or specific might.`,
-
-    restless: `YOUR CURRENT STATE:
-You have been here two hours and nothing is working — you've rewritten the same paragraph four times.
-Restless in a way that has no clear target. Not angry. Just unsettled.
-You are more interruptible than usual, though you wouldn't admit that.
-A distraction that's actually interesting would be welcome, even if you pretend otherwise.`,
-
-    curious: `YOUR CURRENT STATE:
-You have been here ninety minutes. The article is going somewhere unexpected — you followed a thread and it opened.
-Good-curious mood. Alert, a little generative. You've been watching people walk past and wondering about them.
-Slightly more open than usual. Not obviously — just more likely to let something land.`,
-
-    guarded: `YOUR CURRENT STATE:
-You have been here two hours. Someone interrupted you earlier — badly — and the residue is still there.
-Not hostile. Just more closed than usual. Your patience for performative openers is lower.
-Something real will still cut through. But it needs to be actually real, not just slightly-above-average.`,
-
-    playful: `YOUR CURRENT STATE:
-You have been here an hour and a half. The article is actually going well — which almost never happens.
-Quietly, specifically good mood. The kind you don't advertise.
-Your wit is closer to the surface today. You're more likely to let something be funny.
-Still not going to make it easy — but easier than you usually are.`,
-  };
-
-  const SOFIA_MOOD_KEYS = Object.keys(SOFIA_MOODS);
-  const sofiaMood = SOFIA_MOODS[SOFIA_MOOD_KEYS[Math.floor(Math.random() * SOFIA_MOOD_KEYS.length)]];
-
-  // ════════════════════════════════════════════════════════════════════════
   // FULL CHARACTER PROMPTS — verbatim from character.js
   // ════════════════════════════════════════════════════════════════════════
 
@@ -125,7 +89,10 @@ Still not going to make it easy — but easier than you usually are.`,
 You write for a small independent magazine — coastal ecology and local culture.
 You are working on a piece about how the shoreline has changed over twenty years.
 
-${sofiaMood}
+YOUR CURRENT STATE:
+You have been here two hours. The article is not going well — one sentence you don't hate.
+Low-grade frustrated-with-yourself mood. Not visible, just present.
+Generic questions land flat. Something real or unexpected cuts through immediately.
 
 YOUR PHYSICAL WORLD:
 Quieter end of the beach. Late afternoon. Light is lower, warmer here.
@@ -1863,48 +1830,33 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
 
   const systemPrompt = character + '\n\n' + setting + BASE_RULES + nameReminder + nameGivenReminder;
 
-  // ── Helper: stream a text response as SSE sentences ─────────────────────
-  async function streamTextAsSSE(text) {
-    const sentences = splitSentences(text);
-    for (const sentence of sentences) {
-      if (!sentence.trim()) continue;
-      res.write(`data: ${JSON.stringify({ sentence: sentence.trim(), done: false })}\n\n`);
-      await new Promise(r => setTimeout(r, 20));
-    }
-    res.write(`data: ${JSON.stringify({ done: true, full: text })}\n\n`);
-    res.end();
-  }
-
-  // ── Helper: apply name acknowledgment post-processor ─────────────────────
-  function applyNameAck(text) {
-    if (!userName || nameAlreadyAcknowledged) return text;
-    if (text.toLowerCase().includes(userName.toLowerCase())) return text;
-    const acks = [`Nice to meet you, ${userName}.`, `Good to meet you, ${userName}.`, `${userName} — got it.`];
-    return text.replace(/[.!?]?\s*$/, '') + '. ' + acks[Math.floor(Math.random() * acks.length)];
-  }
-
-  // ── Groq call with exponential backoff (5 retries), then OpenAI fallback ─
-  const groqDelays = [2000, 4000, 8000, 16000, 30000];
+  // ── Groq call ────────────────────────────────────────────────────────────
+  const delays = [3000, 6000, 9000];
   let lastError = null;
-  let groqRateLimited = false;
 
-  for (let attempt = 0; attempt <= groqDelays.length; attempt++) {
+  for (let attempt = 0; attempt <= delays.length; attempt++) {
     try {
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
+        headers: {
+          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           model: 'llama-3.3-70b-versatile',
           max_tokens: 150,
-          messages: [{ role: 'system', content: systemPrompt }, ...history, { role: 'user', content: userMessage }],
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...history,
+            { role: 'user', content: userMessage },
+          ],
         }),
       });
 
       if (response.status === 429) {
         lastError = '429';
-        if (attempt < groqDelays.length) { await new Promise(r => setTimeout(r, groqDelays[attempt])); continue; }
-        groqRateLimited = true;
-        break; // fall through to OpenAI fallback
+        if (attempt < delays.length) { await new Promise(r => setTimeout(r, delays[attempt])); continue; }
+        res.write(`data: ${JSON.stringify({ error: 'rate limit' })}\n\n`); res.end(); return;
       }
 
       if (!response.ok) {
@@ -1916,44 +1868,35 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
       let characterResponse = data.choices?.[0]?.message?.content?.trim();
       if (!characterResponse) { res.write(`data: ${JSON.stringify({ error: 'empty' })}\n\n`); res.end(); return; }
 
-      await streamTextAsSSE(applyNameAck(characterResponse));
+      // ── Name post-processor ────────────────────────────────────────────
+      if (userName && !nameAlreadyAcknowledged) {
+        const alreadyUsed = characterResponse.toLowerCase().includes(userName.toLowerCase());
+        if (!alreadyUsed) {
+          const acknowledgments = [
+            `Nice to meet you, ${userName}.`,
+            `Good to meet you, ${userName}.`,
+            `${userName} — got it.`,
+          ];
+          const ack = acknowledgments[Math.floor(Math.random() * acknowledgments.length)];
+          characterResponse = characterResponse.replace(/[.!?]?\s*$/, '') + '. ' + ack;
+        }
+      }
+
+      // ── Stream sentences via SSE ───────────────────────────────────────
+      const sentences = splitSentences(characterResponse);
+      for (const sentence of sentences) {
+        if (!sentence.trim()) continue;
+        res.write(`data: ${JSON.stringify({ sentence: sentence.trim(), done: false })}\n\n`);
+        await new Promise(r => setTimeout(r, 20));
+      }
+      res.write(`data: ${JSON.stringify({ done: true, full: characterResponse })}\n\n`);
+      res.end();
       return;
 
     } catch (err) {
       lastError = err.message;
-      if (attempt < groqDelays.length) { await new Promise(r => setTimeout(r, groqDelays[attempt])); continue; }
+      if (attempt < delays.length) { await new Promise(r => setTimeout(r, delays[attempt])); continue; }
       try { res.write(`data: ${JSON.stringify({ error: lastError })}\n\n`); res.end(); } catch {}
-      return;
-    }
-  }
-
-  // ── OpenAI gpt-4o-mini fallback (only reached when Groq 429s all retries) ─
-  if (groqRateLimited) {
-    const openaiKey = process.env.OPENAI_API_KEY;
-    if (!openaiKey) {
-      res.write(`data: ${JSON.stringify({ error: 'rate limit — no OpenAI fallback configured' })}\n\n`); res.end(); return;
-    }
-    try {
-      console.log('[character-stream] Groq exhausted — falling back to gpt-4o-mini');
-      const fbRes = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${openaiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          max_tokens: 150,
-          messages: [{ role: 'system', content: systemPrompt }, ...history, { role: 'user', content: userMessage }],
-        }),
-      });
-      if (!fbRes.ok) {
-        const err = await fbRes.text();
-        res.write(`data: ${JSON.stringify({ error: 'openai fallback: ' + err })}\n\n`); res.end(); return;
-      }
-      const fbData = await fbRes.json();
-      const fbText = fbData.choices?.[0]?.message?.content?.trim();
-      if (!fbText) { res.write(`data: ${JSON.stringify({ error: 'openai fallback empty' })}\n\n`); res.end(); return; }
-      await streamTextAsSSE(applyNameAck(fbText));
-    } catch (err) {
-      try { res.write(`data: ${JSON.stringify({ error: 'openai fallback failed: ' + err.message })}\n\n`); res.end(); } catch {}
     }
   }
 };

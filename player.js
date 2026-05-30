@@ -101,10 +101,10 @@ const Progress = (() => {
 
   const save = d => { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch {} };
 
-  const recordSession = (score, scenarioKey, characterId) => {
+  const recordSession = (score, scenarioKey) => {
     const d = load();
     const today = new Date().toDateString();
-    d.sessions.push({ score, scenarioKey, characterId: characterId || 'sofia', date: today, ts: Date.now() });
+    d.sessions.push({ score, scenarioKey, date: today, ts: Date.now() });
     if (d.sessions.length > 50) d.sessions = d.sessions.slice(-50); // keep last 50
     d.lastSessionDate = today;
     save(d);
@@ -148,124 +148,18 @@ const Progress = (() => {
     return last - first;
   };
 
-  const refreshStreakBadge = () => {
-    const badge = document.getElementById('ek-streak-badge');
-    if (!badge) return;
-    const streak = getStreak();
-    if (streak < 1) {
-      badge.style.display = 'none';
-      return;
-    }
-    // Scale up visual weight for milestone streaks
-    const isHot  = streak >= 7;
-    const isMid  = streak >= 3;
-    badge.style.display      = 'flex';
-    badge.style.background   = isHot ? '#2b1a00' : '#1e1a0e';
-    badge.style.borderColor  = isHot ? '#ff8c00' : '#7a5500';
-    badge.style.color        = isHot ? '#ffd06a' : '#ffb300';
-    badge.style.fontSize     = isHot ? '15px' : isMid ? '14px' : '13px';
-    badge.innerHTML = '&#128293; ' + streak + (streak === 1 ? '-day streak' : '-day streak');
-    badge.onclick = showDashboard;
-  };
-
   const refreshStatBar = () => {
     const bar = document.getElementById('ek-stat-bar');
-    refreshStreakBadge();
     if (!bar) return;
     const streak = getStreak();
     const best = getBest();
     const total = getTotal();
     if (!total) { bar.style.display = 'none'; return; }
     bar.style.display = 'flex';
-    bar.style.cursor = 'pointer';
-    bar.title = 'View progress dashboard';
     bar.innerHTML =
       (streak > 0 ? '<span>&#128293; ' + streak + '-day streak</span><span style="color:#2b2e36">•</span>' : '') +
       (best !== null ? '<span>&#127942; Best: ' + best + '/10</span><span style="color:#2b2e36">•</span>' : '') +
-      '<span>&#127919; Sessions: ' + total + '</span>' +
-      '<span style="color:#9ec1ff;font-size:11px">&#9660; details</span>';
-    bar.onclick = showDashboard;
-  };
-
-  const showDashboard = () => {
-    const existing = document.getElementById('ek-dashboard-modal');
-    if (existing) { existing.remove(); return; }
-
-    const d = load();
-    if (!d.sessions.length) return;
-
-    const streak = getStreak();
-    const best = getBest();
-    const total = getTotal();
-
-    // Last 10 sessions, chronological for chart, reversed for list
-    const chartSessions = d.sessions.slice(-10);
-    const listSessions  = d.sessions.slice(-10).reverse();
-
-    // Bar chart
-    const maxH = 52;
-    const bars = chartSessions.map(s => {
-      const h = Math.max(6, Math.round((s.score / 10) * maxH));
-      const color = s.score >= 7 ? '#40c770' : s.score >= 5 ? '#ffb300' : '#ff6b6b';
-      return '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1">' +
-        '<div style="font-size:10px;color:#9aa4b2;font-weight:700">' + s.score + '</div>' +
-        '<div style="width:100%;height:' + h + 'px;background:' + color + ';border-radius:3px 3px 0 0"></div>' +
-        '</div>';
-    }).join('');
-
-    // Session rows
-    const rows = listSessions.map(s => {
-      const scoreColor = s.score >= 7 ? '#40c770' : s.score >= 5 ? '#ffb300' : '#ff6b6b';
-      const charRaw = s.characterId || 'sofia';
-      const charLabel = charRaw.charAt(0).toUpperCase() + charRaw.slice(1).replace(/_/g, ' ');
-      const scLabel = (s.scenarioKey || 'session').replace(/_/g, ' ');
-      return '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #23252e">' +
-        '<div style="background:' + scoreColor + ';color:#000;font-weight:800;font-size:14px;border-radius:7px;' +
-        'width:34px;height:34px;display:flex;align-items:center;justify-content:center;flex-shrink:0">' + s.score + '</div>' +
-        '<div style="flex:1;min-width:0">' +
-        '<div style="font-size:13px;color:#e9ecf1;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' +
-        charLabel + ' &mdash; ' + scLabel + '</div>' +
-        '<div style="font-size:11px;color:#9aa4b2;margin-top:1px">' + (s.date || '') + '</div>' +
-        '</div></div>';
-    }).join('');
-
-    // Stat chips
-    const chips =
-      (streak > 0 ? '<div style="flex:1;background:#1d2026;border:1px solid #2b2e36;border-radius:10px;padding:10px 6px;text-align:center">' +
-        '<div style="font-size:18px">&#128293;</div><div style="font-size:17px;font-weight:800;color:#ffb300;margin:2px 0">' + streak + '</div>' +
-        '<div style="font-size:10px;color:#9aa4b2;text-transform:uppercase">Day streak</div></div>' : '') +
-      (best !== null ? '<div style="flex:1;background:#1d2026;border:1px solid #2b2e36;border-radius:10px;padding:10px 6px;text-align:center">' +
-        '<div style="font-size:18px">&#127942;</div><div style="font-size:17px;font-weight:800;color:#40c770;margin:2px 0">' + best + '/10</div>' +
-        '<div style="font-size:10px;color:#9aa4b2;text-transform:uppercase">Best</div></div>' : '') +
-      '<div style="flex:1;background:#1d2026;border:1px solid #2b2e36;border-radius:10px;padding:10px 6px;text-align:center">' +
-      '<div style="font-size:18px">&#127919;</div><div style="font-size:17px;font-weight:800;color:#9ec1ff;margin:2px 0">' + total + '</div>' +
-      '<div style="font-size:10px;color:#9aa4b2;text-transform:uppercase">Sessions</div></div>';
-
-    const modal = document.createElement('div');
-    modal.id = 'ek-dashboard-modal';
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px';
-    modal.innerHTML =
-      '<div style="background:#1a1c22;border:1px solid #2b2e36;border-radius:16px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto;padding:20px">' +
-        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">' +
-          '<div style="font-size:18px;font-weight:800;color:#e9ecf1">Your Progress</div>' +
-          '<button id="ek-dash-close" style="background:none;border:none;color:#9aa4b2;font-size:22px;cursor:pointer;padding:0;line-height:1">&times;</button>' +
-        '</div>' +
-        '<div style="display:flex;gap:8px;margin-bottom:20px">' + chips + '</div>' +
-        (chartSessions.length >= 2 ?
-          '<div style="margin-bottom:20px">' +
-            '<div style="font-size:11px;color:#9aa4b2;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">' +
-            'Last ' + chartSessions.length + ' sessions</div>' +
-            '<div style="display:flex;align-items:flex-end;gap:5px;height:72px;border-bottom:2px solid #2b2e36;padding-bottom:0">' + bars + '</div>' +
-          '</div>' : '') +
-        '<div>' +
-          '<div style="font-size:11px;color:#9aa4b2;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Recent sessions</div>' +
-          rows +
-        '</div>' +
-      '</div>';
-
-    document.body.appendChild(modal);
-    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
-    document.getElementById('ek-dash-close').addEventListener('click', () => modal.remove());
+      '<span>&#127919; Sessions: ' + total + '</span>';
   };
 
   const getHistoryHTML = () => {
@@ -290,7 +184,7 @@ const Progress = (() => {
       '</div>';
   };
 
-  return { recordSession, refreshStatBar, refreshStreakBadge, getHistoryHTML, getStreak, getBest, getTotal, showDashboard };
+  return { recordSession, refreshStatBar, getHistoryHTML, getStreak, getBest, getTotal };
 })();
 
 /* ===== Daily Session Limit ===== */
@@ -303,7 +197,6 @@ const DailyLimit = (() => {
   const KEY = 'ek-daily-v1';
   const DEV_COOKIE = 'ek_dev_bypass';
   const DEV_KEY_STORAGE = 'ek-dev-key';
-  const STRIPE_CUS_KEY = 'ek-stripe-cus'; // stores Stripe customer ID after successful payment
 
   // ── Cookie helpers ──────────────────────────────────────────────────────
   function setCookie(name, value, days) {
@@ -319,61 +212,27 @@ const DailyLimit = (() => {
     document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/';
   }
 
-  // ── Stripe customer helpers ──────────────────────────────────────────────
-  function getStripeCustomer() {
-    return localStorage.getItem(STRIPE_CUS_KEY) || null;
-  }
-  function setStripeCustomer(customerId) {
-    if (customerId) localStorage.setItem(STRIPE_CUS_KEY, customerId);
-  }
-  function isProSubscriber() {
-    return !!getStripeCustomer();
-  }
-
-  // ── Handle ?dev=SECRET, ?resetdev=true, ?stripe_session=xxx in URL ─────
-  async function handleURLParams() {
+  // ── Handle ?dev=SECRET and ?resetdev=true in URL ────────────────────────
+  function handleURLParams() {
     const params = new URLSearchParams(window.location.search);
     const devKey = params.get('dev');
     const reset = params.get('resetdev');
-    const stripeSession = params.get('stripe_session');
 
     if (reset === 'true') {
       deleteCookie(DEV_COOKIE);
       localStorage.removeItem(DEV_KEY_STORAGE);
       console.log('[DailyLimit] Dev bypass cleared.');
+      // Clean URL
       window.history.replaceState({}, '', window.location.pathname);
       return;
     }
 
     if (devKey) {
+      // Store in cookie (1 year) and localStorage for API header
       setCookie(DEV_COOKIE, devKey, 365);
       localStorage.setItem(DEV_KEY_STORAGE, devKey);
       console.log('[DailyLimit] Dev bypass activated on this device.');
-      window.history.replaceState({}, '', window.location.pathname);
-    }
-
-    if (stripeSession && stripeSession.startsWith('cs_')) {
-      console.log('[DailyLimit] Verifying Stripe payment...');
-      try {
-        const r = await fetch(`/api/verify-payment?session_id=${stripeSession}`);
-        const data = await r.json();
-        if (data.active && data.customerId) {
-          setStripeCustomer(data.customerId);
-          console.log('[DailyLimit] Pro subscription activated:', data.customerId);
-          // Show welcome banner
-          const banner = document.createElement('div');
-          banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ffb300;color:#000;text-align:center;padding:12px;font-weight:700;font-size:15px;z-index:99999;cursor:pointer';
-          banner.textContent = 'Welcome to Eklipses Pro! Unlimited sessions activated.';
-          banner.onclick = () => banner.remove();
-          document.body.prepend(banner);
-          setTimeout(() => banner.remove(), 5000);
-        } else {
-          console.warn('[DailyLimit] Stripe payment verification failed:', data);
-        }
-      } catch (e) {
-        console.error('[DailyLimit] Stripe verify error:', e.message);
-      }
-      // Clean URL
+      // Clean URL so secret doesn't stay visible
       window.history.replaceState({}, '', window.location.pathname);
     }
   }
@@ -429,69 +288,37 @@ const DailyLimit = (() => {
     const overlay = document.createElement('div');
     overlay.id = 'ek-paywall';
     overlay.style.cssText = [
-      'position:fixed;inset:0;background:rgba(0,0,0,0.93);z-index:99999',
+      'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99999',
       'display:flex;flex-direction:column;align-items:center;justify-content:center',
       'font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:24px;text-align:center'
     ].join(';');
 
     overlay.innerHTML = `
-      <div style="font-size:44px;margin-bottom:12px">🔐</div>
-      <div style="color:#fff;font-size:24px;font-weight:800;margin-bottom:10px;letter-spacing:-0.5px">
-        You've used your 3 free sessions
+      <div style="font-size:40px;margin-bottom:16px">⏱️</div>
+      <div style="color:#fff;font-size:22px;font-weight:800;margin-bottom:10px">
+        You've used your 3 free sessions today
       </div>
-      <div style="color:#9aa4b2;font-size:15px;max-width:340px;margin-bottom:8px;line-height:1.6">
-        Come back tomorrow for 3 more — or get unlimited practice with Eklipses Pro.
+      <div style="color:#9aa4b2;font-size:15px;max-width:340px;margin-bottom:28px;line-height:1.5">
+        Come back tomorrow for 3 more — or go unlimited with Eklipses Pro.
       </div>
-      <div style="color:#ffb300;font-size:13px;max-width:300px;margin-bottom:28px;line-height:1.5">
-        Unlimited sessions · All scenarios · Ryan coaching after every chat
+      <div style="background:#ffb300;color:#000;font-size:15px;font-weight:800;
+                  padding:14px 32px;border-radius:999px;cursor:pointer;margin-bottom:12px"
+           onclick="document.getElementById('ek-paywall').remove()">
+        Upgrade to Pro — $19.99/month
       </div>
-      <button id="ek-paywall-btn"
-        style="background:#ffb300;color:#000;font-size:16px;font-weight:800;border:none;
-               padding:15px 36px;border-radius:999px;cursor:pointer;margin-bottom:14px;
-               min-width:260px;transition:opacity 0.2s">
-        Upgrade to Pro — $14.99/month
-      </button>
-      <div style="color:#555;font-size:12px;margin-bottom:20px">No contract · Cancel anytime</div>
-      <div style="color:#666;font-size:13px;cursor:pointer;text-decoration:underline"
+      <div style="color:#666;font-size:13px;cursor:pointer"
            onclick="document.getElementById('ek-paywall').remove()">
         Come back tomorrow
       </div>
     `;
-
-    // Wire up upgrade button to Stripe Checkout
-    overlay.querySelector('#ek-paywall-btn').addEventListener('click', async function() {
-      this.textContent = 'Loading...';
-      this.style.opacity = '0.7';
-      this.disabled = true;
-      try {
-        const r = await fetch('/api/create-checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({}),
-        });
-        const data = await r.json();
-        if (data.url) {
-          window.location.href = data.url;
-        } else {
-          throw new Error(data.error || 'No checkout URL returned');
-        }
-      } catch (e) {
-        console.error('[Paywall] Checkout error:', e.message);
-        this.textContent = 'Error — try again';
-        this.style.opacity = '1';
-        this.disabled = false;
-      }
-    });
-
     document.body.appendChild(overlay);
   }
 
   // ── Main check — call before starting a practice session ─────────────────
   async function canPlay() {
-    await handleURLParams(); // process ?dev=, ?resetdev=, ?stripe_session= on every check
+    handleURLParams(); // process ?dev= and ?resetdev= on every check
 
     if (isDevBypass()) return true;
-    if (isProSubscriber()) return true; // paid subscriber — unlimited
 
     // Layer 1: localStorage
     const localCount = getLocalCount();
@@ -512,28 +339,22 @@ const DailyLimit = (() => {
     return true;
   }
 
-  // ── Inject auth headers into all API fetch calls via monkey-patch ─────────
-  // Adds x-dev-key (dev bypass) and x-stripe-customer (paid subscriber) headers
+  // ── Inject dev key into all API fetch calls via monkey-patch ─────────────
+  // This adds x-dev-key header to /api/character and /api/tts automatically
   function patchFetch() {
     const _originalFetch = window.fetch;
     window.fetch = function(url, options = {}) {
       if (typeof url === 'string' && (
         url.includes('/api/character') ||   // covers /api/character AND /api/character-stream
-        url.includes('/api/tts') ||
-        url.includes('/api/stt')
+        url.includes('/api/tts')
       )) {
         const devKey = getDevKey();
-        const stripeCus = getStripeCustomer();
-        if (devKey || stripeCus) {
+        if (devKey) {
           options.headers = options.headers || {};
-          const isHeadersObj = options.headers instanceof Headers;
-          if (devKey) {
-            if (isHeadersObj) options.headers.set('x-dev-key', devKey);
-            else options.headers['x-dev-key'] = devKey;
-          }
-          if (stripeCus) {
-            if (isHeadersObj) options.headers.set('x-stripe-customer', stripeCus);
-            else options.headers['x-stripe-customer'] = stripeCus;
+          if (options.headers instanceof Headers) {
+            options.headers.set('x-dev-key', devKey);
+          } else {
+            options.headers['x-dev-key'] = devKey;
           }
         }
       }
@@ -541,7 +362,7 @@ const DailyLimit = (() => {
     };
   }
 
-  return { canPlay, isDevBypass, isProSubscriber, patchFetch, handleURLParams };
+  return { canPlay, isDevBypass, patchFetch, handleURLParams };
 })();
 
 // Patch fetch immediately so dev key is always sent
@@ -851,108 +672,70 @@ function renderLine(line) {
 /* ===== TTS ===== */
 
 // OpenAI TTS for Mary — streaming playback for low latency
-async function speakElevenLabs(text, onStart, characterId) {
-  // ── Fetch TTS audio with 10s timeout ────────────────────────────────────
-  const fetchCtrl = new AbortController();
-  const fetchTimeout = setTimeout(() => fetchCtrl.abort(), 10000);
-  let res;
-  try {
-    res = await fetch('/api/tts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, characterId: characterId || null }),
-      signal: fetchCtrl.signal,
-    });
-  } catch (e) {
-    clearTimeout(fetchTimeout);
-    console.error('[speakElevenLabs] fetch failed:', e.message, '| char:', characterId, '| text:', text.slice(0, 60));
-    throw e;
-  }
-  clearTimeout(fetchTimeout);
+async function speakElevenLabs(text, onStart) {
+  const res = await fetch('/api/tts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, voice: 'nova' }),
+  });
+  if (!res.ok) throw new Error('OpenAI TTS failed: ' + res.status);
 
-  if (!res.ok) {
-    const errBody = await res.text().catch(() => String(res.status));
-    console.error('[speakElevenLabs] TTS HTTP', res.status, '| char:', characterId, '|', errBody.slice(0, 120));
-    throw new Error('TTS failed ' + res.status);
-  }
+  // Use MediaSource streaming — audio starts playing as first chunks arrive
+  // Falls back to full buffer decode if MediaSource not supported
+  if (window.MediaSource && MediaSource.isTypeSupported('audio/mpeg')) {
+    return new Promise((resolve, reject) => {
+      const mediaSource = new MediaSource();
+      const audio = new Audio();
+      audio.src = URL.createObjectURL(mediaSource);
 
-  // ── Play audio with 10s watchdog so a hung stream can't freeze the queue ─
-  const AUDIO_WATCHDOG = 10000;
+      mediaSource.addEventListener('sourceopen', async () => {
+        const sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
+        const reader = res.body.getReader();
+        let started = false;
 
-  const playPromise = (() => {
-    // Use MediaSource streaming — audio starts playing as first chunks arrive
-    // Falls back to full buffer decode if MediaSource not supported
-    if (window.MediaSource && MediaSource.isTypeSupported('audio/mpeg')) {
-      return new Promise((resolve, reject) => {
-        const mediaSource = new MediaSource();
-        const audio = new Audio();
-        audio.src = URL.createObjectURL(mediaSource);
-
-        mediaSource.addEventListener('sourceopen', async () => {
-          const sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
-          const reader = res.body.getReader();
-          let started = false;
-
-          const pump = async () => {
-            try {
-              while (true) {
-                const { done, value } = await reader.read();
-                if (done) {
-                  if (!sourceBuffer.updating) mediaSource.endOfStream();
-                  else sourceBuffer.addEventListener('updateend', () => mediaSource.endOfStream(), { once: true });
-                  break;
-                }
-                if (sourceBuffer.updating) {
-                  await new Promise(r => sourceBuffer.addEventListener('updateend', r, { once: true }));
-                }
-                sourceBuffer.appendBuffer(value);
-                if (!started) {
-                  started = true;
-                  audio.play().then(() => { onStart(); }).catch(() => {});
-                }
+        const pump = async () => {
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) {
+                if (!sourceBuffer.updating) mediaSource.endOfStream();
+                else sourceBuffer.addEventListener('updateend', () => mediaSource.endOfStream(), { once: true });
+                break;
               }
-            } catch(e) {
-              console.error('[speakElevenLabs] MediaSource pump error:', e.message);
-              reject(e);
+              // Wait if buffer is updating
+              if (sourceBuffer.updating) {
+                await new Promise(r => sourceBuffer.addEventListener('updateend', r, { once: true }));
+              }
+              sourceBuffer.appendBuffer(value);
+              // Start playing as soon as first chunk lands
+              if (!started) {
+                started = true;
+                audio.play().then(() => { onStart(); }).catch(() => {});
+              }
             }
-          };
-          pump();
-        });
-
-        audio.onended = () => { URL.revokeObjectURL(audio.src); resolve(); };
-        audio.onerror = (e) => {
-          console.error('[speakElevenLabs] Audio element error:', e);
-          reject(new Error('Audio playback error'));
+          } catch(e) { reject(e); }
         };
+        pump();
       });
-    } else {
-      // Fallback: full buffer (Safari / older browsers)
-      return (async () => {
-        const arrayBuf = await res.arrayBuffer();
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        __audioContexts.push(audioCtx);
-        const audioBuf = await audioCtx.decodeAudioData(arrayBuf);
-        const source = audioCtx.createBufferSource();
-        source.buffer = audioBuf;
-        source.connect(audioCtx.destination);
-        onStart();
-        return new Promise((resolve) => {
-          source.onended = () => { audioCtx.close(); resolve(); };
-          source.start(0);
-        });
-      })();
-    }
-  })();
 
-  return Promise.race([
-    playPromise,
-    new Promise((_, reject) =>
-      setTimeout(() => {
-        console.error('[speakElevenLabs] audio watchdog fired — stream hung for', AUDIO_WATCHDOG, 'ms | char:', characterId);
-        reject(new Error('TTS audio timeout'));
-      }, AUDIO_WATCHDOG)
-    ),
-  ]);
+      audio.onended = () => { URL.revokeObjectURL(audio.src); resolve(); };
+      audio.onerror = (e) => reject(new Error('Audio error: ' + e));
+    });
+  } else {
+    // Fallback: full buffer (Safari / older browsers)
+    const arrayBuf = await res.arrayBuffer();
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    __audioContexts.push(audioCtx);
+    const audioBuf = await audioCtx.decodeAudioData(arrayBuf);
+    const source = audioCtx.createBufferSource();
+    source.buffer = audioBuf;
+    source.connect(audioCtx.destination);
+    onStart();
+    return new Promise((resolve) => {
+      source.onended = () => { audioCtx.close(); resolve(); };
+      source.start(0);
+    });
+  }
 }
 
 async function speak(text, speaker) {
@@ -999,8 +782,8 @@ async function speak(text, speaker) {
     await Promise.race([
       (async()=>{
         if (speaker === 'Mary') {
-          // Use ElevenLabs for character voice — pass currentCharacterId for correct voice mapping
-          await speakElevenLabs(text, switchToSpeaking, currentCharacterId);
+          // Use ElevenLabs for Sofia — richer, more human voice
+          await speakElevenLabs(text, switchToSpeaking);
           switchToIdle();
         } else {
           // Ryan and others stay on Kokoro
@@ -1079,12 +862,9 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
           } else {
             setMediaForSpeaker('Mary');
           }
-        }, currentCharacterId);
+        });
       } catch (e) {
-        if (e.message !== 'session_changed') {
-          console.error('[processQueue] TTS error for "' + sentence.slice(0, 60) + '":', e.message);
-        }
-        // Continue processing — one failed sentence must not freeze the queue
+        if (e.message !== 'session_changed') console.warn('TTS error:', e.message);
       }
 
       if (mySession !== session) break;
@@ -1108,14 +888,9 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
   }
 
   // SSE stream reader
-  let sseTimedOut = false;
   try {
     const controller = new AbortController();
-    // 25s connection timeout — covers Vercel cold starts (was 10s)
-    const connectTimeout = setTimeout(() => {
-      sseTimedOut = true;
-      controller.abort();
-    }, 25000);
+    const timeout = setTimeout(() => controller.abort(), 10000);
 
     const res = await fetch('/api/character-stream', {
       method: 'POST',
@@ -1129,35 +904,23 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
       signal: controller.signal,
     });
 
-    clearTimeout(connectTimeout);
+    clearTimeout(timeout);
 
     if (!res.ok) {
-      console.error('[streamCharacterAndSpeak] character-stream HTTP', res.status, '| char:', currentCharacterId);
       return await getCharacterResponseFallback(userSaid);
     }
-
-    console.log('[streamCharacterAndSpeak] SSE connected | char:', currentCharacterId, '| scenario:', currentScenarioKey);
 
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
 
-    // Sentence watchdog: if no sentence arrives within 15s of connecting, abort
-    let sentenceWatchdog = setTimeout(() => {
-      if (!streamDone && sentenceQueue.length === 0) {
-        sseTimedOut = true;
-        console.error('[streamCharacterAndSpeak] sentence watchdog fired — no sentence in 15s | char:', currentCharacterId);
-        reader.cancel();
-      }
-    }, 15000);
-
     // Start queue processor immediately
     processQueue();
 
     while (true) {
-      if (mySession !== session) { clearTimeout(sentenceWatchdog); reader.cancel(); break; }
+      if (mySession !== session) { reader.cancel(); break; }
       const { done, value } = await reader.read();
-      if (done) { clearTimeout(sentenceWatchdog); break; }
+      if (done) break;
 
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split('\n');
@@ -1167,21 +930,9 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
         if (!line.startsWith('data: ')) continue;
         try {
           const payload = JSON.parse(line.slice(6));
-          if (payload.error) { console.error('[streamCharacterAndSpeak] SSE payload error:', payload.error); clearTimeout(sentenceWatchdog); break; }
-          if (payload.sentence) {
-            console.log('[SSE] sentence received:', payload.sentence.slice(0, 60));
-            sentenceQueue.push(payload.sentence);
-            // Reset watchdog — we're getting sentences, stream is alive
-            clearTimeout(sentenceWatchdog);
-            sentenceWatchdog = setTimeout(() => {
-              if (!streamDone) {
-                sseTimedOut = true;
-                console.error('[streamCharacterAndSpeak] inter-sentence watchdog fired | char:', currentCharacterId);
-                reader.cancel();
-              }
-            }, 15000);
-          }
-          if (payload.done) { fullText = payload.full || fullText; streamDone = true; clearTimeout(sentenceWatchdog); }
+          if (payload.error) { console.warn('Stream error:', payload.error); break; }
+          if (payload.sentence) sentenceQueue.push(payload.sentence);
+          if (payload.done) { fullText = payload.full || fullText; streamDone = true; }
         } catch {}
       }
     }
@@ -1190,14 +941,8 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
 
   } catch (err) {
     streamDone = true;
-    if (err.name === 'AbortError' || sseTimedOut) {
-      console.error('[streamCharacterAndSpeak] SSE timed out | char:', currentCharacterId, '| had content:', sentenceQueue.length > 0);
-    } else {
-      console.error('[streamCharacterAndSpeak] SSE fetch error:', err.message, '| char:', currentCharacterId);
-    }
-    // Retry once with fallback endpoint if stream produced nothing
+    if (err.name !== 'AbortError') console.warn('Stream fetch error:', err.message);
     if (!fullText && sentenceQueue.length === 0) {
-      console.log('[streamCharacterAndSpeak] falling back to /api/character | char:', currentCharacterId);
       return await getCharacterResponseFallback(userSaid);
     }
   }
@@ -1917,7 +1662,7 @@ function showFeedbackCard(f) {
   if (!f.tryNextTime || f.tryNextTime === '---') f.tryNextTime = 'What made you choose this spot today?';
   if (!f.wouldSheDateHim || f.wouldSheDateHim === '---') f.wouldSheDateHim = 'Maybe — show more genuine curiosity next time.';
   // Record this session in progress history
-  if (f.score >= 1 && f.score <= 10) Progress.recordSession(f.score, currentScenarioKey, currentCharacterId);
+  if (f.score >= 1 && f.score <= 10) Progress.recordSession(f.score, currentScenarioKey);
   // PostHog — session completed
   if (window.posthog) posthog.capture('session_completed', { scenario: currentScenarioKey, score: f.score });
   // PostHog — coach feedback viewed
@@ -2301,7 +2046,6 @@ function launchApp() {
       if (nameEl && nameEl.parentNode) nameEl.parentNode.insertBefore(bar, nameEl.nextSibling);
     }
     Progress.refreshStatBar();
-    Progress.refreshStreakBadge();
     // Render shelf immediately — playScenario calls stopEverything() which increments session
     renderShelf();
     const launchSession = session;
@@ -2322,7 +2066,6 @@ function launchApp() {
       if (nameEl && nameEl.parentNode) nameEl.parentNode.insertBefore(bar, nameEl.nextSibling);
     }
     Progress.refreshStatBar();
-    Progress.refreshStreakBadge();
   };
 }
 
