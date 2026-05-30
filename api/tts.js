@@ -60,8 +60,10 @@ module.exports = async function handler(req, res) {
   const elevenLabsVoiceId = (characterId && ELEVENLABS_VOICES[characterId]) || DEFAULT_ELEVENLABS_VOICE;
   const openaiVoice = (characterId && OPENAI_VOICES[characterId]) || voice || 'nova';
 
-  // ── ElevenLabs Flash (primary) ───────────────────────────────────────────
+  // ── ElevenLabs Flash (primary) — 8s timeout, falls back to OpenAI on hang ─
   if (process.env.ELEVENLABS_API_KEY) {
+    const elCtrl = new AbortController();
+    const elTimeout = setTimeout(() => elCtrl.abort(), 8000);
     try {
       const elRes = await fetch(
         `https://api.elevenlabs.io/v1/text-to-speech/${elevenLabsVoiceId}/stream`,
@@ -77,8 +79,10 @@ module.exports = async function handler(req, res) {
             voice_settings: { stability: 0.5, similarity_boost: 0.75 },
             output_format: 'mp3_44100_128',
           }),
+          signal: elCtrl.signal,
         }
       );
+      clearTimeout(elTimeout);
 
       if (elRes.ok) {
         res.setHeader('Content-Type', 'audio/mpeg');
@@ -94,7 +98,9 @@ module.exports = async function handler(req, res) {
       }
       console.error('[tts] ElevenLabs error', elRes.status, await elRes.text());
     } catch (err) {
-      console.error('[tts] ElevenLabs exception, falling back to OpenAI:', err.message);
+      clearTimeout(elTimeout);
+      const reason = err.name === 'AbortError' ? 'timeout (8s)' : err.message;
+      console.error('[tts] ElevenLabs failed (' + reason + '), falling back to OpenAI');
     }
   }
 

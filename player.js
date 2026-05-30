@@ -852,9 +852,9 @@ function renderLine(line) {
 
 // OpenAI TTS for Mary — streaming playback for low latency
 async function speakElevenLabs(text, onStart, characterId) {
-  // ── Fetch TTS audio with 12s timeout ────────────────────────────────────
+  // ── Fetch TTS audio with 10s timeout ────────────────────────────────────
   const fetchCtrl = new AbortController();
-  const fetchTimeout = setTimeout(() => fetchCtrl.abort(), 12000);
+  const fetchTimeout = setTimeout(() => fetchCtrl.abort(), 10000);
   let res;
   try {
     res = await fetch('/api/tts', {
@@ -876,8 +876,8 @@ async function speakElevenLabs(text, onStart, characterId) {
     throw new Error('TTS failed ' + res.status);
   }
 
-  // ── Play audio with 20s watchdog so a hung stream can't freeze the queue ─
-  const AUDIO_WATCHDOG = 20000;
+  // ── Play audio with 10s watchdog so a hung stream can't freeze the queue ─
+  const AUDIO_WATCHDOG = 10000;
 
   const playPromise = (() => {
     // Use MediaSource streaming — audio starts playing as first chunks arrive
