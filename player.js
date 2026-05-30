@@ -197,6 +197,7 @@ const DailyLimit = (() => {
   const KEY = 'ek-daily-v1';
   const DEV_COOKIE = 'ek_dev_bypass';
   const DEV_KEY_STORAGE = 'ek-dev-key';
+  const DEV_SESSION_KEY = 'devKey'; // sessionStorage key — survives redirects within the tab
 
   // ── Cookie helpers ──────────────────────────────────────────────────────
   function setCookie(name, value, days) {
@@ -221,30 +222,41 @@ const DailyLimit = (() => {
     if (reset === 'true') {
       deleteCookie(DEV_COOKIE);
       localStorage.removeItem(DEV_KEY_STORAGE);
+      sessionStorage.removeItem(DEV_SESSION_KEY);
       console.log('[DailyLimit] Dev bypass cleared.');
-      // Clean URL
       window.history.replaceState({}, '', window.location.pathname);
       return;
     }
 
     if (devKey) {
-      // Store in cookie (1 year) and localStorage for API header
+      // Store in cookie (1 year), localStorage, AND sessionStorage
+      // sessionStorage survives client-side redirects within the same tab
       setCookie(DEV_COOKIE, devKey, 365);
       localStorage.setItem(DEV_KEY_STORAGE, devKey);
+      sessionStorage.setItem(DEV_SESSION_KEY, devKey);
       console.log('[DailyLimit] Dev bypass activated on this device.');
       // Clean URL so secret doesn't stay visible
       window.history.replaceState({}, '', window.location.pathname);
+    } else {
+      // No ?dev= in URL — check if sessionStorage has it from a previous load this tab
+      // and backfill cookie/localStorage in case they were cleared
+      const stored = sessionStorage.getItem(DEV_SESSION_KEY);
+      if (stored && !getCookie(DEV_COOKIE) && !localStorage.getItem(DEV_KEY_STORAGE)) {
+        setCookie(DEV_COOKIE, stored, 365);
+        localStorage.setItem(DEV_KEY_STORAGE, stored);
+        console.log('[DailyLimit] Dev bypass restored from sessionStorage.');
+      }
     }
   }
 
   // ── Check if dev bypass is active on this device ────────────────────────
   function isDevBypass() {
-    return !!(getCookie(DEV_COOKIE) || localStorage.getItem(DEV_KEY_STORAGE));
+    return !!(getCookie(DEV_COOKIE) || localStorage.getItem(DEV_KEY_STORAGE) || sessionStorage.getItem(DEV_SESSION_KEY));
   }
 
   // ── Get dev key for API header ───────────────────────────────────────────
   function getDevKey() {
-    return getCookie(DEV_COOKIE) || localStorage.getItem(DEV_KEY_STORAGE) || null;
+    return sessionStorage.getItem(DEV_SESSION_KEY) || getCookie(DEV_COOKIE) || localStorage.getItem(DEV_KEY_STORAGE) || null;
   }
 
   // ── localStorage session counter ─────────────────────────────────────────
