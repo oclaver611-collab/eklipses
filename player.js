@@ -148,29 +148,8 @@ const Progress = (() => {
     return last - first;
   };
 
-  const refreshStreakBadge = () => {
-    const badge = document.getElementById('ek-streak-badge');
-    if (!badge) return;
-    const streak = getStreak();
-    if (streak < 1) {
-      badge.style.display = 'none';
-      return;
-    }
-    // Scale up visual weight for milestone streaks
-    const isHot  = streak >= 7;
-    const isMid  = streak >= 3;
-    badge.style.display      = 'flex';
-    badge.style.background   = isHot ? '#2b1a00' : '#1e1a0e';
-    badge.style.borderColor  = isHot ? '#ff8c00' : '#7a5500';
-    badge.style.color        = isHot ? '#ffd06a' : '#ffb300';
-    badge.style.fontSize     = isHot ? '15px' : isMid ? '14px' : '13px';
-    badge.innerHTML = '&#128293; ' + streak + (streak === 1 ? '-day streak' : '-day streak');
-    badge.onclick = showDashboard;
-  };
-
   const refreshStatBar = () => {
     const bar = document.getElementById('ek-stat-bar');
-    refreshStreakBadge();
     if (!bar) return;
     const streak = getStreak();
     const best = getBest();
@@ -290,7 +269,7 @@ const Progress = (() => {
       '</div>';
   };
 
-  return { recordSession, refreshStatBar, refreshStreakBadge, getHistoryHTML, getStreak, getBest, getTotal, showDashboard };
+  return { recordSession, refreshStatBar, getHistoryHTML, getStreak, getBest, getTotal, showDashboard };
 })();
 
 /* ===== Daily Session Limit ===== */
@@ -2052,7 +2031,6 @@ function launchApp() {
       if (nameEl && nameEl.parentNode) nameEl.parentNode.insertBefore(bar, nameEl.nextSibling);
     }
     Progress.refreshStatBar();
-    Progress.refreshStreakBadge();
     // Render shelf immediately — playScenario calls stopEverything() which increments session
     renderShelf();
     const launchSession = session;
@@ -2073,7 +2051,6 @@ function launchApp() {
       if (nameEl && nameEl.parentNode) nameEl.parentNode.insertBefore(bar, nameEl.nextSibling);
     }
     Progress.refreshStatBar();
-    Progress.refreshStreakBadge();
   };
 }
 
