@@ -37,7 +37,7 @@ module.exports = async function handler(req, res) {
 
   const history = rawHistory.slice(-16);
   if (!userMessage?.trim()) return res.status(400).json({ error: 'No user message provided' });
-  if (!process.env.GROQ_API_KEY) return res.status(500).json({ error: 'GROQ_API_KEY not set' });
+  if (!process.env.OPENAI_API_KEY && !process.env.GROQ_API_KEY) return res.status(500).json({ error: 'No LLM API key configured' });
 
   // ── Name extraction (identical to character.js) ──────────────────────────
   function extractUserName(msg) {
@@ -1830,73 +1830,63 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
 
   const systemPrompt = character + '\n\n' + setting + BASE_RULES + nameReminder + nameGivenReminder;
 
-  // ── Groq call ────────────────────────────────────────────────────────────
-  const delays = [3000, 6000, 9000];
-  let lastError = null;
-
-  for (let attempt = 0; attempt <= delays.length; attempt++) {
-    try {
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          max_tokens: 150,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...history,
-            { role: 'user', content: userMessage },
-          ],
-        }),
-      });
-
-      if (response.status === 429) {
-        lastError = '429';
-        if (attempt < delays.length) { await new Promise(r => setTimeout(r, delays[attempt])); continue; }
-        res.write(`data: ${JSON.stringify({ error: 'rate limit' })}\n\n`); res.end(); return;
-      }
-
-      if (!response.ok) {
-        const err = await response.text();
-        res.write(`data: ${JSON.stringify({ error: 'groq: ' + err })}\n\n`); res.end(); return;
-      }
-
-      const data = await response.json();
-      let characterResponse = data.choices?.[0]?.message?.content?.trim();
-      if (!characterResponse) { res.write(`data: ${JSON.stringify({ error: 'empty' })}\n\n`); res.end(); return; }
-
-      // ── Name post-processor ────────────────────────────────────────────
-      if (userName && !nameAlreadyAcknowledged) {
-        const alreadyUsed = characterResponse.toLowerCase().includes(userName.toLowerCase());
-        if (!alreadyUsed) {
-          const acknowledgments = [
-            `Nice to meet you, ${userName}.`,
-            `Good to meet you, ${userName}.`,
-            `${userName} — got it.`,
-          ];
-          const ack = acknowledgments[Math.floor(Math.random() * acknowledgments.length)];
-          characterResponse = characterResponse.replace(/[.!?]?\s*$/, '') + '. ' + ack;
+  // ── LLM call: OpenAI primary, Groq fallback ─────────────────────────────
+  async function attemptLLM(url, key, model) {
+    const delays = [3000, 6000];
+    for (let attempt = 0; attempt <= delays.length; attempt++) {
+      try {
+        const resp = await fetch(url, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model,
+            max_tokens: 150,
+            messages: [{ role: 'system', content: systemPrompt }, ...history, { role: 'user', content: userMessage }],
+          }),
+        });
+        if (resp.status === 429 && attempt < delays.length) {
+          await new Promise(resolve => setTimeout(resolve, delays[attempt])); continue;
         }
+        if (!resp.ok) return null;
+        return await resp.json();
+      } catch {
+        if (attempt === delays.length) return null;
+        await new Promise(resolve => setTimeout(resolve, delays[attempt]));
       }
+    }
+    return null;
+  }
 
-      // ── Stream sentences via SSE ───────────────────────────────────────
-      const sentences = splitSentences(characterResponse);
-      for (const sentence of sentences) {
-        if (!sentence.trim()) continue;
-        res.write(`data: ${JSON.stringify({ sentence: sentence.trim(), done: false })}\n\n`);
-        await new Promise(r => setTimeout(r, 20));
-      }
-      res.write(`data: ${JSON.stringify({ done: true, full: characterResponse })}\n\n`);
-      res.end();
-      return;
+  let data =
+    (process.env.OPENAI_API_KEY && await attemptLLM('https://api.openai.com/v1/chat/completions', process.env.OPENAI_API_KEY, 'gpt-4o-mini')) ||
+    (process.env.GROQ_API_KEY   && await attemptLLM('https://api.groq.com/openai/v1/chat/completions', process.env.GROQ_API_KEY, 'llama-3.3-70b-versatile'));
 
-    } catch (err) {
-      lastError = err.message;
-      if (attempt < delays.length) { await new Promise(r => setTimeout(r, delays[attempt])); continue; }
-      try { res.write(`data: ${JSON.stringify({ error: lastError })}\n\n`); res.end(); } catch {}
+  if (!data) { res.write(`data: ${JSON.stringify({ error: 'all providers failed' })}\n\n`); res.end(); return; }
+
+  let characterResponse = data.choices?.[0]?.message?.content?.trim();
+  if (!characterResponse) { res.write(`data: ${JSON.stringify({ error: 'empty' })}\n\n`); res.end(); return; }
+
+  // ── Name post-processor ────────────────────────────────────────────
+  if (userName && !nameAlreadyAcknowledged) {
+    const alreadyUsed = characterResponse.toLowerCase().includes(userName.toLowerCase());
+    if (!alreadyUsed) {
+      const acknowledgments = [
+        `Nice to meet you, ${userName}.`,
+        `Good to meet you, ${userName}.`,
+        `${userName} — got it.`,
+      ];
+      const ack = acknowledgments[Math.floor(Math.random() * acknowledgments.length)];
+      characterResponse = characterResponse.replace(/[.!?]?\s*$/, '') + '. ' + ack;
     }
   }
+
+  // ── Stream sentences via SSE ───────────────────────────────────────
+  const sentences = splitSentences(characterResponse);
+  for (const sentence of sentences) {
+    if (!sentence.trim()) continue;
+    res.write(`data: ${JSON.stringify({ sentence: sentence.trim(), done: false })}\n\n`);
+    await new Promise(r => setTimeout(r, 20));
+  }
+  res.write(`data: ${JSON.stringify({ done: true, full: characterResponse })}\n\n`);
+  res.end();
 };

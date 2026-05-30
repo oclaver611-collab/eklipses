@@ -27,18 +27,16 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'No user message provided' });
   }
 
-  if (!process.env.GROQ_API_KEY) {
-    return res.status(500).json({ error: 'GROQ_API_KEY not set' });
+  if (!process.env.OPENAI_API_KEY && !process.env.GROQ_API_KEY) {
+    return res.status(500).json({ error: 'No LLM API key configured' });
   }
 
-  // Model routing — default: groq 8b (free, fast)
-  // useModel='70b'      → groq llama-3.3-70b-versatile (free, better)
-  // useModel='gpt4mini' → OpenAI gpt-4o-mini (paid, best quality)
+  // Model routing — default: OpenAI gpt-4o-mini (primary), Groq llama-3.3-70b-versatile (auto-fallback)
+  // useModel='70b' → Groq as primary, no OpenAI attempt
   const useGroq70b = useModel === '70b';
-  const useGPT4Mini = useModel === 'gpt4mini';
   const apiUrl = useGroq70b ? 'https://api.groq.com/openai/v1/chat/completions' : 'https://api.openai.com/v1/chat/completions';
   const apiKey = useGroq70b ? process.env.GROQ_API_KEY : process.env.OPENAI_API_KEY;
-  const modelName = useGroq70b ? 'llama-3.3-70b-versatile' : 'gpt-4o-mini'; // default: gpt-4o-mini
+  const modelName = useGroq70b ? 'llama-3.3-70b-versatile' : 'gpt-4o-mini';
 
   // ── Name extraction ──────────────────────────────────────────────────────────
   function extractUserName(msg) {
@@ -1830,74 +1828,62 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
 
   const systemPrompt = character + '\n\n' + setting + BASE_RULES + nameReminder + nameGivenReminder;
 
-  // ── Groq call with retry logic ───────────────────────────────────────────────
-  const delays = [3000, 6000, 9000];
-  let lastError = null;
-
-  for (let attempt = 0; attempt <= delays.length; attempt++) {
-    try {
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: modelName,
-          max_tokens: 120,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...history,
-            { role: 'user', content: userMessage },
-          ],
-        }),
-      });
-
-      if (response.status === 429) {
-        lastError = '429';
-        if (attempt < delays.length) {
-          await new Promise(r => setTimeout(r, delays[attempt]));
-          continue;
+  // ── LLM call: OpenAI primary, Groq fallback ───────────────────────────────
+  async function attemptLLM(url, key, model) {
+    const delays = [3000, 6000, 9000];
+    for (let attempt = 0; attempt <= delays.length; attempt++) {
+      try {
+        const resp = await fetch(url, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model,
+            max_tokens: 120,
+            messages: [{ role: 'system', content: systemPrompt }, ...history, { role: 'user', content: userMessage }],
+          }),
+        });
+        if (resp.status === 429 && attempt < delays.length) {
+          await new Promise(resolve => setTimeout(resolve, delays[attempt])); continue;
         }
-        return res.status(429).json({ error: 'Rate limit — all retries exhausted' });
+        if (!resp.ok) return null;
+        return await resp.json();
+      } catch {
+        if (attempt === delays.length) return null;
+        await new Promise(resolve => setTimeout(resolve, delays[attempt]));
       }
+    }
+    return null;
+  }
 
-      if (!response.ok) {
-        const err = await response.text();
-        return res.status(500).json({ error: 'Groq error: ' + err });
-      }
+  let data = await attemptLLM(apiUrl, apiKey, modelName);
 
-      const data = await response.json();
-      let characterResponse = data.choices?.[0]?.message?.content?.trim();
+  // Groq fallback if OpenAI was primary and failed
+  if (!data && !useGroq70b && process.env.GROQ_API_KEY) {
+    data = await attemptLLM(
+      'https://api.groq.com/openai/v1/chat/completions',
+      process.env.GROQ_API_KEY,
+      'llama-3.3-70b-versatile'
+    );
+  }
 
-      if (!characterResponse) {
-        return res.status(500).json({ error: 'Empty response' });
-      }
+  if (!data) return res.status(500).json({ error: 'All LLM providers failed' });
 
-      // ── Name post-processor ───────────────────────────────────────────────
-      // If name was given and character forgot to use it — inject it in code.
-      if (userName && !nameAlreadyAcknowledged) {
-        const alreadyUsed = characterResponse.toLowerCase().includes(userName.toLowerCase());
-        if (!alreadyUsed) {
-          const acknowledgments = [
-            `Nice to meet you, ${userName}.`,
-            `Good to meet you, ${userName}.`,
-            `${userName} — got it.`,
-          ];
-          const ack = acknowledgments[Math.floor(Math.random() * acknowledgments.length)];
-          characterResponse = characterResponse.replace(/[.!?]?\s*$/, '') + '. ' + ack;
-        }
-      }
+  let characterResponse = data.choices?.[0]?.message?.content?.trim();
+  if (!characterResponse) return res.status(500).json({ error: 'Empty response' });
 
-      return res.json({ response: characterResponse });
-
-    } catch (err) {
-      lastError = err.message;
-      if (attempt < delays.length) {
-        await new Promise(r => setTimeout(r, delays[attempt]));
-        continue;
-      }
-      return res.status(500).json({ error: lastError });
+  // ── Name post-processor ───────────────────────────────────────────────
+  if (userName && !nameAlreadyAcknowledged) {
+    const alreadyUsed = characterResponse.toLowerCase().includes(userName.toLowerCase());
+    if (!alreadyUsed) {
+      const acknowledgments = [
+        `Nice to meet you, ${userName}.`,
+        `Good to meet you, ${userName}.`,
+        `${userName} — got it.`,
+      ];
+      const ack = acknowledgments[Math.floor(Math.random() * acknowledgments.length)];
+      characterResponse = characterResponse.replace(/[.!?]?\s*$/, '') + '. ' + ack;
     }
   }
+
+  return res.json({ response: characterResponse });
 };
