@@ -1108,9 +1108,14 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
   }
 
   // SSE stream reader
+  let sseTimedOut = false;
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
+    // 25s connection timeout — covers Vercel cold starts (was 10s)
+    const connectTimeout = setTimeout(() => {
+      sseTimedOut = true;
+      controller.abort();
+    }, 25000);
 
     const res = await fetch('/api/character-stream', {
       method: 'POST',
@@ -1124,7 +1129,7 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
       signal: controller.signal,
     });
 
-    clearTimeout(timeout);
+    clearTimeout(connectTimeout);
 
     if (!res.ok) {
       console.error('[streamCharacterAndSpeak] character-stream HTTP', res.status, '| char:', currentCharacterId);
@@ -1137,13 +1142,22 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
     const decoder = new TextDecoder();
     let buffer = '';
 
+    // Sentence watchdog: if no sentence arrives within 15s of connecting, abort
+    let sentenceWatchdog = setTimeout(() => {
+      if (!streamDone && sentenceQueue.length === 0) {
+        sseTimedOut = true;
+        console.error('[streamCharacterAndSpeak] sentence watchdog fired — no sentence in 15s | char:', currentCharacterId);
+        reader.cancel();
+      }
+    }, 15000);
+
     // Start queue processor immediately
     processQueue();
 
     while (true) {
-      if (mySession !== session) { reader.cancel(); break; }
+      if (mySession !== session) { clearTimeout(sentenceWatchdog); reader.cancel(); break; }
       const { done, value } = await reader.read();
-      if (done) break;
+      if (done) { clearTimeout(sentenceWatchdog); break; }
 
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split('\n');
@@ -1153,9 +1167,21 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
         if (!line.startsWith('data: ')) continue;
         try {
           const payload = JSON.parse(line.slice(6));
-          if (payload.error) { console.error('[streamCharacterAndSpeak] SSE payload error:', payload.error); break; }
-          if (payload.sentence) { console.log('[SSE] sentence received:', payload.sentence.slice(0, 60)); sentenceQueue.push(payload.sentence); }
-          if (payload.done) { fullText = payload.full || fullText; streamDone = true; }
+          if (payload.error) { console.error('[streamCharacterAndSpeak] SSE payload error:', payload.error); clearTimeout(sentenceWatchdog); break; }
+          if (payload.sentence) {
+            console.log('[SSE] sentence received:', payload.sentence.slice(0, 60));
+            sentenceQueue.push(payload.sentence);
+            // Reset watchdog — we're getting sentences, stream is alive
+            clearTimeout(sentenceWatchdog);
+            sentenceWatchdog = setTimeout(() => {
+              if (!streamDone) {
+                sseTimedOut = true;
+                console.error('[streamCharacterAndSpeak] inter-sentence watchdog fired | char:', currentCharacterId);
+                reader.cancel();
+              }
+            }, 15000);
+          }
+          if (payload.done) { fullText = payload.full || fullText; streamDone = true; clearTimeout(sentenceWatchdog); }
         } catch {}
       }
     }
@@ -1164,9 +1190,14 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
 
   } catch (err) {
     streamDone = true;
-    if (err.name !== 'AbortError') console.error('[streamCharacterAndSpeak] SSE fetch error:', err.message, '| char:', currentCharacterId);
-    else console.error('[streamCharacterAndSpeak] SSE timed out (AbortError) | char:', currentCharacterId);
+    if (err.name === 'AbortError' || sseTimedOut) {
+      console.error('[streamCharacterAndSpeak] SSE timed out | char:', currentCharacterId, '| had content:', sentenceQueue.length > 0);
+    } else {
+      console.error('[streamCharacterAndSpeak] SSE fetch error:', err.message, '| char:', currentCharacterId);
+    }
+    // Retry once with fallback endpoint if stream produced nothing
     if (!fullText && sentenceQueue.length === 0) {
+      console.log('[streamCharacterAndSpeak] falling back to /api/character | char:', currentCharacterId);
       return await getCharacterResponseFallback(userSaid);
     }
   }
