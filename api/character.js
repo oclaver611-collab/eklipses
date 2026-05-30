@@ -10,7 +10,7 @@ module.exports = async function handler(req, res) {
   }
 
   // ── Rate limiting (IP-based, dev bypass via x-dev-key header) ──
-  const rl = checkRateLimit(req, res);
+  const rl = await checkRateLimit(req, res);
   if (!rl.allowed) return;
 
   const {
