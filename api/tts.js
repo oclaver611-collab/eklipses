@@ -82,6 +82,7 @@ module.exports = async function handler(req, res) {
     res.setHeader('Content-Type', 'audio/mpeg');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Transfer-Encoding', 'chunked');
+    res.setHeader('X-TTS-Provider', 'openai');
 
     const reader = response.body.getReader();
     while (true) {
@@ -121,6 +122,7 @@ module.exports = async function handler(req, res) {
         res.setHeader('Content-Type', 'audio/mpeg');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Transfer-Encoding', 'chunked');
+        res.setHeader('X-TTS-Provider', 'elevenlabs');
 
         const reader = elRes.body.getReader();
         while (true) {
