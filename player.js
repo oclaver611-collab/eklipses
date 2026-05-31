@@ -843,14 +843,14 @@ function renderLine(line) {
 
 /* ===== TTS ===== */
 
-// OpenAI TTS for Mary — streaming playback for low latency
+// ElevenLabs/OpenAI TTS for character voices — streaming playback for low latency
 async function speakElevenLabs(text, onStart) {
   const res = await fetch('/api/tts', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, voice: 'nova' }),
+    body: JSON.stringify({ text, voice: 'nova', characterId: currentCharacterId }),
   });
-  if (!res.ok) throw new Error('OpenAI TTS failed: ' + res.status);
+  if (!res.ok) throw new Error('TTS failed: ' + res.status);
 
   // Use MediaSource streaming — audio starts playing as first chunks arrive
   // Falls back to full buffer decode if MediaSource not supported
