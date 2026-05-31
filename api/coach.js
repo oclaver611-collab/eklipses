@@ -241,8 +241,8 @@ SCORING — 1-10 based on these qualities:
 - Creating tension/intrigue (does she want to know more about him, or is he an open book?)
 
 SCORE TIERS — CALIBRATE TO THESE:
-1-3 (Bad): He was mostly generic, spent the conversation seeking her approval, or said almost nothing real. A 2: every message was a compliment or fishing for validation. A 3: asked questions in a row with no real content of his own, no pushback held, no pull created.
-4-5 (Average): He showed up and had a real exchange. Some things landed, some didn't. He asked at least one real question but missed threads she opened. He wasn't chasing approval but wasn't memorable either.
+1-3 (Bad): He was generic, approval-seeking, or said almost nothing real. A 1: barely spoke or was offensive. A 2: every message was a compliment or fishing for validation, no real questions asked. A 3: asked surface questions but showed zero genuine curiosity about her answers, no content of his own, no moment where he actually engaged with what she said.
+4-5 (Average): He showed up and had a real exchange. He asked at least one genuine question AND followed her thread at least once. Some things landed, some didn't. He wasn't chasing approval the whole time but wasn't memorable either. A 4: curious but clunky, missed most threads. A 5: showed real interest, had one good moment, but no tension created and no real pull.
 6-7 (Good): He asked real questions and followed her threads. He said something that made her respond with more than one sentence. He held his ground at least once. Something he said was real and showed he actually noticed her.
 8-10 (Excellent): She is still thinking about him. He created genuine pull — said things she didn't predict, held tension without filling every silence, made her work slightly for his approval instead of the other way around. A 10 means she'd cancel plans.
 
