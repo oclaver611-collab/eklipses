@@ -931,7 +931,7 @@ async function speakElevenLabs(text, onStart) {
   }
 }
 
-async function speak(text, speaker) {
+async function speak(text, speaker, onAudioReady) {
   const mySession=session;
   try { __audioContexts.forEach(c=>{ try{if(c.state==='suspended')c.resume();}catch{} }); } catch {}
   // For Mary: start with idle video, switch to speaking only when audio actually starts
@@ -947,6 +947,7 @@ async function speak(text, speaker) {
 
   const switchToSpeaking=()=>{
     if(mySession!==session) return;
+    if (onAudioReady) onAudioReady();
     if (speaker === 'Mary') {
       if (AVATARS._marySpeakingVideo) {
         const el=els.media;
@@ -1632,8 +1633,7 @@ async function runCoachFeedback(mySession) {
   if (coachParts.length) {
     for (let i = 0; i < coachParts.length; i++) {
       if (mySession !== session) return;
-      els.text.textContent = coachParts[i];
-      await speak(coachParts[i], 'Ryan');
+      await speak(coachParts[i], 'Ryan', () => { els.text.textContent = coachParts[i]; });
       if(mySession!==session) return;
 
       if (i < coachParts.length - 1) {
@@ -1642,8 +1642,7 @@ async function runCoachFeedback(mySession) {
         if(mySession!==session) return;
         const transition = transitions[i];
         if (transition) {
-          els.text.textContent = transition;
-          await speak(transition, 'Ryan');
+          await speak(transition, 'Ryan', () => { els.text.textContent = transition; });
           if(mySession!==session) return;
           await pause(800);
         }
@@ -1654,8 +1653,7 @@ async function runCoachFeedback(mySession) {
     if (f.tryNextTime && mySession === session) {
       await pause(1500);
       const tryLine = `Next time, try this exact line: "${f.tryNextTime}"`;
-      els.text.textContent = tryLine;
-      await speak(tryLine, 'Ryan');
+      await speak(tryLine, 'Ryan', () => { els.text.textContent = tryLine; });
     }
 
   } else {
@@ -1667,8 +1665,7 @@ async function runCoachFeedback(mySession) {
   if (mySession === session) {
     await pause(1500);
     const scoreReveal = `I give that a... ${f.score} out of 10.`;
-    els.text.textContent = scoreReveal;
-    await speak(scoreReveal, 'Ryan');
+    await speak(scoreReveal, 'Ryan', () => { els.text.textContent = scoreReveal; });
   }
 
   if(mySession!==session) return;
