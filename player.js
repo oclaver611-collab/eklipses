@@ -303,6 +303,7 @@ const DailyLimit = (() => {
   const KEY = 'ek-daily-v1';
   const DEV_COOKIE = 'ek_dev_bypass';
   const DEV_KEY_STORAGE = 'ek-dev-key';
+  const STRIPE_CUS_KEY = 'ek-stripe-cus';
 
   // ── Cookie helpers ──────────────────────────────────────────────────────
   function setCookie(name, value, days) {
@@ -318,28 +319,46 @@ const DailyLimit = (() => {
     document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/';
   }
 
-  // ── Handle ?dev=SECRET and ?resetdev=true in URL ────────────────────────
-  function handleURLParams() {
+  // ── Handle ?dev=SECRET, ?resetdev=true, ?stripe_session=xxx in URL ────────
+  async function handleURLParams() {
     const params = new URLSearchParams(window.location.search);
     const devKey = params.get('dev');
     const reset = params.get('resetdev');
+    const stripeSession = params.get('stripe_session');
 
     if (reset === 'true') {
       deleteCookie(DEV_COOKIE);
       localStorage.removeItem(DEV_KEY_STORAGE);
       console.log('[DailyLimit] Dev bypass cleared.');
-      // Clean URL
       window.history.replaceState({}, '', window.location.pathname);
       return;
     }
 
     if (devKey) {
-      // Store in cookie (1 year) and localStorage for API header
       setCookie(DEV_COOKIE, devKey, 365);
       localStorage.setItem(DEV_KEY_STORAGE, devKey);
       console.log('[DailyLimit] Dev bypass activated on this device.');
-      // Clean URL so secret doesn't stay visible
       window.history.replaceState({}, '', window.location.pathname);
+    }
+
+    if (stripeSession && stripeSession.startsWith('cs_')) {
+      window.history.replaceState({}, '', window.location.pathname);
+      try {
+        const r = await fetch(`/api/verify-payment?session_id=${stripeSession}`);
+        const data = await r.json();
+        if (data.active && data.customerId) {
+          setStripeCustomer(data.customerId);
+          console.log('[DailyLimit] Pro subscription activated:', data.customerId);
+          const banner = document.createElement('div');
+          banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ffb300;color:#000;text-align:center;padding:12px;font-weight:700;font-size:15px;z-index:99999;cursor:pointer';
+          banner.textContent = 'Welcome to Eklipses Pro! Unlimited sessions activated.';
+          banner.onclick = () => banner.remove();
+          document.body.prepend(banner);
+          setTimeout(() => banner.remove(), 5000);
+        }
+      } catch (e) {
+        console.error('[DailyLimit] Stripe verify error:', e.message);
+      }
     }
   }
 
@@ -351,6 +370,17 @@ const DailyLimit = (() => {
   // ── Get dev key for API header ───────────────────────────────────────────
   function getDevKey() {
     return getCookie(DEV_COOKIE) || localStorage.getItem(DEV_KEY_STORAGE) || null;
+  }
+
+  // ── Stripe customer helpers ──────────────────────────────────────────────
+  function getStripeCustomer() {
+    return localStorage.getItem(STRIPE_CUS_KEY) || null;
+  }
+  function setStripeCustomer(customerId) {
+    if (customerId) localStorage.setItem(STRIPE_CUS_KEY, customerId);
+  }
+  function isProSubscriber() {
+    return !!getStripeCustomer();
   }
 
   // ── localStorage session counter ─────────────────────────────────────────
@@ -394,37 +424,68 @@ const DailyLimit = (() => {
     const overlay = document.createElement('div');
     overlay.id = 'ek-paywall';
     overlay.style.cssText = [
-      'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99999',
+      'position:fixed;inset:0;background:rgba(0,0,0,0.93);z-index:99999',
       'display:flex;flex-direction:column;align-items:center;justify-content:center',
       'font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:24px;text-align:center'
     ].join(';');
 
     overlay.innerHTML = `
-      <div style="font-size:40px;margin-bottom:16px">⏱️</div>
-      <div style="color:#fff;font-size:22px;font-weight:800;margin-bottom:10px">
-        You've used your 3 free sessions today
+      <div style="font-size:44px;margin-bottom:12px">🔐</div>
+      <div style="color:#fff;font-size:24px;font-weight:800;margin-bottom:10px;letter-spacing:-0.5px">
+        You've used your 3 free sessions
       </div>
-      <div style="color:#9aa4b2;font-size:15px;max-width:340px;margin-bottom:28px;line-height:1.5">
-        Come back tomorrow for 3 more — or go unlimited with Eklipses Pro.
+      <div style="color:#9aa4b2;font-size:15px;max-width:340px;margin-bottom:8px;line-height:1.6">
+        Come back tomorrow for 3 more — or get unlimited practice with Eklipses Pro.
       </div>
-      <div style="background:#ffb300;color:#000;font-size:15px;font-weight:800;
-                  padding:14px 32px;border-radius:999px;cursor:pointer;margin-bottom:12px"
-           onclick="document.getElementById('ek-paywall').remove()">
-        Upgrade to Pro — $19.99/month
+      <div style="color:#ffb300;font-size:13px;max-width:300px;margin-bottom:28px;line-height:1.5">
+        Unlimited sessions · All scenarios · Ryan coaching after every chat
       </div>
-      <div style="color:#666;font-size:13px;cursor:pointer"
+      <button id="ek-paywall-btn"
+        style="background:#ffb300;color:#000;font-size:16px;font-weight:800;border:none;
+               padding:15px 36px;border-radius:999px;cursor:pointer;margin-bottom:14px;
+               min-width:260px;transition:opacity 0.2s">
+        Upgrade to Pro — $14.99/month
+      </button>
+      <div style="color:#555;font-size:12px;margin-bottom:20px">No contract · Cancel anytime</div>
+      <div style="color:#666;font-size:13px;cursor:pointer;text-decoration:underline"
            onclick="document.getElementById('ek-paywall').remove()">
         Come back tomorrow
       </div>
     `;
+
     document.body.appendChild(overlay);
+
+    overlay.querySelector('#ek-paywall-btn').addEventListener('click', async function() {
+      this.textContent = 'Loading...';
+      this.style.opacity = '0.7';
+      this.disabled = true;
+      try {
+        const r = await fetch('/api/create-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
+        });
+        const data = await r.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          throw new Error(data.error || 'No checkout URL returned');
+        }
+      } catch (e) {
+        console.error('[Paywall] Checkout error:', e.message);
+        this.textContent = 'Error — try again';
+        this.style.opacity = '1';
+        this.disabled = false;
+      }
+    });
   }
 
   // ── Main check — call before starting a practice session ─────────────────
   async function canPlay() {
-    handleURLParams(); // process ?dev= and ?resetdev= on every check
+    await handleURLParams(); // process ?dev=, ?resetdev=, ?stripe_session=
 
     if (isDevBypass()) return true;
+    if (isProSubscriber()) return true; // paid subscriber — unlimited
 
     // Layer 1: localStorage
     const localCount = getLocalCount();
@@ -445,22 +506,27 @@ const DailyLimit = (() => {
     return true;
   }
 
-  // ── Inject dev key into all API fetch calls via monkey-patch ─────────────
-  // This adds x-dev-key header to /api/character and /api/tts automatically
+  // ── Inject auth headers into all API fetch calls via monkey-patch ─────────
+  // Adds x-dev-key (dev bypass) and x-stripe-customer (paid subscriber) headers
   function patchFetch() {
     const _originalFetch = window.fetch;
     window.fetch = function(url, options = {}) {
       if (typeof url === 'string' && (
-        url.includes('/api/character') ||   // covers /api/character AND /api/character-stream
+        url.includes('/api/character') ||
         url.includes('/api/tts')
       )) {
         const devKey = getDevKey();
-        if (devKey) {
+        const stripeCus = getStripeCustomer();
+        if (devKey || stripeCus) {
           options.headers = options.headers || {};
-          if (options.headers instanceof Headers) {
-            options.headers.set('x-dev-key', devKey);
-          } else {
-            options.headers['x-dev-key'] = devKey;
+          const isHeadersObj = options.headers instanceof Headers;
+          if (devKey) {
+            if (isHeadersObj) options.headers.set('x-dev-key', devKey);
+            else options.headers['x-dev-key'] = devKey;
+          }
+          if (stripeCus) {
+            if (isHeadersObj) options.headers.set('x-stripe-customer', stripeCus);
+            else options.headers['x-stripe-customer'] = stripeCus;
           }
         }
       }
@@ -468,7 +534,7 @@ const DailyLimit = (() => {
     };
   }
 
-  return { canPlay, isDevBypass, patchFetch, handleURLParams };
+  return { canPlay, isDevBypass, isProSubscriber, patchFetch, handleURLParams };
 })();
 
 // Patch fetch immediately so dev key is always sent

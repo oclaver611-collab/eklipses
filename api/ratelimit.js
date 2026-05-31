@@ -9,6 +9,32 @@
 // ── In-memory IP store (resets on cold start — that's fine, adds friction not a hard wall) ──
 const ipStore = new Map();
 
+// ── In-memory Stripe subscriber cache (customer ID → expiry timestamp) ────────
+const subscriberCache = new Map();
+const SUBSCRIBER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+async function isActiveSubscriber(req) {
+  const customerId = req.headers['x-stripe-customer'];
+  if (!customerId || !customerId.startsWith('cus_')) return false;
+  if (!process.env.STRIPE_SECRET_KEY) return false;
+
+  const cached = subscriberCache.get(customerId);
+  if (cached && cached.expires > Date.now()) return cached.active;
+
+  try {
+    const r = await fetch(
+      `https://api.stripe.com/v1/subscriptions?customer=${customerId}&status=active&limit=1`,
+      { headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` } }
+    );
+    const data = await r.json();
+    const active = Array.isArray(data.data) && data.data.length > 0;
+    subscriberCache.set(customerId, { active, expires: Date.now() + SUBSCRIBER_CACHE_TTL });
+    return active;
+  } catch {
+    return false;
+  }
+}
+
 function getTodayKey() {
   return new Date().toISOString().slice(0, 10); // "2026-05-23"
 }
@@ -59,10 +85,16 @@ function checkIPLimit(req) {
 }
 
 // Main export — call at top of any API handler
-// Returns { allowed: boolean, bypass: boolean }
-function checkRateLimit(req, res) {
+// Returns Promise<{ allowed: boolean, bypass: boolean }>
+async function checkRateLimit(req, res) {
   // Dev bypass — skip all limits
   if (isDevBypass(req)) {
+    return { allowed: true, bypass: true };
+  }
+
+  // Stripe subscriber bypass — paid users get unlimited access
+  const paid = await isActiveSubscriber(req);
+  if (paid) {
     return { allowed: true, bypass: true };
   }
 
