@@ -1625,19 +1625,7 @@ async function runCoachFeedback(mySession) {
 
   if(mySession!==session) return;
 
-  // FIX 3: Announce score out loud before parts start
-  const scoreAnnouncements = [
-    `I'm giving you a ${f.score} out of 10.`,
-    `Your score — ${f.score} out of 10.`,
-    `${f.score} out of 10.`,
-  ];
-  const scoreAnnouncement = scoreAnnouncements[Math.floor(Math.random() * scoreAnnouncements.length)];
-  els.text.textContent = scoreAnnouncement;
-  await speak(scoreAnnouncement, 'Ryan');
-  if(mySession!==session) return;
-
-  // FIX 1: Breathing room between parts — 1.5s pause after each part + transition
-  // FIX 5: Speak tryNextTime after part4 as a final actionable line
+  // Speaking order: part1 → trans2 → part2 → trans3 → part3 → trans4 → part4 → tryNextTime → score reveal
   const coachParts = [f.part1, f.part2, f.part3, f.part4].filter(Boolean);
   const transitions = [f.transition2, f.transition3, f.transition4];
 
@@ -1662,7 +1650,7 @@ async function runCoachFeedback(mySession) {
       }
     }
 
-    // FIX 5: Speak the actionable try-next-time line
+    // Speak tryNextTime after part4
     if (f.tryNextTime && mySession === session) {
       await pause(1500);
       const tryLine = `Next time, try this exact line: "${f.tryNextTime}"`;
@@ -1673,6 +1661,14 @@ async function runCoachFeedback(mySession) {
   } else {
     els.text.textContent = f.spokenFeedback || f.spokenSummary;
     await speak(f.spokenFeedback || f.spokenSummary, 'Ryan');
+  }
+
+  // Score reveal LAST — dramatic pause, then the number
+  if (mySession === session) {
+    await pause(1500);
+    const scoreReveal = `I give that a... ${f.score} out of 10.`;
+    els.text.textContent = scoreReveal;
+    await speak(scoreReveal, 'Ryan');
   }
 
   if(mySession!==session) return;
@@ -1821,7 +1817,7 @@ function showFeedbackCard(f) {
   els.text.innerHTML=`
     <div style="background:#1a1c22;border:1px solid #2b2e36;border-radius:16px;padding:20px;margin:10px 0;text-align:left;max-width:860px">
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
-        <div style="font-size:42px;font-weight:900;color:${scoreColor}">${f.score}<span style="font-size:20px;color:#666">/10</span></div>
+        <div style="font-size:42px;font-weight:900;color:${scoreColor}"><span id="ek-score-display">0</span><span style="font-size:20px;color:#666">/10</span></div>
         <div style="font-size:16px;color:#cfd6e4;line-height:1.5">${f.spokenSummary}</div>
       </div>
       ${bodyHTML}
@@ -1844,6 +1840,16 @@ function showFeedbackCard(f) {
         <div id="ek-comments-list" style="display:flex;flex-direction:column;gap:10px"><div style="color:#666;font-size:13px;text-align:center">Loading comments…</div></div>
       </div>
     </div>`;
+  // Animate score counter 0 → final over 1.5s
+  const _scoreEl = document.getElementById('ek-score-display');
+  if (_scoreEl) {
+    const _target = f.score, _dur = 1500, _t0 = performance.now();
+    (function _tick(now) {
+      const p = Math.min((now - _t0) / _dur, 1);
+      _scoreEl.textContent = Math.round(p * _target);
+      if (p < 1) requestAnimationFrame(_tick);
+    })(performance.now());
+  }
   setTimeout(() => window.EkComments.load('${currentScenarioKey}'), 100);
 }
 

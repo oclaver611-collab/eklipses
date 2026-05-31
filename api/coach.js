@@ -14,9 +14,6 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: 'OPENAI_API_KEY not set' });
   }
 
-  let sofiaFirstResponse = null;
-  let openerLine = (opener || '').trim();
-
   // Character name map for transcript labels
   const CHARACTER_NAME_MAP = {
     beach: 'SOFIA', bar: 'AVA', museum: 'ISABELLE',
@@ -29,120 +26,18 @@ module.exports = async function handler(req, res) {
 
   // Build transcript
   let himCount = 0;
-  let sofiaCount = 0;
   const transcript = conversation
     .map(m => {
       if (m.role === 'user') {
         himCount++;
         return `HIM_${himCount}: ${m.content.trim()}`;
       } else {
-        sofiaCount++;
-        const text = m.content.trim();
-        if (sofiaCount === 1) sofiaFirstResponse = text;
-        return `${characterLabel}: ${text}`;
+        return `${characterLabel}: ${m.content.trim()}`;
       }
     })
     .join('\n');
 
-  if (!openerLine) {
-    openerLine = conversation.find(m => m.role === 'user')?.content || '';
-  }
-
-  // Part1 — generated in JS, guaranteed correct opener
-  const openerLower = openerLine.trim().toLowerCase();
-  const openerWords = openerLine.trim().split(/\s+/);
-  const nameOnly = openerWords.length <= 2 && /^(hi|hey|hello)/i.test(openerLower);
-  const isGeneric = !nameOnly && (
-    /^(hi|hey|hello)\b/i.test(openerLower) ||
-    openerLower.includes('what is your name') ||
-    openerLower.includes("what's your name") ||
-    openerLower.includes('never saw you here') ||
-    openerWords.length <= 5
-  );
-
-  // Non-sequitur detection — opener references things that don't exist in the scenario
-  const nonSequiturTerms = {
-    beach: ['boat', 'car', 'dog', 'coffee', 'drink'],
-    bar: ['book', 'dog', 'boat'],
-    museum: ['dog', 'boat', 'car'],
-    gym: ['dog', 'boat', 'car'],
-    bookstore: ['dog', 'boat', 'car'],
-    street: ['dog', 'boat', 'car'],
-    rooftop: ['dog', 'boat', 'car'],
-    house_party: ['dog', 'boat', 'car'],
-    coffee_shop: ['dog', 'boat', 'car'],
-    art_gallery: ['dog', 'boat', 'car'],
-    yoga_studio: ['dog', 'boat', 'car'],
-    airport: ['dog', 'boat', 'car'],
-    supermarket: ['dog', 'boat', 'car'],
-    office_lobby: ['dog', 'boat', 'car'],
-    train: ['dog', 'boat', 'car'],
-  };
-  const scenarioNonSequiturs = nonSequiturTerms[scenarioKey] || [];
-  const isNonSequitur = scenarioNonSequiturs.some(term => openerLower.includes(term));
-
-  // Scenario-specific better openers
-  const betterOpeners = {
-    beach:       'You look like you found the only quiet corner of this whole beach on purpose — is this your spot, or did you just get lucky?',
-    bar:         'Everyone here is either on their phone or working too hard at being casual. You\'re the only one who actually looks like you\'re here.',
-    museum:      'You\'ve been standing in front of that one longer than anyone else today — what is it doing to you?',
-    gym:         'Shoulder press between sets — I was going to ask if the rack is free but honestly I\'m more curious what you\'re training for.',
-    bookstore:   'You\'ve picked that up twice and put it back down. Either the first page is bad or you\'re deciding something.',
-    street:      'I\'ve got about ten seconds before this gets awkward — I figured I\'d use them honestly.',
-    rooftop:     'You said the view made coming worth it — what were you expecting before you got up here?',
-    house_party: 'You stepped out for air which means you either know everyone here or nobody — which is it?',
-    coffee_shop: 'You\'ve been waiting long enough to make your own at home by now — what are you actually waiting for?',
-    art_gallery:  'Most people walk past that one in under ten seconds. You\'ve been here a while — what is it you can\'t quite place?',
-    yoga_studio:  'You said the hip flexors have been going all week — is that the teaching schedule or something else?',
-    airport:     'You\'ve moved through frustration, acceptance, and bargaining with the board — I\'m curious what stage comes next for you.',
-    supermarket:  'You came in with a plan and the mangoes won — I want to know what was on the list before it fell apart.',
-    office_lobby: 'We\'ve been in this building for months and both of us have been very professional about not talking — I figured one of us had to stop that.',
-    train:       'Someone back there has been on the same thirty seconds of a song for twenty minutes — I\'m genuinely trying to figure out if they know.',
-  };
-  const betterOpener = betterOpeners[scenarioKey] || 'Something specific and real that gives her something to respond to.';
-
   const pick = arr => arr[Math.floor(Math.random() * arr.length)];
-
-  const herReplyVariants = sofiaFirstResponse ? [
-    ` She came back with "${sofiaFirstResponse}" — short, because you didn't give her much to work with.`,
-    ` She said "${sofiaFirstResponse}" — polite, but she's waiting for something real.`,
-    ` Her reply: "${sofiaFirstResponse}" — she kept it brief because nothing in your opener pulled her in.`,
-  ] : [''];
-  const herReplyGoodVariants = sofiaFirstResponse ? [
-    ` She came back with "${sofiaFirstResponse}" — the door was open.`,
-    ` She said "${sofiaFirstResponse}" — that's real engagement. You had something to build on.`,
-    ` Her response: "${sofiaFirstResponse}" — green light. The question is what you did next.`,
-  ] : [''];
-
-  const herReply = pick(herReplyVariants);
-  const herReplyGood = pick(herReplyGoodVariants);
-
-  const nameOnlyVariants = [
-    `You showed up — that already puts you ahead of the guys who freeze. But "${openerLine}" gives her nothing to grab onto. She can only say hi back, and now she's doing all the work. Try this instead: "${betterOpener}" One real observation beats ten safe openers. You have the guts. Now give it some words.`,
-    `Walking up is the hard part and you did it. But "${openerLine}" is a dead end — she has nothing to react to. Give her something: "${betterOpener}" That's the difference between starting a conversation and just standing there.`,
-    `You went for it — good. But "${openerLine}" puts all the pressure on her. She has to carry it from zero. Next time: "${betterOpener}" Specific, curious, real. One line like that changes everything.`,
-  ];
-
-  const genericVariants = [
-    `You walked up and said something — that counts. But "${openerLine}" is the kind of thing anyone would say.${herReply} Try this instead: "${betterOpener}" — something she didn't see coming. The courage was there. Now build on it.`,
-    `You showed up. That matters. But "${openerLine}" didn't stand out.${herReply} Something like "${betterOpener}" would have made her actually turn toward you. Keep the nerve, sharpen what you say.`,
-    `You opened — good. But "${openerLine}" is something she's heard before.${herReply} The fix: "${betterOpener}" Something real beats something smooth every time. You've got the start. Work on what comes out of your mouth.`,
-  ];
-
-  const goodVariants = [
-    `Good opener — "${openerLine}" felt real and gave her something to react to.${herReplyGood} The hard part was done. The question is what you did with it after.`,
-    `Solid start. "${openerLine}" — that's specific enough that she knew you actually noticed her, not just that she exists.${herReplyGood} The door was open. Let's see what happened next.`,
-    `You opened well — "${openerLine}" didn't sound like a line.${herReplyGood} That's the hardest part for most guys. What came after is what we need to look at.`,
-  ];
-
-  let part1;
-  if (nameOnly) {
-    part1 = pick(nameOnlyVariants);
-  } else if (isNonSequitur || isGeneric) {
-    part1 = pick(genericVariants);
-  } else {
-    part1 = pick(goodVariants);
-  }
 
   // Hardcoded transitions between parts — prevents dead air and bans filler phrases at the source
   const transitions2 = [
@@ -288,10 +183,8 @@ module.exports = async function handler(req, res) {
 
   const systemPrompt = `You are Ryan, a dating coach doing a spoken debrief after a practice session.
 You talk directly to the guy — second person, casual, no fluff.
-You are honest but fair: your job is to make him better, not crush him.
-Small mistakes get a quick fix with the better version shown.
-Big mistakes — chasing approval, going completely flat, freezing — get called out harder because he needs to feel those to change.
-When something worked, say it cleanly. Never fake praise.
+You are honest but fair: your job is to make him better, not protect his feelings.
+When something worked, say it cleanly and say why. When something didn't, call it out and show him the better version.
 Your tone is like a good friend who has seen a lot of these conversations and tells it straight.
 
 VOICE — THIS IS CRITICAL:
@@ -318,44 +211,42 @@ ${charProfile.missedOpportunityExamples}
 
 CRITICAL: Your feedback must be about THIS conversation. Reference what actually happened. Quote real lines. Show him the exact better version using what she actually said.
 
-Go through the conversation in order — like watching it back on film. Quote him, quote her, react, show what he should have said.
-
 Respond ONLY with valid JSON — no markdown, no preamble:
 {
   "score": <number 1-10>,
-  "spokenSummary": "<One punchy sentence. Max 20 words. MUST quote or directly reference a specific line from the transcript — his words or her words. No general statements about confidence or effort. If you cannot find a specific line to reference, describe the most concrete moment that happened.>",
+  "spokenSummary": "<One punchy sentence. Max 20 words. MUST quote or directly reference a specific line from the transcript — his words or her words. No general statements about confidence or effort.>",
 
-  "part2": "<MIDDLE OF CONVERSATION. Min 70 words, max 90 words. Pick the most telling exchange from the middle — quote exactly what he said and exactly what ${girlName} said back. Tell him what that moment showed. Was he trying too hard to impress her? Did he miss something she handed him? Connect it to who ${girlName} is — what was she waiting for? What did she open up and he walked past? Stay in the transcript. No general advice.>",
+  "part1": "<Ryan's GENUINE opening reaction to this conversation. 60-80 words. Quote his actual first line (HIM_1) verbatim, then react honestly and directly. Was it good? Say so and say exactly why it worked with ${girlName}. Was it bad? Say so and say what it cost him in THIS conversation. Do NOT start with 'Alright', 'Okay', or 'So'. Start with something real and specific about what happened. No generic opener coaching — this is a direct reaction to THIS conversation.>",
 
-  "part3": "<THE KEY MISTAKE. Min 80 words. Find the single moment that cost him the most with ${girlName}. PRIORITY: (1) If he asked for coffee, a number, or to meet up before he earned it — that is ALWAYS the key mistake. Quote her exact response to it. Tell him what was missing. What needed to happen first before that ask would have landed? Give him the exact words he should have used instead. (2) If no premature close happened, find the biggest door she opened that he walked past. Quote both lines exactly. Tell him what went wrong and why it doesn't work with ${girlName} in particular. Then give him the exact words he should have said. Write it out fully — do not cut it short.>",
+  "part2": "<THE MIDDLE. 70-90 words. Pick the single most revealing exchange from the middle of the conversation. Quote his EXACT words verbatim and ${girlName}'s EXACT words back verbatim — copy them character-for-character from the transcript. Tell him what that exchange reveals about his instincts. Was he chasing approval? Did he miss something she handed him? Was he actually reading her? Connect it directly to who ${girlName} is.>",
 
-  "part4": "<CLOSE + VERDICT. Target 350-430 characters. Name one real thing he did well — quote something specific from the transcript, not a concept. Give one honest sentence about the overall effort. Name the one thing that would change his results most with ${girlName} — make it concrete, not generic. End with ONE motivational line. BANNED ENDINGS — NEVER use these exact phrases: 'Practice is the only way through', 'every rep makes you sharper', 'you are closer than you think', 'one more round', 'you will feel the difference', 'you have got something real here', 'push it further', 'you will surprise yourself', 'keep at it', 'practice makes perfect', 'keep pushing'. Write a motivational line that references something SPECIFIC from THIS session — his best moment, her best response, the exact scenario. Make it personal to what just happened. BANNED WORDS IN PART4: 'go out there', 'dive deeper', 'aim to', 'work on that', 'dig into', 'push deeper', 'delve', 'delved', 'engage', 'dynamic', 'showcase', 'score is a', 'giving you a', 'I give you'. The motivational line MUST be the last sentence.>",
+  "part3": "<THE KEY MISTAKE. 80-100 words. The single moment that cost him the most. Quote both his line and her response exactly as they appear in the transcript. Then write the EXACT alternative line he should have said — not advice, not a concept, actual words. Format: 'Instead of [his exact line], say: [exact replacement].' Explain in one sentence why the replacement works with ${girlName} specifically.>",
 
-  "openerBreakdown": "<The opener was: '${openerLine}'. One sentence on why it worked or didn't with ${girlName}. Do not use HIM_1 label. No banned words.>",
+  "part4": "<THE TAKEAWAY. 60-80 words. One concrete pattern from this conversation to fix or build on — name it precisely. Give him a mental model he can carry into the next session. Quote something specific from the transcript. End with ONE motivational line that references something SPECIFIC from this session — not a generic closer. BANNED ENDINGS: 'Practice is the only way through', 'every rep makes you sharper', 'you are closer than you think', 'one more round', 'you will feel the difference', 'you have got something real here', 'push it further', 'you will surprise yourself', 'keep at it', 'practice makes perfect', 'keep pushing'. BANNED WORDS: 'go out there', 'dive deeper', 'aim to', 'work on that', 'dig into', 'push deeper', 'delve', 'delved', 'engage', 'dynamic', 'showcase', 'score is a', 'giving you a', 'I give you'. The motivational line MUST be the last sentence.>",
+
+  "openerBreakdown": "<One sentence on why his opening line (HIM_1 in the transcript) worked or didn't with ${girlName}. Quote it. No banned words.>",
   "bestMoment": "<Quote the single best thing he said verbatim. One sentence on why it landed with ${girlName}. No banned words.>",
-  "missedOpportunity": "<Quote the moment he lost the most ground — his line and ${girlName}'s response. One sentence on what he should have done. No banned words — say 'gone deeper into' as 'asked more about', say 'delved' as 'got into'.>",
-  "tryNextTime": "<One real line he can actually say next time in this scenario. Real words that would work with ${girlName}, not a concept. No banned words.>",
+  "missedOpportunity": "<Quote the moment he lost the most ground — his exact line and ${girlName}'s exact response. One sentence on what he should have done instead. No banned words.>",
+  "tryNextTime": "<A specific line tailored to THIS exact conversation — not generic advice, actual words that respond to something that came up in their specific exchange. Should feel like a natural continuation or a better version of something he actually said.>",
   "wouldSheDateHim": "<'Yes', 'No', or 'Maybe' — then one sentence from ${girlName}'s point of view in first person, about something specific he said or did. No banned words.>"
 }
 
-SCORING:
-1-2: Barely spoke. Froze. Let it die.
-3: Said almost nothing real the whole time — only compliments and approval-seeking the entire conversation
-4: Tried but barely landed anything real. Mostly flat.
-5-6: Had a real conversation — asked at least one real question, followed at least one thread she opened, showed some actual curiosity even if the close was weak
-7-8: Stayed specific the whole way, held his ground when she pushed back, had clear moments where she was actually interested
-9-10: She is still thinking about him after — he earned real interest, didn't just survive
+SCORING — 1-10 based on these qualities:
+- Quality of questions (does he ask things that invite real answers, or dead-ends?)
+- Emotional intelligence (does he read her responses and adjust, or barrel ahead?)
+- Confidence (does he hold his ground when she pushes back, or fold and apologize?)
+- Genuine interest (does he follow what she says, or redirect to himself?)
+- Humor (does anything land, or is it forced/absent?)
+- Avoiding validation-seeking (does he fish for approval, or just say what he means?)
+- Creating tension/intrigue (does she want to know more about him, or is he an open book?)
 
-SCORING RULES — FOLLOW THESE EXACTLY:
-Default score for anyone who showed up and had a full conversation: 5.
-Score goes DOWN from 5 only if he was mostly chasing approval OR said almost nothing real the entire time.
-Score goes UP from 5 if he asked a real question, followed a thread she opened, held his ground, or said something that made her respond with more than one sentence.
-A 3 means he said nothing real the ENTIRE conversation — only compliments and approval-seeking from start to finish. Reserve it for that only.
-A 4 means he barely landed anything real. Use it sparingly — only if the whole conversation was mostly flat.
-If he asked about her work, followed up on something she said, or had any real back and forth — that is a 5 minimum.
-Most beginners who finish a full session land 5-6. That is right and honest.
-NEVER give 3 or 4 just because he went for coffee too early or didn't nail the close. The close is one moment. Score the whole conversation.
-Low scores kill motivation and they quit. A score that fits the effort keeps them coming back.
+SCORE TIERS — CALIBRATE TO THESE:
+1-3 (Bad): He was mostly generic, spent the conversation seeking her approval, or said almost nothing real. A 2: every message was a compliment or fishing for validation. A 3: asked questions in a row with no real content of his own, no pushback held, no pull created.
+4-5 (Average): He showed up and had a real exchange. Some things landed, some didn't. He asked at least one real question but missed threads she opened. He wasn't chasing approval but wasn't memorable either.
+6-7 (Good): He asked real questions and followed her threads. He said something that made her respond with more than one sentence. He held his ground at least once. Something he said was real and showed he actually noticed her.
+8-10 (Excellent): She is still thinking about him. He created genuine pull — said things she didn't predict, held tension without filling every silence, made her work slightly for his approval instead of the other way around. A 10 means she'd cancel plans.
+
+Score honestly. Do NOT apply a score floor. If someone was bad, they get a 2. If average, a 5.
 
 BANNED PHRASES AND WORDS — if any of these appear anywhere in your output, rewrite that sentence:
 "Right, so here's where", "Now watch this moment", "Now here's the thing", "So — putting it all together",
@@ -370,15 +261,13 @@ Read every sentence before you write it. If a banned phrase or word is in there 
 
 RULES:
 - Quote actual lines from the transcript. Do not make up lines.
-- All four parts are spoken out loud — no bullet points, no headers, just natural speech.
+- All parts are spoken out loud — no bullet points, no headers, just natural speech.
 - Every part must hit its minimum word count. Do not cut it short.
 - Never say "great job" unless score is 8+.
 - wouldSheDateHim is ${girlName} speaking in first person.
-- tryNextTime is actual words for this specific scenario and character.
+- tryNextTime is actual words for this specific conversation, not general advice.
 - Only use things that actually appear in the transcript. Do not invent context.
-- ALL card fields must be filled. No empty strings, no null.
-- Transcript labels HIM lines as HIM_2, HIM_3 etc. HIM_1 was the opener — already handled. Start from HIM_2.
-- Do not quote or reference HIM_1.`;
+- ALL card fields must be filled. No empty strings, no null.`;
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -392,7 +281,7 @@ RULES:
         max_tokens: 2000,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Scenario: ${scenarioTitle}\n\nNote: HIM_1 (the opener) was already handled separately. The transcript below starts from HIM_2 onward.\n\nFull conversation transcript:\n${transcript}` }
+          { role: 'user', content: `Scenario: ${scenarioTitle}\n\nFull conversation transcript (HIM_1 = his opener):\n${transcript}` }
         ],
         response_format: { type: 'json_object' }
       }),
@@ -422,7 +311,7 @@ RULES:
           max_tokens: 2000,
           messages: [
             { role: 'system', content: systemPrompt },
-            { role: 'user', content: `Scenario: ${scenarioTitle}\n\nNote: HIM_1 (the opener) was already handled separately. The transcript below starts from HIM_2 onward.\n\nFull conversation transcript:\n${transcript}\n\nCRITICAL: Return ONLY valid JSON. No markdown, no backticks, no preamble. Start with { and end with }.` }
+            { role: 'user', content: `Scenario: ${scenarioTitle}\n\nFull conversation transcript (HIM_1 = his opener):\n${transcript}\n\nCRITICAL: Return ONLY valid JSON. No markdown, no backticks, no preamble. Start with { and end with }.` }
           ],
           response_format: { type: 'json_object' }
         }),
@@ -433,29 +322,26 @@ RULES:
     }
 
     // Guard: if card fields came back undefined/null, fill with fallbacks
-    const cardFields = ['openerBreakdown', 'bestMoment', 'missedOpportunity', 'tryNextTime', 'wouldSheDateHim', 'spokenSummary'];
+    const cardFields = ['part1', 'openerBreakdown', 'bestMoment', 'missedOpportunity', 'tryNextTime', 'wouldSheDateHim', 'spokenSummary'];
     for (const field of cardFields) {
       if (!feedback[field] || feedback[field] === 'undefined' || feedback[field].length < 5) {
         console.warn(`[coach] Field "${field}" missing — filling fallback`);
         if (field === 'wouldSheDateHim') feedback[field] = 'Maybe. You had some real moments but needed to go further into what she opened.';
         else if (field === 'tryNextTime') feedback[field] = 'Tell me more about that — what made you get into it?';
         else if (field === 'spokenSummary') feedback[field] = 'You showed up and had a real conversation — now make it sharper.';
+        else if (field === 'part1') feedback[field] = 'You showed up. That is the first step. Now let\'s look at what happened.';
         else feedback[field] = 'See the feedback above.';
       }
     }
 
-    // Inject JS-generated part1 and hardcoded transitions — model never touches these
-    feedback.part1 = part1;
+    // Inject hardcoded transitions — model generates part1 itself
     feedback.transition2 = transition2;
     feedback.transition3 = transition3;
     feedback.transition4 = transition4;
 
-    // Enforce score floor — full conversation always gets minimum 5
-    const turnCount = conversation.length;
-    const rawScore = Number(feedback.score) || 4;
-    const finalScore = (turnCount >= 4 && rawScore < 5) ? 5 : rawScore;
-    console.log(`[coach] turns=${turnCount} rawScore=${rawScore} finalScore=${finalScore}`);
-    feedback.score = finalScore;
+    // Clamp score to valid range — no floor, honest scoring
+    feedback.score = Math.min(10, Math.max(1, Math.round(Number(feedback.score) || 5)));
+    console.log(`[coach] score=${feedback.score}`);
 
     // Post-process — guaranteed banned phrase removal
     // Model keeps regenerating these regardless of prompt instructions
@@ -510,6 +396,7 @@ RULES:
     };
 
     // Apply to all spoken fields
+    feedback.part1 = cleanText(feedback.part1);
     feedback.part2 = cleanText(feedback.part2);
     feedback.part3 = cleanText(feedback.part3);
     feedback.part4 = cleanText(feedback.part4);
