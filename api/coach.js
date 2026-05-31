@@ -227,7 +227,7 @@ Respond ONLY with valid JSON — no markdown, no preamble:
   "openerBreakdown": "<One sentence on why his opening line (HIM_1 in the transcript) worked or didn't with ${girlName}. Quote it. No banned words.>",
   "bestMoment": "<Quote the single best thing he said verbatim. One sentence on why it landed with ${girlName}. No banned words.>",
   "missedOpportunity": "<Quote the moment he lost the most ground — his exact line and ${girlName}'s exact response. One sentence on what he should have done instead. No banned words.>",
-  "tryNextTime": "<THREE specific lines tailored to THIS exact conversation — not generic advice, actual words that respond to something that came up in their specific exchange. Number them 1, 2, 3. Each should feel like a natural continuation or sharper version of something he actually said. Format: '1. [line] 2. [line] 3. [line]'>",
+  "tryNextTime": "<THREE specific lines tailored to THIS exact conversation — not generic advice, actual words that respond to something that came up in their specific exchange. Number them 1, 2, 3. Each should feel like a natural continuation or sharper version of something he actually said. Format: '1. [line] 2. [line] 3. [line]' CRITICAL: Each line must contain a direct reference to something unique from THIS transcript — a specific topic, word, or moment that only appeared in this conversation. If the line could apply to any conversation, it is wrong. Never use 'Tell me more about that' or any generic curiosity prompt.>",
   "wouldSheDateHim": "<'Yes', 'No', or 'Maybe' — then one sentence from ${girlName}'s point of view in first person, about something specific he said or did. No banned words.>"
 }
 
@@ -327,7 +327,7 @@ RULES:
       if (!feedback[field] || feedback[field] === 'undefined' || feedback[field].length < 5) {
         console.warn(`[coach] Field "${field}" missing — filling fallback`);
         if (field === 'wouldSheDateHim') feedback[field] = 'Maybe. You had some real moments but needed to go further into what she opened.';
-        else if (field === 'tryNextTime') feedback[field] = 'Tell me more about that — what made you get into it?';
+        else if (field === 'tryNextTime') feedback[field] = '1. Say something real about what she mentioned. 2. Ask about the specific thing she brought up. 3. Reference what actually happened in the conversation.';
         else if (field === 'spokenSummary') feedback[field] = 'You showed up and had a real conversation — now make it sharper.';
         else if (field === 'part1') feedback[field] = 'You showed up. That is the first step. Now let\'s look at what happened.';
         else feedback[field] = 'See the feedback above.';
