@@ -15,7 +15,7 @@ const KokoroSpeech = (() => {
   const VOICE_MAP = {
     'af_nicole':  'nova',
     'am_michael': 'onyx',
-    'am_adam':    'echo',
+    'am_adam':    'onyx',
   };
 
   async function speak(text, voice = 'af_nicole') {
