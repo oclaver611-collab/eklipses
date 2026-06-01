@@ -134,7 +134,8 @@ module.exports = async function handler(req, res) {
         return;
       }
       // ElevenLabs returned non-OK — fall through to OpenAI
-      console.error('[tts] ElevenLabs non-OK:', elRes.status);
+      const elErrBody = await elRes.text();
+      console.error('[tts] ElevenLabs non-OK:', elRes.status, elErrBody);
     } catch (err) {
       // Timeout or network error — fall through to OpenAI
       console.error('[tts] ElevenLabs failed, falling back to OpenAI:', err.message);
