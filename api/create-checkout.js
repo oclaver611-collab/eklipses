@@ -25,9 +25,6 @@ module.exports = async function handler(req, res) {
       ],
       customer_email: email || undefined,
       allow_promotion_codes: true,
-      subscription_data: {
-        trial_period_days: 0, // no trial — already had 3 free sessions
-      },
       success_url: `${origin}/?stripe_session={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/`,
       metadata: {
