@@ -869,13 +869,17 @@ async function speakElevenLabs(text, onStart) {
         mediaSource.addEventListener('sourceopen', async () => {
           clearTimeout(sourceOpenTimer);
           const sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
+          sourceBuffer.addEventListener('updateerror', () => reject(new Error('sourceBuffer updateerror')));
           const reader = res.body.getReader();
           let started = false;
 
           const pump = async () => {
             try {
               while (true) {
-                const { done, value } = await reader.read();
+                const { done, value } = await Promise.race([
+                  reader.read(),
+                  new Promise((_, rej) => setTimeout(() => rej(new Error('stream stall timeout')), 5000)),
+                ]);
                 if (done) {
                   if (!sourceBuffer.updating) mediaSource.endOfStream();
                   else sourceBuffer.addEventListener('updateend', () => mediaSource.endOfStream(), { once: true });
@@ -883,7 +887,10 @@ async function speakElevenLabs(text, onStart) {
                 }
                 // Wait if buffer is updating
                 if (sourceBuffer.updating) {
-                  await new Promise(r => sourceBuffer.addEventListener('updateend', r, { once: true }));
+                  await new Promise((res, rej) => {
+                    const t = setTimeout(() => rej(new Error('updateend timeout')), 5000);
+                    sourceBuffer.addEventListener('updateend', () => { clearTimeout(t); res(); }, { once: true });
+                  });
                 }
                 sourceBuffer.appendBuffer(value);
                 // Start playing as soon as first chunk lands
