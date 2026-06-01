@@ -227,7 +227,7 @@ Respond ONLY with valid JSON — no markdown, no preamble:
   "openerBreakdown": "<One sentence on why his opening line (HIM_1 in the transcript) worked or didn't with ${girlName}. Quote it. No banned words.>",
   "bestMoment": "<Quote the single best thing he said verbatim. One sentence on why it landed with ${girlName}. No banned words.>",
   "missedOpportunity": "<Quote the moment he lost the most ground — his exact line and ${girlName}'s exact response. One sentence on what he should have done instead. No banned words.>",
-  "tryNextTime": "<THREE specific lines tailored to THIS exact conversation — not generic advice, actual words that respond to something that came up in their specific exchange. Number them 1, 2, 3. Each should feel like a natural continuation or sharper version of something he actually said. Format: '1. [line] 2. [line] 3. [line]' CRITICAL: Each line must contain a direct reference to something unique from THIS transcript — a specific topic, word, or moment that only appeared in this conversation. If the line could apply to any conversation, it is wrong. Never use 'Tell me more about that' or any generic curiosity prompt.>",
+  "tryNextTime": "<THREE specific lines tailored to THIS exact conversation — not generic advice, actual words that respond to something that came up in their specific exchange. Number them 1, 2, 3. Each should feel like a natural continuation or sharper version of something he actually said. Format: '1. [line] 2. [line] 3. [line]' CRITICAL: Each line must contain a direct reference to something unique from THIS transcript — a specific topic, word, or moment that only appeared in this conversation. If the line could apply to any conversation, it is wrong. Never use 'Tell me more about that' or any generic curiosity prompt. AUTOMATIC FAIL if any of these phrases appear: 'Say something real', 'Ask about the specific', 'Reference what actually happened', 'Tell me more about that'. These are banned. Every line must quote or directly reference something the user actually said in this transcript.>",
   "wouldSheDateHim": "<'Yes', 'No', or 'Maybe' — then one sentence from ${girlName}'s point of view in first person, about something specific he said or did. No banned words.>"
 }
 
@@ -331,6 +331,44 @@ RULES:
         else if (field === 'spokenSummary') feedback[field] = 'You showed up and had a real conversation — now make it sharper.';
         else if (field === 'part1') feedback[field] = 'You showed up. That is the first step. Now let\'s look at what happened.';
         else feedback[field] = 'See the feedback above.';
+      }
+    }
+
+    // Quality check — tryNextTime must contain transcript-specific content
+    const GENERIC_TNT = [
+      'say something real about',
+      'ask about the specific thing',
+      'reference what actually happened',
+      'tell me more about that',
+    ];
+    const tntGeneric = !feedback.tryNextTime ||
+      GENERIC_TNT.some(p => feedback.tryNextTime.toLowerCase().includes(p));
+
+    if (tntGeneric) {
+      console.warn('[coach] tryNextTime is generic — retrying for just that field');
+      try {
+        const tntRetry = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            max_tokens: 200,
+            messages: [
+              { role: 'system', content: `You are Ryan, a dating coach. Return ONLY valid JSON: {"tryNextTime":"..."}\n\ntryNextTime must be THREE lines of actual dialogue for this specific transcript. Number them 1, 2, 3. Each line must directly quote or reference something HIM actually said. BANNED: "Say something real", "Ask about the specific", "Reference what actually happened", "Tell me more about that". If a line could apply to any conversation, it is wrong.` },
+              { role: 'user', content: `Scenario: ${scenarioTitle}\n\nTranscript:\n${transcript}` },
+            ],
+            response_format: { type: 'json_object' },
+          }),
+        });
+        const tntData = await tntRetry.json();
+        const tntParsed = JSON.parse(tntData.choices?.[0]?.message?.content);
+        const stillGeneric = !tntParsed.tryNextTime ||
+          GENERIC_TNT.some(p => tntParsed.tryNextTime.toLowerCase().includes(p));
+        feedback.tryNextTime = stillGeneric ? '' : tntParsed.tryNextTime;
+        if (stillGeneric) console.warn('[coach] tryNextTime retry still generic — leaving blank');
+      } catch (tntErr) {
+        console.warn('[coach] tryNextTime retry failed:', tntErr.message);
+        feedback.tryNextTime = '';
       }
     }
 
