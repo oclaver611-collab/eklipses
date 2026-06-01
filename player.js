@@ -1681,6 +1681,16 @@ async function runCoachFeedback(mySession) {
     await speak(scoreReveal, 'Ryan', () => { els.text.textContent = scoreReveal; });
   }
 
+  if (mySession === session) {
+    await pause(800);
+    const encouragement =
+      f.score <= 3 ? "That's where most guys start. The ones who improve are the ones who come back. Go again." :
+      f.score <= 5 ? "You've got the instincts — they just need sharpening. One more round." :
+      f.score <= 7 ? "Solid. You're building something real. Keep the reps going." :
+                     "That's how it's done. Now do it again and make it automatic.";
+    await speak(encouragement, 'Ryan', () => { els.text.textContent = encouragement; });
+  }
+
   if(mySession!==session) return;
   showFeedbackCard(f);
 }
