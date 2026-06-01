@@ -846,11 +846,15 @@ function renderLine(line) {
 // ElevenLabs/OpenAI TTS for character voices — streaming playback for low latency
 async function speakElevenLabs(text, onStart) {
   async function attempt() {
+    const fetchController = new AbortController();
+    const fetchTimeout = setTimeout(() => fetchController.abort(), 10000);
     const res = await fetch('/api/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text, voice: 'nova', characterId: currentCharacterId }),
+      signal: fetchController.signal,
     });
+    clearTimeout(fetchTimeout);
     if (!res.ok) throw new Error('TTS failed: ' + res.status);
 
     // Use MediaSource streaming — audio starts playing as first chunks arrive
@@ -860,8 +864,10 @@ async function speakElevenLabs(text, onStart) {
         const mediaSource = new MediaSource();
         const audio = new Audio();
         audio.src = URL.createObjectURL(mediaSource);
+        const sourceOpenTimer = setTimeout(() => reject(new Error('sourceopen timeout')), 8000);
 
         mediaSource.addEventListener('sourceopen', async () => {
+          clearTimeout(sourceOpenTimer);
           const sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
           const reader = res.body.getReader();
           let started = false;
