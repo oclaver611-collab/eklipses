@@ -444,7 +444,7 @@ const DailyLimit = (() => {
         style="background:#ffb300;color:#000;font-size:16px;font-weight:800;border:none;
                padding:15px 36px;border-radius:999px;cursor:pointer;margin-bottom:14px;
                min-width:260px;transition:opacity 0.2s">
-        Upgrade to Pro — $14.99/month
+        Upgrade to Pro — $19.99 CAD/month
       </button>
       <div style="color:#555;font-size:12px;margin-bottom:20px">No contract · Cancel anytime</div>
       <div style="color:#666;font-size:13px;cursor:pointer;text-decoration:underline"
