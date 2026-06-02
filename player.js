@@ -1654,20 +1654,20 @@ async function runCoachFeedback(mySession) {
 
       if (i < coachParts.length - 1) {
         // FIX 1: Pause between parts — feels like Ryan is thinking, not a machine
-        await pause(1500);
+        await pause(600);
         if(mySession!==session) return;
         const transition = transitions[i];
         if (transition) {
           await speak(transition, 'Ryan', () => { els.text.textContent = transition; });
           if(mySession!==session) return;
-          await pause(800);
+          await pause(400);
         }
       }
     }
 
     // Speak tryNextTime after part4
     if (f.tryNextTime && mySession === session) {
-      await pause(1500);
+      await pause(600);
       const tryLine = `Next time, try this exact line: "${f.tryNextTime}"`;
       await speak(tryLine, 'Ryan', () => { els.text.textContent = tryLine; });
     }
@@ -1679,7 +1679,7 @@ async function runCoachFeedback(mySession) {
 
   // Score reveal LAST — dramatic pause, then the number
   if (mySession === session) {
-    await pause(1500);
+    await pause(600);
     const scoreReveal = `I give that a... ${f.score} out of 10.`;
     await speak(scoreReveal, 'Ryan', () => { els.text.textContent = scoreReveal; });
   }
