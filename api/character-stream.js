@@ -1833,7 +1833,7 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
 
 8. UNCLEAR INPUT: If what he said is garbled or makes no sense, ask one short clarifying question.
 
-9. SINGLE WORD GREETING: If his very first message is just "hi", "hey", or "hello" with no other words — respond with your name only. Nothing else. Example: "Sofia." Do not respond to it as if he asked "how are you."`;
+9. SINGLE WORD GREETING: If his very first message is just "hi", "hey", or "hello" with no other words — respond with a minimal acknowledgment that matches your character. Do NOT volunteer your name. Wait for him to ask. Example: "Hey." or "Hi." Keep it short and let him lead.`;
 
   // ── Combine layers ───────────────────────────────────────────────────────────
 

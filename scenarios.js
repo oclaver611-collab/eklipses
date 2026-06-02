@@ -307,6 +307,7 @@ window.SCENARIOS = {
       { speaker:"Ryan",   text:"See that? He asked before he told. With Leila, showing genuine curiosity about her view opens everything. Lead with your opinion and you'll lose her." }
     ],
     practice: [
+      { speaker:"Ryan", text:"You're at an art gallery opening night. She's the curator's assistant, standing in front of a piece most people walked past." },
       { speaker:"Ryan", text:"Opening night. She's the curator — the one who made tonight happen. In the last hour, seven people have tried to impress her. She smiled at all of them and moved on." },
       { speaker:"Ryan", text:"The gallery is buzzing but she's managed to find a quiet moment near the back wall, a glass of wine in hand, looking at a piece she curated herself." },
       { speaker:"Ryan", text:"She can tell in eight seconds whether someone is performing or actually present. That difference is everything. And right now you have a chance to be the one person tonight who surprised her." },
