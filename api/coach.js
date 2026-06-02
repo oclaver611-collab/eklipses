@@ -231,6 +231,8 @@ Respond ONLY with valid JSON — no markdown, no preamble:
   "wouldSheDateHim": "<'Yes', 'No', or 'Maybe' — then one sentence from ${girlName}'s point of view in first person, about something specific he said or did. No banned words.>"
 }
 
+MANDATORY: All four parts (part1, part2, part3, part4) must always be present. Never return fewer than 4 parts regardless of conversation length.
+
 SCORING — 1-10 based on these qualities:
 - Quality of questions (does he ask things that invite real answers, or dead-ends?)
 - Emotional intelligence (does he read her responses and adjust, or barrel ahead?)
@@ -322,7 +324,7 @@ RULES:
     }
 
     // Guard: if card fields came back undefined/null, fill with fallbacks
-    const cardFields = ['part1', 'openerBreakdown', 'bestMoment', 'missedOpportunity', 'tryNextTime', 'wouldSheDateHim', 'spokenSummary'];
+    const cardFields = ['part1', 'part2', 'part3', 'part4', 'openerBreakdown', 'bestMoment', 'missedOpportunity', 'tryNextTime', 'wouldSheDateHim', 'spokenSummary'];
     for (const field of cardFields) {
       if (!feedback[field] || feedback[field] === 'undefined' || feedback[field].length < 5) {
         console.warn(`[coach] Field "${field}" missing — filling fallback`);
