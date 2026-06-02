@@ -360,12 +360,18 @@ RULES:
             response_format: { type: 'json_object' },
           }),
         });
-        const tntData = await tntRetry.json();
-        const tntParsed = JSON.parse(tntData.choices?.[0]?.message?.content);
-        const stillGeneric = !tntParsed.tryNextTime ||
-          GENERIC_TNT.some(p => tntParsed.tryNextTime.toLowerCase().includes(p));
-        feedback.tryNextTime = stillGeneric ? '' : tntParsed.tryNextTime;
-        if (stillGeneric) console.warn('[coach] tryNextTime retry still generic — leaving blank');
+        if (!tntRetry.ok) {
+          const errBody = await tntRetry.text();
+          console.error('[coach] tryNextTime retry non-OK:', tntRetry.status, errBody);
+          feedback.tryNextTime = '';
+        } else {
+          const tntData = await tntRetry.json();
+          const tntParsed = JSON.parse(tntData.choices?.[0]?.message?.content);
+          const stillGeneric = !tntParsed.tryNextTime ||
+            GENERIC_TNT.some(p => tntParsed.tryNextTime.toLowerCase().includes(p));
+          feedback.tryNextTime = stillGeneric ? '' : tntParsed.tryNextTime;
+          if (stillGeneric) console.warn('[coach] tryNextTime retry still generic — leaving blank');
+        }
       } catch (tntErr) {
         console.warn('[coach] tryNextTime retry failed:', tntErr.message);
         feedback.tryNextTime = '';
