@@ -881,8 +881,11 @@ async function speakElevenLabs(text, onStart) {
                   new Promise((_, rej) => setTimeout(() => rej(new Error('stream stall timeout')), 5000)),
                 ]);
                 if (done) {
-                  if (!sourceBuffer.updating) mediaSource.endOfStream();
-                  else sourceBuffer.addEventListener('updateend', () => mediaSource.endOfStream(), { once: true });
+                  const tryEnd = () => {
+                    if (!sourceBuffer.updating) mediaSource.endOfStream();
+                    else sourceBuffer.addEventListener('updateend', tryEnd, { once: true });
+                  };
+                  tryEnd();
                   break;
                 }
                 // Wait if buffer is updating
