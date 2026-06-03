@@ -21,3 +21,10 @@
 **Root cause:** audio.play().catch(() => {}) silently swallowed autoplay blocks and errors.  
 **Fix:** await audio.play() with proper try/catch and logging.  
 **File:** player.js — speakElevenLabs()
+
+## Issue #004 — Ryan Feedback Skips Real Opening Line
+**Date:** June 3, 2026  
+**Symptom:** Ryan says "you started with X" but X is not the user's actual first line.  
+**Root cause:** coach.js prompt picks a notable exchange, not necessarily the first one.  
+**Fix needed:** In coach.js prompt, explicitly instruct: always reference the user's very first message as the opener analysis.  
+**Priority:** P2 — cosmetic but affects coaching accuracy.
