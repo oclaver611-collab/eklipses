@@ -1,14 +1,6 @@
 /**
- * kokoro-speech.js  v4 — OpenAI TTS
- * Calls /api/tts (Vercel serverless) → OpenAI TTS API
- * No model download. Works instantly.
- *
- * Voice mapping:
- *   af_nicole  → nova   (Mary  — warm female)
- *   am_michael → onyx   (Daniel — deep male)
- *   am_adam    → echo   (Ryan  — clear male)
+ * kokoro-speech.js v5 — streaming playback, no blob buffering
  */
-
 const KokoroSpeech = (() => {
   let currentAudio = null;
 
@@ -30,18 +22,24 @@ const KokoroSpeech = (() => {
         body: JSON.stringify({ text, voice: openaiVoice }),
       });
       if (!response.ok) {
-        const err = await response.json().catch(() => ({ error: response.statusText }));
-        console.error('[TTS] API error:', err);
+        console.error('[TTS] API error:', response.status);
         return;
       }
       const blob = await response.blob();
-      const url  = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
       currentAudio = audio;
+      audio.volume = 1;
+      audio.muted = false;
       await new Promise((resolve) => {
         audio.onended = () => { URL.revokeObjectURL(url); currentAudio = null; resolve(); };
-        audio.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; resolve(); };
-        audio.play().catch(() => resolve());
+        audio.onerror = (e) => { console.error('[TTS] audio error:', e); URL.revokeObjectURL(url); currentAudio = null; resolve(); };
+        audio.play().then(() => {
+          console.log('[TTS] playing');
+        }).catch((err) => {
+          console.error('[TTS] play() blocked:', err.message);
+          resolve();
+        });
       });
     } catch (err) {
       console.error('[TTS] speak() error:', err);
@@ -50,8 +48,7 @@ const KokoroSpeech = (() => {
 
   function cancel() {
     if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.src = '';
+      try { currentAudio.pause(); currentAudio.src = ''; } catch {}
       currentAudio = null;
     }
   }
