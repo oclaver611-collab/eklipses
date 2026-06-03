@@ -897,8 +897,13 @@ async function speakElevenLabs(text, onStart) {
                   started = true;
                   audio.volume = 1;
                   audio.muted = false;
-                  if (audio.context && audio.context.state === 'suspended') await audio.context.resume().catch(() => {});
-                  audio.play().then(() => { onStart(); }).catch(() => {});
+                  try {
+                    await audio.play();
+                    onStart();
+                  } catch (playErr) {
+                    console.warn('[TTS] audio.play() blocked:', playErr.message);
+                    onStart();
+                  }
                 }
               }
             } catch(e) { reject(e); }
@@ -907,7 +912,7 @@ async function speakElevenLabs(text, onStart) {
         });
 
         audio.onended = () => { URL.revokeObjectURL(audio.src); resolve(); };
-        audio.onerror = (e) => reject(new Error('Audio error: ' + e));
+        audio.onerror = (e) => { console.error('[TTS] audio element error:', e); reject(new Error('Audio error: ' + JSON.stringify(e))); };
       });
     } else {
       // Fallback: full buffer (Safari / older browsers)
