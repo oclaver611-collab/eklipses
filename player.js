@@ -874,7 +874,7 @@ async function speakElevenLabs(text, onStart) {
               while (true) {
                 const { done, value } = await Promise.race([
                   reader.read(),
-                  new Promise((_, rej) => setTimeout(() => rej(new Error('stream stall timeout')), 5000)),
+                  new Promise((_, rej) => setTimeout(() => rej(new Error('stream stall timeout')), 15000)),
                 ]);
                 if (done) {
                   const tryEnd = () => {
@@ -887,7 +887,7 @@ async function speakElevenLabs(text, onStart) {
                 // Wait if buffer is updating
                 if (sourceBuffer.updating) {
                   await new Promise((res, rej) => {
-                    const t = setTimeout(() => rej(new Error('updateend timeout')), 5000);
+                    const t = setTimeout(() => rej(new Error('updateend timeout')), 10000);
                     sourceBuffer.addEventListener('updateend', () => { clearTimeout(t); res(); }, { once: true });
                   });
                 }
