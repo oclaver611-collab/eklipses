@@ -1681,11 +1681,27 @@ async function runCoachFeedback(mySession) {
 
   if (mySession === session) {
     await pause(800);
+    const pick = arr => arr[Math.floor(Math.random() * arr.length)];
     const encouragement =
-      f.score <= 3 ? "That's where most guys start. The ones who improve are the ones who come back. Go again." :
-      f.score <= 5 ? "You've got the instincts — they just need sharpening. One more round." :
-      f.score <= 7 ? "Solid. You're building something real. Keep the reps going." :
-                     "That's how it's done. Now do it again and make it automatic.";
+      f.score <= 3 ? pick([
+        "That's where most guys start. The ones who improve are the ones who come back. Go again.",
+        "Every rep counts. You just learned what doesn't work. That's progress.",
+        "Rough one. Good. Now you know exactly what to fix. Go again.",
+      ]) :
+      f.score <= 5 ? pick([
+        "You've got the instincts — they just need sharpening. One more round.",
+        "Getting there. The gap between where you are and where you want to be is just reps.",
+        "Solid foundation. Now build on it. Go again.",
+      ]) :
+      f.score <= 7 ? pick([
+        "Solid. You're building something real. Keep the reps going.",
+        "That's a real conversation. Push it further next time.",
+        "You're in the zone. Keep going.",
+      ]) : pick([
+        "That's how it's done. Now do it again and make it automatic.",
+        "She'd remember that one. Do it again until it's effortless.",
+        "That's the standard. Hold it.",
+      ]);
     await speak(encouragement, 'Ryan', () => { els.text.textContent = encouragement; });
   }
 
