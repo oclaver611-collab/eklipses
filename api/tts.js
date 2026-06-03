@@ -97,7 +97,7 @@ module.exports = async function handler(req, res) {
   if (characterId) {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 10000);
+      const timeout = setTimeout(() => controller.abort(), 25000);
 
       const kokoroRes = await fetch('https://kokoro-tts-server.onrender.com/tts', {
         method: 'POST',
