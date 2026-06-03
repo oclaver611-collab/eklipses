@@ -227,7 +227,7 @@ Respond ONLY with valid JSON — no markdown, no preamble:
   "openerBreakdown": "<One sentence on why his opening line (HIM_1 in the transcript) worked or didn't with ${girlName}. Quote it. No banned words.>",
   "bestMoment": "<Quote the single best thing he said verbatim. One sentence on why it landed with ${girlName}. No banned words.>",
   "missedOpportunity": "<Quote the moment he lost the most ground — his exact line and ${girlName}'s exact response. One sentence on what he should have done instead. No banned words.>",
-  "tryNextTime": "<THREE specific lines tailored to THIS exact conversation — not generic advice, actual words that respond to something that came up in their specific exchange. Number them 1, 2, 3. Each should feel like a natural continuation or sharper version of something he actually said. Format: '1. [line] 2. [line] 3. [line]' CRITICAL: Each line must contain a direct reference to something unique from THIS transcript — a specific topic, word, or moment that only appeared in this conversation. If the line could apply to any conversation, it is wrong. Never use 'Tell me more about that' or any generic curiosity prompt. AUTOMATIC FAIL if any of these phrases appear: 'Say something real', 'Ask about the specific', 'Reference what actually happened', 'Tell me more about that'. These are banned. Every line must quote or directly reference something the user actually said in this transcript.>",
+  "tryNextTime": "<THREE specific lines the user should try in a FUTURE conversation — not quotes of what he already said, but better alternatives tailored to this character and scenario. Each line should feel natural and be something he could actually say next time he's in this situation. Number them 1, 2, 3. Format: '1. [line] 2. [line] 3. [line]' Each line must be specific to ${girlName}'s personality and the scenario — not generic advice that could apply anywhere. Never use 'Tell me more about that' or any generic curiosity prompt. AUTOMATIC FAIL if any of these phrases appear: 'Say something real', 'Ask about the specific', 'Reference what actually happened', 'Tell me more about that'.>",
   "wouldSheDateHim": "<'Yes', 'No', or 'Maybe' — then one sentence from ${girlName}'s point of view in first person, about something specific he said or did. No banned words.>"
 }
 
@@ -356,7 +356,7 @@ RULES:
             model: 'gpt-4o-mini',
             max_tokens: 200,
             messages: [
-              { role: 'system', content: `You are Ryan, a dating coach. Return ONLY valid JSON: {"tryNextTime":"..."}\n\ntryNextTime must be THREE lines of actual dialogue for this specific transcript. Number them 1, 2, 3. Each line must directly quote or reference something HIM actually said. BANNED: "Say something real", "Ask about the specific", "Reference what actually happened", "Tell me more about that". If a line could apply to any conversation, it is wrong.` },
+              { role: 'system', content: `You are Ryan, a dating coach. Return ONLY valid JSON: {"tryNextTime":"..."}\n\ntryNextTime must be THREE lines the user should try in a FUTURE conversation — not quotes of what he already said, but better alternatives tailored to this character and scenario. Number them 1, 2, 3. Each line must be specific to the character's personality and scenario — not generic advice. BANNED: "Say something real", "Ask about the specific", "Reference what actually happened", "Tell me more about that".` },
               { role: 'user', content: `Scenario: ${scenarioTitle}\n\nTranscript:\n${transcript}` },
             ],
             response_format: { type: 'json_object' },
@@ -388,8 +388,8 @@ RULES:
       const tntLines = feedback.tryNextTime.toLowerCase().split(/\d+\.\s+/).filter(Boolean);
       const isDirectQuote = himTexts.some(himText =>
         tntLines.some(line => {
-          for (let i = 0; i <= himText.length - 15; i++) {
-            if (line.includes(himText.slice(i, i + 15))) return true;
+          for (let i = 0; i <= himText.length - 25; i++) {
+            if (line.includes(himText.slice(i, i + 25))) return true;
           }
           return false;
         })
