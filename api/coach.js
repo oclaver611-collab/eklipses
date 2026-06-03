@@ -380,6 +380,26 @@ RULES:
       }
     }
 
+    // Quote check — reject tryNextTime if any line is a direct user quote (>15 chars)
+    if (feedback.tryNextTime) {
+      const himTexts = conversation
+        .filter(m => m.role === 'user')
+        .map(m => m.content.trim().toLowerCase());
+      const tntLines = feedback.tryNextTime.toLowerCase().split(/\d+\.\s+/).filter(Boolean);
+      const isDirectQuote = himTexts.some(himText =>
+        tntLines.some(line => {
+          for (let i = 0; i <= himText.length - 15; i++) {
+            if (line.includes(himText.slice(i, i + 15))) return true;
+          }
+          return false;
+        })
+      );
+      if (isDirectQuote) {
+        console.warn('[coach] tryNextTime contains direct user quote — rejecting');
+        feedback.tryNextTime = '';
+      }
+    }
+
     // Inject hardcoded transitions — model generates part1 itself
     feedback.transition2 = transition2;
     feedback.transition3 = transition3;
