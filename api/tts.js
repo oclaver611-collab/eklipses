@@ -1,4 +1,4 @@
-// api/tts.js — ElevenLabs Flash v2.5 primary TTS, OpenAI fallback
+// api/tts.js — Kokoro primary TTS, ElevenLabs fallback, OpenAI final fallback
 // Ryan is NOT routed through this file — handled separately in player.js
 const { checkRateLimit } = require('./ratelimit');
 
@@ -93,7 +93,44 @@ module.exports = async function handler(req, res) {
     res.end();
   }
 
-  // ── Try ElevenLabs Flash v2.5 first ───────────────────────────────────────
+  // ── Try Kokoro first (character requests only) ────────────────────────────
+  if (characterId) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
+
+      const kokoroRes = await fetch('https://kokoro-tts-server.onrender.com/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, voice: 'af_heart' }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout);
+
+      if (kokoroRes.ok && kokoroRes.headers.get('content-type')?.includes('audio/mpeg')) {
+        res.setHeader('Content-Type', 'audio/mpeg');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Transfer-Encoding', 'chunked');
+        res.setHeader('X-TTS-Provider', 'kokoro');
+
+        const reader = kokoroRes.body.getReader();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          res.write(Buffer.from(value));
+        }
+        res.end();
+        return;
+      }
+      const kokoroErrBody = await kokoroRes.text();
+      console.error('[tts] Kokoro non-OK:', kokoroRes.status, kokoroErrBody);
+    } catch (err) {
+      console.error('[tts] Kokoro failed, falling back to ElevenLabs:', err.message);
+    }
+  }
+
+  // ── Try ElevenLabs Flash v2.5 ─────────────────────────────────────────────
   if (elVoiceId && process.env.ELEVENLABS_API_KEY) {
     try {
       const controller = new AbortController();
