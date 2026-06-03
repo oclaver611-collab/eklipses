@@ -935,14 +935,9 @@ async function speakElevenLabs(text, onStart) {
     try {
       await attempt();
     } catch (e2) {
-      console.warn('TTS retry failed, using browser fallback', e2.message);
+      console.warn('TTS failed after retry — skipping line silently', e2.message);
       onStart();
-      await new Promise(resolve => {
-        const utt = new SpeechSynthesisUtterance(text);
-        utt.onend = resolve;
-        utt.onerror = resolve;
-        window.speechSynthesis.speak(utt);
-      });
+      await pause(500);
     }
   }
 }
