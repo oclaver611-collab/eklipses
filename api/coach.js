@@ -283,7 +283,7 @@ RULES:
         max_tokens: 2000,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Scenario: ${scenarioTitle}\n\nFull conversation transcript (HIM_1 = his opener):\n${transcript}` }
+          { role: 'user', content: `Scenario: ${scenarioTitle}\n\nHIS OPENING LINE (HIM_1): "${conversation.find(m => m.role === 'user')?.content?.trim() || ''}"\n\nFull conversation transcript:\n${transcript}` }
         ],
         response_format: { type: 'json_object' }
       }),
@@ -313,7 +313,7 @@ RULES:
           max_tokens: 2000,
           messages: [
             { role: 'system', content: systemPrompt },
-            { role: 'user', content: `Scenario: ${scenarioTitle}\n\nFull conversation transcript (HIM_1 = his opener):\n${transcript}\n\nCRITICAL: Return ONLY valid JSON. No markdown, no backticks, no preamble. Start with { and end with }.` }
+            { role: 'user', content: `Scenario: ${scenarioTitle}\n\nHIS OPENING LINE (HIM_1): "${conversation.find(m => m.role === 'user')?.content?.trim() || ''}"\n\nFull conversation transcript:\n${transcript}\n\nCRITICAL: Return ONLY valid JSON. No markdown, no backticks, no preamble. Start with { and end with }.` }
           ],
           response_format: { type: 'json_object' }
         }),
