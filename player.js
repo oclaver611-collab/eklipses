@@ -22,6 +22,13 @@ const SCENARIO_CHARACTER_MAP = {
   office_lobby: 'maya_office',
   train:        'erika',
 };
+
+function getCharacterDisplayName(id) {
+  const set = AVATAR_SETS.find(s => s.id === id);
+  if (set) return set.label;
+  return id.charAt(0).toUpperCase() + id.slice(1);
+}
+
 let currentScript = null;
 let isPractice = false;
 let stepIndex = 0;
@@ -828,7 +835,7 @@ function renderLine(line) {
   if (line.speaker==='User_Prompt') {
     els.name.textContent = 'Your Turn';
   } else if (line.speaker==='Mary') {
-    els.name.textContent = currentCharacterId.charAt(0).toUpperCase() + currentCharacterId.slice(1);
+    els.name.textContent = getCharacterDisplayName(currentCharacterId);
   } else {
     els.name.textContent = line.speaker;
   }
@@ -1031,7 +1038,7 @@ function resetConversation() { conversationHistory=[]; }
 
 async function streamCharacterAndSpeak(userSaid, mySession) {
   // Show thinking state immediately
-  els.name.textContent = currentCharacterId.charAt(0).toUpperCase() + currentCharacterId.slice(1);
+  els.name.textContent = getCharacterDisplayName(currentCharacterId);
   els.text.textContent = '...';
 
   // Switch to idle video while we wait for first audio
@@ -1463,7 +1470,7 @@ async function freeConversation(mySession) {
   }, 1000);
 
   setMediaForSpeaker('Mary');
-  els.name.textContent = currentCharacterId.charAt(0).toUpperCase() + currentCharacterId.slice(1);
+  els.name.textContent = getCharacterDisplayName(currentCharacterId);
   els.text.textContent = '...';
   const warmupMs = currentScenarioKey === 'street' ? 2500 : 1200;
   await pause(warmupMs);
@@ -1481,7 +1488,7 @@ async function freeConversation(mySession) {
       if (mySession !== session) break;
       await pause(900);
       setMediaForSpeaker('Mary');
-      els.name.textContent = currentCharacterId.charAt(0).toUpperCase() + currentCharacterId.slice(1);
+      els.name.textContent = getCharacterDisplayName(currentCharacterId);
     }
 
     const remMs = Math.min(30000, FREE_MS - (Date.now() - start));
@@ -1562,7 +1569,7 @@ async function freeConversation(mySession) {
     if (mySession !== session) break;
     await pause(300);
     setMediaForSpeaker('Mary');
-    els.name.textContent = currentCharacterId.charAt(0).toUpperCase() + currentCharacterId.slice(1);
+    els.name.textContent = getCharacterDisplayName(currentCharacterId);
   }
 
   clearInterval(timerInterval);
