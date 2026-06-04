@@ -465,7 +465,7 @@ RULES:
     feedback.part1 = cleanText(feedback.part1);
     // Nuclear fix: force part1 to reference actual HIM_1 opener
     const realOpener = conversation.find(m => m.role === 'user')?.content?.trim() || '';
-    if (realOpener && !feedback.part1.toLowerCase().includes(realOpener.toLowerCase().slice(0, 20))) {
+    if (realOpener) {
       feedback.part1 = `You opened with "${realOpener}." ` + feedback.part1;
     }
     feedback.part2 = cleanText(feedback.part2);
