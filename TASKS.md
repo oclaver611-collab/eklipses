@@ -1,70 +1,65 @@
-# EKLIPSES TASKS
-## Add tasks here during the day. Claude Code executes them in the evening.
+# Eklipses — Task Queue
+
+## How to use this file
+Start every session by reading this file. Work top to bottom. Move completed tasks to Done. Add new tasks at the bottom of the relevant priority section.
 
 ---
 
-## PRIORITY — DO THESE FIRST
+## 🔴 P1 — Critical (do these first)
+- [ ] Test caption sync fix live — confirm text appears with audio not before (v-stable-june3-caption-sync)
+- [ ] Investigate score always showing 3/10 in real sessions despite +1 correction — run 3 test conversations with coach API one-liner and check raw scores
 
-- [x] Integrate ElevenLabs Flash API for character voice responses — done, per-character voice IDs, OpenAI fallback
-- [x] Build session history system + progress dashboard — localStorage, last 10 sessions, bar chart modal
-- [x] Add streak counter — consecutive days, fire badge in topbar, scales at 3+ and 7+
-- [x] Sofia mood variation — 5 moods randomly selected per session, injected into system prompt
-- [x] Fix voice bleed bug — speakElevenLabs now passes characterId to /api/tts
-- [x] Fix silent avatars bug — 12s fetch timeout + 20s audio watchdog in speakElevenLabs
-- [x] Build eval-pipeline.js, eval-tts.js, test-all.js master runner
-- [ ] Integrate Stripe — $14.99/month beta plan, 3 free sessions then paywall, use Stripe Checkout hosted page
+## 🟡 P2 — Important
+- [ ] Fix Remi character — check api/character.js and player.js for what's broken
+- [ ] Re-apply rate limit increase (was lost in a previous reset)
+- [ ] Re-apply dev key capture fix in index.html
+- [ ] Fix Ryan dead air gaps between lines (blob buffering — MediaSource approach failed, need new strategy)
 
----
+## 🟢 P3 — Nice to have
+- [ ] Switch Sofia TTS to Fish Audio or Chatterbox — cheaper than ElevenLabs at scale
+- [ ] Add more scenario variety — new characters or locations
+- [ ] Ryan feedback: investigate why part2/part3 sometimes references wrong exchanges
 
-## WEEK 1 TASKS
-
-- [x] Add Sofia mood variation — done (in PRIORITY above)
-- [ ] Fix Deepgram STT — ensure fallback to Chrome STT is seamless, add console logging so we can see which STT is active
-- [ ] Add approach warm-up screen — 10-second Ryan focus screen before each session starts ("Take a breath. She hasn't judged you yet. Go.")
-- [ ] Redesign feedback card — make it screenshot-worthy, score prominent, best line quoted, "Would she date him?" verdict clear
-- [ ] Build deploy.bat — one-click deploy script (already created, just copy to EK7 folder)
-
----
-
-## WEEK 2 TASKS
-
-- [ ] Cross-session memory — Sofia remembers the user from last session, references it in opening lines
-- [ ] Mobile CSS optimization — fix layout on iPhone screen size
-- [ ] Pattern coaching — Ryan tracks recurring mistakes across last 5 sessions, mentions them in feedback
-- [ ] Scenario unlock progression — scenarios unlock as user completes sessions (first 3 free, rest unlock at certain session counts)
-- [ ] Weekly progress email — send summary every Monday (requires email capture at paywall)
+## 🔵 Future / Research
+- [ ] Chatterbox Turbo — emotion tags [laugh] [sigh] for more natural character responses
+- [ ] Fish Audio as ElevenLabs backup
+- [ ] Kokoro on paid Render tier — keep warm, no cold starts
 
 ---
 
-## WEEK 3 TASKS
+## Fast Test Commands
 
-- [ ] Generate 10 new scenarios from Dark Needle YouTube channel using gen-scenario-v2.js
-- [ ] Live vibe meter — subtle visual indicator on session screen showing character interest level
-- [ ] Leaderboard first version — show top 10 scores of the week (shared localStorage or simple backend)
-- [ ] ProductHunt assets — prepare GIF of Sofia responding, Ryan feedback card screenshot
+### Test coach API (no full session needed):
+node -e "fetch('https://eklipses.vercel.app/api/coach', {method:'POST',headers:{'Content-Type':'application/json','x-dev-key':'ek_dev_2026'},body:JSON.stringify({scenarioTitle:'Beach — Cold Open',scenarioKey:'beach',conversation:[{role:'user',content:'hey never saw you here'},{role:'assistant',content:'I come here to think. What about you?'},{role:'user',content:'same actually. what are you writing?'},{role:'assistant',content:'Something I probably won t finish.'},{role:'user',content:'the unfinished ones are usually the most honest'},{role:'assistant',content:'That s... actually true.'}]})}).then(r=>r.json()).then(d=>console.log('SCORE:',d.score,'PART1:',d.part1?.slice(0,150))).catch(console.error)"
 
----
+### Deploy:
+deploy.bat "your message"
 
-## BACKLOG (later)
-
-- [ ] Branching scenario states — each scenario has 3 random starting states
-- [ ] Escalating relationship system — Sofia changes behavior after sessions 3, 7, 15
-- [ ] Dark psychology niche — new character type, new scenarios (manipulative boss, toxic friend)
-- [ ] Squad mode — share a code with friends, compete on weekly scores
-- [ ] Camera/context-aware opener — point camera, AI generates situation-specific opener
+### Manual deploy:
+git push origin HEAD
+curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_l6CBJ6apO3R4vIkcoaXzZO89zXFH/dzoXAksvJp?buildCache=false"
 
 ---
 
-## COMPLETED
-*(move tasks here when done)*
+## ✅ Done
 
-- [x] Groq as default model (latency fix)
-- [x] SSE streaming character responses  
-- [x] Dynamic silence detection 900/1800ms
-- [x] Full Sofia prompts in character-stream.js
-- [x] Deepgram Nova-3 STT integrated
-- [x] All 5 Ryan coach issues fixed
-- [x] Coach eval at 142/144 → now 144/144 (motivational close keywords + post-processor)
-- [x] Stable tags: v-stable-may27-latency-fix, v-stable-may28-coach-fix
-- [x] eval-coach-v4.js — full coach quality eval (banned phrases, score, card fields, motivational close)
-- [x] test-all.js — master runner, exit-code detection, 180s pipeline timeout
+### June 3, 2026
+- [x] Upgraded Vercel to Pro
+- [x] ElevenLabs now primary TTS (Kokoro disabled)
+- [x] Fixed Sofia audio (frontend timeout, audio.play errors)
+- [x] Ryan opener nuclear fix — always HIM_1
+- [x] Score +1 correction for gpt-4o-mini
+- [x] Removed broken Practice Mode and Mic buttons
+- [x] Removed duplicate Ryan intro in train scenario
+- [x] Ryan encouragement — more emotional
+- [x] Caption sync — text shows with audio not before
+- [x] Created TECHNICAL_ISSUES_LOG.md
+
+## Current Stack
+- Live: https://eklipses.vercel.app
+- Dev: https://eklipses.vercel.app?dev=ek_dev_2026
+- TTS: ElevenLabs primary → OpenAI fallback
+- Ryan: OpenAI onyx via KokoroSpeech
+- LLM: gpt-4o-mini
+- Vercel: Pro, 30s timeout
+- Latest stable: v-stable-june3-caption-sync
