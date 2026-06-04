@@ -31,8 +31,6 @@ let session = 0;
 
 const els = {
   select:         document.getElementById('scenarioSelect'),
-  enterPractice:  document.getElementById('enterPractice'),
-  micBtn:         document.getElementById('micBtn'),
   chooseBtn:      document.getElementById('chooseAvatarBtn'),
   media:          document.getElementById('media'),
   name:           document.getElementById('speakerName'),
@@ -1971,8 +1969,6 @@ function renderAvatarPicker() {
   };
 }
 
-els.enterPractice.onclick=()=>playScenario(currentScenarioKey||Object.keys(SCENARIOS)[0],true);
-els.micBtn.onclick=()=>{};
 els.chooseBtn.onclick=renderAvatarPicker;
 
 /* ===== Helpers ===== */
