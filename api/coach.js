@@ -463,6 +463,11 @@ RULES:
 
     // Apply to all spoken fields
     feedback.part1 = cleanText(feedback.part1);
+    // Nuclear fix: force part1 to reference actual HIM_1 opener
+    const realOpener = conversation.find(m => m.role === 'user')?.content?.trim() || '';
+    if (realOpener && !feedback.part1.toLowerCase().includes(realOpener.toLowerCase().slice(0, 20))) {
+      feedback.part1 = `You opened with "${realOpener}." ` + feedback.part1;
+    }
     feedback.part2 = cleanText(feedback.part2);
     feedback.part3 = cleanText(feedback.part3);
     feedback.part4 = cleanText(feedback.part4);
