@@ -486,7 +486,6 @@ window.SCENARIOS = {
       { speaker:"Ryan",   text:"See that? He noticed something specific in their shared environment and made it a real observation. With Erika — someone who bonds over shared absurdity — that's the exact move. She'll match your energy and raise it if you give her something real to work with." }
     ],
     practice: [
-      { speaker:"Ryan", text:"You're on a commuter train heading home. She's in the seat nearby, looking out the window but not really seeing anything." },
       { speaker:"Ryan", text:"You're both on the same commuter train heading home. She's in the seat nearby, looking out the window — but not really seeing anything. She's somewhere else." },
       { speaker:"Ryan", text:"Half-full train, end of the day. That specific tiredness people carry when the week has been long. She has it. So do you. And somehow that makes everyone slightly more real." },
       { speaker:"Ryan", text:"Transit does something to people. Between places, between things — slightly more open than usual. And you have the whole ride. That's either a gift or a missed opportunity. It depends entirely on what you do in the next thirty seconds." },
