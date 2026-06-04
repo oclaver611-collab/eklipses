@@ -835,7 +835,8 @@ function renderLine(line) {
   if (line.speaker==='User_Prompt') {
     els.text.innerHTML = `<div class="practice-prompt"><strong>READ THIS OUT LOUD:</strong><br><br>"${line.text.replace('Say: ','').replace(/'/g,'')}"</div><div class="user-response-area">🎤 Speak when ready…</div>`;
   } else {
-    els.text.textContent = line.text;
+    els.text.textContent = '';
+    els.text.dataset.pendingText = line.text;
   }
 }
 
@@ -960,6 +961,10 @@ async function speak(text, speaker, onAudioReady) {
 
   const switchToSpeaking=()=>{
     if(mySession!==session) return;
+    if (els.text.dataset.pendingText) {
+      els.text.textContent = els.text.dataset.pendingText;
+      delete els.text.dataset.pendingText;
+    }
     if (onAudioReady) onAudioReady();
     if (speaker === 'Mary') {
       if (AVATARS._marySpeakingVideo) {
