@@ -407,6 +407,8 @@ RULES:
 
     // Clamp score to valid range — no floor, honest scoring
     feedback.score = Math.min(10, Math.max(1, Math.round(Number(feedback.score) || 5)));
+    // gpt-4o-mini scores too harshly — apply +1 correction for scores below 7
+    if (feedback.score < 7) feedback.score = Math.min(7, feedback.score + 1);
     console.log(`[coach] score=${feedback.score}`);
 
     // Post-process — guaranteed banned phrase removal
@@ -465,7 +467,7 @@ RULES:
     feedback.part1 = cleanText(feedback.part1);
     // Nuclear fix: force part1 to reference actual HIM_1 opener
     const realOpener = conversation.find(m => m.role === 'user')?.content?.trim() || '';
-    if (realOpener) {
+    if (realOpener && !feedback.part1.toLowerCase().includes(realOpener.toLowerCase().slice(0, 10))) {
       feedback.part1 = `You opened with "${realOpener}." ` + feedback.part1;
     }
     feedback.part2 = cleanText(feedback.part2);
