@@ -1103,7 +1103,7 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
     }
 
     isPlayingAudio = false;
-    console.log('[FC] processQueue resolving stream');
+    console.log('[FC] processQueue calling resolveStream, queue length:', sentenceQueue.length, 'streamDone:', streamDone);
     resolveStream();
   }
 
