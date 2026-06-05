@@ -1113,7 +1113,7 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
 
     const res = await fetch('/api/character-stream', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...(getDevKey() ? { 'x-dev-key': getDevKey() } : {}) },
       body: JSON.stringify({
         userMessage: userSaid,
         scenarioKey: currentScenarioKey,
