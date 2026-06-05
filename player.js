@@ -861,7 +861,7 @@ async function speakElevenLabs(text, onStart) {
 
     // Use MediaSource streaming — audio starts playing as first chunks arrive
     // Falls back to full buffer decode if MediaSource not supported
-    if (window.MediaSource && MediaSource.isTypeSupported('audio/mpeg')) {
+    if (false && window.MediaSource && MediaSource.isTypeSupported('audio/mpeg')) {
       return new Promise((resolve, reject) => {
         const mediaSource = new MediaSource();
         const audio = new Audio();
