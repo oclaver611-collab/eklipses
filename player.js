@@ -1562,8 +1562,11 @@ async function freeConversation(mySession) {
       continue;
     }
 
+    console.log('[FC] calling streamCharacterAndSpeak');
     const reply = await streamCharacterAndSpeak(said, mySession);
+    console.log('[FC] streamCharacterAndSpeak done, mySession:', mySession, 'session:', session);
     firstExchangeDone = true;
+    console.log('[FC] firstExchangeDone set, looping back');
     silenceCount = 0;
     if (mySession !== session) break;
     if (!reply) {
