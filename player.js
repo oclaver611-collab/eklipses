@@ -1494,8 +1494,10 @@ async function freeConversation(mySession) {
     const remMs = Math.min(30000, FREE_MS - (Date.now() - start));
     if (remMs < 2000) break;
 
+    console.log('[FC] loop start, elapsed:', Date.now()-start, 'mySession:', mySession, 'session:', session);
     await pause(500); // brief gap so mic doesn't pick up tail of avatar audio
     const said = await listenForUser(mySession, remMs);
+    console.log('[FC] heard:', said, 'mySession:', mySession, 'session:', session);
     if (mySession !== session) break;
 
     if (!said) {
