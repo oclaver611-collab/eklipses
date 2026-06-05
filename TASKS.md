@@ -6,11 +6,12 @@ Start every session by reading this file. Work top to bottom. Move completed tas
 ---
 
 ## 🔴 P1 — Critical (do these first)
-- [ ] Test caption sync fix live — confirm text appears with audio not before (v-stable-june3-caption-sync)
-- [ ] Investigate score always showing 3/10 in real sessions despite +1 correction — run 3 test conversations with coach API one-liner and check raw scores
+- [x] Test caption sync fix live — confirm text appears with audio not before (v-stable-june3-caption-sync)
+- [x] Investigate score always showing 3/10 in real sessions despite +1 correction — consistent 6/10, +1 correction working, low scores = genuinely weak convos
+- [ ] Fix processQueue session mismatch breaking Ava/all non-sofia characters mid-stream — debug logging deployed (commit 80508a3), need to run test and check [FC] processQueue session mismatch log in DevTools
 
 ## 🟡 P2 — Important
-- [ ] Fix Remi character — check api/character.js and player.js for what's broken
+- [ ] Fix Remi character — BLOCKED: no R2 assets yet. Prompt is malformed + duplicate, not in AVATAR_SETS or charNames. Resume when assets are uploaded.
 - [ ] Re-apply rate limit increase (was lost in a previous reset)
 - [ ] Re-apply dev key capture fix in index.html
 - [ ] Fix Ryan dead air gaps between lines (blob buffering — MediaSource approach failed, need new strategy)
@@ -43,6 +44,12 @@ curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_l6CBJ6apO3R4vIkc
 
 ## ✅ Done
 
+### June 4, 2026
+- [x] Display name fix — maya_office now shows as "Maya" (getCharacterDisplayName via AVATAR_SETS)
+- [x] Stream timeout 10s→25s — character-stream fetch abort timeout increased
+- [x] 500ms mic pause — gap added after avatar speaks before mic reopens
+- [x] processQueue race condition fix (partial) — restarts if exits before stream finishes; session mismatch debug logging deployed
+
 ### June 3, 2026
 - [x] Upgraded Vercel to Pro
 - [x] ElevenLabs now primary TTS (Kokoro disabled)
@@ -62,4 +69,5 @@ curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_l6CBJ6apO3R4vIkc
 - Ryan: OpenAI onyx via KokoroSpeech
 - LLM: gpt-4o-mini
 - Vercel: Pro, 30s timeout
-- Latest stable: v-stable-june3-caption-sync
+- Latest stable: v-stable-june4-mic-echo-fix
+- Current debug build: 80508a3 (do not tag until processQueue bug resolved)
