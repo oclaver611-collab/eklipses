@@ -1103,6 +1103,7 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
     }
 
     isPlayingAudio = false;
+    console.log('[FC] processQueue resolving stream');
     resolveStream();
   }
 
@@ -1166,7 +1167,11 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
     }
   }
 
-  await streamPromise;
+  await Promise.race([
+    streamPromise,
+    new Promise(resolve => setTimeout(resolve, 20000))
+  ]);
+  console.log('[FC] streamPromise resolved or timed out');
 
   if (fullText && mySession === session) {
     if (!firstUserOpener) firstUserOpener = userSaid;
