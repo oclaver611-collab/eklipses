@@ -1057,7 +1057,7 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
     isPlayingAudio = true;
 
     while (true) {
-      if (mySession !== session) break;
+      if (mySession !== session) { console.log('[FC] processQueue session mismatch — breaking', mySession, session); break; }
 
       if (sentenceQueue.length === 0) {
         if (streamDone) break;
