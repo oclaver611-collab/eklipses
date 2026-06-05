@@ -1151,7 +1151,10 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
         try {
           const payload = JSON.parse(line.slice(6));
           if (payload.error) { console.warn('Stream error:', payload.error); break; }
-          if (payload.sentence) sentenceQueue.push(payload.sentence);
+          if (payload.sentence) {
+            sentenceQueue.push(payload.sentence);
+            if (!isPlayingAudio) processQueue();
+          }
           if (payload.done) { fullText = payload.full || fullText; streamDone = true; }
         } catch {}
       }
