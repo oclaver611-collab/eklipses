@@ -917,7 +917,12 @@ async function speakElevenLabs(text, onStart) {
           pump();
         });
 
-        audio.onended = () => { URL.revokeObjectURL(audio.src); resolve(); };
+        const endTimeout = setTimeout(() => {
+          console.log('[TTS] audio.onended timeout — force resolving');
+          URL.revokeObjectURL(audio.src);
+          resolve();
+        }, 30000);
+        audio.onended = () => { clearTimeout(endTimeout); URL.revokeObjectURL(audio.src); resolve(); };
         audio.onerror = (e) => { console.error('[TTS] audio element error:', e); reject(new Error('Audio error: ' + JSON.stringify(e))); };
       });
     } else {
