@@ -22,6 +22,13 @@
 **Fix:** await audio.play() with proper try/catch and logging.  
 **File:** player.js — speakElevenLabs()
 
+## Issue #007 — Ryan Voice Stops Mid-Line During Intro
+**Date:** June 6, 2026
+**Symptom:** Ryan's voice stops for 15-20 seconds mid-sentence during scenario intro, caption text continues showing but no audio.
+**Root cause:** Blob TTS — long lines (60+ words) take 3-5s to download before playback. If a line is very long, the download stalls mid-stream.
+**Fix needed:** Either split long Ryan intro lines into shorter chunks, or re-enable MediaSource streaming (currently disabled due to onended bug).
+**Priority:** P2
+
 ## Issue #004 — Ryan Feedback Skips Real Opening Line
 **Date:** June 3, 2026  
 **Symptom:** Ryan says "you started with X" but X is not the user's actual first line.  
