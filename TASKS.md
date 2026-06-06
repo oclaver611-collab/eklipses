@@ -9,12 +9,13 @@ Start every session by reading this file. Work top to bottom. Move completed tas
 - [x] Test caption sync fix live — confirm text appears with audio not before (v-stable-june3-caption-sync)
 - [x] Investigate score always showing 3/10 in real sessions despite +1 correction — consistent 6/10, +1 correction working, low scores = genuinely weak convos
 - [ ] Fix processQueue session mismatch breaking Ava/all non-sofia characters mid-stream — debug logging deployed (commit 80508a3), need to run test and check [FC] processQueue session mismatch log in DevTools
+- [ ] Test Ryan prefetch + cancel fix live — confirm no double voice, reduced dead air
 
 ## 🟡 P2 — Important
 - [ ] Fix Remi character — BLOCKED: no R2 assets yet. Prompt is malformed + duplicate, not in AVATAR_SETS or charNames. Resume when assets are uploaded.
 - [x] Re-apply rate limit increase (DAILY_SESSION_LIMIT=40 for dev, 1 for prod)
 - [x] Re-apply dev key capture fix in index.html
-- [ ] Fix Ryan dead air gaps between lines (blob buffering — MediaSource approach failed, need new strategy)
+- [x] Fix Ryan dead air gaps between lines — prefetch next part while current plays (v-stable-june6-ryan-prefetch-v2)
 
 ## 🟢 P3 — Nice to have
 - [ ] Switch Sofia TTS to Fish Audio or Chatterbox — cheaper than ElevenLabs at scale
@@ -54,6 +55,13 @@ curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_l6CBJ6apO3R4vIkc
 
 ## ✅ Done
 
+### June 6, 2026
+- [x] SSH auth fix — remote switched to git@github.com, no more GitHub credential popups
+- [x] Automated test suite — test-frontend.js, 14/14 characters passing SSE + TTS checks
+- [x] Ava hidden — hidden: true in AVATAR_SETS, filtered from picker (browser audio bug)
+- [x] Ryan prefetch — pre-downloads next feedback part while current plays, reduces dead air (v-stable-june6-ryan-prefetch-v2)
+- [x] cancel() fix — moved cancel() to after URL resolved, prevents double voice on prefetched audio (v-stable-june6-cancel-fix)
+
 ### June 4, 2026
 - [x] Display name fix — maya_office now shows as "Maya" (getCharacterDisplayName via AVATAR_SETS)
 - [x] Stream timeout 10s→25s — character-stream fetch abort timeout increased
@@ -79,5 +87,4 @@ curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_l6CBJ6apO3R4vIkc
 - Ryan: OpenAI onyx via KokoroSpeech
 - LLM: gpt-4o-mini
 - Vercel: Pro, 30s timeout
-- Latest stable: v-stable-june4-mic-echo-fix
-- Current debug build: 80508a3 (do not tag until processQueue bug resolved)
+- Latest stable: v-stable-june6-cancel-fix (commit 754580b)
