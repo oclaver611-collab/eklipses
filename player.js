@@ -2242,3 +2242,12 @@ function launchApp() {
 }
 
 bootDefault();
+
+// Test hook — allows browser tests to inject speech without microphone
+if (typeof window !== 'undefined') {
+  window.addEventListener('test:speech', (e) => {
+    if (e.detail?.text && typeof streamCharacterAndSpeak === 'function') {
+      streamCharacterAndSpeak(e.detail.text, session);
+    }
+  });
+}
