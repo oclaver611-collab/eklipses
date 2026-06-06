@@ -624,7 +624,7 @@ const Caption = (() => {
 const AVATAR_SETS = [
   { id:'sofia',       label:'Sofia',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_thumb.jpg',    maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_speaking.mp4',    maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_idle.mp4',    danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_idle.mp4',    vibe:'Direct & self-contained',  scenario:'Beach' },
   { id:'isabelle',    label:'Isabelle', thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Isabelle_thumb.jpg', maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Isabelle_speaking.mp4', maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Isabelle_idle.mp4', danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Isabelle_idle.mp4', vibe:'Intellectual & curious',   scenario:'Museum' },
-  { id:'ava',         label:'Ava',      thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_thumb.jpg',      maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_speaking.mp4',      maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_idle.mp4',      danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_idle.mp4',      vibe:'Sharp & direct',           scenario:'Bar' },
+  { id:'ava',         label:'Ava',      thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_thumb.jpg',      maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_speaking.mp4',      maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_idle.mp4',      danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_idle.mp4',      vibe:'Sharp & direct',           scenario:'Bar',  hidden: true },
   { id:'zoe',         label:'Zoe',      thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/zoe_thumb.jpg',      maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/zoe_speaking.mp4',      maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/zoe_idle.mp4',      danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/zoe_idle.mp4',      vibe:'Direct & no-nonsense',     scenario:'Gym' },
   { id:'nadia',       label:'Nadia',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Nadia.jpg',          maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/nadia_speaking.mp4',    maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/nadia_idle.mp4',    danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/nadia_idle.mp4',    vibe:'Warm & bookish',           scenario:'Bookstore' },
   { id:'julia',       label:'Julia',    thumb:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/julia_thumb.jpg',    maryVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/julia_mary.mp4',        maryIdleVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/julia_daniel.mp4',  danielVideo:'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/julia_daniel.mp4',  vibe:'Mysterious & confident',   scenario:'Street' },
@@ -1977,7 +1977,7 @@ function makeCard(key) {
 
 function renderAvatarPicker() {
   if(!els.pickerBackdrop) return;
-  els.pickerGrid.innerHTML=AVATAR_SETS.map(s=>`
+  els.pickerGrid.innerHTML=AVATAR_SETS.filter(s=>!s.hidden).map(s=>`
     <div class="pick-card" data-id="${s.id}">
       <img class="pick-img" src="${s.thumb||'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/ryan.jpg'}" alt="${s.label}" style="height:160px;object-fit:cover;">
       <div class="pick-meta">
