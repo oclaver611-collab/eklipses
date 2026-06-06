@@ -31,15 +31,12 @@ const KokoroSpeech = (() => {
       currentAudio = audio;
       audio.volume = 1;
       audio.muted = false;
+      audio.preload = 'auto';
       await new Promise((resolve) => {
-        audio.onended = () => { URL.revokeObjectURL(url); currentAudio = null; resolve(); };
-        audio.onerror = (e) => { console.error('[TTS] audio error:', e); URL.revokeObjectURL(url); currentAudio = null; resolve(); };
-        audio.play().then(() => {
-          console.log('[TTS] playing');
-        }).catch((err) => {
-          console.error('[TTS] play() blocked:', err.message);
-          resolve();
-        });
+        const timeout = setTimeout(() => { URL.revokeObjectURL(url); currentAudio = null; resolve(); }, 30000);
+        audio.onended = () => { clearTimeout(timeout); URL.revokeObjectURL(url); currentAudio = null; resolve(); };
+        audio.onerror = () => { clearTimeout(timeout); URL.revokeObjectURL(url); currentAudio = null; resolve(); };
+        audio.play().catch(() => resolve());
       });
     } catch (err) {
       console.error('[TTS] speak() error:', err);
