@@ -14,37 +14,35 @@ const SCENARIOS = [
 async function testScenario(page, key, character) {
   const start = Date.now();
   try {
-    // Navigate fresh for each test to avoid stale state
+    // Navigate fresh — set test mode before page scripts run
+    await page.addInitScript(() => { window.__EKLIPSES_TEST_MODE = true; });
     await page.goto(BASE_URL, { waitUntil: 'networkidle', timeout: 30000 });
 
-    // Enable test mode — skips audio playback
-    await page.evaluate(() => { window.__EKLIPSES_TEST_MODE = true; });
-
-    // Wait for scenario options to be populated
+    // Wait for scenario options — MutationObserver auto-clicks splash+onboarding buttons
     await page.waitForFunction(
       () => (document.getElementById('scenarioSelect')?.options.length || 0) > 0,
-      { timeout: 15000 }
+      { timeout: 20000 }
     );
 
     // Select scenario (triggers playScenario via onchange)
     await page.selectOption('#scenarioSelect', key);
 
-    // Wait for Ryan intro — "What do you do?" appears
+    // Wait for listening pill to become visible (Ryan finished intro, mic is open)
     await page.waitForFunction(() => {
-      const text = document.getElementById('lineText')?.textContent || '';
-      return text.toLowerCase().includes('what do you do');
-    }, { timeout: 40000 });
+      const pill = document.getElementById('listenPill');
+      if (!pill) return false;
+      const style = window.getComputedStyle(pill);
+      return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+    }, { timeout: 60000 });
 
-    // Capture text AFTER Ryan finishes
     const ryanText = await page.$eval('#lineText', el => el.textContent);
 
-    // Simulate user speech by dispatching a custom event
+    // Simulate user speech
     await page.evaluate(() => {
-      const event = new CustomEvent('test:speech', { detail: { text: 'hi what is your name' } });
-      window.dispatchEvent(event);
+      window.dispatchEvent(new CustomEvent('test:speech', { detail: { text: 'hi what is your name' } }));
     });
 
-    // Wait for character to respond — text must change from Ryan's last line
+    // Wait for character to respond
     await page.waitForFunction((prev) => {
       const text = document.getElementById('lineText')?.textContent || '';
       return text !== prev && text.length > 10 && !text.toLowerCase().includes('what do you do');
@@ -66,6 +64,20 @@ async function testScenario(page, key, character) {
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ permissions: ['microphone'] });
   const page = await context.newPage();
+
+  // Runs before page scripts — enables test mode and auto-clicks splash/onboarding buttons
+  await page.addInitScript(() => {
+    window.__EKLIPSES_TEST_MODE = true;
+    const observer = new MutationObserver(() => {
+      const startBtn = document.getElementById('ek-start-btn');
+      if (startBtn) { startBtn.click(); }
+      const obBtn = document.getElementById('ob-btn');
+      if (obBtn) { obBtn.click(); }
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+      observer.observe(document.body, { childList: true, subtree: true });
+    });
+  });
 
   page.on('console', () => {});
   page.on('pageerror', e => console.error('[page error]', e.message.slice(0, 80)));
