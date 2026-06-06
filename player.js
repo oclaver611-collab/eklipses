@@ -861,7 +861,7 @@ async function speakElevenLabs(text, onStart) {
 
     // Use MediaSource streaming — audio starts playing as first chunks arrive
     // Falls back to full buffer decode if MediaSource not supported
-    if (false && window.MediaSource && MediaSource.isTypeSupported('audio/mpeg')) {
+    if (window.MediaSource && MediaSource.isTypeSupported('audio/mpeg')) {
       return new Promise((resolve, reject) => {
         const mediaSource = new MediaSource();
         const audio = new Audio();
@@ -922,7 +922,9 @@ async function speakElevenLabs(text, onStart) {
           URL.revokeObjectURL(audio.src);
           resolve();
         }, 30000);
-        audio.onended = () => { clearTimeout(endTimeout); URL.revokeObjectURL(audio.src); resolve(); };
+        const onDone = () => { clearTimeout(endTimeout); URL.revokeObjectURL(audio.src); resolve(); };
+        audio.onended = onDone;
+        mediaSource.onsourceended = onDone;
         audio.onerror = (e) => { console.error('[TTS] audio element error:', e); reject(new Error('Audio error: ' + JSON.stringify(e))); };
       });
     } else {
