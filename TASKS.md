@@ -10,6 +10,8 @@ Start every session by reading this file. Work top to bottom. Move completed tas
 - [x] Investigate score always showing 3/10 in real sessions despite +1 correction — consistent 6/10, +1 correction working, low scores = genuinely weak convos
 - [ ] Fix processQueue session mismatch breaking Ava/all non-sofia characters mid-stream — debug logging deployed (commit 80508a3), need to run test and check [FC] processQueue session mismatch log in DevTools
 - [ ] Test Ryan prefetch + cancel fix live — confirm no double voice, reduced dead air
+- [ ] Verify Supabase rows appearing after user sessions (table was empty after deploy)
+- [ ] Test admin endpoint: https://eklipses.vercel.app/api/admin?key=ADMIN_KEY
 
 ## 🟡 P2 — Important
 - [ ] Fix Remi character — BLOCKED: no R2 assets yet. Prompt is malformed + duplicate, not in AVATAR_SETS or charNames. Resume when assets are uploaded.
@@ -59,8 +61,12 @@ curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_l6CBJ6apO3R4vIkc
 - [x] SSH auth fix — remote switched to git@github.com, no more GitHub credential popups
 - [x] Automated test suite — test-frontend.js, 14/14 characters passing SSE + TTS checks
 - [x] Ava hidden — hidden: true in AVATAR_SETS, filtered from picker (browser audio bug)
+- [x] Bar scenario hidden — hidden: true in scenarios.js, same issue as Ava
 - [x] Ryan prefetch — pre-downloads next feedback part while current plays, reduces dead air (v-stable-june6-ryan-prefetch-v2)
 - [x] cancel() fix — moved cancel() to after URL resolved, prevents double voice on prefetched audio (v-stable-june6-cancel-fix)
+- [x] Supabase-backed rate limiting — api/supabase.js + api/ratelimit.js wired to user_sessions table (v-stable-june6-supabase)
+- [x] Admin API — api/admin.js, block/unblock/reset users via x-admin-key header
+- [x] Playwright browser test suite — 5/6 scenarios passing, test-browser.js (v-stable-june6-playwright)
 
 ### June 4, 2026
 - [x] Display name fix — maya_office now shows as "Maya" (getCharacterDisplayName via AVATAR_SETS)
@@ -87,4 +93,4 @@ curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_l6CBJ6apO3R4vIkc
 - Ryan: OpenAI onyx via KokoroSpeech
 - LLM: gpt-4o-mini
 - Vercel: Pro, 30s timeout
-- Latest stable: v-stable-june6-cancel-fix (commit 754580b)
+- Latest stable: v-stable-june6-playwright (commit 3516343)
