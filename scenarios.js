@@ -22,8 +22,10 @@ window.SCENARIOS = {
     ],
     practice: [
       { speaker:"Ryan", text:"You're on a beach, late afternoon. She's been sitting there since morning — writing, completely at ease." },
-      { speaker:"Ryan", text:"You've walked past a woman like this before. You felt it — that pull. And then you kept walking. You told yourself the timing was wrong. You thought of something perfect to say about three seconds too late." },
-      { speaker:"Ryan", text:"This time is different. It's late afternoon. The beach is almost empty. She's been sitting there for twenty minutes, writing something, completely at ease. She already noticed you walk by once." },
+      { speaker:"Ryan", text:"You've walked past a woman like this before. You felt it — that pull. And then you kept walking." },
+      { speaker:"Ryan", text:"You told yourself the timing was wrong. You thought of something perfect to say about three seconds too late." },
+      { speaker:"Ryan", text:"This time is different. It's late afternoon. The beach is almost empty." },
+      { speaker:"Ryan", text:"She's been sitting there for twenty minutes, writing something, completely at ease. She already noticed you walk by once." },
       { speaker:"Ryan", text:"Your heart is going. Your mind is already making excuses. But she's right there — and this moment has an expiry date of about thirty seconds." },
       { speaker:"Ryan", text:"Gather everything you have. Walk toward her. She looks up." },
       { speaker:"Ryan", text:"What do you do?" }
@@ -118,7 +120,8 @@ window.SCENARIOS = {
       { speaker:"Ryan", text:"You're at the gym on a weekday afternoon. She's between sets, one earbud out, catching her breath." },
       { speaker:"Ryan", text:"She's between sets. One earbud out, catching her breath. That's not an accident — that's a window. And it closes in about five seconds." },
       { speaker:"Ryan", text:"It's a weekday afternoon. The gym is half empty. She's been focused, disciplined, in her own world — and right now she's briefly, genuinely available." },
-      { speaker:"Ryan", text:"Every instinct tells you to do nothing. Most men here look and move on. But the ones who know what they're doing? They know exactly what type of opener works in this environment — and it has nothing to do with her workout." },
+      { speaker:"Ryan", text:"Every instinct tells you to do nothing. Most men here look and move on." },
+      { speaker:"Ryan", text:"But the ones who know what they're doing? They know exactly what type of opener works in this environment — and it has nothing to do with her workout." },
       { speaker:"Ryan", text:"Move now. Before the earbud goes back in. She glances over." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
@@ -149,7 +152,8 @@ window.SCENARIOS = {
       { speaker:"Ryan", text:"You're in a small independent bookstore on a rainy Saturday. She's browsing the fiction shelf, coffee in hand, in her own world." },
       { speaker:"Ryan", text:"She's holding a book with one hand and a coffee with the other, completely in her own world. No reason to talk to you. No expectation. No invitation." },
       { speaker:"Ryan", text:"It's a rainy Saturday afternoon. A small independent bookstore. The kind of place where people come to disappear for a while. She's been browsing the fiction shelf for ten minutes." },
-      { speaker:"Ryan", text:"Here's what almost nobody understands: a bookstore gives you something most places don't. A shared opinion. A man with a real take on something beats a smooth line every single time." },
+      { speaker:"Ryan", text:"Here's what almost nobody understands: a bookstore gives you something most places don't." },
+      { speaker:"Ryan", text:"A shared opinion. A man with a real take on something beats a smooth line every single time." },
       { speaker:"Ryan", text:"Walk toward her shelf. You pick up the book she's looking at. She notices." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
@@ -218,7 +222,8 @@ window.SCENARIOS = {
       { speaker:"Ryan", text:"You're at a rooftop bar in the evening, city skyline behind her. She's standing slightly apart from the crowd, drink in hand, watching." },
       { speaker:"Ryan", text:"Two guys approached her tonight. She turned both of them down without looking up." },
       { speaker:"Ryan", text:"It's evening. A rooftop bar, city skyline behind her. She's standing slightly apart from the crowd, drink in hand — not waiting for someone, just watching. Sharp. Self-contained." },
-      { speaker:"Ryan", text:"She's not cold. She's not unfriendly. She's just seen enough men performing confidence that she recognizes it in the first sentence. What works with a woman like this is the opposite of what most men try." },
+      { speaker:"Ryan", text:"She's not cold. She's not unfriendly. She's just seen enough men performing confidence that she recognizes it in the first sentence." },
+      { speaker:"Ryan", text:"What works with a woman like this is the opposite of what most men try." },
       { speaker:"Ryan", text:"Cross the roof. She sees you coming. She doesn't look away." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
@@ -249,9 +254,11 @@ window.SCENARIOS = {
     ],
     practice: [
       { speaker:"Ryan", text:"You're at a house party at a mutual friend's place. She's stepped away from the main group and is standing alone in the quietest corner of the room." },
-      { speaker:"Ryan", text:"She stepped away from the main group. Not because something's wrong — she just needed a moment to breathe. And now she's standing alone, drink in hand, in the quietest corner of the party." },
+      { speaker:"Ryan", text:"She stepped away from the main group. Not because something's wrong — she just needed a moment to breathe." },
+      { speaker:"Ryan", text:"And now she's standing alone, drink in hand, in the quietest corner of the party." },
       { speaker:"Ryan", text:"Mutual friend's place. Warm, relaxed, low pressure. You've been in the same room for an hour. You've noticed her. She's noticed you noticing." },
-      { speaker:"Ryan", text:"You could stay where you are and wonder about her for the rest of the night. Or you can walk over and find out who she actually is. She's warm underneath — but she doesn't give that away fast." },
+      { speaker:"Ryan", text:"You could stay where you are and wonder about her for the rest of the night. Or you can walk over and find out who she actually is." },
+      { speaker:"Ryan", text:"She's warm underneath — but she doesn't give that away fast." },
       { speaker:"Ryan", text:"Walk over. The music is low enough to talk. She looks up from her drink." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
@@ -287,7 +294,8 @@ window.SCENARIOS = {
       { speaker:"Ryan", text:"You're in a small coffee shop in the afternoon. She's at a table with a notebook open, headphones around her neck — not in her ears." },
       { speaker:"Ryan", text:"Headphones around her neck — not in her ears. That decision means something. Notebook open, coffee going cold, not quite working." },
       { speaker:"Ryan", text:"Small coffee shop, afternoon light. She's been at that table for a while. Present. Slightly open. Not looking for someone — but not closed off either." },
-      { speaker:"Ryan", text:"Most men walk past. The ones who try usually pick the wrong thing to say. But here's what they miss: this is one of the most underestimated openings in daily life — if you know what to notice." },
+      { speaker:"Ryan", text:"Most men walk past. The ones who try usually pick the wrong thing to say." },
+      { speaker:"Ryan", text:"But here's what they miss: this is one of the most underestimated openings in daily life — if you know what to notice." },
       { speaker:"Ryan", text:"Pull out the chair nearby. She looks up. For one second, everything is possible." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
@@ -320,7 +328,8 @@ window.SCENARIOS = {
       { speaker:"Ryan", text:"You're at an art gallery opening night. She's the curator's assistant, standing in front of a piece most people walked past." },
       { speaker:"Ryan", text:"Opening night. She's the curator — the one who made tonight happen. In the last hour, seven people have tried to impress her. She smiled at all of them and moved on." },
       { speaker:"Ryan", text:"The gallery is buzzing but she's managed to find a quiet moment near the back wall, a glass of wine in hand, looking at a piece she curated herself." },
-      { speaker:"Ryan", text:"She can tell in eight seconds whether someone is performing or actually present. That difference is everything. And right now you have a chance to be the one person tonight who surprised her." },
+      { speaker:"Ryan", text:"She can tell in eight seconds whether someone is performing or actually present. That difference is everything." },
+      { speaker:"Ryan", text:"And right now you have a chance to be the one person tonight who surprised her." },
       { speaker:"Ryan", text:"Walk over. She senses you approach. She doesn't turn away." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
@@ -348,7 +357,8 @@ window.SCENARIOS = {
       { speaker:"Mary",   text:"I'm Fatou." },
       { speaker:"Daniel", text:"Daniel. That was more honest than I expected." },
       { speaker:"Mary",   text:"I don't have the energy for anything else after a full class." },
-      { speaker:"Ryan",   text:"See that? He asked about the physical work — specifically. Not about how she looked doing it. With Fatou, directness about the practice earns respect. Everything else gets shut down." }
+      { speaker:"Ryan",   text:"See that? He asked about the physical work — specifically. Not about how she looked doing it." },
+      { speaker:"Ryan",   text:"With Fatou, directness about the practice earns respect. Everything else gets shut down." }
     ],
     practice: [
       { speaker:"Ryan", text:"You're at a yoga studio. Class just ended — she's the instructor, rolling up her mat, still in that post-practice calm." },
@@ -382,13 +392,15 @@ window.SCENARIOS = {
       { speaker:"Mary",   text:"For the record, it's a good book. I'm just elsewhere." },
       { speaker:"Daniel", text:"Where?" },
       { speaker:"Mary",   text:"That's a better question than most people ask at gate C14." },
-      { speaker:"Ryan",   text:"See that? He made a specific observation — he'd been watching the room, not just her. Then he asked a real question. Elena responds to wit and genuine curiosity. Generic opener and she goes back to the book." }
+      { speaker:"Ryan",   text:"See that? He made a specific observation — he'd been watching the room, not just her. Then he asked a real question." },
+      { speaker:"Ryan",   text:"Elena responds to wit and genuine curiosity. Generic opener and she goes back to the book." }
     ],
     practice: [
       { speaker:"Ryan", text:"You're at an airport departure gate — the flight's been delayed two hours. She has a book open that she hasn't turned a page of in fifteen minutes." },
       { speaker:"Ryan", text:"The flight is delayed two hours. You're both stuck at the same gate. She has a book open — hasn't turned a page in fifteen minutes. She's somewhere else in her head." },
       { speaker:"Ryan", text:"Gate C14. The kind of grey limbo that makes strangers briefly, genuinely available to each other. No agenda, nowhere to be, none of the usual social pressure." },
-      { speaker:"Ryan", text:"Here's what most men miss: this is one of the best situations to meet someone in — and almost everyone wastes it by talking about the delay. There's a specific type of opener that works here and almost nowhere else." },
+      { speaker:"Ryan", text:"Here's what most men miss: this is one of the best situations to meet someone in — and almost everyone wastes it by talking about the delay." },
+      { speaker:"Ryan", text:"There's a specific type of opener that works here and almost nowhere else." },
       { speaker:"Ryan", text:"Walk over and sit nearby. She glances up from the book that isn't really being read." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
@@ -422,7 +434,8 @@ window.SCENARIOS = {
       { speaker:"Ryan", text:"You're in a supermarket on Sunday afternoon. She's in the same aisle, basket in hand, clearly off her original shopping list." },
       { speaker:"Ryan", text:"Sunday afternoon. You're in the same aisle. She has a basket that's clearly gone off-script — you can tell from what's in it." },
       { speaker:"Ryan", text:"The supermarket on a weekend. Nobody's performing. Nobody's on. She's just a real person doing a real thing — and so are you. That's rarer than you think." },
-      { speaker:"Ryan", text:"Most men don't even consider this. No mood lighting, no social excuse. Just two people in a grocery aisle. And that's exactly why it works when you do it right — she's off her guard, and the man who matches that realness stands out completely." },
+      { speaker:"Ryan", text:"Most men don't even consider this. No mood lighting, no social excuse. Just two people in a grocery aisle." },
+      { speaker:"Ryan", text:"And that's exactly why it works when you do it right — she's off her guard, and the man who matches that realness stands out completely." },
       { speaker:"Ryan", text:"Turn toward her. She's looking at two options, slightly undecided. Your eyes meet for a second." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
@@ -449,13 +462,15 @@ window.SCENARIOS = {
       { speaker:"Mary",   text:"For the record, I was being professional." },
       { speaker:"Daniel", text:"And now?" },
       { speaker:"Mary",   text:"Now the elevator is broken and I have three minutes to decide if you're interesting." },
-      { speaker:"Ryan",   text:"See that? He acknowledged the awkward reality directly — that they'd been ignoring each other for months. That honesty made her laugh. With Maya, wit and directness open the door. Trying to be impressive closes it." }
+      { speaker:"Ryan",   text:"See that? He acknowledged the awkward reality directly — that they'd been ignoring each other for months. That honesty made her laugh." },
+      { speaker:"Ryan",   text:"With Maya, wit and directness open the door. Trying to be impressive closes it." }
     ],
     practice: [
       { speaker:"Ryan", text:"You're in the lobby of your office building, morning, both waiting for the elevator. You've seen her around — she works in the same building." },
       { speaker:"Ryan", text:"You've walked past each other in this building for months. You've made eye contact. You've both looked away. It's become a thing — a silent, ongoing almost." },
       { speaker:"Ryan", text:"Corporate lobby, morning. Both waiting for the elevator. You've seen her enough times to know her floor, her schedule, the coffee she carries. She knows you exist." },
-      { speaker:"Ryan", text:"Here's what's actually happening in that moment every morning: she's formed an opinion of you. And every day you say nothing, that opinion gets a little more set. Today is different." },
+      { speaker:"Ryan", text:"Here's what's actually happening in that moment every morning: she's formed an opinion of you." },
+      { speaker:"Ryan", text:"And every day you say nothing, that opinion gets a little more set. Today is different." },
       { speaker:"Ryan", text:"The elevator is taking forever. She's right beside you. This is the moment that's been building for months." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
@@ -484,12 +499,15 @@ window.SCENARIOS = {
       { speaker:"Mary",   text:"Or sadder." },
       { speaker:"Daniel", text:"Both." },
       { speaker:"Mary",   text:"Yeah. Both." },
-      { speaker:"Ryan",   text:"See that? He noticed something specific in their shared environment and made it a real observation. With Erika — someone who bonds over shared absurdity — that's the exact move. She'll match your energy and raise it if you give her something real to work with." }
+      { speaker:"Ryan",   text:"See that? He noticed something specific in their shared environment and made it a real observation." },
+      { speaker:"Ryan",   text:"With Erika — someone who bonds over shared absurdity — that's the exact move." },
+      { speaker:"Ryan",   text:"She'll match your energy and raise it if you give her something real to work with." }
     ],
     practice: [
       { speaker:"Ryan", text:"You're both on the same commuter train heading home. She's in the seat nearby, looking out the window — but not really seeing anything. She's somewhere else." },
       { speaker:"Ryan", text:"Half-full train, end of the day. That specific tiredness people carry when the week has been long. She has it. So do you. And somehow that makes everyone slightly more real." },
-      { speaker:"Ryan", text:"Transit does something to people. Between places, between things — slightly more open than usual. And you have the whole ride. That's either a gift or a missed opportunity. It depends entirely on what you do in the next thirty seconds." },
+      { speaker:"Ryan", text:"Transit does something to people. Between places, between things — slightly more open than usual. And you have the whole ride." },
+      { speaker:"Ryan", text:"That's either a gift or a missed opportunity. It depends entirely on what you do in the next thirty seconds." },
       { speaker:"Ryan", text:"The train settles into its rhythm. She shifts slightly in her seat. The moment is here." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
