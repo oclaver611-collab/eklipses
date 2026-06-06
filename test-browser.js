@@ -17,7 +17,10 @@ async function testScenario(page, key, character) {
     // Navigate fresh for each test to avoid stale state
     await page.goto(BASE_URL, { waitUntil: 'networkidle', timeout: 30000 });
 
-    // Wait for scenario options to be populated (renderShelf runs inside launchApp)
+    // Enable test mode — skips audio playback
+    await page.evaluate(() => { window.__EKLIPSES_TEST_MODE = true; });
+
+    // Wait for scenario options to be populated
     await page.waitForFunction(
       () => (document.getElementById('scenarioSelect')?.options.length || 0) > 0,
       { timeout: 15000 }

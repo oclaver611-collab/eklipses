@@ -961,6 +961,18 @@ async function speakElevenLabs(text, onStart) {
 
 async function speak(text, speaker, onAudioReady, prefetchedUrl = null) {
   const mySession=session;
+  // Test mode — skip audio, resolve immediately
+  if (window.__EKLIPSES_TEST_MODE) {
+    if (els.text.dataset.pendingText) {
+      els.text.textContent = els.text.dataset.pendingText;
+      delete els.text.dataset.pendingText;
+    } else {
+      els.text.textContent = text;
+    }
+    if (onAudioReady) onAudioReady();
+    await new Promise(r => setTimeout(r, 50));
+    return;
+  }
   try { __audioContexts.forEach(c=>{ try{if(c.state==='suspended')c.resume();}catch{} }); } catch {}
   // For Mary: start with idle video, switch to speaking only when audio actually starts
   if (speaker === 'Mary') {

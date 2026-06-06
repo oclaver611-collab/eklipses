@@ -11,6 +11,7 @@ const KokoroSpeech = (() => {
   };
 
   async function speak(text, voice = 'af_nicole', prefetchedUrl = null) {
+    if (typeof window !== 'undefined' && window.__EKLIPSES_TEST_MODE) return;
     if (!text?.trim()) return;
     const openaiVoice = VOICE_MAP[voice] || 'nova';
     let url = prefetchedUrl;
