@@ -34,6 +34,7 @@ window.SCENARIOS = {
     title: "Bar — Night Out",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_thumb.jpg",
     bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/bar_bg.jpg",
+    hidden: true,
     coldOpen: true,
     category: "dating",
     difficulty: 2,

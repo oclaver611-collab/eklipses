@@ -1951,7 +1951,7 @@ function startListeningYesNo(mySession) {
 
 /* ===== UI ===== */
 function renderShelf() {
-  const keys=Object.keys(SCENARIOS);
+  const keys=Object.keys(SCENARIOS).filter(k=>!SCENARIOS[k].hidden);
   els.select.innerHTML=keys.map(k=>`<option value="${k}">${SCENARIOS[k].title}</option>`).join('');
   els.select.onchange=()=>playScenario(els.select.value,false);
   els.shelf.innerHTML='';
