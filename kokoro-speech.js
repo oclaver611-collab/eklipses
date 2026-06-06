@@ -12,9 +12,12 @@ const KokoroSpeech = (() => {
 
   async function speak(text, voice = 'af_nicole', prefetchedUrl = null) {
     if (!text?.trim()) return;
-    cancel();
     const openaiVoice = VOICE_MAP[voice] || 'nova';
     let url = prefetchedUrl;
+    if (!url) {
+      cancel();
+      // fetch happens below
+    }
     try {
       if (!url) {
         console.log(`[TTS] ${openaiVoice}: "${text.slice(0,50)}"`);
@@ -32,6 +35,7 @@ const KokoroSpeech = (() => {
       } else {
         console.log(`[TTS] ${openaiVoice} (prefetched): "${text.slice(0,50)}"`);
       }
+      cancel();
       const audio = new Audio(url);
       currentAudio = audio;
       audio.volume = 1;
