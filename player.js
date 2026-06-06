@@ -959,7 +959,7 @@ async function speakElevenLabs(text, onStart) {
   }
 }
 
-async function speak(text, speaker, onAudioReady) {
+async function speak(text, speaker, onAudioReady, prefetchedUrl = null) {
   const mySession=session;
   try { __audioContexts.forEach(c=>{ try{if(c.state==='suspended')c.resume();}catch{} }); } catch {}
   // For Mary: start with idle video, switch to speaking only when audio actually starts
@@ -1017,7 +1017,7 @@ async function speak(text, speaker, onAudioReady) {
           let started=false;
           const poll=setInterval(()=>{ if(mySession!==session){clearInterval(poll);return;} if(__audioContexts.some(c=>c.state==='running')){clearInterval(poll);if(!started){started=true;switchToSpeaking();}} },30);
           setTimeout(()=>{clearInterval(poll);if(!started){started=true;switchToSpeaking();}},3000);
-          await KokoroSpeech.speak(text, voice);
+          await KokoroSpeech.speak(text, voice, prefetchedUrl);
           clearInterval(poll);
           switchToIdle();
         }
@@ -1677,9 +1677,16 @@ async function runCoachFeedback(mySession) {
   const transitions = [f.transition2, f.transition3, f.transition4];
 
   if (coachParts.length) {
+    let prefetchPromise = null;
     for (let i = 0; i < coachParts.length; i++) {
       if (mySession !== session) return;
-      await speak(coachParts[i], 'Ryan', () => { els.text.textContent = coachParts[i]; });
+      // Kick off next part's fetch while current is still playing
+      const nextPrefetch = (i + 1 < coachParts.length)
+        ? KokoroSpeech.prefetch(coachParts[i + 1], 'am_adam')
+        : null;
+      const prefetchedUrl = prefetchPromise ? await prefetchPromise : null;
+      await speak(coachParts[i], 'Ryan', () => { els.text.textContent = coachParts[i]; }, prefetchedUrl);
+      prefetchPromise = nextPrefetch;
       if(mySession!==session) return;
 
       if (i < coachParts.length - 1) {
