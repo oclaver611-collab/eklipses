@@ -10,28 +10,23 @@ const KokoroSpeech = (() => {
     'am_adam':    'onyx',
   };
 
-  async function speak(text, voice = 'af_nicole', prefetchedUrl = null) {
+  async function speak(text, voice = 'af_nicole') {
     if (!text?.trim()) return;
     cancel();
     const openaiVoice = VOICE_MAP[voice] || 'nova';
-    let url = prefetchedUrl;
     try {
-      if (!url) {
-        console.log(`[TTS] ${openaiVoice}: "${text.slice(0,50)}"`);
-        const response = await fetch('/api/tts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, voice: openaiVoice }),
-        });
-        if (!response.ok) {
-          console.error('[TTS] API error:', response.status);
-          return;
-        }
-        const blob = await response.blob();
-        url = URL.createObjectURL(blob);
-      } else {
-        console.log(`[TTS] ${openaiVoice} (prefetched): "${text.slice(0,50)}"`);
+      console.log(`[TTS] ${openaiVoice}: "${text.slice(0,50)}"`);
+      const response = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, voice: openaiVoice }),
+      });
+      if (!response.ok) {
+        console.error('[TTS] API error:', response.status);
+        return;
       }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
       currentAudio = audio;
       audio.volume = 1;
@@ -48,21 +43,6 @@ const KokoroSpeech = (() => {
     }
   }
 
-  async function prefetch(text, voice = 'af_nicole') {
-    if (!text?.trim()) return null;
-    const openaiVoice = VOICE_MAP[voice] || 'nova';
-    try {
-      const response = await fetch('/api/tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, voice: openaiVoice }),
-      });
-      if (!response.ok) return null;
-      const blob = await response.blob();
-      return URL.createObjectURL(blob);
-    } catch { return null; }
-  }
-
   function cancel() {
     if (currentAudio) {
       try { currentAudio.pause(); currentAudio.src = ''; } catch {}
@@ -77,7 +57,7 @@ const KokoroSpeech = (() => {
 
   function isReady() { return true; }
 
-  return { speak, cancel, preload, isReady, prefetch };
+  return { speak, cancel, preload, isReady };
 })();
 
 window.KokoroSpeech = KokoroSpeech;
