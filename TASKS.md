@@ -12,8 +12,8 @@ Start every session by reading this file. Work top to bottom. Move completed tas
 
 ## 🟡 P2 — Important
 - [ ] Fix Remi character — BLOCKED: no R2 assets yet. Prompt is malformed + duplicate, not in AVATAR_SETS or charNames. Resume when assets are uploaded.
-- [ ] Re-apply rate limit increase (was lost in a previous reset)
-- [ ] Re-apply dev key capture fix in index.html
+- [x] Re-apply rate limit increase (DAILY_SESSION_LIMIT=40 for dev, 1 for prod)
+- [x] Re-apply dev key capture fix in index.html
 - [ ] Fix Ryan dead air gaps between lines (blob buffering — MediaSource approach failed, need new strategy)
 
 ## 🟢 P3 — Nice to have
@@ -25,6 +25,16 @@ Start every session by reading this file. Work top to bottom. Move completed tas
 - [ ] Chatterbox Turbo — emotion tags [laugh] [sigh] for more natural character responses
 - [ ] Fish Audio as ElevenLabs backup
 - [ ] Kokoro on paid Render tier — keep warm, no cold starts
+
+---
+
+## Automated Tests
+
+### End-to-end character + TTS check:
+node test-frontend.js https://eklipses.vercel.app
+
+Run before every deploy that touches character or TTS code.
+14/14 passing as of v-stable-june6-all-passing.
 
 ---
 
