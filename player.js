@@ -1467,9 +1467,6 @@ async function playScenario(key, practice=false) {
   firstUserOpener=null;
   await pause(800); // increased from 200ms — kills 1s audio bleed on fast clicks
 
-  // Fire warmup ping immediately — runs in background while Ryan speaks the intro
-  warmupCharacterApi(key);
-
   const mySession=session;
   currentScenarioKey=key;
   // Auto-set default character and avatar for this scenario
@@ -1478,6 +1475,9 @@ async function playScenario(key, practice=false) {
     const defaultSet = AVATAR_SETS.find(s => s.id === currentCharacterId);
     if (defaultSet) applyAvatarSet(defaultSet);
   }
+
+  // Fire warmup ping after character is set — primes Groq cold start with correct character
+  warmupCharacterApi(key);
   Metrics.bumpView(key); Metrics.refreshUI(key);
   setSceneBackground(key);
   const sc=SCENARIOS[key]; if(!sc) return;
