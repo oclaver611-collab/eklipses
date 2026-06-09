@@ -1,33 +1,29 @@
 const { chromium } = require('playwright');
+const BASE_URL = 'https://eklipses.vercel.app?dev=ek_dev_2026';
+
 (async () => {
   const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage();
+  const context = await browser.newContext({ permissions: ['microphone'] });
+  const page = await context.newPage();
 
-  await page.goto('https://eklipses.vercel.app?dev=ek_dev_2026', { waitUntil: 'networkidle', timeout: 30000 });
-  await page.waitForTimeout(2000);
+  await page.addInitScript(() => { window.__EKLIPSES_TEST_MODE = true; });
+  await page.goto(BASE_URL, { waitUntil: 'networkidle', timeout: 30000 });
 
-  const info = await page.evaluate(() => {
-    const sel = document.getElementById('scenarioSelect');
-    return {
-      selectOptions: sel ? Array.from(sel.options).map(o => o.value) : 'element missing',
-      // Try calling renderShelf manually
-      hasRenderShelf: typeof renderShelf !== 'undefined',
-      // Check els object
-      elsSelectId: typeof els !== 'undefined' ? (els.select ? els.select.id : 'els.select null') : 'els undefined',
-      // Which screen is active?
-      activeScreen: Array.from(document.querySelectorAll('[id]'))
-        .filter(el => el.style.display !== 'none' && el.id)
-        .map(el => el.id)
-        .slice(0, 20),
-    };
-  });
-  console.log(JSON.stringify(info, null, 2));
-
-  // Try calling renderShelf and check again
-  await page.evaluate(() => { if (typeof renderShelf !== 'undefined') renderShelf(); });
-  await page.waitForTimeout(500);
-  const optionsAfter = await page.$eval('#scenarioSelect', el => Array.from(el.options).map(o => o.value));
-  console.log('Options after manual renderShelf:', optionsAfter.slice(0, 6));
+  // Poll every 500ms for 15s to watch launchApp progress
+  let last = '';
+  for (let i = 0; i < 30; i++) {
+    await page.waitForTimeout(500);
+    const state = await page.evaluate(() => ({
+      options: document.getElementById('scenarioSelect')?.options.length,
+      lineText: document.getElementById('lineText')?.textContent?.trim().slice(0, 60),
+      testMode: window.__EKLIPSES_TEST_MODE,
+    }));
+    const s = JSON.stringify(state);
+    if (s !== last) {
+      console.log(`[${((i+1)*0.5).toFixed(1)}s]`, state);
+      last = s;
+    }
+  }
 
   await browser.close();
 })();

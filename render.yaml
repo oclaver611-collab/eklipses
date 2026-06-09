@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: kokoro-tts
+    runtime: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: node kokoro-server.mjs
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRANSFORMERS_CACHE
+        value: /opt/render/project/.cache/huggingface
+    disk:
+      name: model-cache
+      mountPath: /opt/render/project/.cache
+      sizeGB: 2
