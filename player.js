@@ -1463,6 +1463,7 @@ async function playScenario(key, practice=false) {
   }
 
   stopEverything();
+  setMediaForSpeaker('Ryan'); // clear stale character video immediately — orb shows during setup
   resetConversation();
   firstUserOpener=null;
   await pause(800); // increased from 200ms — kills 1s audio bleed on fast clicks
