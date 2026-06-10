@@ -1495,10 +1495,7 @@ async function playScenario(key, practice=false) {
 }
 
 async function playLoop(mySession) {
-  // Prefetch first Ryan line immediately so audio is ready when playback reaches it
   let ryanPrefetchPromise = null;
-  const firstRyanLine = currentScript.slice(stepIndex).find(l => l.speaker === 'Ryan');
-  if (firstRyanLine) ryanPrefetchPromise = KokoroSpeech.prefetch(firstRyanLine.text, 'am_adam');
 
   while (stepIndex < currentScript.length) {
     if (mySession !== session) return;
@@ -1530,7 +1527,12 @@ async function playLoop(mySession) {
 
     let prefetchedUrl = null;
     if (line.speaker === 'Ryan') {
-      if (ryanPrefetchPromise) prefetchedUrl = await ryanPrefetchPromise;
+      // If a prefetch is ready from the previous line's playback, use it (should be instant)
+      if (ryanPrefetchPromise) {
+        prefetchedUrl = await ryanPrefetchPromise;
+        ryanPrefetchPromise = null;
+      }
+      // Start prefetching the next Ryan line NOW — runs concurrently with speak() below
       const nextRyanLine = currentScript.slice(stepIndex + 1).find(l => l.speaker === 'Ryan');
       ryanPrefetchPromise = nextRyanLine ? KokoroSpeech.prefetch(nextRyanLine.text, 'am_adam') : null;
     }
