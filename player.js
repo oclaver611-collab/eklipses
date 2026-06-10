@@ -1495,12 +1495,18 @@ async function playScenario(key, practice=false) {
 }
 
 async function playLoop(mySession) {
+  // Prefetch first Ryan line immediately so audio is ready when playback reaches it
+  let ryanPrefetchPromise = null;
+  const firstRyanLine = currentScript.slice(stepIndex).find(l => l.speaker === 'Ryan');
+  if (firstRyanLine) ryanPrefetchPromise = KokoroSpeech.prefetch(firstRyanLine.text, 'am_adam');
+
   while (stepIndex < currentScript.length) {
     if (mySession !== session) return;
     const line = currentScript[stepIndex];
     renderLine(line);
 
     if (line.speaker === 'User_Prompt') {
+      ryanPrefetchPromise = null;
       const said = await listenForUser(mySession, 60000);
       if (mySession !== session) return;
 
@@ -1522,7 +1528,13 @@ async function playLoop(mySession) {
       continue;
     }
 
-    await speak(line.text, line.speaker);
+    let prefetchedUrl = null;
+    if (line.speaker === 'Ryan') {
+      if (ryanPrefetchPromise) prefetchedUrl = await ryanPrefetchPromise;
+      const nextRyanLine = currentScript.slice(stepIndex + 1).find(l => l.speaker === 'Ryan');
+      ryanPrefetchPromise = nextRyanLine ? KokoroSpeech.prefetch(nextRyanLine.text, 'am_adam') : null;
+    }
+    await speak(line.text, line.speaker, undefined, prefetchedUrl);
     if (mySession !== session) return;
     await pause(250);
     stepIndex++;
@@ -1543,6 +1555,8 @@ async function freeConversation(mySession) {
   const start = Date.now();
   let nudged = false;
   resetConversation();
+  const nudgeText = "Two minutes left -- make it count.";
+  const nudgePrefetchPromise = KokoroSpeech.prefetch(nudgeText, 'am_adam');
 
   if (!sc.coldOpen) {
     await speak("Great work! Now let's have a real conversation -- no script, just talk to her naturally for ten minutes. I'll give you feedback at the end.", 'Ryan');
@@ -1576,7 +1590,8 @@ async function freeConversation(mySession) {
 
     if (!nudged && elapsed >= NUDGE_MS) {
       nudged = true;
-      await speak("Two minutes left -- make it count.", 'Ryan');
+      const nudgePrefetchedUrl = await nudgePrefetchPromise;
+      await speak(nudgeText, 'Ryan', null, nudgePrefetchedUrl);
       if (mySession !== session) break;
       await pause(900);
       setMediaForSpeaker('Mary');
