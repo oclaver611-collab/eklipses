@@ -103,6 +103,7 @@
 
     Object.keys(scenarios).forEach((key) => {
       const sc = scenarios[key];
+      if (sc.hidden) return;
       const cat = sc.category || DEFAULT_CATEGORY;
       if (!grouped[cat]) grouped[cat] = [];
       grouped[cat].push({ key, data: sc });
