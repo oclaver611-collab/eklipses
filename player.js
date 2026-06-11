@@ -67,6 +67,7 @@ let stepIndex = 0;
 let rec = null;
 let listenTimer = null;
 let session = 0;
+let _ryanIntroSpoken = false;
 
 const els = {
   select:         document.getElementById('scenarioSelect'),
@@ -1456,6 +1457,11 @@ function warmupCharacterApi(key) {
 
 /* ===== Scenario engine ===== */
 async function playScenario(key, practice=false) {
+  const sc=SCENARIOS[key]; if(!sc) return;
+  // Cold open scenarios skip demo entirely — throw user straight into practice.
+  // Must resolve BEFORE the daily gate, or coldOpen sessions bypass it.
+  if (sc.coldOpen) practice=true;
+
   // ── Daily session gate (practice only — demos always free) ────────────────
   if (practice) {
     const allowed = await DailyLimit.canPlay();
@@ -1481,11 +1487,8 @@ async function playScenario(key, practice=false) {
   warmupCharacterApi(key);
   Metrics.bumpView(key); Metrics.refreshUI(key);
   setSceneBackground(key);
-  const sc=SCENARIOS[key]; if(!sc) return;
   // PostHog — scenario started
   if (window.posthog) posthog.capture('scenario_started', { scenario: key, mode: practice ? 'practice' : 'demo' });
-  // Cold open scenarios skip demo entirely — throw user straight into practice
-  if (sc.coldOpen) practice=true;
   isPractice=practice;
   currentScript=practice?sc.practice:sc.demo;
   stepIndex=0;
@@ -1496,6 +1499,13 @@ async function playScenario(key, practice=false) {
 
 async function playLoop(mySession) {
   let ryanPrefetchPromise = null;
+
+  // Pre-fetch the first Ryan line before the loop so it never plays cold
+  const firstRyanLine = currentScript.find(l => l.speaker === 'Ryan');
+  if (firstRyanLine) {
+    ryanPrefetchPromise = KokoroSpeech.prefetch(firstRyanLine.text, 'am_adam');
+    console.log('[prefetch] queued first Ryan line:', firstRyanLine.text.slice(0, 60));
+  }
 
   while (stepIndex < currentScript.length) {
     if (mySession !== session) return;
@@ -1527,14 +1537,17 @@ async function playLoop(mySession) {
 
     let prefetchedUrl = null;
     if (line.speaker === 'Ryan') {
-      // If a prefetch is ready from the previous line's playback, use it (should be instant)
       if (ryanPrefetchPromise) {
         prefetchedUrl = await ryanPrefetchPromise;
         ryanPrefetchPromise = null;
+        console.log('[prefetch] HIT:', line.text.slice(0, 60));
+      } else {
+        console.log('[prefetch] COLD:', line.text.slice(0, 60));
       }
       // Start prefetching the next Ryan line NOW — runs concurrently with speak() below
       const nextRyanLine = currentScript.slice(stepIndex + 1).find(l => l.speaker === 'Ryan');
       ryanPrefetchPromise = nextRyanLine ? KokoroSpeech.prefetch(nextRyanLine.text, 'am_adam') : null;
+      if (nextRyanLine) console.log('[prefetch] queued next:', nextRyanLine.text.slice(0, 60));
     }
     await speak(line.text, line.speaker, undefined, prefetchedUrl);
     if (mySession !== session) return;
@@ -2314,12 +2327,15 @@ function launchApp() {
     // Render shelf immediately — playScenario calls stopEverything() which increments session
     renderShelf();
     const launchSession = session;
-    await speak("You already know what to say. You just need to stop being afraid to say it.", 'Ryan');
-    if (session !== launchSession) return; // user clicked a scenario — stop here
-    await pause(400);
-    if (session !== launchSession) return;
-    await speak("Pick a scenario. Let's find out where you're at.", 'Ryan');
-    if (session !== launchSession) return;
+    if (!_ryanIntroSpoken) {
+      _ryanIntroSpoken = true;
+      await speak("You already know what to say. You just need to stop being afraid to say it.", 'Ryan');
+      if (session !== launchSession) return; // user clicked a scenario — stop here
+      await pause(400);
+      if (session !== launchSession) return;
+      await speak("Pick a scenario. Let's find out where you're at.", 'Ryan');
+      if (session !== launchSession) return;
+    }
     ryanOrbSetState('silent');
     // Inject stat bar below Ryan name
     const existingBar = document.getElementById('ek-stat-bar');
