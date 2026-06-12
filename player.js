@@ -1479,12 +1479,12 @@ async function playScenario(key, practice=false) {
   if (_firstIntroRyan) console.log('[prefetch] intro warm-up:', _firstIntroRyan.text.slice(0, 60));
 
   stopEverything();
+  const mySession=session; // capture BEFORE pause — rapid re-clicks each get a unique session id
   setMediaForSpeaker('Ryan'); // clear stale character video immediately — orb shows during setup
   resetConversation();
   firstUserOpener=null;
   await pause(800); // increased from 200ms — kills 1s audio bleed on fast clicks
 
-  const mySession=session;
   currentScenarioKey=key;
   // Auto-set default character and avatar for this scenario
   if (SCENARIO_CHARACTER_MAP[key]) {
