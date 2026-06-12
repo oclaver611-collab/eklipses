@@ -68,6 +68,7 @@ let rec = null;
 let listenTimer = null;
 let session = 0;
 let _ryanIntroSpoken = false;
+const _seenScenarioIntros = new Set(); // tracks which scenario intros have played this session
 
 const els = {
   select:         document.getElementById('scenarioSelect'),
@@ -1516,6 +1517,23 @@ async function playLoop(mySession, introPrefetch = null) {
       ryanPrefetchPromise = KokoroSpeech.prefetch(firstRyanLine.text, 'am_adam');
       console.log('[prefetch] first Ryan line (no head start):', firstRyanLine.text.slice(0, 60));
     }
+  }
+
+  // On repeat plays of the same scenario this session, skip motivational intro lines
+  // and jump straight to the final Ryan cue (e.g. "What do you do?") before User_Prompt.
+  if (_seenScenarioIntros.has(currentScenarioKey)) {
+    let lastRyanIdx = -1;
+    for (let i = 0; i < currentScript.length; i++) {
+      if (currentScript[i].speaker === 'User_Prompt') break;
+      if (currentScript[i].speaker === 'Ryan') lastRyanIdx = i;
+    }
+    if (lastRyanIdx > 0) {
+      stepIndex = lastRyanIdx;
+      ryanPrefetchPromise = KokoroSpeech.prefetch(currentScript[lastRyanIdx].text, 'am_adam');
+      console.log('[intro] repeat play — skipping to cue:', currentScript[lastRyanIdx].text.slice(0, 60));
+    }
+  } else {
+    _seenScenarioIntros.add(currentScenarioKey);
   }
 
   while (stepIndex < currentScript.length) {
