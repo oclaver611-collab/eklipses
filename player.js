@@ -1468,6 +1468,15 @@ async function playScenario(key, practice=false) {
     if (!allowed) return; // paywall shown by canPlay()
   }
 
+  // Kick off TTS fetch for the first Ryan line NOW — pause(800) + setup below gives it
+  // ~900ms head start so line 1 never plays cold.
+  const _introScript = practice ? sc.practice : sc.demo;
+  const _firstIntroRyan = (_introScript || []).find(l => l.speaker === 'Ryan');
+  const _introPrefetch = _firstIntroRyan
+    ? KokoroSpeech.prefetch(_firstIntroRyan.text, 'am_adam')
+    : null;
+  if (_firstIntroRyan) console.log('[prefetch] intro warm-up:', _firstIntroRyan.text.slice(0, 60));
+
   stopEverything();
   setMediaForSpeaker('Ryan'); // clear stale character video immediately — orb shows during setup
   resetConversation();
@@ -1494,17 +1503,19 @@ async function playScenario(key, practice=false) {
   stepIndex=0;
   if(els.select.value!==key) els.select.value=key;
   if (window.showFullscreenBtn) window.showFullscreenBtn();
-  await playLoop(mySession);
+  await playLoop(mySession, _introPrefetch);
 }
 
-async function playLoop(mySession) {
-  let ryanPrefetchPromise = null;
-
-  // Pre-fetch the first Ryan line before the loop so it never plays cold
-  const firstRyanLine = currentScript.find(l => l.speaker === 'Ryan');
-  if (firstRyanLine) {
-    ryanPrefetchPromise = KokoroSpeech.prefetch(firstRyanLine.text, 'am_adam');
-    console.log('[prefetch] queued first Ryan line:', firstRyanLine.text.slice(0, 60));
+async function playLoop(mySession, introPrefetch = null) {
+  // Use the pre-warmed promise from playScenario (has ~900ms head start) if available,
+  // otherwise fall back to a fresh fetch (no head start — e.g. called from non-standard path).
+  let ryanPrefetchPromise = introPrefetch;
+  if (!ryanPrefetchPromise) {
+    const firstRyanLine = currentScript.find(l => l.speaker === 'Ryan');
+    if (firstRyanLine) {
+      ryanPrefetchPromise = KokoroSpeech.prefetch(firstRyanLine.text, 'am_adam');
+      console.log('[prefetch] first Ryan line (no head start):', firstRyanLine.text.slice(0, 60));
+    }
   }
 
   while (stepIndex < currentScript.length) {
