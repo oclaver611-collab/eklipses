@@ -3,6 +3,7 @@
  */
 const KokoroSpeech = (() => {
   let currentAudio = null;
+  let _cancelResolve = null; // resolves any pending speak() promise when cancel() fires
 
   const VOICE_MAP = {
     'af_nicole':  'nova',
@@ -43,10 +44,12 @@ const KokoroSpeech = (() => {
       audio.muted = false;
       audio.preload = 'auto';
       await new Promise((resolve) => {
-        const timeout = setTimeout(() => { URL.revokeObjectURL(url); currentAudio = null; resolve(); }, 30000);
-        audio.onended = () => { clearTimeout(timeout); URL.revokeObjectURL(url); currentAudio = null; resolve(); };
-        audio.onerror = () => { clearTimeout(timeout); URL.revokeObjectURL(url); currentAudio = null; resolve(); };
-        audio.play().catch(() => resolve());
+        _cancelResolve = resolve;
+        const done = () => { _cancelResolve = null; URL.revokeObjectURL(url); currentAudio = null; resolve(); };
+        const timeout = setTimeout(done, 30000);
+        audio.onended = () => { clearTimeout(timeout); done(); };
+        audio.onerror = () => { clearTimeout(timeout); done(); };
+        audio.play().catch(() => { _cancelResolve = null; resolve(); });
       });
     } catch (err) {
       console.error('[TTS] speak() error:', err);
@@ -72,6 +75,11 @@ const KokoroSpeech = (() => {
     if (currentAudio) {
       try { currentAudio.pause(); currentAudio.src = ''; } catch {}
       currentAudio = null;
+    }
+    if (_cancelResolve) {
+      const r = _cancelResolve;
+      _cancelResolve = null;
+      r();
     }
   }
 
