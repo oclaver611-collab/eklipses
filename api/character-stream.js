@@ -2767,7 +2767,12 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
 
 8. UNCLEAR INPUT: If what he said is garbled or makes no sense, ask one short clarifying question.
 
-9. SINGLE WORD GREETING: If his very first message is just "hi", "hey", or "hello" with no other words — respond with a minimal acknowledgment that matches your character. Do NOT volunteer your name. Wait for him to ask. Example: "Hey." or "Hi." Keep it short and let him lead.`;
+9. SINGLE WORD GREETING: If his very first message is just "hi", "hey", or "hello" with no other words — respond with a minimal acknowledgment that matches your character. Do NOT volunteer your name. Wait for him to ask. Example: "Hey." or "Hi." Keep it short and let him lead.
+
+10. BANNED PHRASES — ABSOLUTE: Never say "Nice to meet you", "Good to meet you", "Great to meet you", "Lovely to meet you", "Pleased to meet you", or ANY variation. This includes openers like "Nice to meet you, [name]." These phrases are social autopilot — they destroy the illusion immediately.
+    When he introduces himself: react to HIM or the moment, not to the social ritual.
+    WRONG: "Nice to meet you, James." WRONG: "Good to meet you." WRONG: "Great to meet you too."
+    RIGHT (examples): "James." [just the name back, neutral] / Continue the scene as your character / React to something in the situation — never to the introduction itself.`;
 
   // ── Combine layers ───────────────────────────────────────────────────────────
 
@@ -2796,7 +2801,7 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
 
   // Name reminder appended last — final instruction before generation
   const nameReminder = (userName && !nameAlreadyAcknowledged)
-    ? `\n\nURGENT — BEFORE YOU RESPOND: His name is ${userName}. You have not used his name yet. Your response MUST include his name naturally once. Examples: "Nice to meet you, ${userName}." or "So what brings you here, ${userName}?"`
+    ? `\n\nURGENT — BEFORE YOU RESPOND: His name is ${userName}. You have not used his name yet. Weave it naturally into your response once — not as a greeting formula, just as you would use someone's name mid-conversation.`
     : '';
 
   // If she already gave her name — block the "you haven't asked my name" line
@@ -2847,9 +2852,9 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
     const alreadyUsed = characterResponse.toLowerCase().includes(userName.toLowerCase());
     if (!alreadyUsed) {
       const acknowledgments = [
-        `Nice to meet you, ${userName}.`,
-        `Good to meet you, ${userName}.`,
         `${userName} — got it.`,
+        `${userName}.`,
+        `Got it, ${userName}.`,
       ];
       const ack = acknowledgments[Math.floor(Math.random() * acknowledgments.length)];
       characterResponse = characterResponse.replace(/[.!?]?\s*$/, '') + '. ' + ack;
