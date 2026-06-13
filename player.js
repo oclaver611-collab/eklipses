@@ -762,12 +762,12 @@ function getRyanOrb() {
   div.id = 'ryan-orb';
   div.innerHTML = `
     <style>
-      #ryan-orb{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:440px;gap:14px}
-      #ryan-orb .ro-wrap{position:relative;width:110px;height:110px;display:flex;align-items:center;justify-content:center}
+      #ryan-orb{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:220px;gap:14px}
+      #ryan-orb .ro-wrap{position:relative;width:140px;height:140px;display:flex;align-items:center;justify-content:center}
       #ryan-orb .ro-ring{position:absolute;border-radius:50%;border:1.5px solid #378ADD;opacity:0}
-      #ryan-orb .ro-ring1{width:110px;height:110px} #ryan-orb .ro-ring2{width:130px;height:130px} #ryan-orb .ro-ring3{width:152px;height:152px}
-      #ryan-orb .ro-orb{width:80px;height:80px;border-radius:50%;background:#378ADD;display:flex;align-items:center;justify-content:center;position:relative;z-index:2}
-      #ryan-orb .ro-inner{width:54px;height:54px;border-radius:50%;background:#185FA5;display:flex;align-items:center;justify-content:center}
+      #ryan-orb .ro-ring1{width:140px;height:140px} #ryan-orb .ro-ring2{width:165px;height:165px} #ryan-orb .ro-ring3{width:192px;height:192px}
+      #ryan-orb .ro-orb{width:120px;height:120px;border-radius:50%;background:#378ADD;display:flex;align-items:center;justify-content:center;position:relative;z-index:2}
+      #ryan-orb .ro-inner{width:82px;height:82px;border-radius:50%;background:#185FA5;display:flex;align-items:center;justify-content:center}
       #ryan-orb .ro-lbl{font-size:15px;font-weight:600;color:#B5D4F4;letter-spacing:.1em}
       #ryan-orb .ro-bars{display:flex;align-items:flex-end;gap:3px;height:32px}
       #ryan-orb .ro-bar{width:4px;background:#378ADD;border-radius:2px;min-height:4px}
