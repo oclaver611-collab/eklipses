@@ -190,7 +190,7 @@
     const header = document.createElement('div');
     header.className = 'nf-row-header';
     header.innerHTML = `
-      <h2 class="nf-row-title"><span class="nf-emoji">${meta.emoji}</span>${meta.label}</h2>
+      <h2 class="nf-row-title">${meta.label}</h2>
       <span class="nf-row-count">${scenarios.length} ${scenarios.length === 1 ? 'scenario' : 'scenarios'}</span>
     `;
 

@@ -24,7 +24,7 @@
 <link rel="stylesheet" href="netflix-layout.css">
 <style>
   :root{
-    --bg:#121316; --panel:#1a1c22; --card:#21232b; --muted:#9aa4b2; --accent:#ffb300; --stroke:#2b2e36;
+    --bg:#0a0a0a; --panel:#1a1c22; --card:#21232b; --muted:#9aa4b2; --accent:#ffb300; --stroke:#2b2e36;
     --text:#e9ecf1; --shadow: 0 10px 30px rgba(0,0,0,.35);
   }
   html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
@@ -40,9 +40,9 @@
   .wrap{display:grid;grid-template-columns: 1fr 360px; gap:18px; height:calc(100vh - 58px - 36px); padding:16px;}
   .site-footer{text-align:center;padding:8px;font-size:12px;color:#555e6e;border-top:1px solid var(--stroke);}
   .stage{display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
-  .frame{max-width:860px;width:100%;border-radius:16px;border:3px solid #fff;overflow:hidden;box-shadow:var(--shadow);background:#000}
+  .frame{max-width:860px;width:100%;border-radius:16px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;box-shadow:inset 0 0 60px rgba(0,0,0,0.5),var(--shadow);background:#0d0d0d}
   .media{display:block;width:100%;height:520px;object-fit:cover;background:#000}
-  .name{font-size:28px;font-weight:800;color:var(--accent);text-align:center;margin:14px 0 6px}
+  .name{font-size:28px;font-weight:600;color:#fff;text-align:center;margin:14px 0 6px}
   .line{font-size:18px;max-width:860px;text-align:center;color:#e3eaf4}
 
   /* right shelf */

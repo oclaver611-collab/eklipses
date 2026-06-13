@@ -221,8 +221,7 @@ const Progress = (() => {
     bar.innerHTML =
       (streak > 0 ? '<span>&#128293; ' + streak + '-day streak</span><span style="color:#2b2e36">•</span>' : '') +
       (best !== null ? '<span>&#127942; Best: ' + best + '/10</span><span style="color:#2b2e36">•</span>' : '') +
-      '<span>&#127919; Sessions: ' + total + '</span>' +
-      '<span style="color:#9ec1ff;font-size:11px">&#9660; details</span>';
+      '<span>&#127919; Sessions: ' + total + '</span>';
     bar.onclick = showDashboard;
   };
 
@@ -2342,12 +2341,12 @@ function launchApp() {
     currentScenarioKey=firstKey;
     setMediaForSpeaker('Ryan');
     els.name.textContent='Ryan';
-    els.text.textContent='Choose a scenario to begin.';
+    els.text.textContent='';
     Metrics.refreshUI(firstKey);
     if (!document.getElementById('ek-stat-bar')) {
       const bar = document.createElement('div');
       bar.id = 'ek-stat-bar';
-      bar.style.cssText = 'display:none;justify-content:center;align-items:center;gap:12px;font-size:12px;color:#9aa4b2;padding:6px 0;flex-wrap:wrap';
+      bar.style.cssText = 'display:none;justify-content:center;align-items:center;gap:12px;font-size:11px;color:#9aa4b2;padding:4px 0;flex-wrap:wrap;opacity:0.5';
       const nameEl = document.getElementById('speakerName');
       if (nameEl && nameEl.parentNode) nameEl.parentNode.insertBefore(bar, nameEl.nextSibling);
     }
@@ -2371,7 +2370,7 @@ function launchApp() {
     if (!existingBar) {
       const bar = document.createElement('div');
       bar.id = 'ek-stat-bar';
-      bar.style.cssText = 'display:none;justify-content:center;align-items:center;gap:12px;font-size:12px;color:#9aa4b2;padding:6px 0;flex-wrap:wrap';
+      bar.style.cssText = 'display:none;justify-content:center;align-items:center;gap:12px;font-size:11px;color:#9aa4b2;padding:4px 0;flex-wrap:wrap;opacity:0.5';
       const nameEl = document.getElementById('speakerName');
       if (nameEl && nameEl.parentNode) nameEl.parentNode.insertBefore(bar, nameEl.nextSibling);
     }
