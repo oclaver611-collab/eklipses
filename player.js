@@ -66,6 +66,7 @@ let isPractice = false;
 let stepIndex = 0;
 let rec = null;
 let listenTimer = null;
+let watchdogInterval = null;
 let session = 0;
 let _ryanIntroSpoken = false;
 const _seenScenarioIntros = new Set(); // tracks which scenario intros have played this session
@@ -751,6 +752,7 @@ function stopEverything() {
   try { __audioContexts.forEach(c=>{ try{if(c.state==='running')c.suspend();}catch{} }); } catch {}
   if (rec) { try{rec.onresult=null;rec.onerror=null;rec.onend=null;rec.stop();}catch{}; rec=null; }
   if (listenTimer) { clearTimeout(listenTimer); listenTimer=null; }
+  if (watchdogInterval) { clearInterval(watchdogInterval); watchdogInterval=null; }
 }
 
 /* ===== Ryan orb ===== */
@@ -1327,17 +1329,30 @@ function showListening(on=true) {
 }
 
 /* ===== listenForUser — Chrome Web Speech API ===== */
-// LATENCY FIX: Dynamic silence detection
+// Dynamic silence detection:
 //   SILENCE_SHORT = 900ms  — fires when last word ends with . ! ? or common sentence-enders
 //   SILENCE_LONG  = 1800ms — fires otherwise (mid-thought, comma pause, etc.)
 function listenForUser(mySession, maxTotalMs) {
   return new Promise(resolve=>{
     maxTotalMs=maxTotalMs||30000;
     let accumulated='', interim='', silenceTimer=null, hardTimer=null, currentRec=null;
-    let resolved=false, lastSpeech=Date.now(), restarts=0;
+    let resolved=false, lastActivity=Date.now(), restarts=0, errorRetries=0;
+    const listenStartTime=Date.now();
     const MAX_RESTARTS=8;
+    const MAX_ERROR_RETRIES=3;
     const SILENCE_SHORT=900;
     const SILENCE_LONG=1800;
+
+    // Fix 1: watchdog heartbeat — detects silent drops where onend never fires
+    watchdogInterval=setInterval(()=>{
+      if(resolved||mySession!==session){clearInterval(watchdogInterval);watchdogInterval=null;return;}
+      if(currentRec&&Date.now()-lastActivity>3000){
+        console.warn('[SR] watchdog: no activity in 3s, restarting');
+        try{currentRec.onresult=null;currentRec.onerror=null;currentRec.onend=null;currentRec.stop();}catch{}
+        currentRec=null; rec=null;
+        setTimeout(()=>{if(!resolved&&mySession===session)startRec();},300);
+      }
+    },3000);
 
     function isCompleteSentence(text) {
       if (!text) return false;
@@ -1357,6 +1372,7 @@ function listenForUser(mySession, maxTotalMs) {
       if (resolved) return;
       resolved=true;
       clearTimeout(silenceTimer); clearTimeout(hardTimer);
+      if (watchdogInterval){clearInterval(watchdogInterval);watchdogInterval=null;}
       if (listenTimer) { clearTimeout(listenTimer); listenTimer=null; }
       if (currentRec) { try{currentRec.onresult=null;currentRec.onerror=null;currentRec.onend=null;currentRec.stop();}catch{}; currentRec=null; }
       showListening(false);
@@ -1368,20 +1384,27 @@ function listenForUser(mySession, maxTotalMs) {
     function scheduleSilence() {
       clearTimeout(silenceTimer);
       const ms = getSilenceMs();
-      silenceTimer=setTimeout(()=>{ if(Date.now()-lastSpeech>=ms-100) finish('silence'); }, ms);
+      silenceTimer=setTimeout(()=>{ if(Date.now()-lastActivity>=ms-100) finish('silence'); }, ms);
     }
 
     function startRec() {
       if (resolved||mySession!==session) return;
-      if (restarts>=MAX_RESTARTS) restarts=0;
+      // Fix 3: on max restarts, clean reset with 2s pause — never kill the session
+      if (restarts>=MAX_RESTARTS) {
+        console.warn('[SR] max restarts reached — clean reset in 2s');
+        restarts=0; accumulated=''; interim=''; errorRetries=0;
+        setTimeout(()=>{if(!resolved&&mySession===session)startRec();},2000);
+        return;
+      }
       restarts++;
       const r=createRecognition(); if(!r){finish('no_sr');return;}
       r.interimResults=true; r.continuous=true;
       currentRec=r; rec=r; interim='';
+      lastActivity=Date.now(); // reset watchdog clock on each new recognition instance
 
       r.onresult=e=>{
         if (resolved||mySession!==session){finish('session');return;}
-        lastSpeech=Date.now();
+        lastActivity=Date.now();
         let finals='', lat='';
         for(let i=e.resultIndex;i<e.results.length;i++){
           const t=e.results[i][0].transcript;
@@ -1394,16 +1417,31 @@ function listenForUser(mySession, maxTotalMs) {
 
       r.onerror=e=>{
         if(e.error==='aborted') return;
+        // Fix 4: permission denied is unrecoverable — stop immediately
+        if(e.error==='not-allowed'){finish('err_not-allowed');return;}
         if(e.error==='no-speech'){
           restarts=Math.max(0,restarts-1);
           setTimeout(()=>{ if(!resolved&&mySession===session) startRec(); }, 500);
           return;
         }
-        finish('err_'+e.error);
+        // Fix 4: network/audio-capture/service errors — retry up to MAX_ERROR_RETRIES
+        if(errorRetries<MAX_ERROR_RETRIES){
+          errorRetries++;
+          console.warn('[SR] onerror',e.error,'— retry',errorRetries+'/'+MAX_ERROR_RETRIES);
+          setTimeout(()=>{if(!resolved&&mySession===session)startRec();},1000);
+        } else {
+          finish('err_'+e.error);
+        }
       };
 
       r.onend=()=>{
         if(resolved||mySession!==session) return;
+        lastActivity=Date.now(); // onend firing proves Chrome is alive
+        // Fix 2: mid-sentence guard — buffer has text, no sentence-ender, session still young
+        if(accumulated&&!isCompleteSentence(accumulated)&&(Date.now()-listenStartTime)<8000){
+          setTimeout(()=>{if(!resolved&&mySession===session)startRec();},300);
+          return;
+        }
         if(accumulated||interim) { finish(accumulated||interim); return; }
         setTimeout(()=>{ if(!resolved&&mySession===session) startRec(); }, 300);
       };
