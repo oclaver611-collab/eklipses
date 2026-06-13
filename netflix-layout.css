@@ -8,7 +8,7 @@
 .wrap.netflix-mode {
   display: block;
   height: auto;
-  min-height: 100vh;
+  min-height: 0;
   padding: 16px;
 }
 
@@ -41,6 +41,10 @@
 
 .nf-row {
   margin-bottom: 48px;
+}
+
+.nf-row:last-child {
+  margin-bottom: 16px;
 }
 
 .nf-row-header {
