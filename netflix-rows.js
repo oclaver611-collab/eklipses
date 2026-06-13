@@ -233,11 +233,6 @@
     const container = document.createElement('div');
     container.className = 'nf-container';
 
-    const intro = document.createElement('p');
-    intro.className = 'nf-intro';
-    intro.textContent = 'Choose a conversation to practice. Click any card to start.';
-    container.appendChild(intro);
-
     // Group and render
     const grouped = groupScenariosByCategory();
     const sortedCategories = Object.keys(grouped).sort((a, b) => {

@@ -8,7 +8,7 @@
 .wrap.netflix-mode {
   display: block;
   height: auto;
-  min-height: calc(100vh - 58px);
+  min-height: 100vh;
   padding: 16px;
 }
 
@@ -17,9 +17,9 @@
   margin: 0 auto 28px auto;
 }
 
-/* The frame/avatar gets a bit smaller so rows fit below without scrolling too far */
+/* Compact idle frame — orb fills it; has-bg overrides to 520px when a scenario is active */
 .wrap.netflix-mode .media {
-  height: 440px;
+  height: 220px;
 }
 
 /* The old right shelf is hidden in netflix mode */
