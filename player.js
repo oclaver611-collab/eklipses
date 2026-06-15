@@ -2336,7 +2336,9 @@ function prewarmCharacterVideos() {
     const set = charId && AVATAR_SETS.find(s => s.id === charId);
     if (!set) return;
     [set.maryVideo, set.maryIdleVideo].filter(Boolean).forEach(url => {
-      fetch(url, { mode: 'no-cors', headers: { Range: 'bytes=0-65535' } }).catch(() => {});
+      const ctrl = new AbortController();
+      setTimeout(() => ctrl.abort(), 200);
+      fetch(url, { mode: 'no-cors', signal: ctrl.signal }).catch(() => {});
     });
   });
 }
