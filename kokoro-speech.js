@@ -14,12 +14,9 @@ const KokoroSpeech = (() => {
   async function speak(text, voice = 'af_nicole', prefetchedUrl = null) {
     if (typeof window !== 'undefined' && window.__EKLIPSES_TEST_MODE) return;
     if (!text?.trim()) return;
+    cancel(); // always stop any in-flight audio before starting a new line
     const openaiVoice = VOICE_MAP[voice] || 'nova';
     let url = prefetchedUrl;
-    if (!url) {
-      cancel();
-      // fetch happens below
-    }
     try {
       if (!url) {
         console.log(`[TTS] ${openaiVoice}: "${text.slice(0,50)}"`);
