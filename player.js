@@ -2336,7 +2336,7 @@ function prewarmCharacterVideos() {
     const set = charId && AVATAR_SETS.find(s => s.id === charId);
     if (!set) return;
     [set.maryVideo, set.maryIdleVideo].filter(Boolean).forEach(url => {
-      fetch(url, { headers: { Range: 'bytes=0-65535' } }).catch(() => {});
+      fetch(url, { mode: 'no-cors', headers: { Range: 'bytes=0-65535' } }).catch(() => {});
     });
   });
 }
