@@ -2329,6 +2329,18 @@ function bootDefault() {
   }
 }
 
+function prewarmCharacterVideos() {
+  const keys = Object.keys(SCENARIOS).filter(k => !SCENARIOS[k].hidden);
+  keys.forEach(key => {
+    const charId = SCENARIO_CHARACTER_MAP[key];
+    const set = charId && AVATAR_SETS.find(s => s.id === charId);
+    if (!set) return;
+    [set.maryVideo, set.maryIdleVideo].filter(Boolean).forEach(url => {
+      fetch(url, { headers: { Range: 'bytes=0-65535' } }).catch(() => {});
+    });
+  });
+}
+
 function launchApp() {
   const overlay=document.createElement('div');
   overlay.id='ek-start-overlay';
@@ -2384,6 +2396,7 @@ function launchApp() {
     }
     clearInterval(ssTimer);
     overlay.remove();
+    setTimeout(prewarmCharacterVideos, 2000);
     const firstKey=Object.keys(SCENARIOS)[0];
     currentScenarioKey=firstKey;
     setMediaForSpeaker('Ryan');
