@@ -19,6 +19,11 @@
   let sessionStartTime = null;
   let currentScenarioId = null;
 
+  // ── Diagnostic state (private to this IIFE) ──────────────
+  let _diag_isPlaying = false;
+  let _diag_playingText = null;
+  let _diag_audioStartMs = 0;
+
   function loadFromStorage() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -55,6 +60,14 @@
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   }
 
+  function formatTimestampMs(ms) {
+    const secs = Math.floor(ms / 1000);
+    const mins = Math.floor(secs / 60);
+    const s = secs % 60;
+    const milli = ms % 1000;
+    return `${String(mins).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(milli).padStart(3, '0')}`;
+  }
+
   function logEntry(speaker, text, extraMeta = {}) {
     const now = Date.now();
     const entry = {
@@ -74,6 +87,10 @@
     updateBadge();
   }
 
+  function logDiag(text) {
+    logEntry('DIAG', text, { isdiag: true });
+  }
+
   function formatTranscriptForCopy() {
     if (transcriptLog.length === 0) {
       return '(empty transcript — no session recorded yet)';
@@ -83,7 +100,7 @@
     lines.push('='.repeat(60));
     lines.push('EKLIPSES SESSION TRANSCRIPT');
     lines.push('Recorded: ' + new Date(sessionStartTime).toLocaleString());
-    lines.push('Turns: ' + transcriptLog.length);
+    lines.push('Turns: ' + transcriptLog.filter(e => !e.isdiag).length);
     lines.push('='.repeat(60));
     lines.push('');
 
@@ -91,6 +108,12 @@
     let lastElapsed = 0;
 
     transcriptLog.forEach((entry, i) => {
+      // Diagnostic entries: indented, ms-precision timestamp
+      if (entry.isdiag) {
+        lines.push(`  [${formatTimestampMs(entry.elapsed)}] >> ${entry.text}`);
+        return;
+      }
+
       // Scenario header whenever it changes
       if (entry.scenarioTitle !== lastScenario) {
         lines.push('');
@@ -99,11 +122,11 @@
         lastScenario = entry.scenarioTitle;
       }
 
-      // Time gap from previous turn
-      const gap = entry.elapsed - lastElapsed;
-      const gapStr = i === 0 ? '' : ` [+${(gap / 1000).toFixed(1)}s]`;
+      // Time gap from previous non-diag turn
+      const prevNonDiag = transcriptLog.slice(0, i).filter(e => !e.isdiag).pop();
+      const gap = prevNonDiag ? entry.elapsed - prevNonDiag.elapsed : 0;
+      const gapStr = prevNonDiag ? ` [+${(gap / 1000).toFixed(1)}s]` : '';
 
-      // Format the line
       const time = formatTimestamp(entry.elapsed);
       const speaker = entry.speaker.padEnd(5);
       let metaStr = '';
@@ -235,6 +258,11 @@
         font-size: 14px;
         line-height: 1.5;
       }
+      .ek-turn-diag {
+        border-bottom-color: #1a1c22;
+        padding: 3px 0;
+        opacity: 0.75;
+      }
       .ek-turn-time {
         color: #6b7280;
         font-family: ui-monospace, 'SF Mono', Monaco, Consolas, monospace;
@@ -252,7 +280,13 @@
       .ek-turn-speaker.daniel { color: #7aa8ff; }
       .ek-turn-speaker.user_prompt { color: #94f1b6; }
       .ek-turn-speaker.system { color: #9aa4b2; }
+      .ek-turn-speaker.diag { color: #3d4450; font-weight: 600; }
       .ek-turn-text { color: #e3eaf4; }
+      .ek-turn-text-diag {
+        color: #4a5260;
+        font-family: ui-monospace, 'SF Mono', Monaco, Consolas, monospace;
+        font-size: 11px;
+      }
       .ek-turn-meta {
         color: #ff9a8b;
         font-size: 11px;
@@ -331,7 +365,8 @@
 
   function updateBadge() {
     const badge = document.getElementById('ek-transcript-badge');
-    if (badge) badge.textContent = String(transcriptLog.length);
+    // Badge shows only conversation turns, not diagnostic events
+    if (badge) badge.textContent = String(transcriptLog.filter(e => !e.isdiag).length);
   }
 
   function renderTranscript() {
@@ -353,6 +388,18 @@
     let lastElapsed = 0;
 
     transcriptLog.forEach((entry, i) => {
+      // Diagnostic events: compact monospace row
+      if (entry.isdiag) {
+        html.push(`
+          <div class="ek-turn ek-turn-diag">
+            <div class="ek-turn-time" style="font-size:10px">${formatTimestampMs(entry.elapsed)}</div>
+            <div class="ek-turn-speaker diag">diag</div>
+            <div class="ek-turn-text-diag">${escapeHtml(entry.text)}</div>
+          </div>
+        `);
+        return;
+      }
+
       if (entry.scenarioTitle !== lastScenario) {
         html.push(`<div class="ek-scenario-divider">📖 ${escapeHtml(entry.scenarioTitle)} — ${entry.mode}</div>`);
         lastScenario = entry.scenarioTitle;
@@ -433,16 +480,53 @@
   // ============ Hooks into player.js ============
 
   function installHooks() {
-    // Wrap speak() to log every AI utterance
-    if (typeof window.speak === 'function') {
-      const originalSpeak = window.speak;
-      window.speak = async function (text, speaker) {
-        logEntry(speaker || 'AI', text);
-        return originalSpeak.apply(this, arguments);
+
+    // ── Hook 0: KokoroSpeech.cancel — detect external mid-play cancellations ──
+    // Internal cancel() calls (at the start of every speak()) fire within a few ms
+    // of AUDIO_START. External cancellations (stopEverything, rapid scenario switch)
+    // fire while audio is actually playing — well past 150ms after AUDIO_START.
+    if (window.KokoroSpeech && typeof window.KokoroSpeech.cancel === 'function') {
+      const _origKokoroCancel = window.KokoroSpeech.cancel;
+      window.KokoroSpeech.cancel = function () {
+        if (_diag_isPlaying && (Date.now() - _diag_audioStartMs) > 150) {
+          _diag_isPlaying = false; // signals speak() finally → AUDIO_CANCELLED
+        }
+        return _origKokoroCancel.apply(this, arguments);
       };
     }
 
-    // Wrap getDynamicMaryResponse to log the user's transcribed speech AND Mary's dynamic reply
+    // ── Hook 1: speak() — AUDIO_START / AUDIO_END / AUDIO_CANCELLED / OVERLAP_EVENT ──
+    if (typeof window.speak === 'function') {
+      const _origSpeak = window.speak;
+      window.speak = async function (text, speaker, onAudioReady, prefetchedUrl) {
+        // Main conversation log entry (existing)
+        logEntry(speaker || 'AI', text);
+
+        // Overlap: if previous audio is still tracked as in-flight
+        if (_diag_isPlaying && _diag_playingText) {
+          logDiag(`OVERLAP_EVENT: cancelled mid-play — "${_diag_playingText.slice(0, 40)}" interrupted by "${(text || '').slice(0, 40)}"`);
+        }
+
+        logDiag(`AUDIO_START: ${(text || '').slice(0, 40)}`);
+        _diag_isPlaying = true;
+        _diag_playingText = text || '';
+        _diag_audioStartMs = Date.now();
+
+        try {
+          return await _origSpeak.apply(this, arguments);
+        } finally {
+          if (_diag_isPlaying) {
+            logDiag('AUDIO_END');
+            _diag_isPlaying = false;
+          } else {
+            logDiag('AUDIO_CANCELLED');
+          }
+          _diag_playingText = null;
+        }
+      };
+    }
+
+    // ── Hook 2: getDynamicMaryResponse — log user + Mary dynamic reply ──
     if (typeof window.getDynamicMaryResponse === 'function') {
       const originalGetMary = window.getDynamicMaryResponse;
       window.getDynamicMaryResponse = async function (userSaid) {
@@ -457,7 +541,7 @@
       };
     }
 
-    // Wrap listenForUser to capture cases where speak() catches the user too (demo mode scripts)
+    // ── Hook 3: listenForUser — conversation-level user turn logging ──
     if (typeof window.listenForUser === 'function') {
       const originalListen = window.listenForUser;
       window.listenForUser = async function (mySession, timeoutMs) {
@@ -465,9 +549,7 @@
         const result = await originalListen.apply(this, arguments);
         const duration = ((Date.now() - startedAt) / 1000).toFixed(1);
         if (result) {
-          // Check if this was already logged by the Mary wrapper (practice mode)
-          // If it was, skip; otherwise log it (demo/non-practice mode)
-          const lastLog = transcriptLog[transcriptLog.length - 1];
+          const lastLog = transcriptLog.filter(e => !e.isdiag).pop();
           const alreadyLogged = lastLog &&
             lastLog.speaker === 'User' &&
             lastLog.text === result &&
@@ -482,7 +564,55 @@
       };
     }
 
-    // Hook into playScenario to capture scenario changes
+    // ── Hook 4: SpeechRecognition — raw STT_START / STT_STOP / STT_RESULT ──
+    const _SRClass = window.webkitSpeechRecognition || window.SpeechRecognition;
+    if (_SRClass) {
+      const _OrigSR = _SRClass;
+      function PatchedSR() {
+        const inst = new _OrigSR();
+        const _origStart = inst.start.bind(inst);
+        const _origStop  = inst.stop.bind(inst);
+        inst.start = function () { logDiag('STT_START'); return _origStart(); };
+        inst.stop  = function () { logDiag('STT_STOP');  return _origStop();  };
+        return new Proxy(inst, {
+          set(target, prop, value) {
+            if (prop === 'onresult' && typeof value === 'function') {
+              target[prop] = function (e) {
+                const last = e.results[e.results.length - 1];
+                const heard = (last && last[0] ? last[0].transcript : '') || '';
+                if (heard) {
+                  logDiag(`STT_RESULT${last && last.isFinal ? '' : '(interim)'}: ${heard.slice(0, 80)}`);
+                }
+                return value.call(this, e);
+              };
+            } else {
+              target[prop] = value;
+            }
+            return true;
+          }
+        });
+      }
+      PatchedSR.prototype = _OrigSR.prototype;
+      if (window.webkitSpeechRecognition) window.webkitSpeechRecognition = PatchedSR;
+      if (window.SpeechRecognition)        window.SpeechRecognition        = PatchedSR;
+    }
+
+    // ── Hook 5: setMediaForSpeaker — VIDEO_STATE: <speaking|idle> <src> ──
+    if (typeof window.setMediaForSpeaker === 'function') {
+      const _origSetMedia = window.setMediaForSpeaker;
+      window.setMediaForSpeaker = function (speaker) {
+        const result = _origSetMedia.apply(this, arguments);
+        const el = window.els && window.els.media;
+        const src = el
+          ? (el.getAttribute('src') || el.src || '').split('/').pop().split('?')[0]
+          : '';
+        const state = (speaker === 'Mary') ? 'speaking' : 'idle';
+        logDiag(`VIDEO_STATE: ${state} ${src || '(orb)'}`);
+        return result;
+      };
+    }
+
+    // ── Hook 6: playScenario — scenario start marker ──
     if (typeof window.playScenario === 'function') {
       const originalPlay = window.playScenario;
       window.playScenario = function (key, practice) {
@@ -501,7 +631,6 @@
 
   function boot() {
     // Wait for player.js to load and expose its functions globally.
-    // player.js uses top-level functions which ARE accessible on window.
     if (typeof window.speak !== 'function' || typeof window.playScenario !== 'function') {
       setTimeout(boot, 200);
       return;
