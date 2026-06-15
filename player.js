@@ -2449,3 +2449,46 @@ if (typeof window !== 'undefined') {
     }
   });
 }
+
+/* ===== Debug overlay (?debug=1) ===== */
+if (new URLSearchParams(location.search).get('debug') === '1') {
+  const _dbg = document.createElement('div');
+  _dbg.id = 'ek-debug';
+  _dbg.style.cssText = [
+    'position:fixed;bottom:8px;left:8px;z-index:99999',
+    'background:rgba(0,0,0,0.72);color:#39ff14',
+    'font:10px/1.6 monospace;padding:4px 9px;border-radius:4px',
+    'pointer-events:none;white-space:nowrap',
+  ].join(';');
+  document.body.appendChild(_dbg);
+
+  let _dAudio = 'idle', _dSTT = 'off', _dVideo = 'idle';
+  const _dbgRender = () => {
+    _dbg.textContent = `AUDIO: ${_dAudio} | STT: ${_dSTT} | VIDEO: ${_dVideo}`;
+  };
+
+  const _origSpeak = window.speak;
+  window.speak = async function(text, speaker) {
+    _dAudio = 'playing(' + (speaker || '?') + ')';
+    _dbgRender();
+    const r = await _origSpeak.apply(this, arguments);
+    _dAudio = 'idle';
+    _dbgRender();
+    return r;
+  };
+
+  const _origSetMedia = window.setMediaForSpeaker;
+  window.setMediaForSpeaker = function(speaker) {
+    _dVideo = (speaker === 'Mary') ? 'speaking' : 'idle';
+    _dbgRender();
+    return _origSetMedia.apply(this, arguments);
+  };
+
+  // Poll rec (let, not window property) every 300ms
+  setInterval(() => {
+    const s = (rec !== null) ? 'listening' : 'off';
+    if (s !== _dSTT) { _dSTT = s; _dbgRender(); }
+  }, 300);
+
+  _dbgRender();
+}
