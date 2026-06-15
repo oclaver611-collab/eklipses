@@ -918,12 +918,22 @@ function renderLine(line) {
 
 // ElevenLabs/OpenAI TTS for character voices — streaming playback for low latency
 async function speakElevenLabs(text, onStart) {
-  async function attempt() {
-    const res = await fetch('/api/tts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, voice: 'nova', characterId: currentCharacterId }),
-    });
+  async function attempt(useElevenLabs) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    let res;
+    try {
+      const body = { text, voice: 'nova' };
+      if (useElevenLabs) body.characterId = currentCharacterId;
+      res = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: ctrl.signal,
+      });
+    } finally {
+      clearTimeout(timer);
+    }
     if (!res.ok) throw new Error('TTS failed: ' + res.status);
 
     // Use MediaSource streaming — audio starts playing as first chunks arrive
@@ -1012,14 +1022,13 @@ async function speakElevenLabs(text, onStart) {
   }
 
   try {
-    await attempt();
+    await attempt(true);
   } catch (e) {
-    console.warn('TTS failed, retrying...', e.message);
-    await new Promise(r => setTimeout(r, 1000));
+    console.warn('TTS failed, falling back to OpenAI...', e.message);
     try {
-      await attempt();
+      await attempt(false);
     } catch (e2) {
-      console.warn('TTS failed after retry — skipping line silently', e2.message);
+      console.warn('TTS fallback failed — skipping line silently', e2.message);
       onStart();
       await pause(500);
     }
