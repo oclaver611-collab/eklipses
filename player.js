@@ -1182,6 +1182,19 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
       }
 
       if (mySession !== session) break;
+
+      // Reset to idle between sentences so the speaking video can't keep looping
+      // (lips still moving) through the TTS fetch/decode gap before the next
+      // sentence's audio is actually ready — the next onStart callback above
+      // switches back to speaking only once its own audio chunk is ready.
+      if (els.media && els.media.tagName === 'VIDEO') {
+        const idleSrc = AVATARS._maryIdleVideo || AVATARS.User_Prompt.src;
+        if (idleSrc && (els.media.getAttribute('src') || '') !== idleSrc) {
+          els.media.src = idleSrc;
+          els.media.load();
+          try { els.media.play().catch(() => {}); } catch {}
+        }
+      }
     }
 
     // Switch back to idle after all audio done
