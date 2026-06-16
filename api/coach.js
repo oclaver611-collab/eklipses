@@ -25,18 +25,24 @@ module.exports = async function handler(req, res) {
   const characterLabel = CHARACTER_NAME_MAP[scenarioKey] || 'HER';
 
   // Build transcript
-  let himCount = 0;
-  const transcript = conversation
-    .map(m => {
-      if (m.role === 'user') {
-        himCount++;
-        const label = himCount === 1 ? 'HIM_1 (FIRST USER MESSAGE — their opening line)' : `HIM_${himCount}`;
-        return `${label}: ${m.content.trim()}`;
-      } else {
-        return `${characterLabel}: ${m.content.trim()}`;
-      }
-    })
-    .join('\n');
+  const firstUserMsg = conversation.find(m => m.role === 'user');
+  const openerTrimmed = (opener || '').trim();
+  const openerAlreadyFirst = !openerTrimmed || (firstUserMsg && firstUserMsg.content.trim() === openerTrimmed);
+  const transcriptLines = [];
+  if (!openerAlreadyFirst) {
+    transcriptLines.push(`HIM_1 (FIRST USER MESSAGE — their opening line): ${openerTrimmed}`);
+  }
+  let himCount = openerAlreadyFirst ? 0 : 1;
+  conversation.forEach(m => {
+    if (m.role === 'user') {
+      himCount++;
+      const label = himCount === 1 ? 'HIM_1 (FIRST USER MESSAGE — their opening line)' : `HIM_${himCount}`;
+      transcriptLines.push(`${label}: ${m.content.trim()}`);
+    } else {
+      transcriptLines.push(`${characterLabel}: ${m.content.trim()}`);
+    }
+  });
+  const transcript = transcriptLines.join('\n');
 
   const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 
@@ -213,6 +219,8 @@ ${charProfile.missedOpportunityExamples}
 CRITICAL: Your feedback must be about THIS conversation. Reference what actually happened. Quote real lines. Show him the exact better version using what she actually said.
 
 The first message in the transcript is marked "HIM_1 (FIRST USER MESSAGE — their opening line)". When referencing "your opening line", always use the FIRST USER MESSAGE marked above, not any other message.
+
+${openerTrimmed ? `The user's actual opening line was: '${openerTrimmed}'. When referencing their opening line in feedback, always use this exact line.` : ''}
 
 Respond ONLY with valid JSON — no markdown, no preamble:
 {
