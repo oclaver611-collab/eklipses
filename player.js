@@ -1026,7 +1026,10 @@ async function speakElevenLabs(text, onStart) {
   } catch (e) {
     console.warn('TTS failed, falling back to OpenAI...', e.message);
     try {
-      await attempt(false);
+      await Promise.race([
+        attempt(false),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('fallback timeout')), 5000)),
+      ]);
     } catch (e2) {
       console.warn('TTS fallback failed — skipping line silently', e2.message);
       onStart();
