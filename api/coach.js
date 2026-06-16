@@ -30,7 +30,8 @@ module.exports = async function handler(req, res) {
     .map(m => {
       if (m.role === 'user') {
         himCount++;
-        return `HIM_${himCount}: ${m.content.trim()}`;
+        const label = himCount === 1 ? 'HIM_1 (FIRST USER MESSAGE — their opening line)' : `HIM_${himCount}`;
+        return `${label}: ${m.content.trim()}`;
       } else {
         return `${characterLabel}: ${m.content.trim()}`;
       }
@@ -211,6 +212,8 @@ ${charProfile.missedOpportunityExamples}
 
 CRITICAL: Your feedback must be about THIS conversation. Reference what actually happened. Quote real lines. Show him the exact better version using what she actually said.
 
+The first message in the transcript is marked "HIM_1 (FIRST USER MESSAGE — their opening line)". When referencing "your opening line", always use the FIRST USER MESSAGE marked above, not any other message.
+
 Respond ONLY with valid JSON — no markdown, no preamble:
 {
   "score": <number 1-10>,
@@ -249,6 +252,8 @@ SCORE TIERS — CALIBRATE TO THESE:
 8-10 (Excellent): She is still thinking about him. He created genuine pull — said things she didn't predict, held tension without filling every silence, made her work slightly for his approval instead of the other way around. A 10 means she'd cancel plans.
 
 Score honestly. Do NOT apply a score floor. If someone was bad, they get a 2. If average, a 5.
+
+Score honestly from 1-10. Most sessions should score between 3-8. A 7+ requires genuinely strong opener, good thread-following, and a successful close attempt. A 4 means average with missed opportunities. Only give 4 if that accurately describes this specific conversation — do not default to 4.
 
 BANNED PHRASES AND WORDS — if any of these appear anywhere in your output, rewrite that sentence:
 "Right, so here's where", "Now watch this moment", "Now here's the thing", "So — putting it all together",
