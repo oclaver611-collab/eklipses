@@ -397,7 +397,6 @@
     ],
     practice: [
       { speaker:"Ryan", text:"You're at an airport departure gate — the flight's been delayed two hours. She has a book open that she hasn't turned a page of in fifteen minutes." },
-      { speaker:"Ryan", text:"The flight is delayed two hours. You're both stuck at the same gate. She has a book open — hasn't turned a page in fifteen minutes. She's somewhere else in her head." },
       { speaker:"Ryan", text:"Gate C14. The kind of grey limbo that makes strangers briefly, genuinely available to each other. No agenda, nowhere to be, none of the usual social pressure." },
       { speaker:"Ryan", text:"Here's what most men miss: this is one of the best situations to meet someone in — and almost everyone wastes it by talking about the delay." },
       { speaker:"Ryan", text:"There's a specific type of opener that works here and almost nowhere else." },
