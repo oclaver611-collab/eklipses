@@ -938,7 +938,7 @@ async function speakElevenLabs(text, onStart) {
 
     // Use MediaSource streaming — audio starts playing as first chunks arrive
     // Falls back to full buffer decode if MediaSource not supported
-    if (false && window.MediaSource && MediaSource.isTypeSupported('audio/mpeg')) {
+    if (window.MediaSource && MediaSource.isTypeSupported('audio/mpeg')) {
       return new Promise((resolve, reject) => {
         const mediaSource = new MediaSource();
         const audio = new Audio();
@@ -1002,6 +1002,12 @@ async function speakElevenLabs(text, onStart) {
         const onDone = () => { clearTimeout(endTimeout); URL.revokeObjectURL(audio.src); resolve(); };
         audio.onended = onDone;
         mediaSource.onsourceended = onDone;
+        // 'ended'/'sourceended' don't reliably fire for chunked audio/mpeg via MediaSource
+        // in every browser (this is why this branch was disabled twice before) — poll
+        // playback position as a second, more reliable path to detect completion.
+        audio.addEventListener('timeupdate', () => {
+          if (isFinite(audio.duration) && audio.duration > 0 && audio.currentTime >= audio.duration - 0.15) onDone();
+        });
         audio.onerror = (e) => { console.error('[TTS] audio element error:', e); reject(new Error('Audio error: ' + JSON.stringify(e))); };
       });
     } else {
