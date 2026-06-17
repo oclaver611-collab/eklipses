@@ -135,7 +135,7 @@ module.exports = async function handler(req, res) {
   if (elVoiceId && process.env.ELEVENLABS_API_KEY) {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
+      const timeout = setTimeout(() => controller.abort(), 15000);
 
       const elRes = await fetch(
         `https://api.elevenlabs.io/v1/text-to-speech/${elVoiceId}/stream`,
