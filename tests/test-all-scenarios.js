@@ -1,53 +1,78 @@
-// Baseline integration test: for each visible scenario card, triggers the
-// scenario, injects a test message via streamCharacterAndSpeak(), and
-// measures time to first audio (onStart fires) within a 15s window.
+// Comprehensive audio verification test — all 14 visible scenario cards.
+// Uses direct state injection (no card click / playScenario) to avoid polluting
+// the capture window with Ryan's TTS calls and warmupCharacterApi() Groq calls,
+// which accumulate across 14 sequential scenarios and cause rate-limit failures.
+//
+// For each scenario, verifies 6 checks:
+//   1. AUDIO_START fires (speakElevenLabs called — character API responded)
+//   2. VIDEO_STATE: speaking fires (onStart() — audio actually began playing)
+//   3. AUDIO_END fires within 30s of AUDIO_START (audio completes, not hanging)
+//   4. No hard TTS errors (429, 504, both providers failed, audio skipped)
+//   5. No OVERLAP_EVENT
+//   6. No console.error during the character response window
 //
 // node tests/test-all-scenarios.js
 const { chromium } = require('playwright');
+const path = require('path');
+const fs = require('fs');
 
 const LIVE_URL = 'https://eklipses.vercel.app';
 const TEST_MESSAGE = "I couldn't help but notice you — you have a really great presence.";
-const WAIT_MS = 15000;  // max wait per scenario for VIDEO_STATE: speaking
-const SETUP_MS = 2500;  // time after triggering scenario for state to settle
+const CAPTURE_MS = 25000;        // response window per scenario
+const AUDIO_END_LIMIT_MS = 30000; // AUDIO_END must fire within 30s of AUDIO_START
+const BETWEEN_MS = 1500;          // pause between scenarios (API breathing room)
 
-// Patches speakElevenLabs on the page to:
-//   - log [TEST] ELEVEN_LABS_START when called
-//   - log [TEST] VIDEO_STATE: speaking gapMs=N when onStart() fires
-//   - log [TEST] OVERLAP_EVENT if called while another call is still active
+// ─── In-page instrumentation ──────────────────────────────────────────────────
 const SCENARIO_PATCH = () => {
-  window.__sr = { calls: 0, active: 0, overlapFired: false, startedAt: null, onStartAt: null };
+  window.__sr = {
+    audioStartAt: null, videoStateAt: null, audioEndAt: null,
+    overlapCount: 0, active: 0, calls: 0,
+  };
   const orig = window.speakElevenLabs;
   if (typeof orig !== 'function') { console.log('[TEST] WARN speakElevenLabs not found'); return; }
+
   window.speakElevenLabs = function (text, onStart, ...rest) {
     const r = window.__sr;
     r.calls++;
     r.active++;
     if (r.active > 1) {
-      r.overlapFired = true;
-      console.log('[TEST] OVERLAP_EVENT active=' + r.active);
+      r.overlapCount++;
+      console.log('[TEST] OVERLAP_EVENT active=' + r.active + ' calls=' + r.calls);
     }
-    if (r.startedAt === null) r.startedAt = performance.now();
-    console.log('[TEST] ELEVEN_LABS_START text="' + (text || '').slice(0, 40) + '"');
+    if (r.audioStartAt === null) r.audioStartAt = performance.now();
+    console.log('[TEST] AUDIO_START calls=' + r.calls + ' text="' + (text || '').slice(0, 40) + '"');
+
     const wrapped = function (...args) {
-      if (r.onStartAt === null) {
-        r.onStartAt = performance.now();
-        console.log('[TEST] VIDEO_STATE: speaking gapMs=' + (r.onStartAt - r.startedAt).toFixed(1));
+      if (r.videoStateAt === null) {
+        r.videoStateAt = performance.now();
+        console.log('[TEST] VIDEO_STATE: speaking gapMs=' + (r.videoStateAt - r.audioStartAt).toFixed(1));
       }
       if (typeof onStart === 'function') return onStart.apply(this, args);
     };
+
     const p = orig.call(this, text, wrapped, ...rest);
-    Promise.resolve(p).then(() => { r.active = Math.max(0, r.active - 1); },
-                            () => { r.active = Math.max(0, r.active - 1); });
+    Promise.resolve(p).then(
+      () => {
+        r.active = Math.max(0, r.active - 1);
+        if (r.audioEndAt === null) {
+          r.audioEndAt = performance.now();
+          console.log('[TEST] AUDIO_END gapMs=' + (r.audioEndAt - r.audioStartAt).toFixed(1));
+        }
+      },
+      () => { r.active = Math.max(0, r.active - 1); }
+    );
     return p;
   };
+  console.log('[TEST] PATCH_INSTALLED');
 };
 
-// Reset per-scenario tracking without re-wrapping (patch already installed)
 const RESET_TRACKING = () => {
-  window.__sr = { calls: 0, active: 0, overlapFired: false, startedAt: null, onStartAt: null };
+  window.__sr = { audioStartAt: null, videoStateAt: null, audioEndAt: null,
+                  overlapCount: 0, active: 0, calls: 0 };
 };
 
-async function setup(page) {
+// ─── Page setup ──────────────────────────────────────────────────────────────
+async function setupPage(page) {
   await page.goto(LIVE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.evaluate(() => {
     localStorage.setItem('ek-onboarding-v1', '1');
@@ -61,117 +86,259 @@ async function setup(page) {
   await page.evaluate(SCENARIO_PATCH);
 }
 
-// Read visible scenario cards from the page: [{key, title}]
+// Read visible scenario cards: [{key, title}]
 async function getScenarioCards(page) {
-  return page.evaluate(() => {
-    return Array.from(document.querySelectorAll('.nf-card[data-key]')).map(el => ({
+  return page.evaluate(() =>
+    Array.from(document.querySelectorAll('.nf-card[data-key]')).map(el => ({
       key: el.getAttribute('data-key'),
       title: (el.querySelector('.nf-card-title') || {}).textContent || el.getAttribute('data-key'),
-    }));
+    }))
+  );
+}
+
+// Read SCENARIO_CHARACTER_MAP from live page (top-level const, accessible by bare name)
+async function getCharMap(page) {
+  return page.evaluate(() => {
+    const map = {};
+    // SCENARIO_CHARACTER_MAP is a lexical const in player.js — read as bare identifier
+    try { Object.keys(SCENARIO_CHARACTER_MAP).forEach(k => { map[k] = SCENARIO_CHARACTER_MAP[k]; }); }
+    catch { /* fallback: map stays empty, charId defaults to 'sofia' */ }
+    return map;
   });
 }
 
-async function runScenario(page, key) {
-  // Kill any running scenario to free audio and increment session counter
-  await page.evaluate(() => { stopEverything(); });
+// ─── Per-scenario runner ──────────────────────────────────────────────────────
+async function runScenario(page, key, charId, scenarioLogs) {
+  scenarioLogs.length = 0;
 
-  // Reset tracking for this run
+  // Kill any lingering async from previous scenario (increments session counter)
+  await page.evaluate(() => { try { stopEverything(); } catch {} });
+  // Reset conversation history so previous characters don't bleed into new prompt
+  await page.evaluate(() => { try { resetConversation(); } catch {} });
   await page.evaluate(RESET_TRACKING);
 
-  // Trigger the scenario the same way a card click does:
-  // set scenarioSelect.value and dispatch change event
-  const triggered = await page.evaluate((k) => {
-    const sel = document.getElementById('scenarioSelect');
-    if (!sel) return false;
-    sel.value = k;
-    sel.dispatchEvent(new Event('change', { bubbles: true }));
-    return true;
-  }, key);
+  // Set scenario state directly — avoids triggering playScenario/warmupCharacterApi/
+  // Ryan TTS calls that would pollute the capture window with noise errors
+  await page.evaluate((k, c) => {
+    currentScenarioKey = k;
+    currentCharacterId = c;
+    const set = AVATAR_SETS.find(s => s.id === c);
+    if (set) applyAvatarSet(set);
+  }, key, charId || 'sofia');
 
-  if (!triggered) return { pass: false, latencyMs: null, overlap: false, error: 'scenarioSelect not found' };
+  const injectAt = Date.now();
 
-  // Give playScenario time to set currentScenarioKey, currentCharacterId,
-  // and applyAvatarSet before we inject the test message.
-  await page.waitForTimeout(SETUP_MS);
-
-  // Inject the test message directly — this works for both demo and coldOpen
-  // (freeConversation) scenarios since we bypass the STT listener entirely.
+  // Fire streamCharacterAndSpeak — all [TEST] events land in scenarioLogs via page.on('console')
   page.evaluate((msg) => {
     return streamCharacterAndSpeak(msg, session).catch(() => {});
   }, TEST_MESSAGE).catch(() => {});
 
-  // Wait for onStart to fire (VIDEO_STATE: speaking) within WAIT_MS
-  try {
-    await page.waitForFunction(() => window.__sr.onStartAt !== null, { timeout: WAIT_MS });
-    const sr = await page.evaluate(() => window.__sr);
-    return {
-      pass: true,
-      latencyMs: Math.round(sr.onStartAt - sr.startedAt),
-      overlap: sr.overlapFired,
-    };
-  } catch {
-    const sr = await page.evaluate(() => window.__sr);
-    return {
-      pass: false,
-      latencyMs: null,
-      overlap: sr.overlapFired,
-      // If speakElevenLabs was called but onStart never fired within 15s,
-      // that means TTS calls are still pending — ElevenLabs latency too high.
-      // If calls===0, character-stream API produced no sentences.
-      detail: sr.calls > 0 ? 'TTS_TIMEOUT' : 'NO_CHARACTER_RESPONSE',
-    };
+  await page.waitForTimeout(CAPTURE_MS);
+
+  const sr = await page.evaluate(() => window.__sr);
+  const windowLogs = scenarioLogs.filter(m => m.at >= injectAt && m.at < injectAt + CAPTURE_MS);
+  windowLogs.forEach(m => { m.relMs = m.at - injectAt; });
+
+  // ── Check 1: AUDIO_START ───────────────────────────────────────────────────
+  const audioStartFired = sr.audioStartAt !== null;
+
+  // ── Check 2: VIDEO_STATE ───────────────────────────────────────────────────
+  const videoStateFired = sr.videoStateAt !== null;
+  const injectToVideoMs = videoStateFired
+    ? windowLogs.find(m => m.text.includes('[TEST] VIDEO_STATE: speaking'))?.relMs ?? null
+    : null;
+  const audioStartToVideoMs = (audioStartFired && videoStateFired)
+    ? Math.round(sr.videoStateAt - sr.audioStartAt) : null;
+
+  // ── Check 3: AUDIO_END within limit ───────────────────────────────────────
+  const audioEndFired = sr.audioEndAt !== null;
+  const audioEndMs = (audioEndFired && audioStartFired)
+    ? Math.round(sr.audioEndAt - sr.audioStartAt) : null;
+  const audioEndInTime = audioEndFired && audioStartFired
+    ? (sr.audioEndAt - sr.audioStartAt) <= AUDIO_END_LIMIT_MS : false;
+
+  // ── Check 4: TTS hard errors ──────────────────────────────────────────────
+  // Hard-fail only on rate-limit/fatal patterns; "TTS failed, falling back" is
+  // a warning (ElevenLabs primary timed out but OpenAI fallback may still work).
+  const hardTtsPatterns = ['API error: 429', 'API error: 504',
+                           'TTS fallback failed', 'all providers failed'];
+  const softTtsPatterns = ['TTS failed, falling back'];
+
+  const hardTtsErrors = windowLogs.filter(m =>
+    (m.type === 'error' || m.type === 'warning') &&
+    hardTtsPatterns.some(p => m.text.includes(p))
+  );
+  const softTtsWarns = windowLogs.filter(m =>
+    m.type === 'warning' && softTtsPatterns.some(p => m.text.includes(p))
+  );
+
+  // ── Check 5: No OVERLAP ───────────────────────────────────────────────────
+  const overlapCount = sr.overlapCount;
+
+  // ── Check 6: No console.error ─────────────────────────────────────────────
+  const consoleErrors = windowLogs.filter(m => m.type === 'error');
+
+  // ── Overall PASS ─────────────────────────────────────────────────────────
+  const pass = audioStartFired && videoStateFired &&
+               audioEndFired && audioEndInTime &&
+               hardTtsErrors.length === 0 &&
+               overlapCount === 0 &&
+               consoleErrors.length === 0;
+
+  return {
+    pass, key, audioStartFired, videoStateFired, audioEndFired, audioEndInTime,
+    injectToVideoMs, audioStartToVideoMs, audioEndMs,
+    hardTtsErrors, softTtsWarns, overlapCount, consoleErrors, windowLogs, sr,
+  };
+}
+
+// ─── Formatting ───────────────────────────────────────────────────────────────
+function pad(s, n) { return String(s).padEnd(n); }
+function yn(b) { return b ? 'YES' : 'NO '; }
+function ms(n) { return n !== null ? n + 'ms' : '—'; }
+
+function printVerbose(results) {
+  const W = 80;
+  console.log('\n' + '═'.repeat(W));
+  console.log('SCENARIO AUDIO VERIFICATION — DETAILED');
+  console.log('═'.repeat(W));
+  for (const r of results) {
+    const status = r.pass ? '✓ PASS' : '✗ FAIL';
+    console.log(`\n${pad(r.title, 40)} ${status}`);
+    console.log(`  1. AUDIO_START:         ${yn(r.audioStartFired)}`);
+    console.log(`  2. VIDEO_STATE:speaking: ${yn(r.videoStateFired)}` +
+      (r.injectToVideoMs !== null ? `  (${ms(r.injectToVideoMs)} from inject, ${ms(r.audioStartToVideoMs)} TTS decode)` : ''));
+    console.log(`  3. AUDIO_END in time:   ${yn(r.audioEndFired && r.audioEndInTime)}` +
+      (r.audioEndMs !== null ? `  (${ms(r.audioEndMs)} playback, limit ${AUDIO_END_LIMIT_MS/1000}s)` : '') +
+      (r.audioEndFired && !r.audioEndInTime ? '  ⚠ EXCEEDED LIMIT' : ''));
+    console.log(`  4. TTS hard errors:     ${r.hardTtsErrors.length === 0 ? 'none' : r.hardTtsErrors.length + ' ← FAIL'}` +
+      (r.softTtsWarns.length > 0 ? `  (${r.softTtsWarns.length} EL→OAI fallback)` : ''));
+    console.log(`  5. OVERLAP events:      ${r.overlapCount === 0 ? 'none' : r.overlapCount + ' ← FAIL'}`);
+    console.log(`  6. Console errors:      ${r.consoleErrors.length === 0 ? 'none' : r.consoleErrors.length + ' ← FAIL'}`);
+    if (!r.pass) {
+      const reasons = [
+        !r.audioStartFired ? 'no AUDIO_START' : '',
+        !r.videoStateFired ? 'no VIDEO_STATE' : '',
+        !r.audioEndFired ? 'no AUDIO_END' : '',
+        r.audioEndFired && !r.audioEndInTime ? 'AUDIO_END exceeded 30s' : '',
+        r.hardTtsErrors.length ? r.hardTtsErrors[0].text.slice(0, 80) : '',
+        r.overlapCount ? `${r.overlapCount} overlaps` : '',
+        r.consoleErrors.length ? r.consoleErrors[0].text.slice(0, 80) : '',
+      ].filter(Boolean);
+      console.log(`  ↳ Fail reason: ${reasons.join('; ')}`);
+    }
   }
 }
 
-function pad(s, n) { return String(s).padEnd(n); }
-function lpad(s, n) { return String(s).padStart(n); }
+function printSummaryTable(results) {
+  const W = 80;
+  console.log('\n' + '─'.repeat(W));
+  console.log(pad('SCENARIO', 36) + pad('PASS?', 6) + pad('INJECT→SPEAK', 14) +
+              pad('AUDIO_END', 10) + pad('EL→OAI', 8) + 'ERRORS');
+  console.log('─'.repeat(W));
+  for (const r of results) {
+    const errStr = [
+      r.consoleErrors.length ? `${r.consoleErrors.length} err` : '',
+      r.hardTtsErrors.length ? 'TTS_FAIL' : '',
+      r.overlapCount ? 'OVERLAP' : '',
+    ].filter(Boolean).join(' ') || '—';
+    console.log(
+      pad(r.title, 36) +
+      pad(r.pass ? 'PASS' : 'FAIL', 6) +
+      pad(ms(r.injectToVideoMs), 14) +
+      pad(ms(r.audioEndMs), 10) +
+      pad(r.softTtsWarns.length > 0 ? 'yes' : 'no', 8) +
+      errStr
+    );
+  }
+  console.log('─'.repeat(W));
+  const passes = results.filter(r => r.pass).length;
+  console.log(`${passes}/${results.length} scenarios PASS`);
+}
 
+function printFailLogs(results) {
+  const failures = results.filter(r => !r.pass);
+  if (failures.length === 0) return;
+  console.log('\n' + '═'.repeat(80));
+  console.log('RAW CONSOLE LOGS FOR FAILING SCENARIOS');
+  console.log('═'.repeat(80));
+  for (const r of failures) {
+    console.log(`\n── ${r.title} (${r.key}) ──`);
+    if (r.windowLogs.length === 0) {
+      console.log('  (no messages in capture window)');
+    } else {
+      for (const m of r.windowLogs) {
+        const pfx = m.type === 'error' ? '[ERR]' : m.type === 'warning' ? '[WRN]' : '[LOG]';
+        console.log(`  +${String(m.relMs ?? '?').padStart(5)}ms ${pfx} ${m.text}`);
+      }
+    }
+  }
+}
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
 (async () => {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
-  const consoleLogs = [];
-  page.on('console', msg => consoleLogs.push(msg.text()));
-  page.on('pageerror', err => console.error('[PAGE_ERROR]', err.message));
+  const scenarioLogs = [];
+  page.on('console', msg => scenarioLogs.push({ type: msg.type(), text: msg.text(), at: Date.now() }));
+  page.on('pageerror', err => scenarioLogs.push({ type: 'error', text: err.message, at: Date.now() }));
 
   console.log('Loading page and dismissing splash…');
-  await setup(page);
+  await setupPage(page);
 
   const cards = await getScenarioCards(page);
   if (cards.length === 0) {
-    console.log('No .nf-card[data-key] elements found — aborting.');
-    await browser.close();
-    process.exit(1);
+    console.error('No .nf-card[data-key] elements found — aborting.');
+    await browser.close(); process.exit(1);
   }
-  console.log(`Found ${cards.length} scenario cards. Running tests…\n`);
+
+  const charMap = await getCharMap(page);
+  console.log(`Found ${cards.length} scenario cards. Running comprehensive audio checks…`);
+  const perScenarioSecs = (CAPTURE_MS + BETWEEN_MS) / 1000;
+  console.log(`${CAPTURE_MS / 1000}s capture + ${BETWEEN_MS / 1000}s gap per scenario.` +
+    ` Estimated total: ~${Math.ceil(cards.length * perScenarioSecs / 60)} min\n`);
 
   const results = [];
   for (const { key, title } of cards) {
-    process.stdout.write(`  ${pad(title, 36)} … `);
-    const r = await runScenario(page, key);
-    results.push({ key, title, ...r });
-    const status = r.pass
-      ? `PASS  ${lpad(r.latencyMs + 'ms', 7)}${r.overlap ? '  ⚠ OVERLAP' : ''}`
-      : `FAIL  ${r.detail || ''}`;
-    process.stdout.write(status + '\n');
+    process.stdout.write(`  ${pad(title, 38)} … `);
+    const charId = charMap[key] || 'sofia';
+    const r = await runScenario(page, key, charId, scenarioLogs);
+    results.push({ title, ...r });
+
+    const statusStr = r.pass ? 'PASS' : `FAIL (${[
+      !r.audioStartFired   ? 'no AUDIO_START'  : '',
+      !r.videoStateFired   ? 'no VIDEO_STATE'  : '',
+      !r.audioEndFired     ? 'no AUDIO_END'    : '',
+      r.hardTtsErrors.length ? 'TTS_FAIL'       : '',
+      r.overlapCount       ? 'OVERLAP'          : '',
+      r.consoleErrors.length ? `${r.consoleErrors.length} console err` : '',
+    ].filter(Boolean).join(', ')})`;
+    process.stdout.write(statusStr + '\n');
+
+    if (cards.indexOf(cards.find(c => c.key === key)) < cards.length - 1) {
+      await page.waitForTimeout(BETWEEN_MS);
+    }
   }
 
   await browser.close();
 
-  // Summary table
-  const passes = results.filter(r => r.pass).length;
-  console.log('\n' + '─'.repeat(72));
-  console.log(pad('SCENARIO', 36) + pad('RESULT', 8) + pad('LATENCY', 10) + 'OVERLAP');
-  console.log('─'.repeat(72));
-  for (const r of results) {
-    const res = r.pass ? 'PASS' : 'FAIL';
-    const lat = r.latencyMs !== null ? r.latencyMs + 'ms' : '—';
-    const ovl = r.overlap ? 'YES' : 'no';
-    const detail = !r.pass && r.detail ? ` (${r.detail})` : '';
-    console.log(pad(r.title, 36) + pad(res + detail, 8 + (detail ? detail.length : 0)) + lpad(lat, 10) + '  ' + ovl);
-  }
-  console.log('─'.repeat(72));
-  console.log(`${passes}/${results.length} scenarios PASS`);
+  printVerbose(results);
+  printSummaryTable(results);
+  printFailLogs(results);
 
+  // Write full logs to file
+  const logPath = path.join(__dirname, 'log-all-scenarios.txt');
+  const logLines = results.map(r => {
+    const header = `\n=== ${r.title} (${r.key}) — ${r.pass ? 'PASS' : 'FAIL'} ===`;
+    const lines = r.windowLogs.map(m =>
+      `  +${String(m.relMs ?? '?').padStart(5)}ms [${m.type}] ${m.text}`
+    );
+    return [header, ...lines].join('\n');
+  });
+  fs.writeFileSync(logPath, logLines.join('\n') + '\n', 'utf8');
+  console.log(`\nFull logs: tests/log-all-scenarios.txt`);
+
+  const passes = results.filter(r => r.pass).length;
   process.exit(passes === results.length ? 0 : 1);
 })();
