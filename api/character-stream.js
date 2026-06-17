@@ -2811,43 +2811,117 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
 
   const systemPrompt = character + '\n\n' + setting + BASE_RULES + nameReminder + nameGivenReminder;
 
-  // ── LLM call: OpenAI primary, Groq fallback ─────────────────────────────
-  async function attemptLLM(url, key, model) {
-    const delays = [3000, 6000];
-    for (let attempt = 0; attempt <= delays.length; attempt++) {
+  // ── LLM call: Groq primary (3s hard timeout, no retries), OpenAI fallback ─
+  // Groq llama-3.3-70b-versatile: ~400ms first token vs gpt-4o-mini ~1-3s.
+  // Groq gets ONE attempt with a 3s AbortController — if rate-limited or slow,
+  // falls through to OpenAI immediately rather than burning retry budget.
+  // OpenAI gets 3 attempts (retries on 429) with a 15s total abort each attempt.
+
+  const LLM_MESSAGES = [
+    { role: 'system', content: systemPrompt },
+    ...history,
+    { role: 'user', content: userMessage },
+  ];
+
+  async function tryProvider(url, key, model, timeoutMs, maxRetries) {
+    const retryDelays = [3000, 6000];
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
       try {
         const resp = await fetch(url, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model,
-            max_tokens: 150,
-            messages: [{ role: 'system', content: systemPrompt }, ...history, { role: 'user', content: userMessage }],
-          }),
+          body: JSON.stringify({ model, max_tokens: 150, stream: true, messages: LLM_MESSAGES }),
+          signal: controller.signal,
         });
-        if (resp.status === 429 && attempt < delays.length) {
-          await new Promise(resolve => setTimeout(resolve, delays[attempt])); continue;
+        clearTimeout(timer);
+        if (resp.status === 429 && attempt < maxRetries) {
+          await new Promise(r => setTimeout(r, retryDelays[attempt] ?? 3000)); continue;
         }
         if (!resp.ok) return null;
-        return await resp.json();
+        return resp.body;
       } catch {
-        if (attempt === delays.length) return null;
-        await new Promise(resolve => setTimeout(resolve, delays[attempt]));
+        clearTimeout(timer);
+        if (attempt < maxRetries) {
+          await new Promise(r => setTimeout(r, retryDelays[attempt] ?? 3000)); continue;
+        }
+        return null;
       }
     }
     return null;
   }
 
-  let data =
-    (process.env.OPENAI_API_KEY && await attemptLLM('https://api.openai.com/v1/chat/completions', process.env.OPENAI_API_KEY, 'gpt-4o-mini')) ||
-    (process.env.GROQ_API_KEY   && await attemptLLM('https://api.groq.com/openai/v1/chat/completions', process.env.GROQ_API_KEY, 'llama-3.3-70b-versatile'));
+  const streamBody =
+    (process.env.GROQ_API_KEY   && await tryProvider('https://api.groq.com/openai/v1/chat/completions',   process.env.GROQ_API_KEY,   'llama-3.3-70b-versatile', 3000,  0)) ||
+    (process.env.OPENAI_API_KEY && await tryProvider('https://api.openai.com/v1/chat/completions', process.env.OPENAI_API_KEY, 'gpt-4o-mini',             15000, 2));
 
-  if (!data) { res.write(`data: ${JSON.stringify({ error: 'all providers failed' })}\n\n`); res.end(); return; }
+  if (!streamBody) { res.write(`data: ${JSON.stringify({ error: 'all providers failed' })}\n\n`); res.end(); return; }
 
-  let characterResponse = data.choices?.[0]?.message?.content?.trim();
-  if (!characterResponse) { res.write(`data: ${JSON.stringify({ error: 'empty' })}\n\n`); res.end(); return; }
+  // ── Consume streaming SSE, emit sentences as they complete ────────────────
+  // Both Groq and OpenAI use the same delta format:
+  //   data: {"choices":[{"delta":{"content":"token"}}]}
+  //   data: [DONE]
+  // Sentences are emitted to the browser as soon as splitSentences() confirms
+  // they're complete (a new sentence has started after them), so first audio
+  // fires on the first sentence rather than waiting for the full response.
+
+  let fullText = '';
+  let emittedCount = 0;
+
+  try {
+    const reader = streamBody.getReader();
+    const decoder = new TextDecoder();
+    let sseBuffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      sseBuffer += decoder.decode(value, { stream: true });
+      const lines = sseBuffer.split('\n');
+      sseBuffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const raw = line.slice(6).trim();
+        if (raw === '[DONE]') break;
+        let chunk;
+        try { chunk = JSON.parse(raw); } catch { continue; }
+        const token = chunk.choices?.[0]?.delta?.content;
+        if (!token) continue;
+
+        fullText += token;
+
+        // Emit newly completed sentences. All splitSentences() parts except the
+        // last are confirmed complete (more text has arrived after them).
+        const parts = splitSentences(fullText);
+        while (emittedCount < parts.length - 1) {
+          const s = parts[emittedCount].trim();
+          if (s) res.write(`data: ${JSON.stringify({ sentence: s, done: false })}\n\n`);
+          emittedCount++;
+        }
+      }
+    }
+  } catch (err) {
+    if (err.name !== 'AbortError') console.error('[char-stream] stream read error:', err.message);
+  }
+
+  if (!fullText) { res.write(`data: ${JSON.stringify({ error: 'empty' })}\n\n`); res.end(); return; }
+
+  // Flush any remaining text (last sentence, or text with no terminator)
+  {
+    const parts = splitSentences(fullText);
+    while (emittedCount < parts.length) {
+      const s = parts[emittedCount].trim();
+      if (s) res.write(`data: ${JSON.stringify({ sentence: s, done: false })}\n\n`);
+      emittedCount++;
+    }
+  }
 
   // ── Name post-processor ────────────────────────────────────────────
+  // Runs after full text is known. If the character didn't use the user's name,
+  // append an acknowledgment as an extra emitted sentence.
+  let characterResponse = fullText;
   if (userName && !nameAlreadyAcknowledged) {
     const alreadyUsed = characterResponse.toLowerCase().includes(userName.toLowerCase());
     if (!alreadyUsed) {
@@ -2857,17 +2931,11 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
         `Got it, ${userName}.`,
       ];
       const ack = acknowledgments[Math.floor(Math.random() * acknowledgments.length)];
+      res.write(`data: ${JSON.stringify({ sentence: ack, done: false })}\n\n`);
       characterResponse = characterResponse.replace(/[.!?]?\s*$/, '') + '. ' + ack;
     }
   }
 
-  // ── Stream sentences via SSE ───────────────────────────────────────
-  const sentences = splitSentences(characterResponse);
-  for (const sentence of sentences) {
-    if (!sentence.trim()) continue;
-    res.write(`data: ${JSON.stringify({ sentence: sentence.trim(), done: false })}\n\n`);
-    await new Promise(r => setTimeout(r, 20));
-  }
   res.write(`data: ${JSON.stringify({ done: true, full: characterResponse })}\n\n`);
   res.end();
 };
