@@ -1164,6 +1164,7 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
       }
 
       const sentence = sentenceQueue.shift();
+      if (sentence === '[pause]') continue;
       els.text.textContent = sentence;
 
       try {

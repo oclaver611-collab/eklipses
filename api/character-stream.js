@@ -2836,8 +2836,9 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
           signal: controller.signal,
         });
         clearTimeout(timer);
-        if (resp.status === 429 && attempt < maxRetries) {
-          await new Promise(r => setTimeout(r, retryDelays[attempt] ?? 3000)); continue;
+        if (resp.status === 429) {
+          if (attempt < maxRetries) { await new Promise(r => setTimeout(r, retryDelays[attempt] ?? 3000)); continue; }
+          return null;
         }
         if (!resp.ok) return null;
         return resp.body;
@@ -2856,7 +2857,12 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
     (process.env.GROQ_API_KEY   && await tryProvider('https://api.groq.com/openai/v1/chat/completions',   process.env.GROQ_API_KEY,   'llama-3.3-70b-versatile', 3000,  0)) ||
     (process.env.OPENAI_API_KEY && await tryProvider('https://api.openai.com/v1/chat/completions', process.env.OPENAI_API_KEY, 'gpt-4o-mini',             15000, 2));
 
-  if (!streamBody) { res.write(`data: ${JSON.stringify({ error: 'all providers failed' })}\n\n`); res.end(); return; }
+  if (!streamBody) {
+    res.write(`data: ${JSON.stringify({ sentence: '[pause]', done: false })}\n\n`);
+    res.write(`data: ${JSON.stringify({ done: true, full: '' })}\n\n`);
+    res.end();
+    return;
+  }
 
   // ── Consume streaming SSE, emit sentences as they complete ────────────────
   // Both Groq and OpenAI use the same delta format:
