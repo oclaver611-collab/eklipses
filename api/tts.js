@@ -23,10 +23,11 @@ module.exports = async function handler(req, res) {
     zoe:         'EXAVITQu4vr4xnSDxMaL',
     nadia:       'EXAVITQu4vr4xnSDxMaL',
     erika:       'EXAVITQu4vr4xnSDxMaL',
-    ava:         'pMsXgVXv3BLzUkzvXi1f', // Sarah
-    elena:       'pMsXgVXv3BLzUkzvXi1f',
-    julia:       'pMsXgVXv3BLzUkzvXi1f',
-    fatou:       'pMsXgVXv3BLzUkzvXi1f',
+    ava:         'FGY2WhTYpPnrIDTdsKH5', // Laura (Sarah voice pMsXgVXv3BLzUkzvXi1f deprecated)
+    elena:       'FGY2WhTYpPnrIDTdsKH5',
+    julia:       'FGY2WhTYpPnrIDTdsKH5',
+    fatou:       'FGY2WhTYpPnrIDTdsKH5',
+    eden:        'FGY2WhTYpPnrIDTdsKH5',
     sanna:       'FGY2WhTYpPnrIDTdsKH5', // Laura
     isabelle:    'FGY2WhTYpPnrIDTdsKH5',
     leila:       'FGY2WhTYpPnrIDTdsKH5',
