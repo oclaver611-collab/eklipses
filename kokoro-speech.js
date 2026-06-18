@@ -6,24 +6,24 @@ const KokoroSpeech = (() => {
   let _cancelResolve = null; // resolves any pending speak() promise when cancel() fires
 
   const VOICE_MAP = {
-    'af_nicole':  'nova',
-    'am_michael': 'onyx',
-    'am_adam':    'onyx',
+    'af_nicole':  'ryan',
+    'am_michael': 'ryan',
+    'am_adam':    'ryan',
   };
 
   async function speak(text, voice = 'af_nicole', prefetchedUrl = null) {
     if (typeof window !== 'undefined' && window.__EKLIPSES_TEST_MODE) return;
     if (!text?.trim()) return;
     cancel(); // always stop any in-flight audio before starting a new line
-    const openaiVoice = VOICE_MAP[voice] || 'nova';
+    const charId = VOICE_MAP[voice] || 'ryan';
     let url = prefetchedUrl;
     try {
       if (!url) {
-        console.log(`[TTS] ${openaiVoice}: "${text.slice(0,50)}"`);
+        console.log(`[TTS] ${charId}: "${text.slice(0,50)}"`);
         const response = await fetch('/api/tts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, voice: openaiVoice }),
+          body: JSON.stringify({ text, characterId: charId }),
         });
         if (!response.ok) {
           console.error('[TTS] API error:', response.status);
@@ -32,7 +32,7 @@ const KokoroSpeech = (() => {
         const blob = await response.blob();
         url = URL.createObjectURL(blob);
       } else {
-        console.log(`[TTS] ${openaiVoice} (prefetched): "${text.slice(0,50)}"`);
+        console.log(`[TTS] ${charId} (prefetched): "${text.slice(0,50)}"`);
       }
       cancel();
       const audio = new Audio(url);
@@ -55,12 +55,12 @@ const KokoroSpeech = (() => {
 
   async function prefetch(text, voice = 'af_nicole') {
     if (!text?.trim()) return null;
-    const openaiVoice = VOICE_MAP[voice] || 'nova';
+    const charId = VOICE_MAP[voice] || 'ryan';
     try {
       const response = await fetch('/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, voice: openaiVoice }),
+        body: JSON.stringify({ text, characterId: charId }),
       });
       if (!response.ok) return null;
       const blob = await response.blob();
