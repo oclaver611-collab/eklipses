@@ -1609,7 +1609,12 @@ async function playLoop(mySession, introPrefetch = null) {
       const said = await listenForUser(mySession, 60000);
       if (mySession !== session) return;
 
-      if (said && isPractice) {
+      const saidWords = said ? said.trim().split(/\s+/) : [];
+      const saidIsGreeting = said && /^(hi|hey|hello|yes|no|okay|ok|yeah|yep|nope)$/i.test(said.trim());
+      const saidIsNoise = said && saidWords.length < 2 && !saidIsGreeting;
+      if (saidIsNoise) console.log('[STT] filtered noise:', said);
+
+      if (said && isPractice && !saidIsNoise) {
         if (stepIndex + 1 < currentScript.length && currentScript[stepIndex + 1].speaker === 'Mary') stepIndex++;
         const reply = await streamCharacterAndSpeak(said, mySession);
         if (mySession !== session) return;
@@ -1713,6 +1718,15 @@ async function freeConversation(mySession) {
     const said = await listenForUser(mySession, remMs);
     console.log('[FC] heard:', said, 'mySession:', mySession, 'session:', session);
     if (mySession !== session) break;
+
+    if (said) {
+      const fcWords = said.trim().split(/\s+/);
+      const fcIsGreeting = /^(hi|hey|hello|yes|no|okay|ok|yeah|yep|nope)$/i.test(said.trim());
+      if (fcWords.length < 2 && !fcIsGreeting) {
+        console.log('[STT] filtered noise:', said);
+        continue;
+      }
+    }
 
     if (!said) {
       if (sc.coldOpen && !firstExchangeDone) {

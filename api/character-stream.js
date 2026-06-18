@@ -2838,6 +2838,7 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
         clearTimeout(timer);
         if (resp.status === 429) {
           if (attempt < maxRetries) { await new Promise(r => setTimeout(r, retryDelays[attempt] ?? 3000)); continue; }
+          await new Promise(r => setTimeout(r, 1000)); // brief backoff before falling to next provider
           return null;
         }
         if (!resp.ok) return null;
@@ -2853,9 +2854,14 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
     return null;
   }
 
-  const streamBody =
+  let streamBody =
     (process.env.GROQ_API_KEY   && await tryProvider('https://api.groq.com/openai/v1/chat/completions',   process.env.GROQ_API_KEY,   'llama-3.3-70b-versatile', 3000,  0)) ||
     (process.env.OPENAI_API_KEY && await tryProvider('https://api.openai.com/v1/chat/completions', process.env.OPENAI_API_KEY, 'gpt-4o-mini',             15000, 2));
+
+  if (!streamBody && process.env.OPENAI_API_KEY) {
+    await new Promise(r => setTimeout(r, 2000));
+    streamBody = await tryProvider('https://api.openai.com/v1/chat/completions', process.env.OPENAI_API_KEY, 'gpt-4o-mini', 8000, 0);
+  }
 
   if (!streamBody) {
     res.write(`data: ${JSON.stringify({ sentence: '[pause]', done: false })}\n\n`);
