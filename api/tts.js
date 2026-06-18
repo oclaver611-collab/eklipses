@@ -1,5 +1,5 @@
-// api/tts.js — Kokoro primary TTS, ElevenLabs fallback, OpenAI final fallback
-// Ryan is NOT routed through this file — handled separately in player.js
+// api/tts.js — ElevenLabs primary TTS, OpenAI fallback for characters
+// Ryan uses ElevenLabs (Drew 29vD33N1rvCBjLBSMJK1) — no OpenAI fallback for Ryan
 const { checkRateLimit } = require('./ratelimit');
 
 module.exports = async function handler(req, res) {
@@ -14,10 +14,13 @@ module.exports = async function handler(req, res) {
   if (!process.env.OPENAI_API_KEY) return res.status(500).json({ error: 'OPENAI_API_KEY not set' });
 
   // ── ElevenLabs voice mapping ───────────────────────────────────────────────
+  // Drew  (29vD33N1rvCBjLBSMJK1) — steady, confident, coach voice (Ryan)
+  // Elise (EST9Ui6982FZPSi7gCHi) — warm, expressive
   // Bella (EXAVITQu4vr4xnSDxMaL) — warm, expressive
   // Sarah (pMsXgVXv3BLzUkzvXi1f) — sharp, direct
   // Laura (FGY2WhTYpPnrIDTdsKH5) — composed, intellectual
   const ELEVENLABS_VOICES = {
+    ryan:        '29vD33N1rvCBjLBSMJK1', // Drew
     sofia:       'EST9Ui6982FZPSi7gCHi',  // Elise
     anna:        'EXAVITQu4vr4xnSDxMaL',
     zoe:         'EXAVITQu4vr4xnSDxMaL',
@@ -180,7 +183,12 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // ── OpenAI fallback ────────────────────────────────────────────────────────
+  // Ryan has no OpenAI fallback — ElevenLabs only
+  if (characterId === 'ryan') {
+    return res.status(503).json({ error: 'Ryan TTS (ElevenLabs) unavailable' });
+  }
+
+  // ── OpenAI fallback for characters ────────────────────────────────────────
   try {
     await streamOpenAI();
   } catch (err) {
