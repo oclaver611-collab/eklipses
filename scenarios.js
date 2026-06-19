@@ -1,6 +1,6 @@
 ﻿window.SCENARIOS = {
   beach: {
-    title: "Beach — Cold Open",
+    title: "Beach — She's been sitting alone for 20 minutes",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_thumb.jpg",
     bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/beach_bg.mp4",
     coldOpen: true,
@@ -33,7 +33,7 @@
   },
 
   bar: {
-    title: "Bar — Night Out",
+    title: "Bar — End of the night. She's still there.",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Ava_thumb.jpg",
     bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/bar_bg.jpg",
     hidden: true,
@@ -65,7 +65,7 @@
   },
 
   museum: {
-    title: "Museum — Quiet Opener",
+    title: "Museum — Standing in front of the same painting too long.",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Isabelle_thumb.jpg",
     bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/museum_bg.jpg",
     coldOpen: true,
@@ -96,7 +96,7 @@
   },
 
   gym: {
-    title: "Gym — Between Sets",
+    title: "Gym — Between sets. Not in a rush to leave.",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/zoe_thumb.jpg",
     bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/gym_bg.jpg",
     coldOpen: true,
@@ -128,7 +128,7 @@
   },
 
   bookstore: {
-    title: "Bookstore — Quiet Browse",
+    title: "Bookstore — She's reading. Coffee going cold.",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Nadia.jpg",
     bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/bookstore_bg.jpg",
     coldOpen: true,
@@ -160,7 +160,7 @@
   },
 
   street: {
-    title: "Street — Quick Stop",
+    title: "Street — Walking toward you. 4 seconds before she's gone.",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/julia_thumb.jpg",
     bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/street_bg.jpg",
     coldOpen: true,
@@ -196,7 +196,7 @@
   // ════════════════════════════════════════════════════════════════════════════
 
   rooftop: {
-    title: "Rooftop — After Dark",
+    title: "Rooftop — After dark. She came alone.",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Sanna_thumb.jpg",
     bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/rooftop_bg.jpg?v=2",
     coldOpen: true,
@@ -230,7 +230,7 @@
   },
 
   house_party: {
-    title: "House Party — Mutual Friend",
+    title: "House Party — She stepped away from the group",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Sarah_thumb.jpg",
     bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/party_bg.jpg?v=2",
     coldOpen: true,
@@ -265,7 +265,7 @@
   },
 
   coffee_shop: {
-    title: "Coffee Shop — Afternoon",
+    title: "Coffee Shop — Headphones off. Not quite working.",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Anna_thumb.jpg",
     bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/coffee_bg.jpg?v=2",
     coldOpen: true,
@@ -302,7 +302,7 @@
   },
 
   art_gallery: {
-    title: "Art Gallery — Opening Night",
+    title: "Art Gallery — Opening night. She's not looking at the art.",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Leila_thumb.jpg",
     bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/gallery_bg.jpg?v=2",
     coldOpen: true,
@@ -336,7 +336,7 @@
   },
 
   yoga_studio: {
-    title: "Yoga Studio — After Class",
+    title: "Yoga Studio — Just finished class. Still there.",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Fatou_thumb.jpg",
     bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/yoga_bg.jpg?v=2",
     coldOpen: true,
@@ -371,7 +371,7 @@
   },
 
   airport: {
-    title: "Airport — Flight Delayed",
+    title: "Airport — 2-hour delay. She hasn't turned a page.",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Elena_thumb.jpg",
     bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/airport_bg.jpg?v=2",
     coldOpen: true,
@@ -406,7 +406,7 @@
   },
 
   supermarket: {
-    title: "Supermarket — Sunday Shop",
+    title: "Supermarket — Sunday morning. Unhurried.",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Eden_thumb.jpg",
     bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/supermarket_bg.jpg?v=2",
     coldOpen: true,
@@ -441,7 +441,7 @@
   },
 
   office_lobby: {
-    title: "Office Lobby — Same Building",
+    title: "Office Lobby — You've walked past each other for months.",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Maya_thumb.jpg",
     bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/office_bg.jpg?v=2",
     coldOpen: true,
@@ -476,7 +476,7 @@
   },
 
   train: {
-    title: "Train — Commute Home",
+    title: "Train — Commute home. Window seat. Far away.",
     thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/Erika_thumb.jpg",
     bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/train_bg.jpg?v=2",
     coldOpen: true,
