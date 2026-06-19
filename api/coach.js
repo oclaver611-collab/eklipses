@@ -1,4 +1,4 @@
-// api/coach.js — Ryan's post-session coaching via OpenAI
+// api/coach.js — Ryan's post-session coaching (Groq primary, OpenAI fallback)
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -10,8 +10,36 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'No conversation provided' });
   }
 
-  if (!process.env.OPENAI_API_KEY) {
-    return res.status(500).json({ error: 'OPENAI_API_KEY not set' });
+  if (!process.env.GROQ_API_KEY && !process.env.OPENAI_API_KEY) {
+    return res.status(500).json({ error: 'No LLM API key configured' });
+  }
+
+  async function callLLM(messages, maxTokens) {
+    const bodyBase = { max_tokens: maxTokens, messages, response_format: { type: 'json_object' } };
+    if (process.env.GROQ_API_KEY) {
+      try {
+        const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...bodyBase, model: 'llama-3.3-70b-versatile' }),
+        });
+        if (resp.ok) {
+          const d = await resp.json();
+          const content = d.choices?.[0]?.message?.content;
+          if (content) return content;
+        }
+        console.warn('[coach] Groq non-OK:', resp.status);
+      } catch (err) { console.warn('[coach] Groq error:', err.message); }
+    }
+    if (!process.env.OPENAI_API_KEY) throw new Error('No LLM provider available');
+    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...bodyBase, model: 'gpt-4o-mini' }),
+    });
+    if (!resp.ok) throw new Error('OpenAI error: ' + await resp.text());
+    const d = await resp.json();
+    return d.choices?.[0]?.message?.content;
   }
 
   // Character name map for transcript labels
@@ -285,55 +313,29 @@ RULES:
 - ALL card fields must be filled. No empty strings, no null.`;
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        max_tokens: 2000,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Scenario: ${scenarioTitle}\n\nHIS OPENING LINE (HIM_1, MANDATORY — your part1 MUST reference this exact line): "${conversation.find(m => m.role === 'user')?.content?.trim() || ''}"\n\nFull conversation transcript:\n${transcript}\n\nREMINDER: part1 must quote HIM_1 above, not any other line.` }
-        ],
-        response_format: { type: 'json_object' }
-      }),
-    });
-
-    if (!response.ok) {
-      const err = await response.text();
-      return res.status(500).json({ error: 'OpenAI error: ' + err });
-    }
-
-    const data = await response.json();
-    const raw = data.choices?.[0]?.message?.content;
+    const mainMessages = [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: `Scenario: ${scenarioTitle}\n\nHIS OPENING LINE (HIM_1, MANDATORY — your part1 MUST reference this exact line): "${conversation.find(m => m.role === 'user')?.content?.trim() || ''}"\n\nFull conversation transcript:\n${transcript}\n\nREMINDER: part1 must quote HIM_1 above, not any other line.` },
+    ];
+    let raw;
+    try { raw = await callLLM(mainMessages, 2000); }
+    catch (llmErr) { return res.status(500).json({ error: llmErr.message }); }
     let feedback;
     try {
       feedback = JSON.parse(raw);
     } catch(parseErr) {
       // Model returned malformed JSON — retry once with stricter instruction
       console.warn('[coach] JSON parse failed, retrying with stricter prompt...');
-      const retryResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          max_tokens: 2000,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: `Scenario: ${scenarioTitle}\n\nHIS OPENING LINE (HIM_1, MANDATORY — your part1 MUST reference this exact line): "${conversation.find(m => m.role === 'user')?.content?.trim() || ''}"\n\nFull conversation transcript:\n${transcript}\n\nREMINDER: part1 must quote HIM_1 above, not any other line.\n\nCRITICAL: Return ONLY valid JSON. No markdown, no backticks, no preamble. Start with { and end with }.` }
-          ],
-          response_format: { type: 'json_object' }
-        }),
-      });
-      const retryData = await retryResponse.json();
-      const retryRaw = retryData.choices?.[0]?.message?.content;
-      feedback = JSON.parse(retryRaw);
+      const retryMessages = [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `Scenario: ${scenarioTitle}\n\nHIS OPENING LINE (HIM_1, MANDATORY — your part1 MUST reference this exact line): "${conversation.find(m => m.role === 'user')?.content?.trim() || ''}"\n\nFull conversation transcript:\n${transcript}\n\nREMINDER: part1 must quote HIM_1 above, not any other line.\n\nCRITICAL: Return ONLY valid JSON. No markdown, no backticks, no preamble. Start with { and end with }.` },
+      ];
+      try {
+        const retryRaw = await callLLM(retryMessages, 2000);
+        feedback = JSON.parse(retryRaw);
+      } catch(retryErr) {
+        return res.status(500).json({ error: 'JSON parse failed after retry: ' + retryErr.message });
+      }
     }
 
     // Guard: if card fields came back undefined/null, fill with fallbacks
@@ -362,31 +364,16 @@ RULES:
     if (tntGeneric) {
       console.warn('[coach] tryNextTime is generic — retrying for just that field');
       try {
-        const tntRetry = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            max_tokens: 200,
-            messages: [
-              { role: 'system', content: `You are Ryan, a dating coach. Return ONLY valid JSON: {"tryNextTime":"..."}\n\ntryNextTime must be THREE lines the user should try in a FUTURE conversation — not quotes of what he already said, but better alternatives tailored to this character and scenario. Number them 1, 2, 3. Each line must be specific to the character's personality and scenario — not generic advice. BANNED: "Say something real", "Ask about the specific", "Reference what actually happened", "Tell me more about that".` },
-              { role: 'user', content: `Scenario: ${scenarioTitle}\n\nTranscript:\n${transcript}` },
-            ],
-            response_format: { type: 'json_object' },
-          }),
-        });
-        if (!tntRetry.ok) {
-          const errBody = await tntRetry.text();
-          console.error('[coach] tryNextTime retry non-OK:', tntRetry.status, errBody);
-          feedback.tryNextTime = '';
-        } else {
-          const tntData = await tntRetry.json();
-          const tntParsed = JSON.parse(tntData.choices?.[0]?.message?.content);
-          const stillGeneric = !tntParsed.tryNextTime ||
-            GENERIC_TNT.some(p => tntParsed.tryNextTime.toLowerCase().includes(p));
-          feedback.tryNextTime = stillGeneric ? '' : tntParsed.tryNextTime;
-          if (stillGeneric) console.warn('[coach] tryNextTime retry still generic — leaving blank');
-        }
+        const tntMessages = [
+          { role: 'system', content: `You are Ryan, a dating coach. Return ONLY valid JSON: {"tryNextTime":"..."}\n\ntryNextTime must be THREE lines the user should try in a FUTURE conversation — not quotes of what he already said, but better alternatives tailored to this character and scenario. Number them 1, 2, 3. Each line must be specific to the character's personality and scenario — not generic advice. BANNED: "Say something real", "Ask about the specific", "Reference what actually happened", "Tell me more about that".` },
+          { role: 'user', content: `Scenario: ${scenarioTitle}\n\nTranscript:\n${transcript}` },
+        ];
+        const tntRaw = await callLLM(tntMessages, 200);
+        const tntParsed = JSON.parse(tntRaw);
+        const stillGeneric = !tntParsed.tryNextTime ||
+          GENERIC_TNT.some(p => tntParsed.tryNextTime.toLowerCase().includes(p));
+        feedback.tryNextTime = stillGeneric ? '' : tntParsed.tryNextTime;
+        if (stillGeneric) console.warn('[coach] tryNextTime retry still generic — leaving blank');
       } catch (tntErr) {
         console.warn('[coach] tryNextTime retry failed:', tntErr.message);
         feedback.tryNextTime = '';
