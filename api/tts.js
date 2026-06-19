@@ -19,7 +19,7 @@ module.exports = async function handler(req, res) {
   // Sarah (pMsXgVXv3BLzUkzvXi1f) — sharp, direct
   // Laura (FGY2WhTYpPnrIDTdsKH5) — composed, intellectual
   const ELEVENLABS_VOICES = {
-    ryan:        '29vD33N1rvCBjLBSMJK1', // Drew
+    ryan:        'q0IMILNRPxOgtBTS4taI', // Drew
     sofia:       'EST9Ui6982FZPSi7gCHi',  // Elise
     anna:        'EXAVITQu4vr4xnSDxMaL',
     zoe:         'EXAVITQu4vr4xnSDxMaL',
