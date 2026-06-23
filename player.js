@@ -529,27 +529,21 @@ const DailyLimit = (() => {
 
   // ── Main check — call before starting a practice session ─────────────────
   async function canPlay() {
-    await handleURLParams(); // process ?dev=, ?resetdev=, ?stripe_session=
+    await handleURLParams();
 
     if (isDevBypass()) return true;
-    if (isProSubscriber()) return true; // paid subscriber — unlimited
+    if (isProSubscriber()) return true;
 
-    // Layer 1: localStorage
-    const localCount = getLocalCount();
-    if (localCount >= LIMIT) {
-      showPaywall();
-      return false;
+    try {
+      const r = await fetch('/api/check-session');
+      const data = await r.json();
+      if (!data.allowed) {
+        showPaywall();
+        return false;
+      }
+    } catch {
+      // network error — fail open
     }
-
-    // Layer 2: FingerprintJS (async, non-blocking — if it fails we still proceed)
-    const fpCount = await getFingerprintCount();
-    if (fpCount >= LIMIT) {
-      showPaywall();
-      return false;
-    }
-
-    // Passed — increment and allow
-    incrementLocal();
     return true;
   }
 
@@ -560,7 +554,9 @@ const DailyLimit = (() => {
     window.fetch = function(url, options = {}) {
       if (typeof url === 'string' && (
         url.includes('/api/character') ||
-        url.includes('/api/tts')
+        url.includes('/api/tts') ||
+        url.includes('/api/count-session') ||
+        url.includes('/api/check-session')
       )) {
         const devKey = getDevKey();
         const stripeCus = getStripeCustomer();
@@ -581,7 +577,18 @@ const DailyLimit = (() => {
     };
   }
 
-  return { canPlay, isDevBypass, isProSubscriber, patchFetch, handleURLParams };
+  async function countSession(exchangeCount) {
+    if (isDevBypass() || isProSubscriber()) return;
+    try {
+      await fetch('/api/count-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ exchangeCount }),
+      });
+    } catch {}
+  }
+
+  return { canPlay, isDevBypass, isProSubscriber, patchFetch, handleURLParams, countSession };
 })();
 
 // Patch fetch immediately so dev key is always sent
@@ -1139,8 +1146,9 @@ function getKokoroVoice(speaker) {
 
 /* ===== Dynamic Mary ===== */
 let conversationHistory=[];
+let _exchangeCount = 0;
 let firstUserOpener=null;
-function resetConversation() { conversationHistory=[]; }
+function resetConversation() { conversationHistory=[]; _exchangeCount = 0; }
 
 async function streamCharacterAndSpeak(userSaid, mySession) {
   // Show thinking state immediately
@@ -1300,6 +1308,7 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
     conversationHistory.push({ role: 'user', content: userSaid });
     conversationHistory.push({ role: 'assistant', content: fullText });
     if (conversationHistory.length > 12) conversationHistory = conversationHistory.slice(-12);
+    _exchangeCount++;
   }
 
   return fullText || null;
@@ -1328,6 +1337,7 @@ async function getCharacterResponseFallback(userSaid) {
     conversationHistory.push({ role: 'user', content: userSaid });
     conversationHistory.push({ role: 'assistant', content: maryText });
     if (conversationHistory.length > 12) conversationHistory = conversationHistory.slice(-12);
+    _exchangeCount++;
     return maryText;
   } catch (err) {
     clearTimeout(timeout);
@@ -1819,6 +1829,7 @@ async function runCoachFeedback(mySession) {
     await speak("Looks like we didn't get enough conversation to work with. Hit Try Again and give me something to coach.", 'Ryan');
     return;
   }
+  await DailyLimit.countSession(_exchangeCount);
 
   // FIX 4: Fire API call and thinking line IN PARALLEL — no more dead silence
   // Both start at the same time. Thinking line plays while API is in flight.
