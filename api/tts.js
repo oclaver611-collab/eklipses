@@ -1,4 +1,4 @@
-// api/tts.js — ElevenLabs TTS for all voices (no OpenAI speech API)
+// api/tts.js — Fish Audio TTS for all voices
 const { checkRateLimit } = require('./ratelimit');
 
 module.exports = async function handler(req, res) {
@@ -10,54 +10,47 @@ module.exports = async function handler(req, res) {
 
   const { text, characterId } = req.body || {};
   if (!text?.trim()) return res.status(400).json({ error: 'No text provided' });
-  if (!process.env.ELEVENLABS_API_KEY) return res.status(500).json({ error: 'ELEVENLABS_API_KEY not set' });
+  if (!process.env.FISH_AUDIO_API_KEY) return res.status(500).json({ error: 'FISH_AUDIO_API_KEY not set' });
 
-  // ── ElevenLabs voice mapping ───────────────────────────────────────────────
-  // Drew  (29vD33N1rvCBjLBSMJK1) — steady, confident, coach voice (Ryan)
-  // Elise (EST9Ui6982FZPSi7gCHi) — warm, expressive
-  // Bella (EXAVITQu4vr4xnSDxMaL) — warm, expressive
-  // Sarah (FGY2WhTYpPnrIDTdsKH5) — sharp, direct
-  // Laura (FGY2WhTYpPnrIDTdsKH5) — composed, intellectual
-  const ELEVENLABS_VOICES = {
-    ryan:        'q0IMILNRPxOgtBTS4taI', // Drew
-    sofia:       'EST9Ui6982FZPSi7gCHi',  // Elise
-    anna:        'EXAVITQu4vr4xnSDxMaL',
-    zoe:         'EXAVITQu4vr4xnSDxMaL',
-    nadia:       'EXAVITQu4vr4xnSDxMaL',
-    erika:       'EXAVITQu4vr4xnSDxMaL',
-    eden:        'FGY2WhTYpPnrIDTdsKH5', // Laura
-    ava:         'FGY2WhTYpPnrIDTdsKH5',
-    elena:       'FGY2WhTYpPnrIDTdsKH5',
-    julia:       'FGY2WhTYpPnrIDTdsKH5',
-    fatou:       'FGY2WhTYpPnrIDTdsKH5',
-    sanna:       'FGY2WhTYpPnrIDTdsKH5', // Laura
-    isabelle:    'FGY2WhTYpPnrIDTdsKH5',
-    leila:       'FGY2WhTYpPnrIDTdsKH5',
-    maya_office: 'FGY2WhTYpPnrIDTdsKH5',
-    remi:        'FGY2WhTYpPnrIDTdsKH5',
-    sarah:       'FGY2WhTYpPnrIDTdsKH5',
+  // ── Fish Audio voice mapping ───────────────────────────────────────────────
+  const FISH_AUDIO_VOICES = {
+    ryan:    '44b996214285427697767cb469793647',
+    sofia:   '22d0bcafaa6d4f489145bc65c1afdaa1',
+    mary:    '22d0bcafaa6d4f489145bc65c1afdaa1',
+    anna:    '22d0bcafaa6d4f489145bc65c1afdaa1',
+    leila:   'd2d81e5c8a8f4114870d3d34c3c58005',
+    eden:    'd2d81e5c8a8f4114870d3d34c3c58005',
+    erika:   'd2d81e5c8a8f4114870d3d34c3c58005',
+    julia:   '98655a12fa944e26b274c535e5e03842',
+    maya:    '98655a12fa944e26b274c535e5e03842',
+    sanna:   '98655a12fa944e26b274c535e5e03842',
+    elena:   'cad803570d5d4202808bf6d4838a4246',
+    fatou:   'cad803570d5d4202808bf6d4838a4246',
+    sarah:   'cad803570d5d4202808bf6d4838a4246',
+    default: '22d0bcafaa6d4f489145bc65c1afdaa1',
   };
 
-  const elVoiceId = characterId ? ELEVENLABS_VOICES[characterId] : null;
-  if (!elVoiceId) return res.status(400).json({ error: 'Unknown characterId: ' + characterId });
+  const voiceId = characterId ? (FISH_AUDIO_VOICES[characterId] || FISH_AUDIO_VOICES.default) : null;
+  if (!voiceId) return res.status(400).json({ error: 'Unknown characterId: ' + characterId });
 
-  // ── ElevenLabs Flash v2.5 ─────────────────────────────────────────────────
+  // ── Fish Audio TTS ─────────────────────────────────────────────────────────
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
 
-    const elRes = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${elVoiceId}/stream`,
+    const fishRes = await fetch(
+      'https://api.fish.audio/v1/tts',
       {
         method: 'POST',
         headers: {
-          'xi-api-key': process.env.ELEVENLABS_API_KEY,
+          'Authorization': `Bearer ${process.env.FISH_AUDIO_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           text,
-          model_id: 'eleven_flash_v2_5',
-          voice_settings: { stability: 0.5, similarity_boost: 0.75 },
+          reference_id: voiceId,
+          format: 'mp3',
+          streaming: false,
         }),
         signal: controller.signal,
       }
@@ -65,13 +58,13 @@ module.exports = async function handler(req, res) {
 
     clearTimeout(timeout);
 
-    if (elRes.ok) {
+    if (fishRes.ok) {
       res.setHeader('Content-Type', 'audio/mpeg');
       res.setHeader('Cache-Control', 'no-cache');
       res.setHeader('Transfer-Encoding', 'chunked');
-      res.setHeader('X-TTS-Provider', 'elevenlabs');
+      res.setHeader('X-TTS-Provider', 'fishaudio');
 
-      const reader = elRes.body.getReader();
+      const reader = fishRes.body.getReader();
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -81,11 +74,11 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    const errBody = await elRes.text();
-    console.error('[tts] ElevenLabs non-OK:', elRes.status, errBody);
-    return res.status(elRes.status).json({ error: 'ElevenLabs error: ' + errBody });
+    const errBody = await fishRes.text();
+    console.error('[tts] Fish Audio non-OK:', fishRes.status, errBody);
+    return res.status(fishRes.status).json({ error: 'Fish Audio error: ' + errBody });
   } catch (err) {
-    console.error('[tts] ElevenLabs failed:', err.message);
+    console.error('[tts] Fish Audio failed:', err.message);
     return res.status(503).json({ error: 'TTS unavailable: ' + err.message });
   }
 };
