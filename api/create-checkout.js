@@ -1,6 +1,6 @@
-// api/create-checkout.js — Creates a Stripe Checkout session for Eklipses Pro
-// POST { email? } → { url: string }
-// Requires env: STRIPE_SECRET_KEY, STRIPE_PRICE_ID
+// api/create-checkout.js — Creates a Stripe Checkout session for Eklipses Pro or Elite
+// POST { email?, plan? } → { url: string }
+// Requires env: STRIPE_SECRET_KEY, STRIPE_PRO_PRICE_ID, STRIPE_ELITE_PRICE_ID
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -9,7 +9,13 @@ module.exports = async function handler(req, res) {
   if (!key) return res.status(500).json({ error: 'Stripe not configured' });
 
   const stripe = require('stripe')(key);
-  const { email } = req.body || {};
+  const { email, plan } = req.body || {};
+
+  const priceId = plan === 'elite'
+    ? process.env.STRIPE_ELITE_PRICE_ID
+    : process.env.STRIPE_PRO_PRICE_ID;
+
+  if (!priceId) return res.status(500).json({ error: `Price ID not configured for plan: ${plan || 'pro'}` });
 
   const origin = (req.headers.origin || req.headers.referer || 'https://eklipses.vercel.app').replace(/\/$/, '');
 
@@ -19,7 +25,7 @@ module.exports = async function handler(req, res) {
       payment_method_types: ['card'],
       line_items: [
         {
-          price: process.env.STRIPE_PRICE_ID, // $14.99/month price ID from Stripe dashboard
+          price: priceId,
           quantity: 1,
         },
       ],
@@ -29,6 +35,7 @@ module.exports = async function handler(req, res) {
       cancel_url: `${origin}/`,
       metadata: {
         source: 'eklipses-paywall',
+        plan: plan || 'pro',
       },
     });
 

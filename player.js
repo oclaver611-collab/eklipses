@@ -481,18 +481,32 @@ const DailyLimit = (() => {
       <div style="color:#fff;font-size:24px;font-weight:800;margin-bottom:10px;letter-spacing:-0.5px">
         You've used your 3 free sessions
       </div>
-      <div style="color:#9aa4b2;font-size:15px;max-width:340px;margin-bottom:8px;line-height:1.6">
-        Come back tomorrow for 3 more — or get unlimited practice with Eklipses Pro.
+      <div style="color:#9aa4b2;font-size:15px;max-width:360px;margin-bottom:28px;line-height:1.6">
+        Come back tomorrow for 3 more — or unlock unlimited practice below.
       </div>
-      <div style="color:#ffb300;font-size:13px;max-width:300px;margin-bottom:28px;line-height:1.5">
-        Unlimited sessions · All scenarios · Ryan coaching after every chat
+      <div style="display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap;justify-content:center">
+        <div style="background:#1a1f2e;border:1px solid #2a3040;border-radius:16px;padding:20px 24px;min-width:200px;text-align:center">
+          <div style="color:#ffb300;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Pro</div>
+          <div style="color:#fff;font-size:22px;font-weight:800;margin-bottom:2px">$19.99<span style="font-size:13px;font-weight:400;color:#9aa4b2">/month</span></div>
+          <div style="color:#9aa4b2;font-size:12px;margin-bottom:16px">60 sessions/month</div>
+          <button class="ek-plan-btn" data-plan="pro"
+            style="background:#ffb300;color:#000;font-size:14px;font-weight:800;border:none;
+                   padding:11px 28px;border-radius:999px;cursor:pointer;width:100%;transition:opacity 0.2s">
+            Choose Pro
+          </button>
+        </div>
+        <div style="background:#1a1f2e;border:2px solid #ffb300;border-radius:16px;padding:20px 24px;min-width:200px;text-align:center;position:relative">
+          <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#ffb300;color:#000;font-size:10px;font-weight:800;padding:3px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:0.5px">Best value</div>
+          <div style="color:#ffb300;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Elite</div>
+          <div style="color:#fff;font-size:22px;font-weight:800;margin-bottom:2px">$39.99<span style="font-size:13px;font-weight:400;color:#9aa4b2">/month</span></div>
+          <div style="color:#9aa4b2;font-size:12px;margin-bottom:16px">200 sessions/month</div>
+          <button class="ek-plan-btn" data-plan="elite"
+            style="background:#ffb300;color:#000;font-size:14px;font-weight:800;border:none;
+                   padding:11px 28px;border-radius:999px;cursor:pointer;width:100%;transition:opacity 0.2s">
+            Choose Elite
+          </button>
+        </div>
       </div>
-      <button id="ek-paywall-btn"
-        style="background:#ffb300;color:#000;font-size:16px;font-weight:800;border:none;
-               padding:15px 36px;border-radius:999px;cursor:pointer;margin-bottom:14px;
-               min-width:260px;transition:opacity 0.2s">
-        Upgrade to Pro — $19.99 CAD/month
-      </button>
       <div style="color:#555;font-size:12px;margin-bottom:20px">No contract · Cancel anytime</div>
       <div style="color:#666;font-size:13px;cursor:pointer;text-decoration:underline"
            onclick="document.getElementById('ek-paywall').remove()">
@@ -502,28 +516,31 @@ const DailyLimit = (() => {
 
     document.body.appendChild(overlay);
 
-    overlay.querySelector('#ek-paywall-btn').addEventListener('click', async function() {
-      this.textContent = 'Loading...';
-      this.style.opacity = '0.7';
-      this.disabled = true;
-      try {
-        const r = await fetch('/api/create-checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({}),
-        });
-        const data = await r.json();
-        if (data.url) {
-          window.location.href = data.url;
-        } else {
-          throw new Error(data.error || 'No checkout URL returned');
+    overlay.querySelectorAll('.ek-plan-btn').forEach(function(btn) {
+      btn.addEventListener('click', async function() {
+        const plan = this.dataset.plan;
+        this.textContent = 'Loading...';
+        this.style.opacity = '0.7';
+        this.disabled = true;
+        try {
+          const r = await fetch('/api/create-checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ plan }),
+          });
+          const data = await r.json();
+          if (data.url) {
+            window.location.href = data.url;
+          } else {
+            throw new Error(data.error || 'No checkout URL returned');
+          }
+        } catch (e) {
+          console.error('[Paywall] Checkout error:', e.message);
+          this.textContent = plan === 'elite' ? 'Choose Elite' : 'Choose Pro';
+          this.style.opacity = '1';
+          this.disabled = false;
         }
-      } catch (e) {
-        console.error('[Paywall] Checkout error:', e.message);
-        this.textContent = 'Error — try again';
-        this.style.opacity = '1';
-        this.disabled = false;
-      }
+      });
     });
   }
 
