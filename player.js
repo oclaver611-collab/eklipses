@@ -549,7 +549,6 @@ const DailyLimit = (() => {
     await handleURLParams();
 
     if (isDevBypass()) return true;
-    if (isProSubscriber()) return true;
 
     try {
       const r = await fetch('/api/check-session');
@@ -595,7 +594,7 @@ const DailyLimit = (() => {
   }
 
   async function countSession(exchangeCount) {
-    if (isDevBypass() || isProSubscriber()) return;
+    if (isDevBypass()) return;
     try {
       await fetch('/api/count-session', {
         method: 'POST',
