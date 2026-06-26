@@ -37,6 +37,7 @@ module.exports = async function handler(req, res) {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
+    const t0 = Date.now();
 
     const fishRes = await fetch(
       'https://api.fish.audio/v1/tts',
@@ -59,6 +60,7 @@ module.exports = async function handler(req, res) {
     clearTimeout(timeout);
 
     if (fishRes.ok) {
+      console.log(`[tts] ${characterId} voice=${voiceId.slice(0, 8)} chars=${text.length} ${Date.now() - t0}ms`);
       res.setHeader('Content-Type', 'audio/mpeg');
       res.setHeader('Cache-Control', 'no-cache');
       res.setHeader('Transfer-Encoding', 'chunked');
