@@ -6,3 +6,8 @@ test-bar-card.js
 test-bar.js 
 .vercel
 .env*
+*.mp3
+*.png
+*.jpg
+tests/logs/
+screenshots/
