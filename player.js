@@ -2211,7 +2211,7 @@ function makeCard(key) {
   const img=document.createElement('img'); img.className='sc-thumb'; img.src=sc.thumb||'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/ryan.jpg'; img.onerror=()=>img.style.display='none';
   const title=document.createElement('div'); title.innerHTML='<div class="sc-title">'+sc.title+'</div><div class="sc-sub">Click to load</div>';
   card.appendChild(img); card.appendChild(title);
-  card.onclick=()=>playScenario(key,false);
+  card.onclick=()=>playScenario(key,true);
   return card;
 }
 
