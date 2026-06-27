@@ -1,0 +1,456 @@
+[0.002] NAVIGATE_START url=https://eklipses.vercel.app
+[0.087] CONSOLE.log [DIAG] STT_PATCH_INSTALLED
+[0.181] CONSOLE.log [TTS] OpenAI TTS module ready
+[0.213] CONSOLE.log [Transcript] Tool loaded. Press 📋 button to view session.
+[0.213] DOMCONTENTLOADED
+[0.294] REQ_FAILED config.js net::ERR_ABORTED
+[0.294] REQ_FAILED sofia_speaking.mp4 net::ERR_ABORTED
+[0.294] REQ_FAILED Fatou_thumb.jpg net::ERR_ABORTED
+[0.295] REQ_FAILED Leila_thumb.jpg net::ERR_ABORTED
+[0.295] REQ_FAILED Isabelle_thumb.jpg net::ERR_ABORTED
+[0.296] REQ_FAILED Anna_thumb.jpg net::ERR_ABORTED
+[0.296] REQ_FAILED zoe_thumb.jpg net::ERR_ABORTED
+[0.296] REQ_FAILED Elena_thumb.jpg net::ERR_ABORTED
+[0.296] REQ_FAILED Sanna_thumb.jpg net::ERR_ABORTED
+[0.296] REQ_FAILED Eden_thumb.jpg net::ERR_ABORTED
+[0.296] REQ_FAILED Maya_thumb.jpg net::ERR_ABORTED
+[0.296] REQ_FAILED Nadia.jpg net::ERR_ABORTED
+[0.296] REQ_FAILED sofia_thumb.jpg net::ERR_ABORTED
+[0.296] REQ_FAILED julia_thumb.jpg net::ERR_ABORTED
+[0.296] REQ_FAILED Sarah_thumb.jpg net::ERR_ABORTED
+[0.296] REQ_FAILED Erika_thumb.jpg net::ERR_ABORTED
+[0.298] CONSOLE.log [DIAG] STT_PATCH_INSTALLED
+[0.314] CONSOLE.log [TTS] OpenAI TTS module ready
+[0.321] CONSOLE.log [Transcript] Tool loaded. Press 📋 button to view session.
+[15.770] REQ_FAILED sofia_speaking.mp4 net::ERR_ABORTED
+[16.279] RELOAD_NETWORKIDLE
+[16.329] SPLASH_VISIBLE
+[16.386] CONSOLE.log [TTS] OpenAI TTS — no preload needed
+[16.389] CONSOLE.log [TTS] onyx: "You already know what to say. You just need to sto"
+[16.399] SPLASH_DISMISSED
+[16.909] CONSOLE.log [DIAG] PATCHED_speak
+[16.909] CONSOLE.log [DIAG] PATCHED_setMediaForSpeaker
+[16.910] CONSOLE.log [DIAG] PATCHED_speakElevenLabs
+[16.910] CONSOLE.log [DIAG] PATCHED_KokoroSpeech
+[16.911] CONSOLE.log [DIAG] INITIAL_SCENE_BG tag=VIDEO src=
+[16.911] CONSOLE.log [DIAG] RUNTIME_PATCHES_COMPLETE
+[16.911] RUNTIME_PATCHES_INSTALLED
+[16.916] PRE_TRIGGER_SNAPSHOT {"mediaSrc":"","sceneBgTag":"VIDEO","sceneBgSrc":""}
+[16.916] TRIGGER_PLAY_SCENARIO key=airport
+[16.928] CONSOLE.log [DIAG] STT_PATCH_INSTALLED
+[16.934] CONSOLE.log [DIAG] STT_PATCH_INSTALLED
+[17.074] CONSOLE.log [prefetch] intro warm-up: You're at an airport departure gate — the flight's been dela
+[17.074] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[17.074] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[17.877] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[17.877] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[17.878] CONSOLE.log [DIAG] DOM_ADD tag=VIDEO id=? class="" src=elena_speaking.mp4
+[17.878] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#sceneBg src=
+[17.878] CONSOLE.log [DIAG] DOM_REMOVE tag=VIDEO id=sceneBg class="scene-bg hidden" src=
+[17.878] CONSOLE.log [DIAG] DOM_ADD tag=IMG id=? class="scene-bg" src=airport_bg.jpg?v=2
+[17.878] CONSOLE.log [DIAG] ATTR_CLASS tag=DIV#stageFrame class="frame has-bg"
+[18.110] CONSOLE.log [DIAG] DOM_REMOVE tag=VIDEO id=? class="" src=elena_speaking.mp4
+[18.614] REQ_FAILED character-stream net::ERR_ABORTED
+[19.744] CONSOLE.log [prefetch] HIT: You're at an airport departure gate — the flight's been dela
+[19.744] CONSOLE.log [prefetch] queued next: The flight is delayed two hours. You're both stuck at the sa
+[19.744] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="You're at an airport departure gate — the flight's been dela"
+[19.744] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[19.744] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[19.745] CONSOLE.log [DIAG] KOKORO_START text="You're at an airport departure gate — th"
+[19.745] CONSOLE.log [TTS] onyx (prefetched): "You're at an airport departure gate — the flight's"
+[20.228] REQ_FAILED tts net::ERR_ABORTED
+[20.285] CONSOLE.log [DIAG] ATTR_CLASS tag=IMG#scene-bg class="scene-bg kb-active"
+[28.249] CONSOLE.log [DIAG] KOKORO_END
+[28.249] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=8504
+[28.504] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[28.504] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[28.504] CONSOLE.log [prefetch] HIT: The flight is delayed two hours. You're both stuck at the sa
+[28.505] CONSOLE.log [prefetch] queued next: Gate C14. The kind of grey limbo that makes strangers briefl
+[28.505] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="The flight is delayed two hours. You're both stuck at the sa"
+[28.505] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[28.505] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[28.505] CONSOLE.log [DIAG] KOKORO_START text="The flight is delayed two hours. You're "
+[28.505] CONSOLE.log [TTS] onyx (prefetched): "The flight is delayed two hours. You're both stuck"
+[38.749] CONSOLE.log [DIAG] KOKORO_END
+[38.749] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=10244
+[39.006] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[39.006] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[39.006] CONSOLE.log [prefetch] HIT: Gate C14. The kind of grey limbo that makes strangers briefl
+[39.008] CONSOLE.log [prefetch] queued next: Here's what most men miss: this is one of the best situation
+[39.008] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="Gate C14. The kind of grey limbo that makes strangers briefl"
+[39.008] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[39.008] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[39.008] CONSOLE.log [DIAG] KOKORO_START text="Gate C14. The kind of grey limbo that ma"
+[39.008] CONSOLE.log [TTS] onyx (prefetched): "Gate C14. The kind of grey limbo that makes strang"
+[49.228] CONSOLE.log [DIAG] KOKORO_END
+[49.229] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=10223
+[49.484] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[49.484] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[49.484] CONSOLE.log [prefetch] HIT: Here's what most men miss: this is one of the best situation
+[49.486] CONSOLE.log [prefetch] queued next: There's a specific type of opener that works here and almost
+[49.486] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="Here's what most men miss: this is one of the best situation"
+[49.486] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[49.486] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[49.486] CONSOLE.log [DIAG] KOKORO_START text="Here's what most men miss: this is one o"
+[49.486] CONSOLE.log [TTS] onyx (prefetched): "Here's what most men miss: this is one of the best"
+[58.090] CONSOLE.log [DIAG] KOKORO_END
+[58.091] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=8605
+[58.348] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[58.350] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[58.350] CONSOLE.log [prefetch] HIT: There's a specific type of opener that works here and almost
+[58.350] CONSOLE.log [prefetch] queued next: Walk over and sit nearby. She glances up from the book that 
+[58.350] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="There's a specific type of opener that works here and almost"
+[58.351] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[58.351] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[58.351] CONSOLE.log [DIAG] KOKORO_START text="There's a specific type of opener that w"
+[58.351] CONSOLE.log [TTS] onyx (prefetched): "There's a specific type of opener that works here "
+[62.929] CONSOLE.log [DIAG] KOKORO_END
+[62.929] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=4580
+[63.190] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[63.190] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[63.190] CONSOLE.log [prefetch] HIT: Walk over and sit nearby. She glances up from the book that 
+[63.190] CONSOLE.log [prefetch] queued next: What do you do?
+[63.190] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="Walk over and sit nearby. She glances up from the book that "
+[63.190] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[63.190] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[63.190] CONSOLE.log [DIAG] KOKORO_START text="Walk over and sit nearby. She glances up"
+[63.190] CONSOLE.log [TTS] onyx (prefetched): "Walk over and sit nearby. She glances up from the "
+[68.529] CONSOLE.log [DIAG] KOKORO_END
+[68.529] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=5339
+[68.782] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[68.782] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[68.783] CONSOLE.log [prefetch] HIT: What do you do?
+[68.784] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="What do you do?"
+[68.784] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[68.785] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[68.785] CONSOLE.log [DIAG] KOKORO_START text="What do you do?"
+[68.785] CONSOLE.log [TTS] onyx (prefetched): "What do you do?"
+[69.708] CONSOLE.log [DIAG] KOKORO_END
+[69.708] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=926
+[69.966] CONSOLE.log [DIAG] SET_MEDIA speaker=Mary prev_el=?#? prev_src=
+[69.966] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Mary new_el=? new_src=
+[69.966] CONSOLE.log [DIAG] DOM_ADD tag=VIDEO id=media class="media" src=elena_idle.mp4
+[71.169] CONSOLE.log [FC] loop start, elapsed: 1203 mySession: 1 session: 1
+[71.670] CONSOLE.log [DIAG] STT_START
+[74.671] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[74.671] CONSOLE.log [DIAG] STT_STOP
+[74.972] CONSOLE.log [DIAG] STT_START
+[80.670] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[80.670] CONSOLE.log [DIAG] STT_STOP
+[80.972] CONSOLE.log [DIAG] STT_START
+[86.670] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[86.670] CONSOLE.log [DIAG] STT_STOP
+[86.971] CONSOLE.log [DIAG] STT_START
+[92.671] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[92.671] CONSOLE.log [DIAG] STT_STOP
+[92.972] CONSOLE.log [DIAG] STT_START
+[98.671] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[98.671] CONSOLE.log [DIAG] STT_STOP
+[98.972] CONSOLE.log [DIAG] STT_START
+[101.672] CONSOLE.log [DIAG] STT_STOP
+[101.673] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[101.673] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="You look like you had something to say."
+[101.673] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[101.673] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[101.673] CONSOLE.log [DIAG] ELEVEN_LABS_START text="You look like you had something to say."
+[103.920] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_speaking.mp4
+[105.968] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[105.969] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_idle.mp4
+[105.969] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=4296
+[107.769] CONSOLE.log [FC] loop start, elapsed: 37803 mySession: 1 session: 1
+[108.270] CONSOLE.log [DIAG] STT_START
+[114.270] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[114.270] CONSOLE.log [DIAG] STT_STOP
+[114.571] CONSOLE.log [DIAG] STT_START
+[120.272] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[120.272] CONSOLE.log [DIAG] STT_STOP
+[120.572] CONSOLE.log [DIAG] STT_START
+[126.270] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[126.270] CONSOLE.log [DIAG] STT_STOP
+[126.571] CONSOLE.log [DIAG] STT_START
+[132.270] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[132.270] CONSOLE.log [DIAG] STT_STOP
+[132.572] CONSOLE.log [DIAG] STT_START
+[138.273] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[138.273] CONSOLE.log [DIAG] STT_STOP
+[138.274] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[138.274] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="Take your time."
+[138.274] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[138.274] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[138.274] CONSOLE.log [DIAG] ELEVEN_LABS_START text="Take your time."
+[139.224] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_speaking.mp4
+[140.281] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[140.282] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_idle.mp4
+[140.282] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=2009
+[142.084] CONSOLE.log [FC] loop start, elapsed: 72118 mySession: 1 session: 1
+[142.585] CONSOLE.log [DIAG] STT_START
+[145.586] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[145.586] CONSOLE.log [DIAG] STT_STOP
+[145.887] CONSOLE.log [DIAG] STT_START
+[151.587] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[151.587] CONSOLE.log [DIAG] STT_STOP
+[151.887] CONSOLE.log [DIAG] STT_START
+[157.584] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[157.584] CONSOLE.log [DIAG] STT_STOP
+[157.885] CONSOLE.log [DIAG] STT_START
+[163.585] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[163.585] CONSOLE.log [DIAG] STT_STOP
+[163.886] CONSOLE.log [DIAG] STT_START
+[169.585] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[169.585] CONSOLE.log [DIAG] STT_STOP
+[169.886] CONSOLE.log [DIAG] STT_START
+[172.584] CONSOLE.log [DIAG] STT_STOP
+[172.585] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[172.585] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="We've got time. Flight's delayed."
+[172.585] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[172.585] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[172.585] CONSOLE.log [DIAG] ELEVEN_LABS_START text="We've got time. Flight's delayed."
+[202.668] CONSOLE.error Failed to load resource: the server responded with a status of 504 ()
+[202.669] CONSOLE.warning TTS failed, retrying... TTS failed: 504
+[207.428] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_speaking.mp4
+[209.339] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[209.343] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_idle.mp4
+[209.343] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=36755
+[211.144] CONSOLE.log [FC] loop start, elapsed: 141177 mySession: 1 session: 1
+[211.644] CONSOLE.log [DIAG] STT_START
+[214.646] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[214.646] CONSOLE.log [DIAG] STT_STOP
+[214.946] CONSOLE.log [DIAG] STT_START
+[220.644] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[220.644] CONSOLE.log [DIAG] STT_STOP
+[220.945] CONSOLE.log [DIAG] STT_START
+[226.646] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[226.646] CONSOLE.log [DIAG] STT_STOP
+[226.947] CONSOLE.log [DIAG] STT_START
+[232.645] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[232.645] CONSOLE.log [DIAG] STT_STOP
+[232.947] CONSOLE.log [DIAG] STT_START
+[238.646] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[238.646] CONSOLE.log [DIAG] STT_STOP
+[238.947] CONSOLE.log [DIAG] STT_START
+[241.648] CONSOLE.log [DIAG] STT_STOP
+[241.648] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[241.648] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="The board hasn't changed."
+[241.648] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[241.648] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[241.648] CONSOLE.log [DIAG] ELEVEN_LABS_START text="The board hasn't changed."
+[244.005] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_speaking.mp4
+[245.414] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[245.414] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_idle.mp4
+[245.414] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=3763
+[247.213] CONSOLE.log [FC] loop start, elapsed: 177247 mySession: 1 session: 1
+[247.712] CONSOLE.log [DIAG] STT_START
+[250.714] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[250.714] CONSOLE.log [DIAG] STT_STOP
+[251.015] CONSOLE.log [DIAG] STT_START
+[256.712] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[256.712] CONSOLE.log [DIAG] STT_STOP
+[257.013] CONSOLE.log [DIAG] STT_START
+[262.713] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[262.714] CONSOLE.log [DIAG] STT_STOP
+[263.015] CONSOLE.log [DIAG] STT_START
+[268.713] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[268.713] CONSOLE.log [DIAG] STT_STOP
+[269.013] CONSOLE.log [DIAG] STT_START
+[274.713] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[274.713] CONSOLE.log [DIAG] STT_STOP
+[275.014] CONSOLE.log [DIAG] STT_START
+[277.714] CONSOLE.log [DIAG] STT_STOP
+[277.714] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[277.714] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="Still working up to it?"
+[277.715] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[277.715] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[277.715] CONSOLE.log [DIAG] ELEVEN_LABS_START text="Still working up to it?"
+[280.389] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_speaking.mp4
+[281.916] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[281.916] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_idle.mp4
+[281.916] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=4200
+[283.715] CONSOLE.log [FC] loop start, elapsed: 213749 mySession: 1 session: 1
+[284.217] CONSOLE.log [DIAG] STT_START
+[287.217] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[287.217] CONSOLE.log [DIAG] STT_STOP
+[287.518] CONSOLE.log [DIAG] STT_START
+[293.217] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[293.217] CONSOLE.log [DIAG] STT_STOP
+[293.519] CONSOLE.log [DIAG] STT_START
+[299.218] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[299.218] CONSOLE.log [DIAG] STT_STOP
+[299.519] CONSOLE.log [DIAG] STT_START
+[305.217] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[305.217] CONSOLE.log [DIAG] STT_STOP
+[305.519] CONSOLE.log [DIAG] STT_START
+[311.219] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[311.220] CONSOLE.log [DIAG] STT_STOP
+[311.521] CONSOLE.log [DIAG] STT_START
+[314.219] CONSOLE.log [DIAG] STT_STOP
+[314.219] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[314.219] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="Most people just stay in their seat."
+[314.219] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[314.219] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[314.219] CONSOLE.log [DIAG] ELEVEN_LABS_START text="Most people just stay in their seat."
+[316.274] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_speaking.mp4
+[318.463] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[318.463] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_idle.mp4
+[318.463] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=4243
+[320.264] CONSOLE.log [FC] loop start, elapsed: 250298 mySession: 1 session: 1
+[320.769] CONSOLE.log [DIAG] STT_START
+[323.766] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[323.766] CONSOLE.log [DIAG] STT_STOP
+[324.071] CONSOLE.log [DIAG] STT_START
+[329.766] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[329.766] CONSOLE.log [DIAG] STT_STOP
+[330.066] CONSOLE.log [DIAG] STT_START
+[335.766] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[335.766] CONSOLE.log [DIAG] STT_STOP
+[336.066] CONSOLE.log [DIAG] STT_START
+[341.765] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[341.765] CONSOLE.log [DIAG] STT_STOP
+[342.066] CONSOLE.log [DIAG] STT_START
+[347.765] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[347.765] CONSOLE.log [DIAG] STT_STOP
+[348.067] CONSOLE.log [DIAG] STT_START
+[350.765] CONSOLE.log [DIAG] STT_STOP
+[350.766] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[350.766] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="We've got time. Flight's delayed."
+[350.766] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[350.766] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[350.766] CONSOLE.log [DIAG] ELEVEN_LABS_START text="We've got time. Flight's delayed."
+[352.154] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_speaking.mp4
+[354.176] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[354.176] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_idle.mp4
+[354.176] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=3411
+[355.978] CONSOLE.log [FC] loop start, elapsed: 286012 mySession: 1 session: 1
+[356.478] CONSOLE.log [DIAG] STT_START
+[359.479] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[359.479] CONSOLE.log [DIAG] STT_STOP
+[359.779] CONSOLE.log [DIAG] STT_START
+[365.480] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[365.480] CONSOLE.log [DIAG] STT_STOP
+[365.779] CONSOLE.log [DIAG] STT_START
+[371.479] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[371.479] CONSOLE.log [DIAG] STT_STOP
+[371.781] CONSOLE.log [DIAG] STT_START
+[377.479] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[377.479] CONSOLE.log [DIAG] STT_STOP
+[377.780] CONSOLE.log [DIAG] STT_START
+[383.480] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[383.480] CONSOLE.log [DIAG] STT_STOP
+[383.781] CONSOLE.log [DIAG] STT_START
+[386.480] CONSOLE.log [DIAG] STT_STOP
+[386.481] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[386.481] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="You look like you had something to say."
+[386.481] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[386.481] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[386.481] CONSOLE.log [DIAG] ELEVEN_LABS_START text="You look like you had something to say."
+[388.719] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_speaking.mp4
+[391.136] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[391.136] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_idle.mp4
+[391.137] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=4656
+[392.937] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="Two minutes left -- make it count."
+[392.937] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[392.939] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[392.940] CONSOLE.log [DIAG] KOKORO_START text="Two minutes left -- make it count."
+[392.940] CONSOLE.log [TTS] onyx (prefetched): "Two minutes left -- make it count."
+[392.940] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=
+[392.940] CONSOLE.log [DIAG] DOM_REMOVE tag=VIDEO id=media class="media" src=
+[395.181] CONSOLE.log [DIAG] KOKORO_END
+[395.181] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=2244
+[396.089] CONSOLE.log [DIAG] SET_MEDIA speaker=Mary prev_el=?#? prev_src=
+[396.089] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Mary new_el=? new_src=
+[396.089] CONSOLE.log [FC] loop start, elapsed: 326125 mySession: 1 session: 1
+[396.090] CONSOLE.log [DIAG] DOM_ADD tag=VIDEO id=media class="media" src=elena_idle.mp4
+[396.591] CONSOLE.log [DIAG] STT_START
+[399.593] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[399.593] CONSOLE.log [DIAG] STT_STOP
+[399.894] CONSOLE.log [DIAG] STT_START
+[405.591] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[405.591] CONSOLE.log [DIAG] STT_STOP
+[405.893] CONSOLE.log [DIAG] STT_START
+[411.593] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[411.593] CONSOLE.log [DIAG] STT_STOP
+[411.893] CONSOLE.log [DIAG] STT_START
+[417.591] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[417.591] CONSOLE.log [DIAG] STT_STOP
+[417.892] CONSOLE.log [DIAG] STT_START
+[423.592] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[423.592] CONSOLE.log [DIAG] STT_STOP
+[423.892] CONSOLE.log [DIAG] STT_START
+[426.594] CONSOLE.log [DIAG] STT_STOP
+[426.594] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[426.594] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="Still working up to it?"
+[426.595] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[426.595] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[426.595] CONSOLE.log [DIAG] ELEVEN_LABS_START text="Still working up to it?"
+[428.864] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_speaking.mp4
+[430.435] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[430.436] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_idle.mp4
+[430.436] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=3841
+[432.238] CONSOLE.log [FC] loop start, elapsed: 362273 mySession: 1 session: 1
+[432.738] CONSOLE.log [DIAG] STT_START
+[435.740] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[435.740] CONSOLE.log [DIAG] STT_STOP
+[436.040] CONSOLE.log [DIAG] STT_START
+[441.740] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[441.740] CONSOLE.log [DIAG] STT_STOP
+[442.041] CONSOLE.log [DIAG] STT_START
+[447.739] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[447.739] CONSOLE.log [DIAG] STT_STOP
+[448.041] CONSOLE.log [DIAG] STT_START
+[453.740] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[453.740] CONSOLE.log [DIAG] STT_STOP
+[454.042] CONSOLE.log [DIAG] STT_START
+[459.739] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[459.739] CONSOLE.log [DIAG] STT_STOP
+[460.041] CONSOLE.log [DIAG] STT_START
+[462.740] CONSOLE.log [DIAG] STT_STOP
+[462.740] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[462.740] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="Most people just stay in their seat."
+[462.740] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[462.740] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[462.740] CONSOLE.log [DIAG] ELEVEN_LABS_START text="Most people just stay in their seat."
+[465.483] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_speaking.mp4
+[467.867] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[467.868] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_idle.mp4
+[467.868] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=5126
+[469.668] CONSOLE.log [FC] loop start, elapsed: 399702 mySession: 1 session: 1
+[470.169] CONSOLE.log [DIAG] STT_START
+[476.171] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[476.171] CONSOLE.log [DIAG] STT_STOP
+[476.471] CONSOLE.log [DIAG] STT_START
+[482.171] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[482.171] CONSOLE.log [DIAG] STT_STOP
+[482.471] CONSOLE.log [DIAG] STT_START
+[488.170] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[488.170] CONSOLE.log [DIAG] STT_STOP
+[488.472] CONSOLE.log [DIAG] STT_START
+[490.467] CONSOLE.log [DIAG] STT_STOP
+[490.469] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[490.469] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="Take your time."
+[490.470] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[490.470] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[490.470] CONSOLE.log [DIAG] ELEVEN_LABS_START text="Take your time."
+[492.292] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_speaking.mp4
+[493.337] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[493.337] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=elena_idle.mp4
+[493.337] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=2870
+[495.139] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="That's time. Let me put together your feedback."
+[495.139] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[495.140] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[495.141] CONSOLE.log [DIAG] KOKORO_START text="That's time. Let me put together your fe"
+[495.141] CONSOLE.log [TTS] onyx: "That's time. Let me put together your feedback."
+[495.142] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=
+[495.142] CONSOLE.log [DIAG] DOM_REMOVE tag=VIDEO id=media class="media" src=
+[498.908] CONSOLE.log [DIAG] KOKORO_END
+[498.908] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=3770
+[498.909] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[498.909] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[498.909] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="Looks like we didn't get enough conversation to work with. H"
+[498.909] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[498.910] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[498.910] CONSOLE.log [DIAG] KOKORO_START text="Looks like we didn't get enough conversa"
+[498.910] CONSOLE.log [TTS] onyx: "Looks like we didn't get enough conversation to wo"
+[507.110] CONSOLE.log [DIAG] KOKORO_END
+[507.110] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=8201
+[507.111] PLAY_SCENARIO_CALLED
+[527.129] FINAL_SNAPSHOT {"mediaTag":"DIV","mediaId":"ryan-orb","mediaSrc":"","sceneBgTag":"IMG","sceneBgSrc":"airport_bg.jpg?v=2"}
+[527.129] CAPTURE_COMPLETE

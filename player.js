@@ -479,10 +479,10 @@ const DailyLimit = (() => {
     overlay.innerHTML = `
       <div style="font-size:44px;margin-bottom:12px">🔐</div>
       <div style="color:#fff;font-size:24px;font-weight:800;margin-bottom:10px;letter-spacing:-0.5px">
-        You've used your 3 free sessions
+        You've used your 2 free sessions
       </div>
       <div style="color:#9aa4b2;font-size:15px;max-width:360px;margin-bottom:28px;line-height:1.6">
-        Come back tomorrow for 3 more — or unlock unlimited practice below.
+        Come back tomorrow for 2 more — or unlock unlimited practice below.
       </div>
       <div style="display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap;justify-content:center">
         <div style="background:#1a1f2e;border:1px solid #2a3040;border-radius:16px;padding:20px 24px;min-width:200px;text-align:center">

@@ -1,0 +1,515 @@
+[0.011] NAVIGATE_START url=https://eklipses.vercel.app
+[0.133] CONSOLE.log [DIAG] STT_PATCH_INSTALLED
+[0.247] CONSOLE.log [TTS] OpenAI TTS module ready
+[0.391] CONSOLE.log [Transcript] Tool loaded. Press 📋 button to view session.
+[0.391] DOMCONTENTLOADED
+[0.729] REQ_FAILED sofia_speaking.mp4 net::ERR_ABORTED
+[0.729] REQ_FAILED config.js net::ERR_ABORTED
+[0.730] REQ_FAILED Maya_thumb.jpg net::ERR_ABORTED
+[0.730] REQ_FAILED Sanna_thumb.jpg net::ERR_ABORTED
+[0.730] REQ_FAILED Elena_thumb.jpg net::ERR_ABORTED
+[0.730] REQ_FAILED Sarah_thumb.jpg net::ERR_ABORTED
+[0.731] REQ_FAILED Isabelle_thumb.jpg net::ERR_ABORTED
+[0.732] REQ_FAILED Eden_thumb.jpg net::ERR_ABORTED
+[0.732] REQ_FAILED Fatou_thumb.jpg net::ERR_ABORTED
+[0.732] REQ_FAILED Anna_thumb.jpg net::ERR_ABORTED
+[0.732] REQ_FAILED Leila_thumb.jpg net::ERR_ABORTED
+[0.732] REQ_FAILED julia_thumb.jpg net::ERR_ABORTED
+[0.732] REQ_FAILED Erika_thumb.jpg net::ERR_ABORTED
+[0.732] REQ_FAILED zoe_thumb.jpg net::ERR_ABORTED
+[0.739] CONSOLE.log [DIAG] STT_PATCH_INSTALLED
+[0.934] CONSOLE.log [TTS] OpenAI TTS module ready
+[0.943] CONSOLE.log [Transcript] Tool loaded. Press 📋 button to view session.
+[16.246] REQ_FAILED sofia_speaking.mp4 net::ERR_ABORTED
+[16.757] RELOAD_NETWORKIDLE
+[16.791] SPLASH_VISIBLE
+[16.863] CONSOLE.log [TTS] OpenAI TTS — no preload needed
+[16.866] CONSOLE.log [TTS] onyx: "You already know what to say. You just need to sto"
+[16.880] SPLASH_DISMISSED
+[17.393] CONSOLE.log [DIAG] PATCHED_speak
+[17.393] CONSOLE.log [DIAG] PATCHED_setMediaForSpeaker
+[17.393] CONSOLE.log [DIAG] PATCHED_speakElevenLabs
+[17.393] CONSOLE.log [DIAG] PATCHED_KokoroSpeech
+[17.393] CONSOLE.log [DIAG] INITIAL_SCENE_BG tag=VIDEO src=
+[17.393] CONSOLE.log [DIAG] RUNTIME_PATCHES_COMPLETE
+[17.393] RUNTIME_PATCHES_INSTALLED
+[17.395] PRE_TRIGGER_SNAPSHOT {"mediaSrc":"","sceneBgTag":"VIDEO","sceneBgSrc":""}
+[17.395] TRIGGER_PLAY_SCENARIO key=beach
+[17.409] CONSOLE.log [DIAG] STT_PATCH_INSTALLED
+[17.413] CONSOLE.log [DIAG] STT_PATCH_INSTALLED
+[17.561] CONSOLE.log [prefetch] intro warm-up: You're on a beach, late afternoon. She's been sitting there 
+[17.561] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[17.561] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[18.365] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[18.366] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[18.366] CONSOLE.log [DIAG] DOM_ADD tag=VIDEO id=? class="" src=sofia_speaking.mp4
+[18.366] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#sceneBg src=
+[18.366] CONSOLE.log [DIAG] DOM_REMOVE tag=VIDEO id=sceneBg class="scene-bg hidden" src=
+[18.366] CONSOLE.log [DIAG] DOM_ADD tag=VIDEO id=? class="scene-bg" src=beach_bg.mp4
+[18.366] CONSOLE.log [DIAG] ATTR_CLASS tag=DIV#stageFrame class="frame has-bg"
+[18.445] CONSOLE.log [DIAG] DOM_REMOVE tag=VIDEO id=? class="" src=sofia_speaking.mp4
+[18.544] REQ_FAILED beach_bg.mp4 net::ERR_ABORTED
+[18.643] REQ_FAILED tts net::ERR_ABORTED
+[18.680] CONSOLE.log [prefetch] HIT: You're on a beach, late afternoon. She's been sitting there 
+[18.681] CONSOLE.log [prefetch] queued next: You've walked past a woman like this before. You felt it — t
+[18.681] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="You're on a beach, late afternoon. She's been sitting there "
+[18.681] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[18.681] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[18.681] CONSOLE.log [DIAG] KOKORO_START text="You're on a beach, late afternoon. She's"
+[18.681] CONSOLE.log [TTS] onyx (prefetched): "You're on a beach, late afternoon. She's been sitt"
+[18.845] CONSOLE.log [DIAG] KOKORO_END
+[18.845] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=147
+[19.092] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[19.093] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[19.612] REQ_FAILED character-stream net::ERR_ABORTED
+[21.244] CONSOLE.log [prefetch] HIT: You've walked past a woman like this before. You felt it — t
+[21.245] CONSOLE.log [prefetch] queued next: You told yourself the timing was wrong. You thought of somet
+[21.245] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="You've walked past a woman like this before. You felt it — t"
+[21.245] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[21.245] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[21.245] CONSOLE.log [DIAG] KOKORO_START text="You've walked past a woman like this bef"
+[21.246] CONSOLE.log [TTS] onyx (prefetched): "You've walked past a woman like this before. You f"
+[21.467] REQ_FAILED beach_bg.mp4 net::ERR_ABORTED
+[27.700] CONSOLE.log [DIAG] KOKORO_END
+[27.700] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=6565
+[27.955] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[27.955] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[27.955] CONSOLE.log [prefetch] HIT: You told yourself the timing was wrong. You thought of somet
+[27.962] CONSOLE.log [prefetch] queued next: This time is different. It's late afternoon. The beach is al
+[27.962] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="You told yourself the timing was wrong. You thought of somet"
+[27.962] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[27.962] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[27.962] CONSOLE.log [DIAG] KOKORO_START text="You told yourself the timing was wrong. "
+[27.962] CONSOLE.log [TTS] onyx (prefetched): "You told yourself the timing was wrong. You though"
+[34.507] CONSOLE.log [DIAG] KOKORO_END
+[34.507] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=6545
+[34.775] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[34.775] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[34.775] CONSOLE.log [prefetch] HIT: This time is different. It's late afternoon. The beach is al
+[34.775] CONSOLE.log [prefetch] queued next: She's been sitting there for twenty minutes, writing somethi
+[34.779] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="This time is different. It's late afternoon. The beach is al"
+[34.779] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[34.779] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[34.780] CONSOLE.log [DIAG] KOKORO_START text="This time is different. It's late aftern"
+[34.780] CONSOLE.log [TTS] onyx (prefetched): "This time is different. It's late afternoon. The b"
+[39.248] CONSOLE.log [DIAG] KOKORO_END
+[39.251] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=4483
+[39.507] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[39.517] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[39.518] CONSOLE.log [prefetch] HIT: She's been sitting there for twenty minutes, writing somethi
+[39.518] CONSOLE.log [prefetch] queued next: Your heart is going. Your mind is already making excuses. Bu
+[39.518] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="She's been sitting there for twenty minutes, writing somethi"
+[39.518] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[39.518] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[39.518] CONSOLE.log [DIAG] KOKORO_START text="She's been sitting there for twenty minu"
+[39.518] CONSOLE.log [TTS] onyx (prefetched): "She's been sitting there for twenty minutes, writi"
+[46.951] CONSOLE.log [DIAG] KOKORO_END
+[46.951] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=7437
+[47.203] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[47.203] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[69.593] CONSOLE.error Failed to load resource: the server responded with a status of 504 ()
+[69.594] CONSOLE.log [prefetch] HIT: Your heart is going. Your mind is already making excuses. Bu
+[69.594] CONSOLE.log [prefetch] queued next: Gather everything you have. Walk toward her. She looks up.
+[69.594] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="Your heart is going. Your mind is already making excuses. Bu"
+[69.594] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[69.595] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[69.595] CONSOLE.log [DIAG] KOKORO_START text="Your heart is going. Your mind is alread"
+[69.595] CONSOLE.log [TTS] onyx: "Your heart is going. Your mind is already making e"
+[81.442] CONSOLE.log [DIAG] KOKORO_END
+[81.443] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=11847
+[81.711] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[81.712] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[81.724] CONSOLE.log [prefetch] HIT: Gather everything you have. Walk toward her. She looks up.
+[81.724] CONSOLE.log [prefetch] queued next: What do you do?
+[81.725] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="Gather everything you have. Walk toward her. She looks up."
+[81.725] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[81.725] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[81.725] CONSOLE.log [DIAG] KOKORO_START text="Gather everything you have. Walk toward "
+[81.725] CONSOLE.log [TTS] onyx (prefetched): "Gather everything you have. Walk toward her. She l"
+[85.325] CONSOLE.log [DIAG] KOKORO_END
+[85.325] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=3626
+[85.579] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[85.580] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[85.581] CONSOLE.log [prefetch] HIT: What do you do?
+[85.581] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="What do you do?"
+[85.581] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[85.582] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[85.582] CONSOLE.log [DIAG] KOKORO_START text="What do you do?"
+[85.583] CONSOLE.log [TTS] onyx (prefetched): "What do you do?"
+[86.643] CONSOLE.log [DIAG] KOKORO_END
+[86.643] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=1064
+[86.906] CONSOLE.log [DIAG] SET_MEDIA speaker=Mary prev_el=?#? prev_src=
+[86.907] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Mary new_el=? new_src=
+[86.907] CONSOLE.log [DIAG] DOM_ADD tag=VIDEO id=media class="media" src=sofia_idle.mp4
+[88.117] CONSOLE.log [FC] loop start, elapsed: 1214 mySession: 1 session: 1
+[88.626] CONSOLE.log [DIAG] STT_START
+[91.630] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[91.630] CONSOLE.log [DIAG] STT_STOP
+[91.937] CONSOLE.log [DIAG] STT_START
+[97.636] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[97.636] CONSOLE.log [DIAG] STT_STOP
+[97.937] CONSOLE.log [DIAG] STT_START
+[103.638] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[103.638] CONSOLE.log [DIAG] STT_STOP
+[103.945] CONSOLE.log [DIAG] STT_START
+[109.633] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[109.633] CONSOLE.log [DIAG] STT_STOP
+[109.936] CONSOLE.log [DIAG] STT_START
+[115.626] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[115.626] CONSOLE.log [DIAG] STT_STOP
+[115.941] CONSOLE.log [DIAG] STT_START
+[116.964] CONSOLE.error Failed to load resource: the server responded with a status of 504 ()
+[118.641] CONSOLE.log [DIAG] STT_STOP
+[118.641] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[118.641] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="I saw you walk by earlier."
+[118.641] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[118.641] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[118.641] CONSOLE.log [DIAG] ELEVEN_LABS_START text="I saw you walk by earlier."
+[119.459] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_speaking.mp4
+[121.006] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[121.007] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_idle.mp4
+[121.012] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=2362
+[121.012] REQ_FAILED sofia_speaking.mp4 net::ERR_ABORTED
+[122.812] CONSOLE.log [FC] loop start, elapsed: 35909 mySession: 1 session: 1
+[123.324] CONSOLE.log [DIAG] STT_START
+[126.330] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[126.330] CONSOLE.log [DIAG] STT_STOP
+[126.643] CONSOLE.log [DIAG] STT_START
+[132.326] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[132.326] CONSOLE.log [DIAG] STT_STOP
+[132.642] CONSOLE.log [DIAG] STT_START
+[138.330] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[138.330] CONSOLE.log [DIAG] STT_STOP
+[138.634] CONSOLE.log [DIAG] STT_START
+[144.328] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[144.328] CONSOLE.log [DIAG] STT_STOP
+[144.633] CONSOLE.log [DIAG] STT_START
+[150.334] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[150.334] CONSOLE.log [DIAG] STT_STOP
+[150.646] CONSOLE.log [DIAG] STT_START
+[153.330] CONSOLE.log [DIAG] STT_STOP
+[153.331] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[153.331] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="The waves aren't that interesting, I promise."
+[153.335] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[153.335] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[153.335] CONSOLE.log [DIAG] ELEVEN_LABS_START text="The waves aren't that interesting, I pro"
+[153.765] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_speaking.mp4
+[156.021] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[156.022] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_idle.mp4
+[156.022] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=2691
+[156.027] REQ_FAILED sofia_speaking.mp4 net::ERR_ABORTED
+[157.823] CONSOLE.log [FC] loop start, elapsed: 70920 mySession: 1 session: 1
+[158.325] CONSOLE.log [DIAG] STT_START
+[161.330] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[161.330] CONSOLE.log [DIAG] STT_STOP
+[161.639] CONSOLE.log [DIAG] STT_START
+[167.337] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[167.338] CONSOLE.log [DIAG] STT_STOP
+[167.647] CONSOLE.log [DIAG] STT_START
+[173.336] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[173.336] CONSOLE.log [DIAG] STT_STOP
+[173.636] CONSOLE.log [DIAG] STT_START
+[179.338] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[179.338] CONSOLE.log [DIAG] STT_STOP
+[179.648] CONSOLE.log [DIAG] STT_START
+[185.336] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[185.336] CONSOLE.log [DIAG] STT_STOP
+[185.643] CONSOLE.log [DIAG] STT_START
+[188.331] CONSOLE.log [DIAG] STT_STOP
+[188.331] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[188.331] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="I don't bite. Usually."
+[188.333] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[188.334] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[188.334] CONSOLE.log [DIAG] ELEVEN_LABS_START text="I don't bite. Usually."
+[188.659] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_speaking.mp4
+[190.277] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[190.278] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_idle.mp4
+[190.278] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=1947
+[190.278] REQ_FAILED sofia_speaking.mp4 net::ERR_ABORTED
+[192.076] CONSOLE.log [FC] loop start, elapsed: 105172 mySession: 1 session: 1
+[192.586] CONSOLE.log [DIAG] STT_START
+[195.591] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[195.591] CONSOLE.log [DIAG] STT_STOP
+[195.904] CONSOLE.log [DIAG] STT_START
+[201.594] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[201.594] CONSOLE.log [DIAG] STT_STOP
+[201.908] CONSOLE.log [DIAG] STT_START
+[207.601] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[207.601] CONSOLE.log [DIAG] STT_STOP
+[207.911] CONSOLE.log [DIAG] STT_START
+[213.597] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[213.597] CONSOLE.log [DIAG] STT_STOP
+[213.905] CONSOLE.log [DIAG] STT_START
+[219.597] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[219.597] CONSOLE.log [DIAG] STT_STOP
+[219.910] CONSOLE.log [DIAG] STT_START
+[222.590] CONSOLE.log [DIAG] STT_STOP
+[222.590] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[222.590] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="You walked all the way over here. Might as well say somethin"
+[222.591] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[222.591] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[222.591] CONSOLE.log [DIAG] ELEVEN_LABS_START text="You walked all the way over here. Might "
+[223.197] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_speaking.mp4
+[226.519] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[226.521] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_idle.mp4
+[226.521] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=3930
+[226.521] REQ_FAILED sofia_speaking.mp4 net::ERR_ABORTED
+[228.331] CONSOLE.log [FC] loop start, elapsed: 141427 mySession: 1 session: 1
+[228.841] CONSOLE.log [DIAG] STT_START
+[231.853] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[231.854] CONSOLE.log [DIAG] STT_STOP
+[232.159] CONSOLE.log [DIAG] STT_START
+[237.844] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[237.844] CONSOLE.log [DIAG] STT_STOP
+[238.155] CONSOLE.log [DIAG] STT_START
+[243.842] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[243.842] CONSOLE.log [DIAG] STT_STOP
+[244.151] CONSOLE.log [DIAG] STT_START
+[249.853] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[249.853] CONSOLE.log [DIAG] STT_STOP
+[250.163] CONSOLE.log [DIAG] STT_START
+[255.844] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[255.845] CONSOLE.log [DIAG] STT_STOP
+[256.155] CONSOLE.log [DIAG] STT_START
+[258.850] CONSOLE.log [DIAG] STT_STOP
+[258.852] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[258.852] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="You can sit if you want. I don't mind."
+[258.852] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[258.852] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[258.852] CONSOLE.log [DIAG] ELEVEN_LABS_START text="You can sit if you want. I don't mind."
+[259.369] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_speaking.mp4
+[261.751] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[261.753] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_idle.mp4
+[261.755] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=2902
+[261.756] REQ_FAILED sofia_speaking.mp4 net::ERR_ABORTED
+[263.557] CONSOLE.log [FC] loop start, elapsed: 176655 mySession: 1 session: 1
+[264.060] CONSOLE.log [DIAG] STT_START
+[267.062] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[267.062] CONSOLE.log [DIAG] STT_STOP
+[267.375] CONSOLE.log [DIAG] STT_START
+[273.063] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[273.063] CONSOLE.log [DIAG] STT_STOP
+[273.374] CONSOLE.log [DIAG] STT_START
+[279.062] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[279.062] CONSOLE.log [DIAG] STT_STOP
+[279.364] CONSOLE.log [DIAG] STT_START
+[285.061] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[285.061] CONSOLE.log [DIAG] STT_STOP
+[285.363] CONSOLE.log [DIAG] STT_START
+[291.067] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[291.067] CONSOLE.log [DIAG] STT_STOP
+[291.367] CONSOLE.log [DIAG] STT_START
+[294.068] CONSOLE.log [DIAG] STT_STOP
+[294.068] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[294.068] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="Still working up to it?"
+[294.069] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[294.069] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[294.069] CONSOLE.log [DIAG] ELEVEN_LABS_START text="Still working up to it?"
+[294.544] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_speaking.mp4
+[295.920] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[295.921] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_idle.mp4
+[295.921] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=1852
+[295.921] REQ_FAILED sofia_speaking.mp4 net::ERR_ABORTED
+[297.722] CONSOLE.log [FC] loop start, elapsed: 210820 mySession: 1 session: 1
+[298.230] CONSOLE.log [DIAG] STT_START
+[301.231] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[301.231] CONSOLE.log [DIAG] STT_STOP
+[301.535] CONSOLE.log [DIAG] STT_START
+[307.229] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[307.229] CONSOLE.log [DIAG] STT_STOP
+[307.538] CONSOLE.log [DIAG] STT_START
+[313.238] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[313.238] CONSOLE.log [DIAG] STT_STOP
+[313.549] CONSOLE.log [DIAG] STT_START
+[319.241] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[319.241] CONSOLE.log [DIAG] STT_STOP
+[319.552] CONSOLE.log [DIAG] STT_START
+[325.245] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[325.245] CONSOLE.log [DIAG] STT_STOP
+[325.546] CONSOLE.log [DIAG] STT_START
+[328.239] CONSOLE.log [DIAG] STT_STOP
+[328.240] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[328.240] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="Take your time."
+[328.240] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[328.240] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[328.240] CONSOLE.log [DIAG] ELEVEN_LABS_START text="Take your time."
+[328.646] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_speaking.mp4
+[329.651] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[329.652] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_idle.mp4
+[329.654] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=1413
+[329.654] REQ_FAILED sofia_speaking.mp4 net::ERR_ABORTED
+[331.462] CONSOLE.log [FC] loop start, elapsed: 244559 mySession: 1 session: 1
+[331.973] CONSOLE.log [DIAG] STT_START
+[334.987] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[334.987] CONSOLE.log [DIAG] STT_STOP
+[335.293] CONSOLE.log [DIAG] STT_START
+[340.974] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[340.974] CONSOLE.log [DIAG] STT_STOP
+[341.289] CONSOLE.log [DIAG] STT_START
+[346.986] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[346.987] CONSOLE.log [DIAG] STT_STOP
+[347.292] CONSOLE.log [DIAG] STT_START
+[352.976] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[352.976] CONSOLE.log [DIAG] STT_STOP
+[353.286] CONSOLE.log [DIAG] STT_START
+[358.975] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[358.975] CONSOLE.log [DIAG] STT_STOP
+[359.286] CONSOLE.log [DIAG] STT_START
+[361.981] CONSOLE.log [DIAG] STT_STOP
+[361.981] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[361.981] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="The quiet is better when someone breaks it well."
+[361.982] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[361.982] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[361.982] CONSOLE.log [DIAG] ELEVEN_LABS_START text="The quiet is better when someone breaks "
+[362.433] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_speaking.mp4
+[364.920] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[364.921] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_idle.mp4
+[364.921] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=2940
+[364.923] REQ_FAILED sofia_speaking.mp4 net::ERR_ABORTED
+[366.723] CONSOLE.log [FC] loop start, elapsed: 279819 mySession: 1 session: 1
+[367.226] CONSOLE.log [DIAG] STT_START
+[370.226] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[370.226] CONSOLE.log [DIAG] STT_STOP
+[370.539] CONSOLE.log [DIAG] STT_START
+[376.225] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[376.225] CONSOLE.log [DIAG] STT_STOP
+[376.526] CONSOLE.log [DIAG] STT_START
+[382.224] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[382.224] CONSOLE.log [DIAG] STT_STOP
+[382.538] CONSOLE.log [DIAG] STT_START
+[388.226] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[388.227] CONSOLE.log [DIAG] STT_STOP
+[388.531] CONSOLE.log [DIAG] STT_START
+[394.226] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[394.226] CONSOLE.log [DIAG] STT_STOP
+[394.527] CONSOLE.log [DIAG] STT_START
+[397.238] CONSOLE.log [DIAG] STT_STOP
+[397.238] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[397.238] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="Most people just walk past. You didn't."
+[397.238] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[397.238] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[397.238] CONSOLE.log [DIAG] ELEVEN_LABS_START text="Most people just walk past. You didn't."
+[397.813] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_speaking.mp4
+[400.351] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[400.351] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_idle.mp4
+[400.351] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=3114
+[400.354] REQ_FAILED sofia_speaking.mp4 net::ERR_ABORTED
+[402.164] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="Two minutes left -- make it count."
+[402.164] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[402.171] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[402.171] CONSOLE.log [DIAG] KOKORO_START text="Two minutes left -- make it count."
+[402.172] CONSOLE.log [TTS] onyx: "Two minutes left -- make it count."
+[402.172] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=
+[402.172] CONSOLE.log [DIAG] DOM_REMOVE tag=VIDEO id=media class="media" src=
+[402.180] REQ_FAILED sofia_idle.mp4 net::ERR_ABORTED
+[405.519] CONSOLE.log [DIAG] KOKORO_END
+[405.519] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=3356
+[406.421] CONSOLE.log [DIAG] SET_MEDIA speaker=Mary prev_el=?#? prev_src=
+[406.421] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Mary new_el=? new_src=
+[406.422] CONSOLE.log [FC] loop start, elapsed: 319520 mySession: 1 session: 1
+[406.422] CONSOLE.log [DIAG] DOM_ADD tag=VIDEO id=media class="media" src=sofia_idle.mp4
+[406.925] CONSOLE.log [DIAG] STT_START
+[409.926] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[409.926] CONSOLE.log [DIAG] STT_STOP
+[410.233] CONSOLE.log [DIAG] STT_START
+[415.927] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[415.927] CONSOLE.log [DIAG] STT_STOP
+[416.241] CONSOLE.log [DIAG] STT_START
+[421.932] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[421.932] CONSOLE.log [DIAG] STT_STOP
+[422.243] CONSOLE.log [DIAG] STT_START
+[427.929] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[427.929] CONSOLE.log [DIAG] STT_STOP
+[428.240] CONSOLE.log [DIAG] STT_START
+[433.928] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[433.928] CONSOLE.log [DIAG] STT_STOP
+[434.238] CONSOLE.log [DIAG] STT_START
+[436.927] CONSOLE.log [DIAG] STT_STOP
+[436.928] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[436.928] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="You look like you had something to say."
+[436.928] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[436.930] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[436.931] CONSOLE.log [DIAG] ELEVEN_LABS_START text="You look like you had something to say."
+[437.362] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_speaking.mp4
+[439.429] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[439.430] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_idle.mp4
+[439.430] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=2505
+[439.430] REQ_FAILED sofia_speaking.mp4 net::ERR_ABORTED
+[441.236] CONSOLE.log [FC] loop start, elapsed: 354334 mySession: 1 session: 1
+[441.748] CONSOLE.log [DIAG] STT_START
+[444.750] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[444.750] CONSOLE.log [DIAG] STT_STOP
+[445.052] CONSOLE.log [DIAG] STT_START
+[450.753] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[450.753] CONSOLE.log [DIAG] STT_STOP
+[451.065] CONSOLE.log [DIAG] STT_START
+[456.757] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[456.757] CONSOLE.log [DIAG] STT_STOP
+[457.071] CONSOLE.log [DIAG] STT_START
+[462.749] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[462.749] CONSOLE.log [DIAG] STT_STOP
+[463.056] CONSOLE.log [DIAG] STT_START
+[468.749] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[468.749] CONSOLE.log [DIAG] STT_STOP
+[469.054] CONSOLE.log [DIAG] STT_START
+[471.749] CONSOLE.log [DIAG] STT_STOP
+[471.749] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[471.749] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="The waves aren't that interesting, I promise."
+[471.750] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[471.750] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[471.750] CONSOLE.log [DIAG] ELEVEN_LABS_START text="The waves aren't that interesting, I pro"
+[472.215] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_speaking.mp4
+[474.618] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[474.619] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_idle.mp4
+[474.619] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=2869
+[474.619] REQ_FAILED sofia_speaking.mp4 net::ERR_ABORTED
+[476.420] CONSOLE.log [FC] loop start, elapsed: 389518 mySession: 1 session: 1
+[476.922] CONSOLE.log [DIAG] STT_START
+[479.928] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[479.928] CONSOLE.log [DIAG] STT_STOP
+[480.229] CONSOLE.log [DIAG] STT_START
+[485.923] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[485.923] CONSOLE.log [DIAG] STT_STOP
+[486.226] CONSOLE.log [DIAG] STT_START
+[491.934] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[491.934] CONSOLE.log [DIAG] STT_STOP
+[492.234] CONSOLE.log [DIAG] STT_START
+[497.922] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[497.922] CONSOLE.log [DIAG] STT_STOP
+[498.223] CONSOLE.log [DIAG] STT_START
+[503.923] CONSOLE.warning [SR] watchdog: no activity in 3s, restarting
+[503.923] CONSOLE.log [DIAG] STT_STOP
+[504.224] CONSOLE.log [DIAG] STT_START
+[506.924] CONSOLE.log [DIAG] STT_STOP
+[506.925] CONSOLE.log [FC] heard: null mySession: 1 session: 1
+[506.927] CONSOLE.log [DIAG] SPEAK_START speaker=Mary text="The quiet is better when someone breaks it well."
+[506.928] CONSOLE.log [DIAG] SET_MEDIA speaker=User_Prompt prev_el=?#? prev_src=
+[506.928] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=User_Prompt new_el=? new_src=
+[506.928] CONSOLE.log [DIAG] ELEVEN_LABS_START text="The quiet is better when someone breaks "
+[507.466] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_speaking.mp4
+[510.095] CONSOLE.log [DIAG] ELEVEN_LABS_END
+[510.095] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=sofia_idle.mp4
+[510.095] CONSOLE.log [DIAG] SPEAK_END speaker=Mary ms=3166
+[510.096] REQ_FAILED sofia_speaking.mp4 net::ERR_ABORTED
+[511.890] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="That's time. Let me put together your feedback."
+[511.890] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[511.891] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[511.891] CONSOLE.log [DIAG] KOKORO_START text="That's time. Let me put together your fe"
+[511.893] CONSOLE.log [TTS] onyx: "That's time. Let me put together your feedback."
+[511.895] CONSOLE.log [DIAG] ATTR_SRC tag=VIDEO#media src=
+[511.895] CONSOLE.log [DIAG] DOM_REMOVE tag=VIDEO id=media class="media" src=
+[511.895] REQ_FAILED sofia_idle.mp4 net::ERR_ABORTED
+[515.567] CONSOLE.log [DIAG] KOKORO_END
+[515.568] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=3678
+[515.568] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[515.568] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[515.568] CONSOLE.log [DIAG] SPEAK_START speaker=Ryan text="Looks like we didn't get enough conversation to work with. H"
+[515.569] CONSOLE.log [DIAG] SET_MEDIA speaker=Ryan prev_el=?#? prev_src=
+[515.569] CONSOLE.log [DIAG] SET_MEDIA_DONE speaker=Ryan new_el=? new_src=
+[515.569] CONSOLE.log [DIAG] KOKORO_START text="Looks like we didn't get enough conversa"
+[515.569] CONSOLE.log [TTS] onyx: "Looks like we didn't get enough conversation to wo"
+[524.489] CONSOLE.log [DIAG] KOKORO_END
+[524.489] CONSOLE.log [DIAG] SPEAK_END speaker=Ryan ms=8921
+[524.490] PLAY_SCENARIO_CALLED
+[544.505] FINAL_SNAPSHOT {"mediaTag":"DIV","mediaId":"ryan-orb","mediaSrc":"","sceneBgTag":"VIDEO","sceneBgSrc":"beach_bg.mp4"}
+[544.505] CAPTURE_COMPLETE

@@ -1,0 +1,54 @@
+[0.799] NAVIGATE_START
+[3.745] CONSOLE [AUDIO-DIAG] AUDIO_PATCH_INSTALLED
+[3.850] CONSOLE [TTS] OpenAI TTS module ready
+[3.910] DOM_LOADED
+[4.065] CONSOLE [AUDIO-DIAG] AUDIO_PATCH_INSTALLED
+[4.086] CONSOLE [TTS] OpenAI TTS module ready
+[19.847] RELOAD_COMPLETE
+[20.018] CONSOLE [TTS] OpenAI TTS — no preload needed
+[20.025] CONSOLE [TTS] onyx: "You already know what to say. You just need to sto"
+[20.047] SPLASH_DISMISSED
+[20.047] TRIGGER airport
+[20.063] CONSOLE [AUDIO-DIAG] AUDIO_PATCH_INSTALLED
+[20.066] CONSOLE [AUDIO-DIAG] NEW id=a1 src=
+[20.072] CONSOLE [AUDIO-DIAG] AUDIO_PATCH_INSTALLED
+[20.216] CONSOLE [TTS] API error: 429
+[20.266] CONSOLE [AUDIO-DIAG] NEW id=a2 src=
+[20.339] CONSOLE [AUDIO-DIAG] NEW id=a3 src=
+[20.347] CONSOLE [prefetch] intro warm-up: You're at an airport departure gate — the flight's been dela
+[21.175] CONSOLE [prefetch] HIT: You're at an airport departure gate — the flight's been dela
+[21.176] CONSOLE [prefetch] queued next: The flight is delayed two hours. You're both stuck at the sa
+[21.176] CONSOLE [TTS] onyx: "You're at an airport departure gate — the flight's"
+[21.360] CONSOLE [TTS] API error: 429
+[21.612] CONSOLE [prefetch] HIT: The flight is delayed two hours. You're both stuck at the sa
+[21.612] CONSOLE [prefetch] queued next: Gate C14. The kind of grey limbo that makes strangers briefl
+[21.612] CONSOLE [TTS] onyx: "The flight is delayed two hours. You're both stuck"
+[21.694] CONSOLE [TTS] API error: 429
+[21.951] CONSOLE [prefetch] HIT: Gate C14. The kind of grey limbo that makes strangers briefl
+[21.951] CONSOLE [prefetch] queued next: Here's what most men miss: this is one of the best situation
+[21.951] CONSOLE [TTS] onyx: "Gate C14. The kind of grey limbo that makes strang"
+[22.035] CONSOLE [TTS] API error: 429
+[22.291] CONSOLE [prefetch] HIT: Here's what most men miss: this is one of the best situation
+[22.291] CONSOLE [prefetch] queued next: There's a specific type of opener that works here and almost
+[22.294] CONSOLE [TTS] onyx: "Here's what most men miss: this is one of the best"
+[22.423] CONSOLE [TTS] API error: 429
+[22.678] CONSOLE [prefetch] HIT: There's a specific type of opener that works here and almost
+[22.679] CONSOLE [prefetch] queued next: Walk over and sit nearby. She glances up from the book that 
+[22.679] CONSOLE [TTS] onyx: "There's a specific type of opener that works here "
+[22.830] CONSOLE [TTS] API error: 429
+[23.083] CONSOLE [prefetch] HIT: Walk over and sit nearby. She glances up from the book that 
+[23.083] CONSOLE [prefetch] queued next: What do you do?
+[23.089] CONSOLE [TTS] onyx: "Walk over and sit nearby. She glances up from the "
+[23.167] CONSOLE [TTS] API error: 429
+[23.422] CONSOLE [prefetch] HIT: What do you do?
+[23.423] CONSOLE [TTS] onyx: "What do you do?"
+[23.506] CONSOLE [TTS] API error: 429
+[356.396] CONSOLE [TTS] onyx: "Two minutes left -- make it count."
+[356.512] CONSOLE [TTS] API error: 429
+[446.792] CONSOLE [TTS] onyx: "That's time. Let me put together your feedback."
+[446.892] CONSOLE [TTS] API error: 429
+[446.894] CONSOLE [TTS] onyx: "Looks like we didn't get enough conversation to wo"
+[446.982] CONSOLE [TTS] API error: 429
+[446.982] PLAY_SCENARIO_CALLED
+[461.992] FINAL max_simultaneous=0
+[461.992] RESULT: OK — no overlap detected

@@ -1,0 +1,43 @@
+[run 1] CONSOLE.log [TTS] OpenAI TTS module ready
+[run 1] CONSOLE.log [Transcript] Tool loaded. Press 📋 button to view session.
+[run 1] CONSOLE.log [TTS] OpenAI TTS module ready
+[run 1] CONSOLE.log [Transcript] Tool loaded. Press 📋 button to view session.
+[run 1] CONSOLE.log [TTS] OpenAI TTS — no preload needed
+[run 1] CONSOLE.log [TTS] onyx: "You already know what to say. You just need to sto"
+[run 1] SPLASH_DISMISSED
+[run 1] CONSOLE.log [LAT] INSTRUMENTED speakElevenLabs
+[run 1] STATE_INITIALIZED
+[run 1] CONSOLE.log [LAT] ELEVEN_LABS_START text="I'm just giving the book some time to reflect on i"
+[run 1] CONSOLE.log [TTS] onyx: "Pick a scenario. Let's find out where you're at."
+[run 1] CONSOLE.log [FC] streamPromise resolved or timed out
+[run 1] RESULT {"ok":true,"log":[]}
+[run 2] CONSOLE.log [TTS] OpenAI TTS module ready
+[run 2] CONSOLE.log [Transcript] Tool loaded. Press 📋 button to view session.
+[run 2] CONSOLE.log [TTS] OpenAI TTS module ready
+[run 2] CONSOLE.log [Transcript] Tool loaded. Press 📋 button to view session.
+[run 2] CONSOLE.log [TTS] OpenAI TTS — no preload needed
+[run 2] CONSOLE.log [TTS] onyx: "You already know what to say. You just need to sto"
+[run 2] SPLASH_DISMISSED
+[run 2] CONSOLE.log [LAT] INSTRUMENTED speakElevenLabs
+[run 2] STATE_INITIALIZED
+[run 2] CONSOLE.log [LAT] ELEVEN_LABS_START text="It’s a rare skill."
+[run 2] CONSOLE.log [TTS] onyx: "Pick a scenario. Let's find out where you're at."
+[run 2] CONSOLE.log [FC] streamPromise resolved or timed out
+[run 2] RESULT {"ok":true,"log":[]}
+[run 3] CONSOLE.log [TTS] OpenAI TTS module ready
+[run 3] CONSOLE.log [Transcript] Tool loaded. Press 📋 button to view session.
+[run 3] CONSOLE.log [TTS] OpenAI TTS module ready
+[run 3] CONSOLE.log [Transcript] Tool loaded. Press 📋 button to view session.
+[run 3] CONSOLE.log [TTS] OpenAI TTS — no preload needed
+[run 3] CONSOLE.log [TTS] onyx: "You already know what to say. You just need to sto"
+[run 3] SPLASH_DISMISSED
+[run 3] CONSOLE.log [LAT] INSTRUMENTED speakElevenLabs
+[run 3] STATE_INITIALIZED
+[run 3] CONSOLE.log [LAT] ELEVEN_LABS_START text="It’s a rare talent."
+[run 3] CONSOLE.log [TTS] onyx: "Pick a scenario. Let's find out where you're at."
+[run 3] CONSOLE.warning TTS failed, falling back to OpenAI... signal is aborted without reason
+[run 3] CONSOLE.warning TTS fallback failed — skipping line silently fallback timeout
+[run 3] CONSOLE.log [LAT] VIDEO_STATE: speaking gapMs=13023.4
+[run 3] CONSOLE.log [LAT] ELEVEN_LABS_START text="I’m just trying to mentally prepare for the plot t"
+[run 3] CONSOLE.log [FC] streamPromise resolved or timed out
+[run 3] RESULT {"ok":true,"log":[{"text":"It’s a rare talent.","gapMs":13023.39999999106}]}
