@@ -2,7 +2,7 @@
 const { supabase } = require('./supabase');
 const { isDevBypass, isActiveSubscriber, getClientIP } = require('./ratelimit');
 
-const FREE_SESSION_LIMIT = 3;
+const FREE_SESSION_LIMIT = 2;
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
