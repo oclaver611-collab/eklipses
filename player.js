@@ -1175,6 +1175,7 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
   setMediaForSpeaker('User_Prompt');
 
   let fullText = '';
+  let usedFallback = false;
   const sentenceQueue = [];
   let isPlayingAudio = false;
   let streamDone = false;
@@ -1270,6 +1271,7 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
     clearTimeout(timeout);
 
     if (!res.ok) {
+      usedFallback = true;
       return await getCharacterResponseFallback(userSaid);
     }
 
@@ -1309,6 +1311,7 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
     streamDone = true;
     if (err.name !== 'AbortError') console.warn('Stream fetch error:', err.message);
     if (!fullText && sentenceQueue.length === 0) {
+      usedFallback = true;
       return await getCharacterResponseFallback(userSaid);
     }
   }
@@ -1319,7 +1322,7 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
   ]);
   console.log('[FC] streamPromise resolved or timed out');
 
-  if (fullText && mySession === session) {
+  if (fullText && !usedFallback && mySession === session) {
     if (!firstUserOpener) firstUserOpener = userSaid;
     conversationHistory.push({ role: 'user', content: userSaid });
     conversationHistory.push({ role: 'assistant', content: fullText });
