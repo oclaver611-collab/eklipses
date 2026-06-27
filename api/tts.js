@@ -15,19 +15,19 @@ module.exports = async function handler(req, res) {
   // ── Fish Audio voice mapping ───────────────────────────────────────────────
   const FISH_AUDIO_VOICES = {
     ryan:    '44b996214285427697767cb469793647',
-    sofia:   '8c7ee2cd4d884622a0747daa25120b47',
-    mary:    '8c7ee2cd4d884622a0747daa25120b47',
-    anna:    '8c7ee2cd4d884622a0747daa25120b47',
+    sofia:   '836513f294d64aec8403226e69268b1b',
+    mary:    '836513f294d64aec8403226e69268b1b',
+    anna:    '836513f294d64aec8403226e69268b1b',
     leila:   'd2d81e5c8a8f4114870d3d34c3c58005',
     eden:    'd2d81e5c8a8f4114870d3d34c3c58005',
     erika:   'd2d81e5c8a8f4114870d3d34c3c58005',
-    julia:   '933563129e564b19a115bedd57b7406a',
-    maya:    '933563129e564b19a115bedd57b7406a',
-    sanna:   '933563129e564b19a115bedd57b7406a',
+    julia:   '833d6497b2c74eecb43bc008ee259520',
+    maya:    '833d6497b2c74eecb43bc008ee259520',
+    sanna:   '833d6497b2c74eecb43bc008ee259520',
     elena:   'cad803570d5d4202808bf6d4838a4246',
     fatou:   'cad803570d5d4202808bf6d4838a4246',
     sarah:   'cad803570d5d4202808bf6d4838a4246',
-    default: '22d0bcafaa6d4f489145bc65c1afdaa1',
+    default: '836513f294d64aec8403226e69268b1b',
   };
 
   const voiceId = characterId ? (FISH_AUDIO_VOICES[characterId] || FISH_AUDIO_VOICES.default) : null;
