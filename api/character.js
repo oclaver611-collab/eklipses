@@ -2767,7 +2767,7 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
 
   // Name reminder appended last — final instruction before generation
   const nameReminder = (userName && !nameAlreadyAcknowledged)
-    ? `\n\nURGENT — BEFORE YOU RESPOND: His name is ${userName}. You have not used his name yet. Your response MUST include his name naturally once. Examples: "Nice to meet you, ${userName}." or "So what brings you here, ${userName}?"`
+    ? `\n\nURGENT — BEFORE YOU RESPOND: His name is ${userName}. You have not used his name yet. Weave it naturally into your response once — not as a greeting formula, just as you would use someone's name mid-conversation. IMPORTANT: Do NOT say "Nice to meet you" or any greeting formula. Use his name naturally in context instead.`
     : '';
 
   // If she already gave her name — block the "you haven't asked my name" line
