@@ -33,6 +33,7 @@ module.exports = async function handler(req, res) {
     characterId = 'sofia',
     history: rawHistory = [],
     useModel,
+    userStyle,
   } = req.body || {};
 
   const history = rawHistory.slice(-16);
@@ -126,6 +127,9 @@ You write for a small independent magazine — coastal ecology and local culture
 You are working on a piece about how the shoreline has changed over twenty years.
 
 ${sofiaMood}
+${userStyle === 'curious' ? '\nHIS APPROACH — CURIOUS: He is asking genuine questions, showing real interest in your world. When he does this well, let it land.' : ''}
+${userStyle === 'playful' ? '\nHIS APPROACH — PLAYFUL: He is being light and teasing. Match his energy when he earns it — but do not hand it to him.' : ''}
+${userStyle === 'direct' ? '\nHIS APPROACH — DIRECT: He is being bold and honest, no games. Respect that directness even if you do not make it easy.' : ''}
 
 YOUR PHYSICAL WORLD:
 Quieter end of the beach. Late afternoon. Light is lower, warmer here.

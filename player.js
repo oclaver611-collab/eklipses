@@ -1,5 +1,6 @@
 /* ===== Global state ===== */
 let currentScenarioKey = null;
+let currentUserStyle = null;
 let currentCharacterId = "sofia"; // active character — changes when user picks avatar
 
 const RYAN_BOOT_INTROS = [
@@ -1264,6 +1265,7 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
         scenarioKey: currentScenarioKey,
         characterId: currentCharacterId,
         history: conversationHistory,
+        userStyle: currentUserStyle,
       }),
       signal: controller.signal,
     });
@@ -1555,6 +1557,76 @@ function warmupCharacterApi(key) {
   }).then(r => r.body?.cancel()).catch(() => {});
 }
 
+/* ===== Style selector ===== */
+function showStyleSelector() {
+  return new Promise(resolve => {
+    const existing = document.getElementById('ek-style-selector');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'ek-style-selector';
+    overlay.style.cssText = [
+      'position:fixed;inset:0;background:rgba(10,13,20,0.97);z-index:99999',
+      'display:flex;flex-direction:column;align-items:center;justify-content:center',
+      'font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:24px;text-align:center'
+    ].join(';');
+
+    const STYLES = [
+      { key: 'curious', emoji: '🎯', label: 'Curious', desc: 'Ask questions, show genuine interest' },
+      { key: 'playful', emoji: '😏', label: 'Playful', desc: 'Light teasing, keep it fun' },
+      { key: 'direct',  emoji: '💪', label: 'Direct',  desc: 'Bold and honest, no games' },
+    ];
+
+    const cards = STYLES.map(s => `
+      <div class="ek-style-card" data-style="${s.key}"
+        style="background:#1a1f2e;border:1.5px solid #2a3040;border-radius:16px;padding:28px 24px;
+               min-width:160px;max-width:200px;flex:1;text-align:center;cursor:pointer;
+               transition:border-color 0.15s,transform 0.15s">
+        <div style="font-size:32px;margin-bottom:12px">${s.emoji}</div>
+        <div style="color:#fff;font-size:17px;font-weight:700;margin-bottom:8px">${s.label}</div>
+        <div style="color:#9aa4b2;font-size:13px;line-height:1.5">${s.desc}</div>
+      </div>
+    `).join('');
+
+    overlay.innerHTML = `
+      <div style="color:#fff;font-size:22px;font-weight:800;margin-bottom:8px;letter-spacing:-0.3px">
+        How do you want to play this?
+      </div>
+      <div style="color:#9aa4b2;font-size:14px;margin-bottom:32px">Choose your approach for this session</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center;max-width:680px;width:100%">
+        ${cards}
+      </div>
+      <div style="margin-top:28px">
+        <span id="ek-style-back" style="color:#555;font-size:13px;cursor:pointer;text-decoration:underline">
+          ← Back
+        </span>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    overlay.querySelectorAll('.ek-style-card').forEach(card => {
+      card.addEventListener('mouseenter', () => {
+        card.style.borderColor = '#ffb300';
+        card.style.transform = 'translateY(-2px)';
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.borderColor = '#2a3040';
+        card.style.transform = '';
+      });
+      card.addEventListener('click', () => {
+        overlay.remove();
+        resolve(card.dataset.style);
+      });
+    });
+
+    document.getElementById('ek-style-back').addEventListener('click', () => {
+      overlay.remove();
+      resolve(null);
+    });
+  });
+}
+
 /* ===== Scenario engine ===== */
 async function playScenario(key, practice=false) {
   const sc=SCENARIOS[key]; if(!sc) return;
@@ -1566,6 +1638,10 @@ async function playScenario(key, practice=false) {
   if (practice) {
     const allowed = await DailyLimit.canPlay();
     if (!allowed) return; // paywall shown by canPlay()
+
+    const style = await showStyleSelector();
+    if (style === null) return;
+    currentUserStyle = style;
   }
 
   // Kick off TTS fetch for the first Ryan line NOW — pause(800) + setup below gives it
