@@ -1330,6 +1330,7 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
     conversationHistory.push({ role: 'assistant', content: fullText });
     if (conversationHistory.length > 12) conversationHistory = conversationHistory.slice(-12);
     _exchangeCount++;
+    updateCoachBtnVisibility();
   }
 
   return fullText || null;
@@ -1359,6 +1360,7 @@ async function getCharacterResponseFallback(userSaid) {
     conversationHistory.push({ role: 'assistant', content: maryText });
     if (conversationHistory.length > 12) conversationHistory = conversationHistory.slice(-12);
     _exchangeCount++;
+    updateCoachBtnVisibility();
     return maryText;
   } catch (err) {
     clearTimeout(timeout);
@@ -1657,6 +1659,8 @@ async function playScenario(key, practice=false) {
   const mySession=session; // capture BEFORE pause — rapid re-clicks each get a unique session id
   setMediaForSpeaker('Ryan'); // clear stale character video immediately — orb shows during setup
   resetConversation();
+  hideCoachSuggestions();
+  updateCoachBtnVisibility();
   firstUserOpener=null;
   await pause(800); // increased from 200ms — kills 1s audio bleed on fast clicks
 
@@ -1823,6 +1827,7 @@ async function freeConversation(mySession) {
     console.log('[FC] loop start, elapsed:', Date.now()-start, 'mySession:', mySession, 'session:', session);
     await pause(500); // brief gap so mic doesn't pick up tail of avatar audio
     const said = await listenForUser(mySession, remMs);
+    hideCoachSuggestions();
     console.log('[FC] heard:', said, 'mySession:', mySession, 'session:', session);
     if (mySession !== session) break;
 
@@ -2573,7 +2578,78 @@ function launchApp() {
   };
 }
 
+/* ===== Coach-me button ===== */
+function initCoachBtn() {
+  const btn = document.createElement('button');
+  btn.id = 'ek-coach-btn';
+  btn.textContent = '🎯 Coach me';
+  btn.style.cssText = [
+    'display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%)',
+    'background:#1a1c22;border:1.5px solid #2b2e36;border-radius:999px',
+    'color:#ffb300;font-size:13px;font-weight:700;padding:8px 20px',
+    'cursor:pointer;z-index:9998;letter-spacing:0.3px'
+  ].join(';');
+  btn.addEventListener('click', handleCoachBtn);
+  document.body.appendChild(btn);
+}
+
+async function handleCoachBtn() {
+  const btn = document.getElementById('ek-coach-btn');
+  if (!btn || btn.disabled) return;
+  btn.disabled = true;
+  btn.textContent = '...';
+  try {
+    const res = await fetch('/api/coach-suggest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        history: conversationHistory,
+        scenarioKey: currentScenarioKey,
+        userStyle: currentUserStyle,
+      }),
+    });
+    if (!res.ok) throw new Error('suggest failed');
+    const data = await res.json();
+    showCoachSuggestions(data.suggestions);
+  } catch (err) {
+    console.warn('[coach-btn] error:', err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🎯 Coach me';
+  }
+}
+
+function showCoachSuggestions(suggestions) {
+  hideCoachSuggestions();
+  const overlay = document.createElement('div');
+  overlay.id = 'ek-coach-overlay';
+  overlay.style.cssText = [
+    'position:fixed;bottom:130px;left:50%;transform:translateX(-50%)',
+    'display:flex;flex-direction:column;gap:10px;z-index:9997;width:min(440px,90vw)'
+  ].join(';');
+  overlay.innerHTML = suggestions.map(s => `
+    <div style="background:#1a1c22;border:1.5px solid #2b2e36;border-radius:12px;
+                padding:12px 16px;display:flex;align-items:flex-start;gap:10px">
+      <span style="color:#ffb300;font-size:11px;font-weight:800;text-transform:uppercase;
+                   min-width:52px;padding-top:1px">${s.style}</span>
+      <span style="color:#e8ecf0;font-size:14px;line-height:1.5">${s.text}</span>
+    </div>
+  `).join('');
+  document.body.appendChild(overlay);
+}
+
+function hideCoachSuggestions() {
+  const el = document.getElementById('ek-coach-overlay');
+  if (el) el.remove();
+}
+
+function updateCoachBtnVisibility() {
+  const btn = document.getElementById('ek-coach-btn');
+  if (btn) btn.style.display = _exchangeCount >= 1 ? 'block' : 'none';
+}
+
 bootDefault();
+initCoachBtn();
 
 // Test hook — allows browser tests to inject speech without microphone
 if (typeof window !== 'undefined') {
