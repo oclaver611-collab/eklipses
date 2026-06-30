@@ -212,7 +212,15 @@
     </aside>
   </div>
 
-  <footer class="site-footer">Questions? Contact us at <a href="mailto:support@eklipses.com" style="color:#6b7685;text-decoration:none;">support@eklipses.com</a></footer>
+  <footer class="site-footer">
+    Questions? <a href="mailto:support@eklipses.com" style="color:#6b7685;text-decoration:none;">support@eklipses.com</a>
+    &nbsp;·&nbsp;
+    <a href="/terms" style="color:#6b7685;text-decoration:none;">Terms of Service</a>
+    <span id="ek-cancel-wrap" style="display:none">
+      &nbsp;·&nbsp;
+      <a href="#" id="ek-cancel-btn" style="color:#6b7685;text-decoration:none;" onclick="ekCancelSubscription(event)">Cancel subscription</a>
+    </span>
+  </footer>
 
   <div id="listenPill" class="pill">🎤 Listening…</div>
 
@@ -224,6 +232,72 @@
       <div id="pickerGrid" class="grid"></div>
     </div>
   </div>
+
+  <!-- Cancel subscription modal -->
+  <div id="ek-cancel-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99999;display:none;align-items:center;justify-content:center;font-family:system-ui,sans-serif">
+    <div style="background:#161616;border:1px solid #2a2a2a;border-radius:10px;padding:32px;max-width:380px;width:90%;text-align:center">
+      <div id="ek-cancel-body">
+        <p style="font-size:16px;font-weight:600;color:#fff;margin-bottom:8px">Cancel subscription?</p>
+        <p style="font-size:13px;color:#888;margin-bottom:24px">You'll keep access until the end of your current billing period. No refunds for the current period.</p>
+        <button id="ek-cancel-confirm" style="width:100%;padding:10px;background:#e05252;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px">Yes, cancel my subscription</button>
+        <button onclick="document.getElementById('ek-cancel-modal').style.display='none'" style="width:100%;padding:10px;background:transparent;color:#888;border:1px solid #333;border-radius:6px;font-size:14px;cursor:pointer">Never mind</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  function ekCancelSubscription(e) {
+    e.preventDefault();
+    const modal = document.getElementById('ek-cancel-modal');
+    modal.style.display = 'flex';
+    const btn = document.getElementById('ek-cancel-confirm');
+    btn.textContent = 'Yes, cancel my subscription';
+    btn.disabled = false;
+    btn.onclick = async function() {
+      btn.textContent = 'Cancelling…';
+      btn.disabled = true;
+      const customerId = localStorage.getItem('ek-stripe-cus');
+      if (!customerId) {
+        document.getElementById('ek-cancel-body').innerHTML =
+          '<p style="color:#e05252;font-size:14px">Could not find your subscription. Email <a href="mailto:support@eklipses.com" style="color:#6b9fff">support@eklipses.com</a> and we\'ll cancel it for you.</p>';
+        return;
+      }
+      try {
+        const res = await fetch('/api/cancel-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ customerId }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          const msg = data.alreadyCancelled
+            ? 'Your subscription is already set to cancel on ' + data.cancelDate + '.'
+            : 'Cancelled. You\'ll have access until ' + data.cancelDate + '.';
+          document.getElementById('ek-cancel-body').innerHTML =
+            '<p style="color:#4caf50;font-size:15px;font-weight:600;margin-bottom:8px">Done.</p>' +
+            '<p style="color:#aaa;font-size:13px;margin-bottom:20px">' + msg + '</p>' +
+            '<button onclick="document.getElementById(\'ek-cancel-modal\').style.display=\'none\'" style="padding:8px 24px;background:#333;color:#fff;border:none;border-radius:6px;cursor:pointer">Close</button>';
+        } else {
+          document.getElementById('ek-cancel-body').innerHTML =
+            '<p style="color:#e05252;font-size:14px">Something went wrong — email <a href="mailto:support@eklipses.com" style="color:#6b9fff">support@eklipses.com</a></p>' +
+            '<button onclick="document.getElementById(\'ek-cancel-modal\').style.display=\'none\'" style="margin-top:16px;padding:8px 24px;background:#333;color:#fff;border:none;border-radius:6px;cursor:pointer">Close</button>';
+        }
+      } catch {
+        document.getElementById('ek-cancel-body').innerHTML =
+          '<p style="color:#e05252;font-size:14px">Something went wrong — email <a href="mailto:support@eklipses.com" style="color:#6b9fff">support@eklipses.com</a></p>' +
+          '<button onclick="document.getElementById(\'ek-cancel-modal\').style.display=\'none\'" style="margin-top:16px;padding:8px 24px;background:#333;color:#fff;border:none;border-radius:6px;cursor:pointer">Close</button>';
+      }
+    };
+  }
+
+  // Show cancel link in footer only for pro subscribers
+  document.addEventListener('DOMContentLoaded', function() {
+    if (localStorage.getItem('ek-stripe-cus')) {
+      const wrap = document.getElementById('ek-cancel-wrap');
+      if (wrap) wrap.style.display = 'inline';
+    }
+  });
+  </script>
 
   <script src="scenarios.js"></script>
 
