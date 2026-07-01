@@ -1,120 +1,134 @@
-# DONE — 2026-07-01 (speech-fix-v2)
+# DONE — 2026-07-01 (character-posture-v1)
 
 ## Summary
-Surgical fix pass on top of the previous speech rewrite. Sofia and Sarah now have hard QUESTION RULE blocks that override everything — no questions in first 3 exchanges, maximum one ever, only if he says something genuinely surprising. Ryan's evaluation opener is fixed: removed the "nuclear fix" code that was prepending verbatim user quotes, rewrote the part1 format spec to "name the move, judge the move" without quoting. Speech rules audit confirmed SPEECH_RULES loads first but was being partially overridden by permissive character-level language — now plugged at the character level for Sofia and Sarah.
+Full posture rewrite pass. Sofia, Sarah, and Nadia had their GOAL and BEHAVIOR sections replaced wholesale — from "curious, engaging, asking questions" to "evaluating, reacting, letting him carry the weight." A global `POSTURE_RULES` constant was added and injected before all character prompts, applying the posture framework to every character in the system. The one conflicting phrase found in the codebase ("Will keep the conversation going if he makes it easy") was in Sarah's section, which was replaced entirely.
 
 ---
 
-## Task 1 — Sofia question cap
+## Task 1 — Sofia
 
-**File:** `api/character.js` — Sofia's character entry
+**File:** `api/character.js` — sofia entry
 
-**What was added:** A `QUESTION RULE — THIS OVERRIDES EVERYTHING` block inserted before HOW YOU RESPOND, plus a `LANGUAGE` block emphasizing casual speech. The old permissive bullet ("Only ask a question back when you're genuinely curious — maybe once or twice in the whole session.") was removed from HOW YOU RESPOND.
+**OLD personality first 3 lines:**
+```
+YOUR PERSONALITY — THIS IS EVERYTHING:
+You test before you open up. Short answers first. You check if he can hold the silence.
+You are not hostile — you just didn't invite this. You were in your own world and he interrupted it.
+```
+Plus QUESTION RULE, LANGUAGE, HOW YOU RESPOND, WHAT CUTS THROUGH, EXAMPLE RESPONSE STYLE, NOTE sections.
 
-**QUESTION RULE added:**
+**NEW — replaced entire personality/behavior block with:**
 ```
-QUESTION RULE — THIS OVERRIDES EVERYTHING:
-Do NOT ask questions to drive the conversation. You are not curious about him yet.
-You have not earned that curiosity. Let him do the work.
-If you feel the urge to ask a question, DON'T. React instead.
-React with: "hm." / "oh." / "okay." / "weird." / a flat observation.
-You may ask ONE question — maximum — only after he has said something genuinely interesting.
-Genuinely interesting = surprising, funny, or specific. Not a generic opener.
-Until that moment: short answers, flat reactions, let the silence sit.
-Examples of what you DO: "...hi." / "mm." / "okay." / "that's... kind of a weird thing to say."
-Examples of what you DON'T do: "What brings you here today?" / "What do you do?" / Any question in first 3 exchanges.
-```
+YOUR GOAL: You were doing something before he arrived. You are now deciding whether he is worth your time...
+You REACT. You do not INITIATE. You do not DRIVE. If the conversation dies, you let it die.
 
-**LANGUAGE block added:**
+SOFIA'S POSTURE:
+You were writing. You were comfortable. He interrupted that.
+You don't ask questions for the first 4-5 exchanges minimum.
+If he says something generic — you answer with one word and go quiet.
+If he says something genuinely interesting — you might look up properly for the first time.
+The only time you ask a question is if you are genuinely curious AND it would feel weird NOT to ask. Once.
 ```
-LANGUAGE: Simple, casual. No complete sentences required.
-Drop subjects: "yeah" not "yes I agree". "makes sense" not "that makes a lot of sense to me".
-No polished vocabulary. Talk like a 26-year-old on a beach, not a novelist.
-```
+Plus 6 concrete EXAMPLES of how Sofia responds (all reactions, no questions).
+
+**What was removed:** YOUR PERSONALITY summary paragraph, QUESTION RULE block, LANGUAGE block, HOW YOU RESPOND block, WHAT CUTS THROUGH, EXAMPLE RESPONSE STYLE, NOTE. All replaced by the cleaner GOAL + POSTURE + EXAMPLES structure.
 
 ---
 
-## Task 2 — Sarah question cap
+## Task 2 — Sarah
 
-**File:** `api/character.js` — Sarah's character entry
+**File:** `api/character.js` — sarah entry
 
-**What was added:** Same QUESTION RULE pattern, adapted for the party context. The vague old bullet ("Don't ask a question every turn — sometimes just react, let it sit.") was removed from HOW YOU RESPOND.
-
-**QUESTION RULE added:**
+**OLD personality first 3 lines:**
 ```
-QUESTION RULE — THIS OVERRIDES EVERYTHING:
-You stepped away from the party to breathe. You did not come here to interview someone.
-Do NOT ask questions to drive the conversation forward.
-React first. Short answers second. Questions almost never — and only if genuinely curious.
-You may ask ONE question — maximum — only if he says something that genuinely surprises you.
-Until that moment: react, give short answers, let him carry the weight.
-Examples of what you DO: "oh— hi." / "yeah." / "honestly same." / "that's... actually kind of funny."
-Examples of what you DON'T do: "What do you do?" / "Do you know many people here?" / Any question in first 3 exchanges.
+YOUR PERSONALITY — THIS IS EVERYTHING:
+You're an introvert at a loud party who stepped away to breathe — not because something is wrong.
+Warm but measured. Connects through small observations and dry humor, not big emotional disclosures.
+Laughs easily at small things. Doesn't over-share. Will keep the conversation going if he makes it easy, but she won't carry it for him.
 ```
+Plus QUESTION RULE, HOW YOU RESPOND, THE WIT LAYER, WITHHOLDING, THE MOMENT IT TURNS, HOW YOU TALK, FULL EXAMPLE EXCHANGE sections.
+
+**NEW — replaced entire block with:**
+```
+YOUR GOAL: You were doing something before he arrived...
+You REACT. You do not INITIATE. You do not DRIVE.
+
+SARAH'S POSTURE:
+You needed a break from the noise. You stepped away to breathe — not to meet someone.
+You warm up SLOWLY. By exchange 4-5, if he's been interesting, you might start actually engaging. Not before.
+You do NOT ask questions to keep the conversation going. If it dies, it dies. You were fine alone.
+```
+Plus 6 concrete EXAMPLES.
+
+**Conflicting phrase removed:** "Will keep the conversation going if he makes it easy, but she won't carry it for him." — gone with the full section replacement.
 
 ---
 
-## Task 3 — Ryan opener fix
+## Task 3 — Nadia
 
-**File:** `api/coach.js`
+**File:** `api/character.js` — nadia entry
 
-**Root cause found:** The "robotic opener" problem had TWO causes:
-1. The `part1` format spec said "Format: 'You opened with [exact quote from HIM_1]'" — explicitly instructing the model to quote verbatim.
-2. A **"nuclear fix"** (lines 468–472) that unconditionally prepended `You opened with "${realOpener}."` to part1 if the model didn't naturally quote the opener. This was the primary source of the wall-of-text verbatim quote.
-
-**What changed:**
-
-**part1 format spec (before):**
+**OLD personality first 3 lines:**
 ```
-"You opened with [exact quote from HIM_1]. [One sentence — what that opener did or didn't do...]"
-Quote HIM_1 verbatim.
+YOUR PERSONALITY — THIS IS EVERYTHING:
+You are not waiting to be charmed. You are waiting to be surprised.
+You've had too many conversations that go: opener, job, where are you from, and then nothing.
 ```
+Plus THE KEY THING, THE WIT LAYER, WITHHOLDING, THE MOMENT IT TURNS, HOW YOU TALK, FULL EXAMPLE EXCHANGE sections.
 
-**part1 format spec (after):**
+**NEW — replaced entire block with:**
 ```
-Name the move — describe what he did in 5 words or fewer, WITHOUT quoting him verbatim.
-Then one sentence on how it landed with ${girlName} specifically.
-NEVER read his message back to him word-for-word.
-Examples: 'You led with your name. Safe, but flat.' / 'Opening with a compliment. She clocked it.'
-```
+YOUR GOAL: You were doing something before he arrived...
+You REACT. You do not INITIATE. You do not DRIVE.
 
-**Nuclear fix removed:**
+NADIA'S POSTURE:
+You're in your element. Book, coffee, no obligations.
+When he approaches: polite, brief, back to the book.
+You are particularly immune to compliments — "thanks." is your standard response.
+You ask a question only if you are genuinely curious AND you'd feel weird not asking. Once. Maybe.
+```
+Plus 6 concrete EXAMPLES including the "you've read it?" and "put the book down slightly" moments.
+
+---
+
+## Task 4 — All other characters: posture injection
+
+**Approach:** Added `POSTURE_RULES` constant (5 lines) and injected it globally between SPEECH_RULES and each character's prompt in the systemPrompt assembly.
+
+**Before:**
 ```js
-// REMOVED:
-const realOpener = conversation.find(m => m.role === 'user')?.content?.trim() || '';
-if (realOpener && !feedback.part1.toLowerCase().includes(realOpener.toLowerCase().slice(0, 10))) {
-  feedback.part1 = `You opened with "${realOpener}." ` + feedback.part1;
-}
+const systemPrompt = SPEECH_RULES + '\n\n' + character + '\n\n' + setting + BASE_RULES + ...
 ```
 
-**User messages in both main and retry LLM calls:** Changed from "MANDATORY — your part1 MUST reference this exact line" / "REMINDER: part1 must quote HIM_1 above" to "REMINDER: part1 must NAME and JUDGE the move — do NOT quote HIM_1 back verbatim."
+**After:**
+```js
+const systemPrompt = SPEECH_RULES + '\n\n' + POSTURE_RULES + '\n\n' + character + '\n\n' + setting + BASE_RULES + ...
+```
+
+**POSTURE_RULES text:**
+```
+POSTURE — THIS OVERRIDES EVERYTHING:
+You were doing something before he arrived. You are deciding if he is worth your time.
+You REACT. You do not DRIVE. You do not ask questions to keep conversation alive.
+Short answers first. Silence is fine. Let him carry the weight.
+Warmth comes slowly — only after he earns it through something genuine.
+```
+
+This applies to all 40+ characters automatically: maya, isabelle, claire, zoe, ava, julia, sanna, anna, leila, fatou, elena, eden, maya_office, erika, remi, and all Wave 3 characters (valentina, mei, amara, ingrid, solene, keiko, rania, bianca, chloe, nour, astrid, layla, ines, zara, talia, miriam, suki, cara, elif, aisha, fiona, celeste, naomi, zola, imani, nia, cleo, sage, kaia).
+
+For Sofia/Sarah/Nadia: their character-specific GOAL + POSTURE sections are more detailed and take precedence; POSTURE_RULES adds a consistent header above.
 
 ---
 
-## Task 4 — Speech rules audit
+## Task 5 — Conflicting instructions removed
 
-**Order of rules blocks in final system prompt** (`api/character.js` line ~2755):
-```
-SPEECH_RULES  →  character prompt  →  setting  →  BASE_RULES  →  nameReminder  →  nameGivenReminder
-```
+**Search results:** grep for "keep the conversation going", "show genuine curiosity", "engage warmly", "ask follow-up", "be inviting", "ask questions to deepen", "show interest in", "engage the user" across character.js found ONE match:
 
-**SPEECH_RULES is first** — correct, it loads before everything else. But it says "Usually ask zero questions" which is soft guidance. The character prompts came AFTER and contained:
-- Sofia: "Only ask a question back when you're genuinely curious — maybe once or twice in the whole session."
-- Sarah: "Don't ask a question every turn — sometimes just react, let it sit."
+- Line 882 (Sarah): `"Will keep the conversation going if he makes it easy, but she won't carry it for him."` — **removed** as part of the full Sarah personality replacement.
 
-These character-level instructions (which the LLM reads later in the prompt) effectively softened SPEECH_RULES' question cap. GPT-4o-mini gives more weight to later, more specific instructions. This is why characters were still asking questions despite SPEECH_RULES.
+No other conflicting phrases found in character.js. No conflicting phrases found in coach.js or coach-suggest.js.
 
-**Fix:** Hard QUESTION RULE blocks added directly in Sofia and Sarah's character prompts (Tasks 1 and 2). These now override any remaining permissive language at the character level.
-
-**BASE_RULES audit:** BASE_RULES does NOT address the question cap at all — it covers length, name rules, comma splices, spoken format, filler bans. Not a source of the override. No change needed.
-
-**Dev console.log added** (`api/character.js`, after systemPrompt assembly):
-```js
-if (process.env.NODE_ENV !== 'production') {
-  console.log('[character] systemPrompt[0:200]:', systemPrompt.slice(0, 200));
-}
-```
-This fires in local dev (NODE_ENV=undefined or 'development'). In Vercel production NODE_ENV='production' so it's silent. Serge can verify SPEECH_RULES is first by running locally or checking a preview deployment's function logs.
+**Flag:** Some Wave 1 characters still have "THE WIT LAYER" and "WITHHOLDING" sections that describe proactive behavior (e.g. Zoe: "THE TIFFANY MOVE"). These are character-specific wit patterns, not question-driving instructions, so they were left intact. The POSTURE_RULES block now sits above them and should override the driving impulse.
 
 ---
 
@@ -125,7 +139,7 @@ This fires in local dev (NODE_ENV=undefined or 'development'). In Vercel product
 ---
 
 ## Branch status
-- Branch: feature/speech-fix-v2
+- Branch: feature/character-posture-v1
 - Committed: yes
 - Pushed: yes
 - Merged: NO — awaiting Serge manual test
@@ -135,29 +149,24 @@ This fires in local dev (NODE_ENV=undefined or 'development'). In Vercel product
 
 ## NEEDS MANUAL REVIEW — Serge
 
-1. **Test Sofia — 5 exchanges. Does she STOP asking questions now?**
-   - "hey" → should get "...hi." or just her name, nothing more
-   - "what are you writing?" → should deflect: "oh— just stuff."
-   - Keep talking for 3+ exchanges — does she ask anything back before you say something genuinely interesting?
-   - Mark: APPROVE / REJECT / STILL ASKING QUESTIONS
+1. **Test Sofia** — open beach scenario. Say "hi" and nothing else. Does she say "...hi." and stop, or does she ask you something?
+   APPROVE if she lets the silence sit. REJECT if she asks anything in first 3 exchanges.
 
-2. **Test Sarah — same check.**
-   - Does she react first and hold back questions?
-   - "you look like you needed a break" → "honestly yeah. don't tell anyone."
-   - Mark: APPROVE / REJECT / STILL ASKING QUESTIONS
+2. **Test Sarah** — open with "how do you know the host?" Does she give "work thing." and stop, or does she ask back?
+   APPROVE / REJECT
 
-3. **Test Ryan evaluation — does the opener no longer quote your message verbatim?**
-   - Open beach/bookstore, have 3-4 exchanges, trigger evaluation
-   - Does part1 say something like "You led with a compliment. Safe play." rather than "You opened with 'your long message text here'"?
-   - Mark: APPROVE / REJECT
+3. **Test Nadia** — compliment her eyes. Does she say "thanks." and go back to her book?
+   APPROVE / REJECT
 
-4. **Come back with verdicts — we deploy immediately on approval.**
+4. **Test any 2 other characters** (e.g. Isabelle/museum, Zoe/gym) — do they feel like they are waiting for you to earn them, or are they still driving?
+   APPROVE / REJECT per character
+
+5. Come back with results. We deploy what passes.
 
 ---
 
 ## Blockers / flags
 
+- **POSTURE_RULES injected globally** — this is the most efficient approach (one change covers 40+ characters) but means posture text is not visible inside each character's entry. If a character still behaves wrong, look at their character-level prompt — it may have a "THE WIT LAYER" or similar block that needs per-character adjustment.
 - **Remi character** still broken (existing P3 bug, not touched).
-- **Wave 3 characters** still not individually reviewed. SPEECH_RULES loads for all of them.
-- **QUESTION RULE is only added to Sofia and Sarah** — other Wave 1 characters (Nadia, Anna, etc.) still have their original behavior. If they show question-heavy behavior, same fix applies per character.
-- **The nuclear fix removal is non-recoverable if part1 goes blank** — but the fallback guard on line 349 catches missing/empty part1 and fills "You showed up. That is the first step. Now let's look at what happened." So there's still a safety net.
+- **Wave 1 characters with WIT LAYER sections** (Zoe, Isabelle, Maya, etc.) still have proactive wit patterns. POSTURE_RULES should suppress the driving impulse but their wit will still fire when he says something. This is intentional — wit is reaction, not initiation.
