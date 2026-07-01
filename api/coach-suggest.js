@@ -8,12 +8,20 @@ module.exports = async function handler(req, res) {
 
   const { history = [], scenarioKey, userStyle } = req.body || {};
 
+  // Extract the character's last message explicitly for anchor injection
+  const recentHistory = history.slice(-8);
+  const lastCharMessage = [...recentHistory].reverse().find(m => m.role === 'assistant')?.content?.trim() || '';
+
+  const lastCharAnchor = lastCharMessage
+    ? `\n\nThe character's last message was: "${lastCharMessage}"\nGenerate 3 suggested user responses that directly respond to THIS message.\nEach suggestion must be a natural reply to what the character just said.\nDo NOT generate generic openers or unrelated conversation starters.`
+    : '';
+
   const systemPrompt = `You are Ryan, a sharp dating coach helping a man practice real conversations with women.
 
 The conversation history shows what was just said. Your ONLY job is to suggest 3 short lines the user can say IN DIRECT RESPONSE to the character's last message.
 
 CRITICAL RULES:
-- Read the character's LAST message carefully
+- Read the character's LAST message carefully — it is explicitly quoted below
 - Every suggestion must directly acknowledge, react to, or build on what she just said
 - Never introduce a completely new topic
 - Never ask a generic question unrelated to her last line
@@ -35,13 +43,14 @@ Good direct: "That sounds like work that actually matters."
 
 Bad (generic, ignores what she said): "What do you like doing for fun?"
 Bad (too long): "That's really interesting, what made you decide to pursue that as a career path?"
+${lastCharAnchor}
 
 Return ONLY valid JSON, no other text:
 {"suggestions": [{"style": "curious", "text": "..."}, {"style": "playful", "text": "..."}, {"style": "direct", "text": "..."}]}`;
 
   const messages = [
     { role: 'system', content: systemPrompt },
-    ...history.slice(-8),
+    ...recentHistory,
     { role: 'user', content: 'Suggest 3 lines I could say next.' },
   ];
 
