@@ -1,107 +1,120 @@
-# DONE — 2026-07-01
+# DONE — 2026-07-01 (speech-fix-v2)
 
 ## Summary
-Speech rewrite v2 complete: SPEECH_RULES injected to every character's system prompt (17+ characters), Sofia fully rewritten for a "deflect-first, earn it slowly" personality, Sarah refined for fewer questions and more reactive responses, Nadia's vocabulary stripped of therapist language, Ryan's evaluation restructured into short beats format, coach-suggest now explicitly anchors to the character's last message. All changes committed to `feature/speech-rewrite-v2`. Awaiting Serge's manual review before deploy.
+Surgical fix pass on top of the previous speech rewrite. Sofia and Sarah now have hard QUESTION RULE blocks that override everything — no questions in first 3 exchanges, maximum one ever, only if he says something genuinely surprising. Ryan's evaluation opener is fixed: removed the "nuclear fix" code that was prepending verbatim user quotes, rewrote the part1 format spec to "name the move, judge the move" without quoting. Speech rules audit confirmed SPEECH_RULES loads first but was being partially overridden by permissive character-level language — now plugged at the character level for Sofia and Sarah.
 
 ---
 
-## Character prompts found
+## Task 1 — Sofia question cap
 
-**File:** `api/character.js` — all character prompts live in the `CHARACTERS` object. System prompt assembly at line ~2796:
-```js
-const systemPrompt = SPEECH_RULES + '\n\n' + character + '\n\n' + setting + BASE_RULES + nameReminder + nameGivenReminder;
+**File:** `api/character.js` — Sofia's character entry
+
+**What was added:** A `QUESTION RULE — THIS OVERRIDES EVERYTHING` block inserted before HOW YOU RESPOND, plus a `LANGUAGE` block emphasizing casual speech. The old permissive bullet ("Only ask a question back when you're genuinely curious — maybe once or twice in the whole session.") was removed from HOW YOU RESPOND.
+
+**QUESTION RULE added:**
+```
+QUESTION RULE — THIS OVERRIDES EVERYTHING:
+Do NOT ask questions to drive the conversation. You are not curious about him yet.
+You have not earned that curiosity. Let him do the work.
+If you feel the urge to ask a question, DON'T. React instead.
+React with: "hm." / "oh." / "okay." / "weird." / a flat observation.
+You may ask ONE question — maximum — only after he has said something genuinely interesting.
+Genuinely interesting = surprising, funny, or specific. Not a generic opener.
+Until that moment: short answers, flat reactions, let the silence sit.
+Examples of what you DO: "...hi." / "mm." / "okay." / "that's... kind of a weird thing to say."
+Examples of what you DON'T do: "What brings you here today?" / "What do you do?" / Any question in first 3 exchanges.
 ```
 
-**Ryan evaluation prompt:** `api/coach.js` — `systemPrompt` const (around line 219)
-
-**Coach suggestions prompt:** `api/coach-suggest.js` — `systemPrompt` const (line 19)
-
-**Characters in the visible 14 scenarios:**
-| Scenario key | Character | Character ID |
-|---|---|---|
-| beach | Sofia | `sofia` |
-| bookstore | Nadia | `nadia` |
-| house_party | Sarah | `sarah` |
-| coffee_shop | Anna | `anna` |
-| supermarket | Eden | `eden` |
-| train | Erika | `erika` |
-| museum | Isabelle | `isabelle` |
-| gym | Zoe | `zoe` |
-| rooftop | Sanna | `sanna` |
-| bar | Ava | `ava` |
-| street | Julia | `julia` |
-| art_gallery | Leila | `leila` |
-| yoga_studio | Fatou | `fatou` |
-| airport | Elena | `elena` |
-
-**Additional characters (not in visible 14):** claire, maya_office, remi (broken), + Wave 3: camille, priya, valentina, mei, amara, ingrid, solene, keiko, rania, bianca, chloe, nour, astrid, layla, ines, zara, talia, miriam, suki, cara, elif, aisha, fiona, celeste, naomi, zola, imani, nia, cleo, sage, kaia
+**LANGUAGE block added:**
+```
+LANGUAGE: Simple, casual. No complete sentences required.
+Drop subjects: "yeah" not "yes I agree". "makes sense" not "that makes a lot of sense to me".
+No polished vocabulary. Talk like a 26-year-old on a beach, not a novelist.
+```
 
 ---
 
-## Changes made per character
+## Task 2 — Sarah question cap
 
-**SOFIA:**
-  OLD (first 3 sentences of personality section): "You are complete on your own. You do not need this to go well. But you are genuinely curious about people — and when someone earns your attention, it shows."
-  NEW (first 3 sentences of personality section): "You test before you open up. Short answers first. You check if he can hold the silence."
-  Speech rules injected: yes
-  Personality rewrite: YES — full replacement. Removed: wit layer, "observe him" observer framework, withholding technique, setup-and-payoff wit. Added: deflect-first posture, minimal responses, warm-underneath-but-doesn't-show-it framing.
+**File:** `api/character.js` — Sarah's character entry
 
-**SARAH:**
-  OLD (first 3 sentences of personality section): "You are not guarded because you're cold. You are guarded because you know what it costs to open up to the wrong person. You are warm underneath — genuinely, naturally warm."
-  NEW (first 3 sentences of personality section): "You're an introvert at a loud party who stepped away to breathe — not because something is wrong. Warm but measured. Connects through small observations and dry humor, not big emotional disclosures."
-  Speech rules injected: yes
-  Personality rewrite: PARTIAL — kept warmth and backstory, replaced behavior instructions and example exchange. Key changes: fewer questions, more reactions, shorter answers, let him fill silences.
+**What was added:** Same QUESTION RULE pattern, adapted for the party context. The vague old bullet ("Don't ask a question every turn — sometimes just react, let it sit.") was removed from HOW YOU RESPOND.
 
-**NADIA:**
-  OLD (HOW YOU TALK first sentence): "Literary rhythm — unhurried, precise, occasionally a trailing thought."
-  NEW (HOW YOU TALK first sentence): "Talks like a normal person who reads a lot — not like a person performing intelligence."
-  Speech rules injected: yes
-  Personality rewrite: PARTIAL — kept intellectual depth and wit structure, stripped therapist vocabulary. Added explicit ban on: "That's a bold admission." / "It's refreshing." / "I appreciate your openness." Lowercased example responses to sound more casual.
-
-**ALL OTHER CHARACTERS (isabelle, maya, claire, zoe, ava, julia, sanna, anna, leila, fatou, elena, eden, maya_office, erika + all Wave 3):**
-  OLD (first 3 sentences): unchanged — each character's bio/identity kept as-is
-  NEW (first 3 sentences): unchanged — SPEECH_RULES prepended to systemPrompt via assembly, not inserted into character text
-  Speech rules injected: yes
-  Personality rewrite: no
+**QUESTION RULE added:**
+```
+QUESTION RULE — THIS OVERRIDES EVERYTHING:
+You stepped away from the party to breathe. You did not come here to interview someone.
+Do NOT ask questions to drive the conversation forward.
+React first. Short answers second. Questions almost never — and only if genuinely curious.
+You may ask ONE question — maximum — only if he says something that genuinely surprises you.
+Until that moment: react, give short answers, let him carry the weight.
+Examples of what you DO: "oh— hi." / "yeah." / "honestly same." / "that's... actually kind of funny."
+Examples of what you DON'T do: "What do you do?" / "Do you know many people here?" / Any question in first 3 exchanges.
+```
 
 ---
 
-## Ryan evaluation fix
+## Task 3 — Ryan opener fix
 
-**What was changed:** `api/coach.js` — part1/part2/part3/part4 field specs restructured from paragraph-length to 2-sentence beats.
+**File:** `api/coach.js`
 
-**Before:**
-- part1: 60-80 words, Ryan's opening reaction
-- part2: 90-120 words, two most revealing exchanges
-- part3: 100-130 words, two key mistakes
-- part4: 80-100 words, takeaway + patterns
+**Root cause found:** The "robotic opener" problem had TWO causes:
+1. The `part1` format spec said "Format: 'You opened with [exact quote from HIM_1]'" — explicitly instructing the model to quote verbatim.
+2. A **"nuclear fix"** (lines 468–472) that unconditionally prepended `You opened with "${realOpener}."` to part1 if the model didn't naturally quote the opener. This was the primary source of the wall-of-text verbatim quote.
 
-**After:**
-- part1: "THE OPENER. Two sentences max. 'You opened with [HIM_1 quote]. [One sentence on what it did.]'"
-- part2: "THE MIDDLE. Two sentences max. 'When she said [quote], you said [quote]. [One sentence.]'"
-- part3: "THE CORRECTION. Two sentences max. 'Instead of [his line], say: [replacement] — because [one reason].'"
-- part4: "THE CLOSER. Two sentences max. 'Two things to fix: [pattern 1] and [pattern 2]. [One punchy closing line.]'"
+**What changed:**
 
-The hardcoded transitions (transition2/3/4) already exist and create natural breaks between beats. The model now generates shorter beats, not paragraphs.
+**part1 format spec (before):**
+```
+"You opened with [exact quote from HIM_1]. [One sentence — what that opener did or didn't do...]"
+Quote HIM_1 verbatim.
+```
+
+**part1 format spec (after):**
+```
+Name the move — describe what he did in 5 words or fewer, WITHOUT quoting him verbatim.
+Then one sentence on how it landed with ${girlName} specifically.
+NEVER read his message back to him word-for-word.
+Examples: 'You led with your name. Safe, but flat.' / 'Opening with a compliment. She clocked it.'
+```
+
+**Nuclear fix removed:**
+```js
+// REMOVED:
+const realOpener = conversation.find(m => m.role === 'user')?.content?.trim() || '';
+if (realOpener && !feedback.part1.toLowerCase().includes(realOpener.toLowerCase().slice(0, 10))) {
+  feedback.part1 = `You opened with "${realOpener}." ` + feedback.part1;
+}
+```
+
+**User messages in both main and retry LLM calls:** Changed from "MANDATORY — your part1 MUST reference this exact line" / "REMINDER: part1 must quote HIM_1 above" to "REMINDER: part1 must NAME and JUDGE the move — do NOT quote HIM_1 back verbatim."
 
 ---
 
-## Coach suggestions fix
+## Task 4 — Speech rules audit
 
-**What was wrong:** The system prompt said "read the character's LAST message carefully" but didn't explicitly name or quote it. The LLM had to infer which message was "last" from the history — this caused off-target suggestions.
+**Order of rules blocks in final system prompt** (`api/character.js` line ~2755):
+```
+SPEECH_RULES  →  character prompt  →  setting  →  BASE_RULES  →  nameReminder  →  nameGivenReminder
+```
 
-**What was fixed** (`api/coach-suggest.js`):
-1. Explicit extraction of last assistant message:
-   ```js
-   const lastCharMessage = [...recentHistory].reverse().find(m => m.role === 'assistant')?.content?.trim() || '';
-   ```
-2. Injection as named anchor in system prompt:
-   ```
-   The character's last message was: "[exact message]"
-   Generate 3 suggested user responses that directly respond to THIS message.
-   ```
+**SPEECH_RULES is first** — correct, it loads before everything else. But it says "Usually ask zero questions" which is soft guidance. The character prompts came AFTER and contained:
+- Sofia: "Only ask a question back when you're genuinely curious — maybe once or twice in the whole session."
+- Sarah: "Don't ask a question every turn — sometimes just react, let it sit."
 
-**Flag:** The issue was in the **prompt**, not the data being passed. The history was always passed correctly — the LLM just needed the last message named explicitly rather than inferred.
+These character-level instructions (which the LLM reads later in the prompt) effectively softened SPEECH_RULES' question cap. GPT-4o-mini gives more weight to later, more specific instructions. This is why characters were still asking questions despite SPEECH_RULES.
+
+**Fix:** Hard QUESTION RULE blocks added directly in Sofia and Sarah's character prompts (Tasks 1 and 2). These now override any remaining permissive language at the character level.
+
+**BASE_RULES audit:** BASE_RULES does NOT address the question cap at all — it covers length, name rules, comma splices, spoken format, filler bans. Not a source of the override. No change needed.
+
+**Dev console.log added** (`api/character.js`, after systemPrompt assembly):
+```js
+if (process.env.NODE_ENV !== 'production') {
+  console.log('[character] systemPrompt[0:200]:', systemPrompt.slice(0, 200));
+}
+```
+This fires in local dev (NODE_ENV=undefined or 'development'). In Vercel production NODE_ENV='production' so it's silent. Serge can verify SPEECH_RULES is first by running locally or checking a preview deployment's function logs.
 
 ---
 
@@ -112,54 +125,39 @@ The hardcoded transitions (transition2/3/4) already exist and create natural bre
 ---
 
 ## Branch status
-- Branch: feature/speech-rewrite-v2
+- Branch: feature/speech-fix-v2
 - Committed: yes
 - Pushed: yes
-- Merged to main: NO (intentional — awaiting Serge approval)
-- Deployed: NO (intentional — awaiting Serge approval)
+- Merged: NO — awaiting Serge manual test
+- Deployed: NO
 
 ---
 
-## NEEDS MANUAL REVIEW — Serge do these tomorrow
+## NEEDS MANUAL REVIEW — Serge
 
-1. **Test Sofia: open beach scenario with dev bypass (`?dev=ek_dev_2026`)**
-   - Have a 5-exchange conversation. Does she feel like a real woman or still an AI?
-   - Test: "hey" → should get minimal response: "...hi." or just her name
-   - Test: "what are you writing?" → should deflect: "oh— just stuff. nothing interesting."
-   - Test: "can I sit here?" → should get: "I mean... it's a beach." (not warm, not cold)
-   - Mark: APPROVE / REJECT / NEEDS ADJUSTMENT
+1. **Test Sofia — 5 exchanges. Does she STOP asking questions now?**
+   - "hey" → should get "...hi." or just her name, nothing more
+   - "what are you writing?" → should deflect: "oh— just stuff."
+   - Keep talking for 3+ exchanges — does she ask anything back before you say something genuinely interesting?
+   - Mark: APPROVE / REJECT / STILL ASKING QUESTIONS
 
-2. **Test Sarah: open house party scenario**
-   - Does she react before answering? Does she lead less?
-   - Test: "you look like you needed a break" → should get: "honestly yeah. don't tell anyone."
-   - Test: "do you know many people here?" → should get: "like... three? maybe four. it's fine."
-   - Mark: APPROVE / REJECT / NEEDS ADJUSTMENT
+2. **Test Sarah — same check.**
+   - Does she react first and hold back questions?
+   - "you look like you needed a break" → "honestly yeah. don't tell anyone."
+   - Mark: APPROVE / REJECT / STILL ASKING QUESTIONS
 
-3. **Test Nadia: open bookstore scenario**
-   - Does she sound like a normal person? No therapist vocabulary?
-   - Give her a compliment and see if she says "okay." and moves on (not "That's a bold admission.")
-   - Mark: APPROVE / REJECT / NEEDS ADJUSTMENT
-
-4. **Test 2-3 other characters randomly**
-   - Do the speech rules make them feel more human? Shorter? More natural?
-   - Mark each: APPROVE / REJECT
-
-5. **Test Ryan evaluation**
-   - Does it feel like short beats with breathing room, or still a wall of text?
+3. **Test Ryan evaluation — does the opener no longer quote your message verbatim?**
+   - Open beach/bookstore, have 3-4 exchanges, trigger evaluation
+   - Does part1 say something like "You led with a compliment. Safe play." rather than "You opened with 'your long message text here'"?
    - Mark: APPROVE / REJECT
 
-6. **Test coach suggestions**
-   - Open any scenario, have 3 exchanges, click coach me
-   - Do the 3 suggestions actually respond to what the character just said?
-   - Mark: APPROVE / REJECT
-
-7. **Come back to chat with your verdicts — we deploy approved changes immediately.**
+4. **Come back with verdicts — we deploy immediately on approval.**
 
 ---
 
 ## Blockers / flags
 
-- **Remi character is still broken** (duplicate entry in CHARACTERS, truncated text) — existing P3 bug, not touched here.
-- **Wave 3 characters** all get speech rules via injection but were not individually reviewed. They have shorter/simpler prompts than Wave 1 — the speech rules should help.
-- **Ryan coach.js `tryNextTime` fallback** (line ~347) still references generic phrases — left as-is since it's a safety fallback, not primary behavior.
-- **coach-suggest edge case:** When history has no assistant messages yet, `lastCharMessage` is empty and anchor won't inject. This is correct behavior — suggestions at turn 0 are naturally unanchored.
+- **Remi character** still broken (existing P3 bug, not touched).
+- **Wave 3 characters** still not individually reviewed. SPEECH_RULES loads for all of them.
+- **QUESTION RULE is only added to Sofia and Sarah** — other Wave 1 characters (Nadia, Anna, etc.) still have their original behavior. If they show question-heavy behavior, same fix applies per character.
+- **The nuclear fix removal is non-recoverable if part1 goes blank** — but the fallback guard on line 349 catches missing/empty part1 and fills "You showed up. That is the first step. Now let's look at what happened." So there's still a safety net.

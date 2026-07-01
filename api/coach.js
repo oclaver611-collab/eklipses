@@ -255,7 +255,7 @@ Respond ONLY with valid JSON — no markdown, no preamble:
   "score": <number 1-10>,
   "spokenSummary": "<One punchy sentence. Max 20 words. MUST quote or directly reference a specific line from the transcript — his words or her words. No general statements about confidence or effort.>",
 
-  "part1": "<THE OPENER. Two sentences maximum. Format: 'You opened with [exact quote from HIM_1]. [One sentence — what that opener did or didn't do with ${girlName}, named directly.]' Quote HIM_1 verbatim. Do NOT start with 'Alright', 'Okay', or 'So'. No generic opener coaching — react to THIS exact line with THIS exact character.>",
+  "part1": "<THE OPENER. Two sentences maximum. Name the move — describe what he did in 5 words or fewer, WITHOUT quoting him verbatim. Then one sentence on how it landed with ${girlName} specifically. NEVER read his message back to him word-for-word. Examples: 'You led with your name. Safe, but flat.' / 'Opening with a compliment. She clocked it.' / 'You went straight for the number. Too fast.' / 'That opener gave her nothing to grab onto.' Name the move. Judge the move. Move on.>",
 
   "part2": "<THE MIDDLE. Two sentences maximum. Quote the single most revealing exchange: 'When she said [exact ${girlName} quote], you said [exact HIM quote]. [One sentence — what that exchange cost him or earned him with ${girlName}, specific to who she is.]' Be surgical.>",
 
@@ -315,7 +315,7 @@ RULES:
   try {
     const mainMessages = [
       { role: 'system', content: systemPrompt },
-      { role: 'user', content: `Scenario: ${scenarioTitle}\n\nHIS OPENING LINE (HIM_1, MANDATORY — your part1 MUST reference this exact line): "${conversation.find(m => m.role === 'user')?.content?.trim() || ''}"\n\nFull conversation transcript:\n${transcript}\n\nREMINDER: part1 must quote HIM_1 above, not any other line.` },
+      { role: 'user', content: `Scenario: ${scenarioTitle}\n\nHIS OPENING LINE (HIM_1): "${conversation.find(m => m.role === 'user')?.content?.trim() || ''}"\n\nFull conversation transcript:\n${transcript}\n\nREMINDER: part1 must NAME and JUDGE the move — do NOT quote HIM_1 back verbatim.` },
     ];
     let raw;
     try { raw = await callLLM(mainMessages, 2000); }
@@ -328,7 +328,7 @@ RULES:
       console.warn('[coach] JSON parse failed, retrying with stricter prompt...');
       const retryMessages = [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: `Scenario: ${scenarioTitle}\n\nHIS OPENING LINE (HIM_1, MANDATORY — your part1 MUST reference this exact line): "${conversation.find(m => m.role === 'user')?.content?.trim() || ''}"\n\nFull conversation transcript:\n${transcript}\n\nREMINDER: part1 must quote HIM_1 above, not any other line.\n\nCRITICAL: Return ONLY valid JSON. No markdown, no backticks, no preamble. Start with { and end with }.` },
+        { role: 'user', content: `Scenario: ${scenarioTitle}\n\nHIS OPENING LINE (HIM_1): "${conversation.find(m => m.role === 'user')?.content?.trim() || ''}"\n\nFull conversation transcript:\n${transcript}\n\nREMINDER: part1 must NAME and JUDGE the move — do NOT quote HIM_1 back verbatim.\n\nCRITICAL: Return ONLY valid JSON. No markdown, no backticks, no preamble. Start with { and end with }.` },
       ];
       try {
         const retryRaw = await callLLM(retryMessages, 2000);
@@ -465,11 +465,6 @@ RULES:
 
     // Apply to all spoken fields
     feedback.part1 = cleanText(feedback.part1);
-    // Nuclear fix: force part1 to reference actual HIM_1 opener
-    const realOpener = conversation.find(m => m.role === 'user')?.content?.trim() || '';
-    if (realOpener && !feedback.part1.toLowerCase().includes(realOpener.toLowerCase().slice(0, 10))) {
-      feedback.part1 = `You opened with "${realOpener}." ` + feedback.part1;
-    }
     feedback.part2 = cleanText(feedback.part2);
     feedback.part3 = cleanText(feedback.part3);
     feedback.part4 = cleanText(feedback.part4);
