@@ -1266,6 +1266,7 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
         characterId: currentCharacterId,
         history: conversationHistory,
         userStyle: currentUserStyle,
+        lesson1Complete: localStorage.getItem('eklipses_lesson1_complete') === 'true',
       }),
       signal: controller.signal,
     });
@@ -1348,6 +1349,7 @@ async function getCharacterResponseFallback(userSaid) {
         scenarioKey: currentScenarioKey,
         characterId: currentCharacterId,
         history: conversationHistory,
+        lesson1Complete: localStorage.getItem('eklipses_lesson1_complete') === 'true',
       }),
       signal: controller.signal,
     });
@@ -1937,7 +1939,9 @@ async function runCoachFeedback(mySession) {
     conversation: conversationHistory,
     scenarioTitle: sc.title || 'Dating scenario',
     scenarioKey: currentScenarioKey || '',
-    opener: firstUserOpener || ''
+    opener: firstUserOpener || '',
+    lesson1Complete: localStorage.getItem('eklipses_lesson1_complete') === 'true',
+    characterId: currentCharacterId || 'sofia',
   });
 
   // Start API call immediately (don't await yet)
@@ -2142,6 +2146,12 @@ function showFeedbackCard(f) {
   if (!f.wouldSheDateHim || f.wouldSheDateHim === '---') f.wouldSheDateHim = 'Maybe — show more genuine curiosity next time.';
   // Record this session in progress history
   if (f.score >= 1 && f.score <= 10) Progress.recordSession(f.score, currentScenarioKey, currentCharacterId);
+  // Lesson 1 certification tracking
+  if (f.lesson1Check && window.LessonPlayer) {
+    const lc = f.lesson1Check;
+    const passed = typeof lc.passed === 'boolean' ? lc.passed : (lc.score >= 4);
+    LessonPlayer.recordCoachResult(currentCharacterId, passed);
+  }
   // PostHog — session completed
   if (window.posthog) posthog.capture('session_completed', { scenario: currentScenarioKey, score: f.score });
   // PostHog — coach feedback viewed

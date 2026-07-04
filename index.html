@@ -128,6 +128,46 @@
   .metrics{display:flex;gap:12px;align-items:center}
   .metrics .count{font-weight:700}
 
+  /* ===== TABS ===== */
+  .ek-tabs { display:flex; gap:6px; padding:10px 16px 0; border-bottom:1px solid var(--stroke); background:var(--bg); }
+  .ek-tab { background:transparent; border:none; color:#9aa4b2; font-size:14px; font-weight:600; padding:10px 20px; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; letter-spacing:.04em; }
+  .ek-tab:hover { color:#cfd6e4; }
+  .ek-tab.ek-tab-active { color:#fff; border-bottom-color:#378ADD; }
+
+  /* ===== LEARN TAB ===== */
+  #ek-learn-tab { padding:28px 16px; max-width:860px; margin:0 auto; width:100%; box-sizing:border-box; }
+  .ek-learn-inner { display:flex; flex-direction:column; gap:16px; }
+  .ek-lesson-card { background:var(--panel); border:1px solid var(--stroke); border-radius:14px; padding:22px; }
+  .ek-lesson-card.locked { opacity:.5; cursor:not-allowed; }
+  .ek-lesson-card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .ek-lesson-num { font-size:11px; font-weight:700; letter-spacing:.12em; color:#556; text-transform:uppercase; }
+  .ek-lesson-status { font-size:11px; font-weight:700; letter-spacing:.08em; padding:3px 8px; border-radius:20px; }
+  .ek-lesson-status.completed { background:rgba(76,175,80,.18); color:#4caf50; }
+  .ek-lesson-status.in-progress { background:rgba(255,179,0,.15); color:#ffb300; }
+  .ek-lesson-status.not-started { background:rgba(154,164,178,.12); color:#9aa4b2; }
+  .ek-lesson-title { font-size:20px; font-weight:700; color:#fff; margin-bottom:8px; }
+  .ek-lesson-desc { font-size:14px; color:#9aa4b2; line-height:1.5; margin-bottom:16px; }
+  .ek-start-btn { background:#378ADD; color:#fff; border:none; border-radius:8px; padding:11px 24px; font-size:14px; font-weight:700; cursor:pointer; }
+  .ek-start-btn:hover { background:#4a94e0; }
+  .ek-cert-bar { margin-bottom:14px; }
+  .ek-cert-label { font-size:13px; color:#9aa4b2; margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+  .ek-cert-badge { background:rgba(76,175,80,.2); color:#4caf50; font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; }
+  .ek-cert-track { background:#1e2028; border-radius:4px; height:4px; }
+  .ek-cert-fill { background:#4caf50; height:4px; border-radius:4px; transition:width .4s; }
+
+  /* ===== PRACTICE BANNER ===== */
+  #ek-practice-banner { background:rgba(255,179,0,.1); border:1px solid rgba(255,179,0,.3); border-radius:12px; padding:14px 16px; margin-bottom:14px; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  #ek-practice-banner .ek-banner-text { font-size:13px; color:#ffd67a; flex:1; min-width:200px; }
+  #ek-practice-banner .ek-banner-btns { display:flex; gap:8px; }
+  #ek-practice-banner .ek-banner-btns button { font-size:12px; padding:6px 12px; border-radius:6px; border:1px solid rgba(255,179,0,.4); cursor:pointer; }
+  #ek-banner-go-lesson { background:rgba(255,179,0,.2); color:#ffb300; }
+  #ek-banner-dismiss { background:transparent; color:#9aa4b2; }
+
+  /* ===== CERT CHIP on scenario cards ===== */
+  .ek-cert-chip { font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px; }
+  .ek-cert-chip.certified { background:rgba(76,175,80,.2); color:#4caf50; }
+  .ek-cert-chip.practiced { background:rgba(154,164,178,.12); color:#9aa4b2; }
+
   /* ===== MOBILE ===== */
   @media (max-width: 600px) {
     /* Topbar: single clean row, hide non-essential items */
@@ -193,6 +233,26 @@
     </div>
   </div>
 
+  <!-- LEARN / PRACTICE Tabs -->
+  <div class="ek-tabs">
+    <button class="ek-tab" id="ek-tab-learn">LEARN</button>
+    <button class="ek-tab" id="ek-tab-practice">PRACTICE</button>
+  </div>
+
+  <!-- LEARN tab content -->
+  <div id="ek-learn-tab" style="display:none;"></div>
+
+  <!-- PRACTICE tab content -->
+  <div id="ek-practice-wrap" style="display:none;">
+  <!-- Warning banner -->
+  <div id="ek-practice-banner">
+    <span class="ek-banner-text">Recommended: Complete Lesson 1 before your first practice session — you'll perform significantly better.</span>
+    <div class="ek-banner-btns">
+      <button id="ek-banner-go-lesson">Go to Lesson 1</button>
+      <button id="ek-banner-dismiss">Dismiss</button>
+    </div>
+  </div>
+
   <div class="wrap">
     <div class="stage">
       <div class="frame" id="stageFrame">
@@ -211,6 +271,8 @@
       <div id="showMore" class="showmore" style="display:none;"></div>
     </aside>
   </div>
+
+  </div><!-- /#ek-practice-wrap -->
 
   <footer class="site-footer">
     Questions? <a href="mailto:support@eklipses.com" style="color:#6b7685;text-decoration:none;">support@eklipses.com</a>
@@ -308,5 +370,6 @@
   <script src="player.js"></script>
   <script src="netflix-rows.js"></script>
   <script src="transcript.js"></script>
+  <script src="lesson-player.js"></script>
 </body>
 </html>
