@@ -1,41 +1,33 @@
 // ===================================================================
-// Eklipses — Lesson Player Module
+// Eklipses — Lesson Player Module  (v2 — audio_v2 manifest system)
 // Handles LEARN tab, Lesson 1 player, completion, certification
 // ===================================================================
 (function () {
   'use strict';
 
-  const R2_BASE = 'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev';
+  const R2_BASE      = 'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev';
+  const R2_MANIFEST  = R2_BASE + '/lessons/lesson1/audio_v2/manifest.json';
   const SOFIA_IDLE   = R2_BASE + '/sofia_idle.mp4';
   const SOFIA_SPEAK  = R2_BASE + '/sofia_speaking.mp4';
-  const SOFIA_THUMB  = R2_BASE + '/sofia_thumb.jpg';
 
-  const LS_PROGRESS = 'eklipses_lesson1_progress';
-  const LS_COMPLETE = 'eklipses_lesson1_complete';
-  const LS_CERT     = 'eklipses_lesson1_certification';
+  const LS_PROGRESS  = 'eklipses_lesson1_progress';
+  const LS_COMPLETE  = 'eklipses_lesson1_complete';
+  const LS_CERT      = 'eklipses_lesson1_certification';
 
   const SEGMENTS = [
-    { id:'01', type:'A', title:'Lesson Intro' },
-    { id:'02', type:'A', title:'Before The Approach' },
-    { id:'03', type:'B', title:'The Approach — Live Exchange',    sofiaLines:["...sure.", "...that's a strange thing to notice."] },
-    { id:'04', type:'A', title:'Step 1 — The Observation Opener' },
-    { id:'05', type:'B', title:'The Tease — Live Exchange',        sofiaLines:["...maybe.", "Should I?", "...you're very observant."] },
-    { id:'06', type:'A', title:'Step 2 — Playful Challenge' },
-    { id:'07', type:'B', title:'The Sensitive Topic — Live Exchange', sofiaLines:["Why — are you trying to figure out if I'm worth talking to?", "...I'm just making conversation.", "...that's a very careful answer."] },
-    { id:'08', type:'A', title:'Step 3 — Owning Your Mystery' },
-    { id:'09', type:'B', title:'The Verbal Spike — Live Exchange', sofiaLines:["What?", "...most people find that strange.", "...that's actually a nice thing to say."] },
-    { id:'10', type:'A', title:'Step 4 — The Verbal Spike' },
-    { id:'11', type:'B', title:'The Close — Live Exchange',       sofiaLines:["...is that a complaint?", "...yeah. I'd like that.", "...confident."] },
-    { id:'12', type:'A', title:'Step 5 — The Natural Close' },
-    { id:'13', type:'A', title:'Summary and Send-Off' },
-  ];
-
-  const COMPLETION_STEPS = [
-    'The observation opener',
-    'Playful challenge',
-    'Own your mystery',
-    'The verbal spike',
-    'The natural close',
+    { id:'01', title:'The Lesson' },
+    { id:'02', title:'Before The Approach' },
+    { id:'03', title:'Watch — The Approach' },
+    { id:'04', title:'Step 1 — The Observation Opener' },
+    { id:'05', title:'Watch — The Tease' },
+    { id:'06', title:'Step 2 — Playful Challenge' },
+    { id:'07', title:'Watch — The Mystery' },
+    { id:'08', title:'Step 3 — Own Your Mystery' },
+    { id:'09', title:'Watch — The Verbal Spike' },
+    { id:'10', title:'Step 4 — The Verbal Spike' },
+    { id:'11', title:'Watch — The Close' },
+    { id:'12', title:'Step 5 — The Natural Close' },
+    { id:'13', title:'Your Five Steps' },
   ];
 
   // ── localStorage helpers ───────────────────────────────────────────
@@ -45,21 +37,19 @@
   function getCert() {
     const raw = lsGet(LS_CERT, null);
     if (raw) return raw;
-    // Initialize with all known character IDs
     const ids = (window.AVATAR_SETS || []).map(s => s.id);
     const obj = {};
     ids.forEach(id => { obj[id] = { attempts:0, passed:0, certified:false }; });
     return obj;
   }
-
   function saveCert(obj) { lsSet(LS_CERT, obj); }
 
   // ── Public API ─────────────────────────────────────────────────────
   window.LessonPlayer = {
-    isComplete: () => lsGet(LS_COMPLETE, null) === true,
-    getProgress: () => lsGet(LS_PROGRESS, null),
+    isComplete:          () => lsGet(LS_COMPLETE, null) === true,
+    getProgress:         () => lsGet(LS_PROGRESS, null),
     getCertForCharacter: (charId) => { const c = getCert(); return c[charId] || { attempts:0, passed:0, certified:false }; },
-    recordCoachResult: (charId, passed) => {
+    recordCoachResult:   (charId, passed) => {
       const cert = getCert();
       if (!cert[charId]) cert[charId] = { attempts:0, passed:0, certified:false };
       cert[charId].attempts++;
@@ -68,32 +58,29 @@
       refreshLearnTabStatus();
       if (window.refreshCertBadges) window.refreshCertBadges();
     },
-    openLesson: openLesson,
-    renderLearnTab: renderLearnTab,
+    openLesson:      openLesson,
+    renderLearnTab:  renderLearnTab,
   };
 
   // ── Tab management ─────────────────────────────────────────────────
   function switchTab(tab) {
-    const learnTab  = document.getElementById('ek-learn-tab');
+    const learnTab   = document.getElementById('ek-learn-tab');
     const practiceTab = document.getElementById('ek-practice-wrap');
-    const btnLearn  = document.getElementById('ek-tab-learn');
-    const btnPrac   = document.getElementById('ek-tab-practice');
-    const banner    = document.getElementById('ek-practice-banner');
-
+    const btnLearn   = document.getElementById('ek-tab-learn');
+    const btnPrac    = document.getElementById('ek-tab-practice');
+    const banner     = document.getElementById('ek-practice-banner');
     if (!learnTab || !practiceTab) return;
-
     if (tab === 'learn') {
-      learnTab.style.display   = '';
+      learnTab.style.display    = '';
       practiceTab.style.display = 'none';
       btnLearn.classList.add('ek-tab-active');
       btnPrac.classList.remove('ek-tab-active');
       if (banner) banner.style.display = 'none';
     } else {
-      learnTab.style.display   = 'none';
+      learnTab.style.display    = 'none';
       practiceTab.style.display = '';
       btnLearn.classList.remove('ek-tab-active');
       btnPrac.classList.add('ek-tab-active');
-      // Show warning banner if lesson not complete
       if (banner && !LessonPlayer.isComplete()) {
         const dismissed = sessionStorage.getItem('ek-lesson-banner-dismissed');
         if (!dismissed) banner.style.display = 'flex';
@@ -106,16 +93,12 @@
     const btnPrac  = document.getElementById('ek-tab-practice');
     const banner   = document.getElementById('ek-practice-banner');
     if (!btnLearn || !btnPrac) return;
-
     btnLearn.onclick = () => switchTab('learn');
     btnPrac.onclick  = () => switchTab('practice');
-
     const goL1  = document.getElementById('ek-banner-go-lesson');
     const disBtn = document.getElementById('ek-banner-dismiss');
-    if (goL1)  goL1.onclick  = () => { switchTab('learn'); };
-    if (disBtn) disBtn.onclick = () => { sessionStorage.setItem('ek-lesson-banner-dismissed','1'); if(banner) banner.style.display='none'; };
-
-    // Default to LEARN tab
+    if (goL1)  goL1.onclick  = () => switchTab('learn');
+    if (disBtn) disBtn.onclick = () => { sessionStorage.setItem('ek-lesson-banner-dismissed','1'); if (banner) banner.style.display='none'; };
     switchTab('learn');
   }
 
@@ -126,17 +109,15 @@
     if (prog && prog !== '01') return 'in_progress';
     return 'not_started';
   }
-
   function getCertifiedCount() {
-    const cert = getCert();
-    return Object.values(cert).filter(v => v.certified).length;
+    return Object.values(getCert()).filter(v => v.certified).length;
   }
 
   function renderLearnTab() {
     const container = document.getElementById('ek-learn-tab');
     if (!container) return;
-    const status = getLesson1Status();
-    const certCount = getCertifiedCount();
+    const status     = getLesson1Status();
+    const certCount  = getCertifiedCount();
     const totalAvatars = (window.AVATAR_SETS || []).filter(s => !s.hidden).length;
 
     const statusHtml = status === 'completed'
@@ -170,7 +151,6 @@
             ${status === 'completed' ? '↺ Review Lesson' : status === 'in_progress' ? '▶ Continue Lesson' : '▶ Start Lesson'}
           </button>
         </div>
-
         <div class="ek-lesson-card locked">
           <div class="ek-lesson-card-header">
             <span class="ek-lesson-num">🔒 LESSON 2</span>
@@ -180,22 +160,170 @@
         </div>
       </div>
     `;
-
     const btn = document.getElementById('ek-start-lesson1');
     if (btn) btn.onclick = () => openLesson(status === 'in_progress' ? LessonPlayer.getProgress() : '01');
   }
 
-  function refreshLearnTabStatus() {
-    renderLearnTab();
+  function refreshLearnTabStatus() { renderLearnTab(); }
+
+  // ── Player state ───────────────────────────────────────────────────
+  let _playerEl    = null;
+  let _currentSegIdx = 0;
+  let _aborted     = false;
+  let _manifest    = null;
+  let _playGen     = 0;       // incremented on navigate/open to invalidate in-flight playback
+  let _currentAudio = null;
+  let _paused      = false;
+  let _resumeResolve = null;  // set when waiting for resume
+  let _orbAnim     = null;
+  let _orbT        = 0;
+
+  // ── Manifest ───────────────────────────────────────────────────────
+  async function loadManifest() {
+    if (_manifest) return _manifest;
+    const res = await fetch(R2_MANIFEST);
+    if (!res.ok) throw new Error('manifest HTTP ' + res.status);
+    _manifest = await res.json();
+    return _manifest;
   }
 
-  // ── Lesson Player overlay ──────────────────────────────────────────
-  let _playerEl = null;
-  let _currentSegIdx = 0;
-  let _playing = false;
-  let _currentAudio = null;
-  let _aborted = false;
+  // ── Pause / resume engine ──────────────────────────────────────────
+  function whenResumed() {
+    if (!_paused) return Promise.resolve();
+    return new Promise(res => { _resumeResolve = res; });
+  }
 
+  function togglePause() {
+    _paused = !_paused;
+    if (_paused) {
+      if (_currentAudio) _currentAudio.pause();
+    } else {
+      if (_currentAudio) _currentAudio.play().catch(() => {});
+      if (_resumeResolve) { const fn = _resumeResolve; _resumeResolve = null; fn(); }
+    }
+    updatePauseBtn();
+  }
+
+  function updatePauseBtn() {
+    const btn = document.getElementById('elp-pause-btn');
+    if (btn) { btn.textContent = _paused ? '▶' : '⏸'; btn.title = _paused ? 'Resume' : 'Pause'; }
+  }
+
+  // ── Sequential audio player ────────────────────────────────────────
+  function playOneAudio(url) {
+    return new Promise(res => {
+      const a = new Audio(url);
+      _currentAudio = a;
+      a.onended = () => { _currentAudio = null; res(); };
+      a.onerror = () => { _currentAudio = null; res(); };
+      a.play().catch(() => { _currentAudio = null; res(); });
+    });
+  }
+
+  async function gapMs(ms, gen) {
+    if (_aborted || gen !== _playGen) return;
+    // Don't start the gap if already paused — wait for resume first
+    await whenResumed();
+    if (_aborted || gen !== _playGen) return;
+    await new Promise(res => setTimeout(res, ms));
+  }
+
+  async function playSequence(files, gen) {
+    for (let i = 0; i < files.length; i++) {
+      if (_aborted || gen !== _playGen) return;
+      await whenResumed();
+      if (_aborted || gen !== _playGen) return;
+
+      const f = files[i];
+      const url = R2_BASE + '/lessons/lesson1/audio_v2/' + f.file;
+
+      onFileStart(f.voice);
+      await playOneAudio(url);
+      if (_aborted || gen !== _playGen) return;
+      onFileEnd(f.voice);
+
+      if (i < files.length - 1) await gapMs(700, gen);
+    }
+  }
+
+  // ── Audio-event driven visual states ──────────────────────────────
+  function onFileStart(voice) {
+    if (voice === 'ryan') {
+      orbAnimate(true);
+      setOrbSpeaker('ryan');
+      setSofiaState(false);
+    } else if (voice === 'alex') {
+      orbAnimate(false);
+      setOrbSpeaker('alex');
+      setSofiaState(false);
+    } else if (voice === 'sofia') {
+      orbAnimate(false);
+      setOrbSpeaker('ryan');   // orb reverts to RYAN label while Sofia speaks
+      setSofiaState(true);
+    }
+  }
+
+  function onFileEnd(voice) {
+    if (voice === 'sofia') setSofiaState(false);
+  }
+
+  // ── Segment runner ─────────────────────────────────────────────────
+  async function runSegment(idx) {
+    if (_aborted) return;
+    const seg = SEGMENTS[idx];
+    if (!seg) return;
+    _currentSegIdx = idx;
+    updateProgress(idx);
+    lsSet(LS_PROGRESS, seg.id);
+
+    // Build base display (Ryan orb + Sofia idle) on each segment start
+    showRyanWithSofia();
+
+    const gen = _playGen;
+
+    // Get file list from manifest
+    let files = [];
+    if (_manifest) {
+      const segData = _manifest.segments.find(s => s.segmentId === seg.id);
+      if (segData) files = segData.sequence || segData.files || [];
+    }
+
+    if (files.length === 0) {
+      // No audio for this segment — auto-advance after a beat
+      await new Promise(res => setTimeout(res, 1500));
+    } else {
+      await playSequence(files, gen);
+    }
+
+    if (_aborted || gen !== _playGen) return;
+
+    // Reset visual state, brief inter-segment pause
+    orbAnimate(false);
+    setSofiaState(false);
+    setOrbSpeaker('ryan');
+    await new Promise(res => setTimeout(res, 800));
+
+    if (_aborted || gen !== _playGen) return;
+
+    if (idx + 1 >= SEGMENTS.length) {
+      onLessonComplete();
+    } else {
+      runSegment(idx + 1);
+    }
+  }
+
+  // ── Navigation ─────────────────────────────────────────────────────
+  function navigate(delta) {
+    const newIdx = Math.max(0, Math.min(SEGMENTS.length - 1, _currentSegIdx + delta));
+    _playGen++;
+    if (_currentAudio) { _currentAudio.pause(); _currentAudio = null; }
+    if (_resumeResolve) { const fn = _resumeResolve; _resumeResolve = null; fn(); }
+    _paused = false;
+    updatePauseBtn();
+    runSegment(newIdx);
+  }
+
+  // ── Player HTML ────────────────────────────────────────────────────
   function buildPlayerHTML() {
     const el = document.createElement('div');
     el.id = 'ek-lesson-player';
@@ -204,14 +332,19 @@
         <button class="elp-close" id="elp-close" title="Exit lesson">✕</button>
 
         <div class="elp-stage">
-          <div class="elp-avatar-area" id="elp-avatar-area">
-            <!-- Ryan orb or Sofia video goes here -->
-          </div>
+          <div class="elp-avatar-area" id="elp-avatar-area"></div>
           <div class="elp-caption" id="elp-caption"></div>
         </div>
 
         <div class="elp-bottom">
           <div class="elp-seg-title" id="elp-seg-title"></div>
+
+          <div class="elp-controls">
+            <button class="elp-ctrl-btn" id="elp-back-btn" title="Previous segment">⏮</button>
+            <button class="elp-ctrl-btn elp-ctrl-pause" id="elp-pause-btn" title="Pause">⏸</button>
+            <button class="elp-ctrl-btn" id="elp-fwd-btn" title="Next segment">⏭</button>
+          </div>
+
           <div class="elp-progress-bar">
             <div class="elp-progress-fill" id="elp-progress-fill"></div>
           </div>
@@ -231,6 +364,17 @@
               <div class="elp-step"><span class="elp-step-n">3.</span> Own your mystery</div>
               <div class="elp-step"><span class="elp-step-n">4.</span> The verbal spike</div>
               <div class="elp-step"><span class="elp-step-n">5.</span> The natural close</div>
+            </div>
+            <div class="elp-mnemonic">
+              <div class="elp-mnemonic-label">HOW TO REMEMBER THEM:</div>
+              <div class="elp-mnemonic-phrase">One Tequila Makes Ideas Click</div>
+              <div class="elp-mnemonic-map">
+                <div class="elp-mnemonic-row"><span class="elp-mnemonic-word">One</span><span class="elp-mnemonic-arrow">→</span><span class="elp-mnemonic-meaning">Observe something specific</span></div>
+                <div class="elp-mnemonic-row"><span class="elp-mnemonic-word">Tequila</span><span class="elp-mnemonic-arrow">→</span><span class="elp-mnemonic-meaning">Tease playfully</span></div>
+                <div class="elp-mnemonic-row"><span class="elp-mnemonic-word">Makes</span><span class="elp-mnemonic-arrow">→</span><span class="elp-mnemonic-meaning">Mystery — don't give it all away</span></div>
+                <div class="elp-mnemonic-row"><span class="elp-mnemonic-word">Ideas</span><span class="elp-mnemonic-arrow">→</span><span class="elp-mnemonic-meaning">Imply your interest</span></div>
+                <div class="elp-mnemonic-row"><span class="elp-mnemonic-word">Click</span><span class="elp-mnemonic-arrow">→</span><span class="elp-mnemonic-meaning">Close naturally</span></div>
+              </div>
             </div>
             <div class="elp-complete-btns">
               <button class="elp-btn-primary" id="elp-go-practice">Go to Practice</button>
@@ -263,11 +407,11 @@
       .elp-close:hover { background:rgba(255,255,255,.22); }
 
       .elp-stage { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; max-width:860px; gap:16px; }
-      .elp-avatar-area { width:100%; max-width:540px; height:320px; display:flex; align-items:center; justify-content:center; position:relative; }
+      .elp-avatar-area { width:100%; max-width:540px; height:300px; display:flex; align-items:center; justify-content:center; position:relative; }
       .elp-avatar-area video { width:100%; height:100%; object-fit:cover; border-radius:16px; }
 
-      /* Ryan orb inside player */
-      .elp-ryan-orb { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; }
+      /* Ryan orb */
+      .elp-ryan-orb { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
       .elp-orb-wrap { position:relative; width:140px; height:140px; display:flex; align-items:center; justify-content:center; }
       .elp-orb-ring { position:absolute; border-radius:50%; border:1.5px solid #378ADD; opacity:0; transition:opacity .3s; }
       .elp-orb-ring.r1 { width:140px; height:140px; }
@@ -275,28 +419,51 @@
       .elp-orb-circle { width:120px; height:120px; border-radius:50%; background:#378ADD; display:flex; align-items:center; justify-content:center; }
       .elp-orb-inner  { width:82px; height:82px; border-radius:50%; background:#185FA5; display:flex; align-items:center; justify-content:center; }
       .elp-orb-lbl { font-size:18px; font-weight:700; color:#B5D4F4; letter-spacing:.1em; }
-      .elp-orb-bars { display:flex; align-items:flex-end; gap:4px; height:36px; }
+      .elp-orb-bars { display:flex; align-items:flex-end; gap:4px; height:32px; }
       .elp-orb-bar { width:5px; background:#378ADD; border-radius:3px; min-height:4px; transition:height .1s; }
-      .elp-orb-name { font-size:14px; color:#B5D4F4; font-weight:600; letter-spacing:.08em; }
+      .elp-orb-name { font-size:13px; font-weight:700; color:#B5D4F4; letter-spacing:.12em; transition:color .2s; }
+      .elp-orb-name.alex { color:#f0b429; }
 
       .elp-caption { font-size:17px; color:#e3eaf4; text-align:center; max-width:640px; min-height:48px; line-height:1.5; padding:0 20px; }
 
       .elp-bottom { width:100%; max-width:860px; }
-      .elp-seg-title { font-size:12px; color:#556; text-transform:uppercase; letter-spacing:.1em; text-align:center; margin-bottom:8px; }
+      .elp-seg-title { font-size:12px; color:#556; text-transform:uppercase; letter-spacing:.1em; text-align:center; margin-bottom:10px; }
+
+      /* Playback controls */
+      .elp-controls { display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:14px; }
+      .elp-ctrl-btn { background:rgba(255,255,255,.08); border:none; color:#cfd6e4; width:38px; height:38px; border-radius:50%; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s; }
+      .elp-ctrl-btn:hover { background:rgba(255,255,255,.16); }
+      .elp-ctrl-pause { width:46px; height:46px; font-size:18px; background:rgba(55,138,221,.18); color:#7eb8f4; }
+      .elp-ctrl-pause:hover { background:rgba(55,138,221,.3); }
+
       .elp-progress-bar { background:#1a1e26; border-radius:4px; height:4px; width:100%; }
       .elp-progress-fill { background:#378ADD; height:4px; border-radius:4px; transition:width .4s ease; }
       .elp-progress-label { font-size:12px; color:#556; text-align:center; margin-top:6px; }
 
+      /* Sofia label */
+      .elp-speaker-label { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.65); color:#fff; font-size:13px; font-weight:600; padding:4px 14px; border-radius:20px; white-space:nowrap; }
+
       /* Completion screen */
-      .elp-complete { position:absolute; inset:0; background:#080a0e; display:flex; align-items:center; justify-content:center; z-index:5; }
-      .elp-complete-inner { max-width:480px; width:90%; text-align:center; }
+      .elp-complete { position:absolute; inset:0; background:#080a0e; display:flex; align-items:center; justify-content:center; z-index:5; overflow-y:auto; }
+      .elp-complete-inner { max-width:500px; width:90%; text-align:center; padding:24px 0; }
       .elp-complete-check { font-size:56px; color:#4caf50; margin-bottom:12px; }
       .elp-complete-title { font-size:26px; font-weight:700; color:#fff; margin-bottom:8px; }
       .elp-complete-sub { font-size:16px; color:#ffb300; margin-bottom:16px; font-weight:600; }
       .elp-complete-body { font-size:15px; color:#9aa4b2; margin-bottom:24px; line-height:1.6; }
-      .elp-complete-steps { text-align:left; margin-bottom:28px; }
+      .elp-complete-steps { text-align:left; margin-bottom:24px; }
       .elp-step { font-size:14px; color:#cfd6e4; padding:6px 0; border-bottom:1px solid #1e2028; display:flex; gap:10px; }
       .elp-step-n { color:#378ADD; font-weight:700; min-width:22px; }
+
+      /* Mnemonic cheat sheet */
+      .elp-mnemonic { background:#0e1420; border:1px solid #1e2e48; border-radius:12px; padding:20px 24px; margin-bottom:28px; text-align:left; }
+      .elp-mnemonic-label { font-size:11px; color:#556; text-transform:uppercase; letter-spacing:.12em; margin-bottom:10px; }
+      .elp-mnemonic-phrase { font-size:22px; font-weight:800; color:#fff; margin-bottom:16px; letter-spacing:.01em; text-align:center; }
+      .elp-mnemonic-map { display:flex; flex-direction:column; gap:8px; }
+      .elp-mnemonic-row { display:flex; align-items:baseline; gap:8px; }
+      .elp-mnemonic-word { font-size:14px; font-weight:700; color:#378ADD; min-width:68px; }
+      .elp-mnemonic-arrow { font-size:13px; color:#3a4455; }
+      .elp-mnemonic-meaning { font-size:14px; color:#cfd6e4; }
+
       .elp-complete-btns { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
 
       /* Exit confirm */
@@ -311,9 +478,6 @@
       .elp-btn-primary:hover { background:#4a94e0; }
       .elp-btn-ghost { background:transparent; color:#9aa4b2; border:1px solid #2b2e36; border-radius:8px; padding:11px 24px; font-size:14px; cursor:pointer; }
       .elp-btn-ghost:hover { background:#1e2028; }
-
-      /* Sofia idle/speaking label */
-      .elp-speaker-label { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.65); color:#fff; font-size:13px; font-weight:600; padding:4px 14px; border-radius:20px; white-space:nowrap; }
     `;
   }
 
@@ -325,10 +489,7 @@
     document.head.appendChild(style);
   }
 
-  // ── Ryan orb in player ─────────────────────────────────────────────
-  let _orbAnim = null;
-  let _orbT = 0;
-
+  // ── Ryan orb ───────────────────────────────────────────────────────
   function buildRyanOrb() {
     const d = document.createElement('div');
     d.className = 'elp-ryan-orb';
@@ -339,9 +500,9 @@
         <div class="elp-orb-circle"><div class="elp-orb-inner"><span class="elp-orb-lbl">R</span></div></div>
       </div>
       <div class="elp-orb-bars" id="elp-bars">
-        ${[0,1,2,3,4].map(()=>'<div class="elp-orb-bar" style="height:6px"></div>').join('')}
+        ${[0,1,2,3,4].map(() => '<div class="elp-orb-bar" style="height:6px"></div>').join('')}
       </div>
-      <div class="elp-orb-name">RYAN</div>
+      <div class="elp-orb-name" id="elp-orb-name">RYAN</div>
     `;
     return d;
   }
@@ -349,80 +510,50 @@
   function orbAnimate(speaking) {
     cancelAnimationFrame(_orbAnim);
     _orbT = 0;
-    const r1 = document.getElementById('elp-ring1');
-    const r2 = document.getElementById('elp-ring2');
+    const r1   = document.getElementById('elp-ring1');
+    const r2   = document.getElementById('elp-ring2');
     const bars = document.querySelectorAll('.elp-orb-bar');
     if (!r1) return;
-
     function tick() {
       _orbT += 0.08;
       const t = _orbT;
       if (speaking) {
         r1.style.opacity = (0.25 + 0.18 * Math.sin(t * 2.1)).toFixed(3);
         r2.style.opacity = (0.12 + 0.10 * Math.sin(t * 1.7 + 1)).toFixed(3);
-        bars.forEach((b, i) => {
-          b.style.height = (6 + 20 * Math.abs(Math.sin(t * 3 + i * 0.7))).toFixed(1) + 'px';
-        });
+        bars.forEach((b, i) => { b.style.height = (6 + 20 * Math.abs(Math.sin(t * 3 + i * 0.7))).toFixed(1) + 'px'; });
       } else {
-        r1.style.opacity = '0.10';
+        r1.style.opacity = '0.08';
         r2.style.opacity = '0';
-        bars.forEach(b => b.style.height = '4px');
+        bars.forEach(b => { b.style.height = '4px'; });
       }
       _orbAnim = requestAnimationFrame(tick);
     }
     tick();
   }
 
-  // ── Sofia video element ────────────────────────────────────────────
-  function buildSofiaEl() {
-    const wrap = document.createElement('div');
-    wrap.style.cssText = 'position:relative;width:100%;height:100%;';
-    const v = document.createElement('video');
-    v.id = 'elp-sofia-video';
-    v.src = SOFIA_IDLE;
-    v.muted = true;
-    v.loop = true;
-    v.autoplay = true;
-    v.playsInline = true;
-    v.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:16px;';
-    const lbl = document.createElement('div');
-    lbl.className = 'elp-speaker-label';
-    lbl.id = 'elp-sofia-label';
-    lbl.textContent = 'Sofia';
-    wrap.appendChild(v);
-    wrap.appendChild(lbl);
-    return wrap;
+  function setOrbSpeaker(voice) {
+    const el = document.getElementById('elp-orb-name');
+    if (!el) return;
+    if (voice === 'alex') {
+      el.textContent = 'ALEX';
+      el.classList.add('alex');
+    } else {
+      el.textContent = 'RYAN';
+      el.classList.remove('alex');
+    }
   }
 
+  // ── Sofia video ────────────────────────────────────────────────────
   function setSofiaState(speaking) {
     const v = document.getElementById('elp-sofia-video');
     if (!v) return;
-    v.src = speaking ? SOFIA_SPEAK : SOFIA_IDLE;
+    const newSrc = speaking ? SOFIA_SPEAK : SOFIA_IDLE;
+    if (v.src !== newSrc) { v.src = newSrc; }
     v.play().catch(() => {});
   }
 
-  // ── Show Ryan or Sofia in avatar area ─────────────────────────────
-  function showRyan() {
-    const area = document.getElementById('elp-avatar-area');
-    if (!area) return;
-    area.innerHTML = '';
-    area.appendChild(buildRyanOrb());
-    orbAnimate(true);
-  }
-
-  function showSofia(speaking) {
-    const area = document.getElementById('elp-avatar-area');
-    if (!area) return;
-    if (!area.querySelector('#elp-sofia-video')) {
-      area.innerHTML = '';
-      area.appendChild(buildSofiaEl());
-    }
-    setSofiaState(speaking);
-    cancelAnimationFrame(_orbAnim);
-  }
-
+  // ── Stage layout — always Ryan orb + Sofia side by side ───────────
   function showRyanWithSofia() {
-    // Ryan orb on left, Sofia idle on right
     const area = document.getElementById('elp-avatar-area');
     if (!area) return;
     area.innerHTML = '';
@@ -443,7 +574,6 @@
     v.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:12px;';
     const lbl = document.createElement('div');
     lbl.className = 'elp-speaker-label';
-    lbl.id = 'elp-sofia-label';
     lbl.textContent = 'Sofia';
     sofiaWrap.appendChild(v);
     sofiaWrap.appendChild(lbl);
@@ -451,10 +581,11 @@
     row.appendChild(orbWrap);
     row.appendChild(sofiaWrap);
     area.appendChild(row);
-    orbAnimate(true);
+
+    orbAnimate(false);
   }
 
-  // ── Caption & progress UI ──────────────────────────────────────────
+  // ── Progress & caption ─────────────────────────────────────────────
   function setCaption(text) {
     const el = document.getElementById('elp-caption');
     if (el) el.textContent = text || '';
@@ -466,179 +597,90 @@
     const title = document.getElementById('elp-seg-title');
     const seg   = SEGMENTS[idx];
     if (!fill || !label || !seg) return;
-    fill.style.width = ((idx + 1) / SEGMENTS.length * 100).toFixed(1) + '%';
+    fill.style.width  = ((idx + 1) / SEGMENTS.length * 100).toFixed(1) + '%';
     label.textContent = (idx + 1) + ' / ' + SEGMENTS.length;
     if (title) title.textContent = seg.title;
+    setCaption('');
   }
 
-  // ── Audio helpers ──────────────────────────────────────────────────
-  function pause(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-  function playR2Audio(segId) {
-    return new Promise((resolve) => {
-      const url = `${R2_BASE}/lessons/lesson1/audio/lesson1_seg${segId}.mp3`;
-      const audio = new Audio(url);
-      _currentAudio = audio;
-      audio.onended = () => { _currentAudio = null; resolve(); };
-      audio.onerror = () => { _currentAudio = null; resolve(); };
-      audio.play().catch(() => { _currentAudio = null; resolve(); });
-    });
-  }
-
-  async function playSofiaTTS(text) {
-    return new Promise(async (resolve) => {
-      try {
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 10000);
-        const res = await fetch('/api/tts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, characterId: 'sofia' }),
-          signal: ctrl.signal,
-        });
-        clearTimeout(timer);
-        if (!res.ok) { resolve(); return; }
-        const buf = await res.arrayBuffer();
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const audioBuf = await audioCtx.decodeAudioData(buf);
-        const source = audioCtx.createBufferSource();
-        source.buffer = audioBuf;
-        source.connect(audioCtx.destination);
-        source.onended = () => { audioCtx.close(); resolve(); };
-        source.start(0);
-      } catch (e) {
-        resolve();
-      }
-    });
-  }
-
-  // ── Segment sequencer ──────────────────────────────────────────────
-  async function runSegment(idx) {
-    if (_aborted) return;
-    const seg = SEGMENTS[idx];
-    updateProgress(idx);
-    lsSet(LS_PROGRESS, seg.id);
-
-    if (seg.type === 'A') {
-      // Ryan coaching segment — orb + Sofia idle background
-      showRyanWithSofia();
-      setCaption(seg.title);
-      orbAnimate(true);
-      await playR2Audio(seg.id);
-      if (_aborted) return;
-      orbAnimate(false);
-      await pause(1000);
-    } else {
-      // Type B — Live exchange: Ryan MP3 first, then Sofia TTS responses
-      showRyanWithSofia();
-      setCaption('');
-      orbAnimate(true);
-      await playR2Audio(seg.id);
-      if (_aborted) return;
-      orbAnimate(false);
-
-      // Now play Sofia's scripted TTS responses
-      for (const line of (seg.sofiaLines || [])) {
-        if (_aborted) return;
-        showSofia(true);
-        setCaption(line);
-        await playSofiaTTS(line);
-        if (_aborted) return;
-        setSofiaState(false);
-        setCaption('');
-        await pause(500);
-      }
-
-      // Switch back to Ryan+Sofia view
-      if (!_aborted) {
-        showRyanWithSofia();
-        orbAnimate(false);
-        await pause(1000);
-      }
-    }
-
-    if (!_aborted) {
-      _currentSegIdx = idx + 1;
-      if (_currentSegIdx >= SEGMENTS.length) {
-        onLessonComplete();
-      } else {
-        await runSegment(_currentSegIdx);
-      }
-    }
-  }
-
+  // ── Completion ─────────────────────────────────────────────────────
   function onLessonComplete() {
     lsSet(LS_COMPLETE, true);
     lsSet(LS_PROGRESS, null);
-    const completeEl = document.getElementById('elp-complete');
-    if (completeEl) completeEl.style.display = '';
-    refreshLearnTabStatus();
     cancelAnimationFrame(_orbAnim);
+    const el = document.getElementById('elp-complete');
+    if (el) el.style.display = '';
+    refreshLearnTabStatus();
   }
 
-  // ── Open / close lesson ────────────────────────────────────────────
-  function openLesson(startSegId) {
+  // ── Open / close ───────────────────────────────────────────────────
+  async function openLesson(startSegId) {
     injectCSS();
-    _aborted = false;
+    _aborted  = false;
+    _paused   = false;
+    _playGen++;
     cancelAnimationFrame(_orbAnim);
     if (_currentAudio) { _currentAudio.pause(); _currentAudio = null; }
+    if (_resumeResolve) { _resumeResolve(); _resumeResolve = null; }
 
-    // Remove any existing player
     const existing = document.getElementById('ek-lesson-player');
     if (existing) existing.remove();
 
     _playerEl = buildPlayerHTML();
     document.body.appendChild(_playerEl);
 
-    // Wire up controls
+    // Wire controls
     document.getElementById('elp-close').onclick = () => {
-      const confirm = document.getElementById('elp-exit-confirm');
-      if (confirm) confirm.style.display = '';
+      document.getElementById('elp-exit-confirm').style.display = '';
     };
-    document.getElementById('elp-exit-yes').onclick = () => closeLesson();
-    document.getElementById('elp-exit-no').onclick = () => {
-      const confirm = document.getElementById('elp-exit-confirm');
-      if (confirm) confirm.style.display = 'none';
-    };
-    document.getElementById('elp-go-practice').onclick = () => {
-      closeLesson();
-      switchTab('practice');
-    };
+    document.getElementById('elp-exit-yes').onclick  = closeLesson;
+    document.getElementById('elp-exit-no').onclick   = () => { document.getElementById('elp-exit-confirm').style.display = 'none'; };
+    document.getElementById('elp-pause-btn').onclick = togglePause;
+    document.getElementById('elp-back-btn').onclick  = () => navigate(-1);
+    document.getElementById('elp-fwd-btn').onclick   = () => navigate(1);
+    document.getElementById('elp-go-practice').onclick = () => { closeLesson(); switchTab('practice'); };
     document.getElementById('elp-review-lesson').onclick = () => {
-      const completeEl = document.getElementById('elp-complete');
-      if (completeEl) completeEl.style.display = 'none';
+      document.getElementById('elp-complete').style.display = 'none';
       _aborted = false;
-      _currentSegIdx = 0;
+      _paused  = false;
+      _playGen++;
       runSegment(0);
     };
 
-    // Start from specified segment
+    // Load manifest (cached after first call)
+    try {
+      await loadManifest();
+    } catch (e) {
+      console.error('[lesson] manifest load failed:', e);
+      setCaption('Audio unavailable — check connection.');
+    }
+
     const startIdx = SEGMENTS.findIndex(s => s.id === (startSegId || '01'));
-    _currentSegIdx = Math.max(0, startIdx);
-    runSegment(_currentSegIdx);
+    runSegment(Math.max(0, startIdx));
   }
 
   function closeLesson() {
     _aborted = true;
+    _playGen++;
     cancelAnimationFrame(_orbAnim);
     if (_currentAudio) { _currentAudio.pause(); _currentAudio = null; }
+    if (_resumeResolve) { _resumeResolve(); _resumeResolve = null; }
     if (_playerEl) { _playerEl.remove(); _playerEl = null; }
     refreshLearnTabStatus();
   }
 
-  // ── Certification badge refresh (called by player.js after coach eval) ─
+  // ── Certification badge refresh ────────────────────────────────────
   window.refreshCertBadges = function () {
-    // Trigger re-render of any badge elements already in the DOM
     document.querySelectorAll('[data-cert-char]').forEach(el => {
       const charId = el.getAttribute('data-cert-char');
-      const cert = LessonPlayer.getCertForCharacter(charId);
+      const cert   = LessonPlayer.getCertForCharacter(charId);
       if (cert.certified) {
         el.textContent = '✓ Certified';
-        el.className = 'ek-cert-chip certified';
+        el.className   = 'ek-cert-chip certified';
         el.style.display = '';
       } else if (cert.attempts > 0) {
         el.textContent = 'Practiced';
-        el.className = 'ek-cert-chip practiced';
+        el.className   = 'ek-cert-chip practiced';
         el.style.display = '';
       } else {
         el.style.display = 'none';
@@ -646,7 +688,7 @@
     });
   };
 
-  // ── Init on DOMContentLoaded ───────────────────────────────────────
+  // ── Init ───────────────────────────────────────────────────────────
   function init() {
     injectCSS();
     renderLearnTab();
