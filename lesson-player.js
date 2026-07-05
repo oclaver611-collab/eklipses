@@ -6,7 +6,7 @@
   'use strict';
 
   const R2_BASE      = 'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev';
-  const R2_MANIFEST  = R2_BASE + '/lessons/lesson1/audio_v2/manifest.json';
+  const R2_MANIFEST  = '/api/lesson-audio?file=manifest.json';
   const SOFIA_IDLE   = R2_BASE + '/sofia_idle.mp4';
   const SOFIA_SPEAK  = R2_BASE + '/sofia_speaking.mp4';
 
@@ -235,7 +235,7 @@
       if (_aborted || gen !== _playGen) return;
 
       const f = files[i];
-      const url = R2_BASE + '/lessons/lesson1/audio_v2/' + f.file;
+      const url = '/api/lesson-audio?file=' + encodeURIComponent(f.file);
 
       onFileStart(f.voice);
       await playOneAudio(url);
