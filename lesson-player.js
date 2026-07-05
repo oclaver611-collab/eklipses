@@ -181,9 +181,13 @@
   // ── Manifest ───────────────────────────────────────────────────────
   async function loadManifest() {
     if (_manifest) return _manifest;
+    console.log('[lesson] fetching manifest from:', R2_MANIFEST);
     const res = await fetch(R2_MANIFEST);
     if (!res.ok) throw new Error('manifest HTTP ' + res.status);
     _manifest = await res.json();
+    const fileList = (_manifest.segments || []).flatMap(s => (s.sequence || s.files || []).map(f => f.file));
+    console.log('[lesson] manifest loaded — version:', _manifest.version, '| segments:', (_manifest.segments || []).length, '| files:', fileList.length);
+    console.log('[lesson] all files in manifest:', fileList);
     return _manifest;
   }
 
@@ -214,9 +218,9 @@
     return new Promise(res => {
       const a = new Audio(url);
       _currentAudio = a;
-      a.onended = () => { _currentAudio = null; res(); };
-      a.onerror = () => { _currentAudio = null; res(); };
-      a.play().catch(() => { _currentAudio = null; res(); });
+      a.onended = () => { console.log('[lesson] audio ended:', url); _currentAudio = null; res(); };
+      a.onerror = (e) => { console.warn('[lesson] audio error:', url, e); _currentAudio = null; res(); };
+      a.play().catch(e => { console.warn('[lesson] play() rejected:', url, e.message); _currentAudio = null; res(); });
     });
   }
 
@@ -236,6 +240,7 @@
 
       const f = files[i];
       const url = '/api/lesson-audio?file=' + encodeURIComponent(f.file);
+      console.log('[lesson] playing', f.voice, '→', url);
 
       onFileStart(f.voice);
       await playOneAudio(url);
