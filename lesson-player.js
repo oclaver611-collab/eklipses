@@ -5,9 +5,8 @@
 (function () {
   'use strict';
 
+  const WORKER_BASE  = 'https://eklipses-lesson-audio.oclaver611.workers.dev';
   const R2_BASE      = 'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev';
-  const R2_AUDIO_BASE = R2_BASE + '/lessons/lesson1/audio_v2';
-  const R2_MANIFEST  = '/api/lesson-audio?file=manifest.json';
   const SOFIA_IDLE   = R2_BASE + '/sofia_idle.mp4';
   const SOFIA_SPEAK  = R2_BASE + '/sofia_speaking.mp4';
 
@@ -184,7 +183,7 @@
   // ── Manifest ───────────────────────────────────────────────────────
   async function loadManifest() {
     if (_manifest) return _manifest;
-    const manifestUrl = R2_MANIFEST + '&t=' + Date.now();
+    const manifestUrl = WORKER_BASE + '?file=manifest.json&t=' + Date.now();
     console.log('[lesson] fetching manifest from:', manifestUrl);
     const res = await fetch(manifestUrl);
     if (!res.ok) throw new Error('manifest HTTP ' + res.status);
@@ -301,9 +300,7 @@
       if (_aborted || gen !== _playGen) return;
 
       const f = files[i];
-      const url = f.file.startsWith('ryan_')
-        ? 'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/lessons/lesson1/audio_v2/' + f.file
-        : '/api/lesson-audio?file=' + encodeURIComponent(f.file);
+      const url = WORKER_BASE + '?file=' + encodeURIComponent(f.file);
       console.log('[lesson] playing', f.voice, '→', url);
 
       onFileStart(f.voice);

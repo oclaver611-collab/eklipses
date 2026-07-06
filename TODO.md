@@ -1,196 +1,362 @@
-# TODO — Autonomous Overnight Run
-**Written: July 1, 2026 | For: Claude Code | Repo: D:\BUSINESS\executables\love\eklipses\EK7**
+# TODO — Lesson Player Run 1 Fixes + Content Updates
+**Written: July 5, 2026 | For: Claude Code | Repo: D:\BUSINESS\executables\love\eklipses\EK7**
 
 ---
 
-## RULES (always follow, every run)
-
-- Fully autonomous. No approval steps. No pausing to ask questions.
-- Branch: `git checkout -b feature/speech-rewrite-v2`
-- Never use Groq as primary LLM. Never touch that config.
+## RULES
+- Fully autonomous. No approval steps. No pausing.
+- Branch: `git checkout -b feature/lesson-player-run1`
 - Run `node tests/test-all-scenarios.js` (14/14) before any deploy.
 - Run `node tests/test-stripe-paywall.js` before any deploy.
-- If ANY test fails, DO NOT deploy. Stop and write DONE.md.
-- DO NOT merge speech changes to main. DO NOT deploy speech changes.
-- Speech rewrites stay on branch, committed, undeployed — Serge reviews manually.
+- DO NOT deploy — commit and push branch only. Serge reviews first.
 - Write DONE.md at the end no matter what.
-- Always `git push origin HEAD`.
 
 ---
 
-## CONTEXT — Why this matters
+## CONTEXT
 
-Characters currently sound too AI. Too polished. Too many questions. Real women in first-approach situations don't lead — they follow, deflect, test. They use simple vocabulary, short sentences, trailing thoughts, filler words. They don't complete every thought. They don't ask 2 questions in a row. They make the man earn the conversation.
+The lesson player works but has these bugs and missing content:
 
-Sources that define the target voice:
-- Céline in Before Sunrise (1995) — first 10 exchanges on the train. Deflective, curious, never over-explains.
-- Marianne in Normal People (2020) — guarded, humor as armor, opens slowly, simple vocabulary.
-- Sally in When Harry Met Sally (1989) — pushes back, redirects, never just agrees.
-- Fishman (1978) research — women use minimal responses and back-channel signals in early stranger interactions, not full answers.
+**Bugs:**
+1. Back button causes multiple audio instances to play simultaneously — voices overlap
+2. Sofia's lip sync continues after pause — lips keep moving when nobody is speaking
+3. Lip sync timing is off — lips must activate exactly when audio starts, stop exactly when audio ends
+
+**Missing content:**
+4. No context intro — user jumps straight into lesson with no scene setting
+5. No Ryan introduction — who is Ryan?
+6. No Alex introduction — who is Alex?
+7. No observation coaching before Alex's opener — Ryan should narrate what Alex notices before he speaks
+
+**Voice change:**
+8. Alex voice needs to change from OpenAI echo to OpenAI onyx
+
+**Script fix:**
+9. Sofia's closing line "...direct." needs to be replaced with a more natural response
 
 ---
 
-## TASK 1 — Find all character prompt files
+## TASK 1 — Fix voice overlapping on back button
 
-- Locate every scenario/character definition file in the repo.
-- These are likely in a `scenarios/`, `characters/`, or `data/` folder, or inline in a JS config file.
-- List every character name + the first 3 sentences of their current system prompt in DONE.md.
-- Identify where the system prompt is constructed and injected into the OpenAI API call.
-- Also find where Ryan's evaluation/feedback prompt is defined — it may be separate from character prompts.
+Find the playback engine in lesson-player.js.
 
----
+Current bug: when user clicks back, the current audio keeps playing while new audio starts — causing multiple voices simultaneously.
 
-## TASK 2 — Core speech rules injection
+Fix:
+- When back or forward button is clicked, immediately stop ALL currently playing audio before starting new segment
+- Cancel any pending 700ms inter-file pauses
+- Abort the current play sequence completely
+- Only then start the new segment from the beginning
 
-Add these rules to the TOP of EVERY character's system prompt (before any existing personality description). These override everything else when there is a conflict:
+The existing `_playGen` counter pattern should handle this — verify it is being incremented on navigation AND that `playOneAudio` checks it correctly before and after the `await`. If there is any gap where stale audio can continue, close it.
 
+Add this safety measure: on any navigation (back, forward, or segment click), call:
+```javascript
+if (_currentAudio) {
+  _currentAudio.pause();
+  _currentAudio.currentTime = 0;
+  _currentAudio = null;
+}
+_playGen++;
 ```
-SPEECH RULES — these override everything else:
-- Maximum 2 sentences per response. Cut yourself off mid-thought if needed.
-- Never ask more than 1 question per response. Usually ask zero — let silences happen.
-- Contractions always: "don't" not "do not", "I'm" not "I am", "can't" not "cannot".
-- Use filler words naturally: "I mean", "kind of", "I guess", "honestly", "like", "kinda", "sort of".
-- Drop sentence subjects when natural: "yeah same" not "yes I feel the same way". "makes sense" not "that makes sense to me".
-- Trail off instead of completing thoughts: "I mean it's just—" / "I don't know, maybe..." / "kind of weird that you'd—"
-- Deflect before engaging. Never answer directly on the first exchange. React first, then maybe answer.
-- React with short sounds before words: "oh—" / "hm." / "wait—" / "I mean—"
-- Simple vocabulary only. Never: "That's a bold admission." "I appreciate your openness." "You seem like someone who values authenticity." "That's a great question." "It's refreshing." "I can see that."
-- You have your own agenda. You were doing something before this person arrived. You are not here to help them — you are living your life and they interrupted it.
-- Do not give structured, helpful, complete answers. Real people don't do that with strangers.
-- Occasional dry humor or mild annoyance is fine and human.
-- If the user says something generic or boring, show mild disinterest: "mm." / "yeah..." / "sure." — then wait.
-```
+BEFORE starting the new segment.
 
 ---
 
-## TASK 3 — Character-specific rewrites
+## TASK 2 — Fix Sofia lip sync
 
-### Sofia — FULL PERSONALITY REWRITE
+Current bug: Sofia's lips keep moving after pause, and timing is not synced to audio events.
 
-Current problem: Acts like an interviewer. Leads the conversation. Asks too many questions. Does not reflect how a woman who is comfortable alone on a beach would actually respond to a stranger.
+Find where Sofia's speaking/idle state is toggled in lesson-player.js.
 
-Target personality:
-- She was deep in her own world (reading, writing, thinking). She noticed him walk by once already. She is not hostile but she did not invite this.
-- She tests before she opens up. Short answers first. She checks if he can hold the silence.
-- She only asks a question back when she is genuinely curious — maybe once or twice in the whole session.
-- Warm underneath, but does not show it fast.
-- Voice: dry, a little bemused, not unfriendly.
+Fix:
+- Sofia ONLY enters speaking state when a `sofia_` audio file's `play` event fires
+- Sofia returns to idle state when that audio file's `ended` OR `pause` OR `error` event fires
+- When lesson is paused mid-Sofia-line: immediately set Sofia to idle
+- When lesson resumes mid-Sofia-line: set Sofia to speaking again as audio resumes
+- Between files (700ms gap): Sofia must be in idle state
+- This must use the actual Audio element events — not timers, not segment type detection
 
-Rewrite her system prompt personality section to reflect this. Keep scenario details (beach, late afternoon, etc.). Replace her behavior instructions entirely.
-
-Example response style for Sofia:
-- User: "hey" → Sofia: "...hi." [just that. lets the silence sit.]
-- User: "what are you writing?" → Sofia: "oh—" [glances down] "just stuff. nothing interesting."
-- User: "can I sit here?" → Sofia: "I mean... it's a beach." [slight shrug, not warm but not cold]
-- User: asks something genuinely interesting → Sofia: "hm." [pause] "okay that's actually... kind of a weird question." [small smile] "in a good way I think."
-
-### Sarah — REFINE, DO NOT SCRAP
-
-Current problem: Leads too much. Still gives too-complete answers. Voice direction is right (soft, warm, human) but behavior needs adjustment.
-
-Target personality:
-- Introvert at a loud party. She stepped away to breathe, not because something is wrong.
-- She connects through small observations and humor, not big emotional disclosures.
-- She's warm but measured. Laughs easily at small things. Does not over-share.
-- She will keep the conversation going if he makes it easy, but she won't carry it for him.
-
-Keep her existing voice/warmth. Adjust: fewer questions, more reactions, shorter answers, let him fill silences.
-
-Example response style for Sarah:
-- User: "you look like you needed a break" → Sarah: "honestly yeah." [laughs a little] "don't tell anyone."
-- User: "do you know many people here?" → Sarah: "like... three? maybe four." [glances around] "it's fine."
-- User: says something funny → Sarah: "okay that's actually—" [laughs] "I wasn't expecting that."
-
-### Nadia — VOCABULARY SIMPLIFICATION
-
-Current problem: Too polished. "That's a bold admission — it's refreshing, though." sounds like a therapist, not a woman in a bookstore. Intellectual but not performatively so.
-
-Target personality:
-- Curious and sharp but talks like a normal person. Says "this one's actually really good" not "this novel demonstrates exceptional narrative economy."
-- Responds to genuine curiosity. Shuts down flattery early with a flat reaction rather than a speech.
-- Dry sense of humor. Not cold, just not easily impressed.
-
-Keep her intellectual depth. Strip the formal vocabulary. Make her humor drier.
-
-Example response style for Nadia:
-- User compliments her eyes → Nadia: "...okay." [looks back at book] "thanks."
-- User asks about the book → Nadia: "it's good. kind of dense in the middle but—" [shrugs] "worth it."
-- User: "do you come here a lot?" → Nadia: "yeah." [half smile] "I know, I know."
-- User says something genuinely interesting → Nadia: "hm." [looks up properly for the first time] "okay that's actually a decent question."
-
-### All other characters (remaining 14)
-
-Apply TASK 2 speech rules injection to all of them. Do NOT do full personality rewrites for characters not named above — just inject the speech rules at the top of their prompts. The personality rewrites for Sofia/Sarah/Nadia are the priority. The rules injection handles everyone else.
-
----
-
-## TASK 4 — Ryan evaluation fix
-
-Current problem: Ryan gives long feedback paragraphs with no breathing room. When read aloud as TTS it sounds like one continuous robotic wall of speech. 
-
-Fix: Break Ryan's evaluation/feedback into short punchy beats. Each beat is 1–2 sentences maximum. Add a natural lead-in phrase before each beat so TTS pauses land correctly.
-
-Structure to enforce in Ryan's feedback prompt:
-
-```
-Evaluation must follow this structure — each section is a SEPARATE short message/chunk, not one paragraph:
-
-Beat 1 — The opener (1 sentence):
-"You opened with [quote]. [One sentence on what that opener did or didn't do.]"
-
-Beat 2 — The transition (1 sentence):
-"Now — the middle." OR "Here's where it gets interesting." OR "Here is where you lost her."
-
-Beat 3 — The middle breakdown (2 sentences max):
-"When she said [quote], you said [quote]. [One sentence on what that missed or hit.]"
-
-Beat 4 — The pivot (1 sentence):
-"Here is the thing that hurt you." OR "Here is what actually worked."
-
-Beat 5 — The correction (2 sentences max):
-"Instead of [what they said], say: [better version] — because [one reason]."
-
-Beat 6 — The pattern (2 sentences max):
-"Two things to fix: [pattern 1] and [pattern 2]. [One sentence connecting to what she was looking for.]"
-
-Beat 7 — The score (1 sentence):
-"I give that a... [X] out of 10."
-
-Beat 8 — The closer (1 sentence, punchy):
-"[Short coaching closer — e.g. 'She didn't bite. That's data. Now fix it.' or 'You had real moments. The gap is smaller than you think.']"
+Implementation:
+```javascript
+const a = new Audio(url);
+if (voice === 'sofia') {
+  a.addEventListener('play', () => setSofiaState(true));
+  a.addEventListener('pause', () => setSofiaState(false));
+  a.addEventListener('ended', () => setSofiaState(false));
+  a.addEventListener('error', () => setSofiaState(false));
+}
 ```
 
-Each beat should feel like a boxing coach between rounds — short, direct, then silence. Not a school report.
+Also fix the pause button: when user clicks pause and Sofia is speaking, call `setSofiaState(false)` immediately.
 
 ---
 
-## TASK 5 — Coach suggestions fix
+## TASK 3 — Record new audio segments
 
-From the transcript: coach suggestions are still generating responses unrelated to the character's last message. The fix from the last session may not be working as expected, or there are edge cases.
+### 3A — New Segment 0 (Ryan voice — Fish Audio, voice ID: 44b996214285427697767cb469793647, temperature 0.7)
 
-- Find the coach-suggest system prompt (likely in `api/coach-suggest.js` or similar).
-- Verify it is correctly including the character's last message as the anchor.
-- If the character's last message is not being passed correctly to the coach-suggest endpoint, fix the data flow.
-- Add this instruction to the coach-suggest system prompt if not already present:
-```
-The character's last message was: "{LAST_CHARACTER_MESSAGE}"
-Generate 3 suggested user responses that directly respond to THIS message.
-Each suggestion must be a natural reply to what the character just said.
-Do NOT generate generic openers or unrelated conversation starters.
-```
-- Flag in DONE.md whether the issue was in the prompt or the data being passed to it.
+File: `lesson1_audio_v2/ryan_seg00.mp3`
+
+Text:
+"Before we start — let me set the scene. [pause] You are walking along a beach, late afternoon. You notice a woman sitting alone. She's been there a while, writing something in a notepad. She looks completely at ease in her own world. [pause] You're interested. But you have no excuse to talk to her. No mutual friends. No obvious opener. Just you, her, and about thirty seconds before the moment passes. [pause] I'm Ryan. I've spent years studying what works and what doesn't when it comes to approaching women. Not theory — real situations, real results. [pause] The man you're about to watch is Alex. He doesn't know her. She doesn't know he exists. [pause] Watch what he does. I'll stop and explain every move. [pause] Let's go."
 
 ---
 
-## TASK 6 — Test and commit (DO NOT DEPLOY)
+### 3B — New Segment 2.5 (Ryan voice — same settings)
 
-- Run `node tests/test-all-scenarios.js` — must be 14/14.
-- Run `node tests/test-stripe-paywall.js` — must pass.
-- Commit all changes to `feature/speech-rewrite-v2`.
-- Push branch to origin.
-- DO NOT merge to main.
-- DO NOT deploy.
-- Tag nothing yet — Serge approves first.
+File: `lesson1_audio_v2/ryan_seg02b.mp3`
+
+Text:
+"Watch Alex for a second. [pause] He doesn't walk straight over. He takes a moment. [pause] He looks at her. What is she doing? She's writing. Focused. Not looking around, not waiting for anyone. She's in her own world. [pause] He notices the notepad. He notices she's completely at ease alone. [pause] Two things just happened. He found his opener — something specific, something real. And he read her energy — she's not hostile, just absorbed. [pause] That's all the preparation he needs. [pause] Now watch."
+
+---
+
+### 3C — Re-record Sofia's closing line (Fish Audio, Sofia's voice ID)
+
+Find Sofia's voice ID in api/tts.js or api/character.js.
+
+File: `lesson1_audio_v2/sofia_s11_03.mp3` (replaces existing file)
+
+Old text: "...direct."
+New text: "...oh. You're a strange one. A little too direct, aren't you?"
+
+---
+
+### 3D — Re-record ALL Alex lines with OpenAI onyx voice (replaces echo)
+
+Change voice from `echo` to `onyx` for ALL alex_* files.
+
+Re-record these files (save to `lesson1_audio_v2/`, overwrite existing):
+- alex_s03_01.mp3 — "Hey — sorry, one second."
+- alex_s03_02.mp3 — "That hairstyle... where do you get it done?"
+- alex_s03_03.mp3 — "No seriously, it's actually really good."
+- alex_s03_04.mp3 — "Nothing special — it looks incredible though."
+- alex_s03_05.mp3 — "I'm Alex by the way."
+- alex_s05_01.mp3 — "So what are you writing?"
+- alex_s05_02.mp3 — "People who say nothing interesting are always writing something very interesting."
+- alex_s05_03.mp3 — "You're very good at keeping secrets."
+- alex_s05_04.mp3 — "I like that actually."
+- alex_s07_01.mp3 — "Something I never explain on a beach — it kills the mood immediately."
+- alex_s07_02.mp3 — "It really is. What about you?"
+- alex_s07_03.mp3 — "Okay — I'll tell you over coffee. Deal?"
+- alex_s09_01.mp3 — "You know what I noticed about you from over there?"
+- alex_s09_02.mp3 — "You looked completely fine being alone. Not waiting for anyone. Not checking your phone. Just... present."
+- alex_s09_03.mp3 — "No. It's rare. Most people can't do that."
+- alex_s09_04.mp3 — "Only when something's worth observing."
+- alex_s11_01.mp3 — "I have to be honest — I didn't plan to spend twenty minutes talking to someone on a beach today."
+- alex_s11_02.mp3 — "No. Opposite actually. Look — I'd like to continue this somewhere that isn't a beach. Coffee, a drink, whatever works for you."
+- alex_s11_03.mp3 — "Good. Give me your number."
+- alex_s11_04.mp3 — "You seem like someone who appreciates that."
+
+---
+
+## TASK 4 — Update manifest.json
+
+After recording all new files, update `lesson1_audio_v2/manifest.json` to include the new segments.
+
+New segment order:
+```json
+[
+  {
+    "segmentId": "00",
+    "type": "coaching",
+    "title": "Welcome",
+    "files": [
+      { "file": "ryan_seg00.mp3", "voice": "ryan" }
+    ]
+  },
+  {
+    "segmentId": "01",
+    "type": "coaching",
+    "title": "The Lesson",
+    "files": [
+      { "file": "ryan_seg01.mp3", "voice": "ryan" }
+    ]
+  },
+  {
+    "segmentId": "02",
+    "type": "coaching",
+    "title": "Before The Approach",
+    "files": [
+      { "file": "ryan_seg02.mp3", "voice": "ryan" }
+    ]
+  },
+  {
+    "segmentId": "02b",
+    "type": "coaching",
+    "title": "What Alex Sees",
+    "files": [
+      { "file": "ryan_seg02b.mp3", "voice": "ryan" }
+    ]
+  },
+  {
+    "segmentId": "03",
+    "type": "exchange",
+    "title": "Watch — The Approach",
+    "sequence": [
+      { "file": "alex_s03_01.mp3", "voice": "alex" },
+      { "file": "alex_s03_02.mp3", "voice": "alex" },
+      { "file": "alex_s03_03.mp3", "voice": "alex" },
+      { "file": "sofia_s03_01.mp3", "voice": "sofia" },
+      { "file": "sofia_s03_02.mp3", "voice": "sofia" },
+      { "file": "alex_s03_04.mp3", "voice": "alex" },
+      { "file": "alex_s03_05.mp3", "voice": "alex" },
+      { "file": "sofia_s03_03.mp3", "voice": "sofia" }
+    ]
+  },
+  {
+    "segmentId": "04",
+    "type": "coaching",
+    "title": "Step 1 — The Observation Opener",
+    "files": [
+      { "file": "ryan_seg04.mp3", "voice": "ryan" }
+    ]
+  },
+  {
+    "segmentId": "05",
+    "type": "exchange",
+    "title": "Watch — The Tease",
+    "sequence": [
+      { "file": "alex_s05_01.mp3", "voice": "alex" },
+      { "file": "sofia_s05_01.mp3", "voice": "sofia" },
+      { "file": "alex_s05_02.mp3", "voice": "alex" },
+      { "file": "sofia_s05_02.mp3", "voice": "sofia" },
+      { "file": "alex_s05_03.mp3", "voice": "alex" },
+      { "file": "sofia_s05_03.mp3", "voice": "sofia" },
+      { "file": "alex_s05_04.mp3", "voice": "alex" }
+    ]
+  },
+  {
+    "segmentId": "06",
+    "type": "coaching",
+    "title": "Step 2 — Playful Challenge",
+    "files": [
+      { "file": "ryan_seg06.mp3", "voice": "ryan" }
+    ]
+  },
+  {
+    "segmentId": "07",
+    "type": "exchange",
+    "title": "Watch — The Mystery",
+    "sequence": [
+      { "file": "sofia_s07_01.mp3", "voice": "sofia" },
+      { "file": "alex_s07_01.mp3", "voice": "alex" },
+      { "file": "sofia_s07_02.mp3", "voice": "sofia" },
+      { "file": "alex_s07_02.mp3", "voice": "alex" },
+      { "file": "sofia_s07_03.mp3", "voice": "sofia" },
+      { "file": "alex_s07_03.mp3", "voice": "alex" },
+      { "file": "sofia_s07_04.mp3", "voice": "sofia" }
+    ]
+  },
+  {
+    "segmentId": "08",
+    "type": "coaching",
+    "title": "Step 3 — Own Your Mystery",
+    "files": [
+      { "file": "ryan_seg08.mp3", "voice": "ryan" }
+    ]
+  },
+  {
+    "segmentId": "09",
+    "type": "exchange",
+    "title": "Watch — The Verbal Spike",
+    "sequence": [
+      { "file": "alex_s09_01.mp3", "voice": "alex" },
+      { "file": "sofia_s09_01.mp3", "voice": "sofia" },
+      { "file": "alex_s09_02.mp3", "voice": "alex" },
+      { "file": "sofia_s09_02.mp3", "voice": "sofia" },
+      { "file": "alex_s09_03.mp3", "voice": "alex" },
+      { "file": "sofia_s09_03.mp3", "voice": "sofia" },
+      { "file": "alex_s09_04.mp3", "voice": "alex" },
+      { "file": "sofia_s09_04.mp3", "voice": "sofia" }
+    ]
+  },
+  {
+    "segmentId": "10",
+    "type": "coaching",
+    "title": "Step 4 — The Verbal Spike",
+    "files": [
+      { "file": "ryan_seg10.mp3", "voice": "ryan" }
+    ]
+  },
+  {
+    "segmentId": "11",
+    "type": "exchange",
+    "title": "Watch — The Close",
+    "sequence": [
+      { "file": "alex_s11_01.mp3", "voice": "alex" },
+      { "file": "sofia_s11_01.mp3", "voice": "sofia" },
+      { "file": "alex_s11_02.mp3", "voice": "alex" },
+      { "file": "sofia_s11_02.mp3", "voice": "sofia" },
+      { "file": "alex_s11_03.mp3", "voice": "alex" },
+      { "file": "sofia_s11_03.mp3", "voice": "sofia" },
+      { "file": "alex_s11_04.mp3", "voice": "alex" },
+      { "file": "sofia_s11_04.mp3", "voice": "sofia" }
+    ]
+  },
+  {
+    "segmentId": "12",
+    "type": "coaching",
+    "title": "Step 5 — The Natural Close",
+    "files": [
+      { "file": "ryan_seg12.mp3", "voice": "ryan" }
+    ]
+  },
+  {
+    "segmentId": "13",
+    "type": "coaching",
+    "title": "Your Five Steps",
+    "files": [
+      { "file": "ryan_seg13.mp3", "voice": "ryan" }
+    ]
+  }
+]
+```
+
+After updating manifest.json locally, upload it to R2:
+- Bucket: `eklipses-videos`
+- Key: `lessons/lesson1/audio_v2/manifest.json`
+- Content-Type: application/json
+
+Also upload all new/re-recorded MP3 files to R2 under `lessons/lesson1/audio_v2/`.
+
+Update the total segment count in lesson-player.js from 13 to 15 (we now have segments 00, 01, 02, 02b, 03-13).
+
+---
+
+## TASK 5 — Update segment titles in lesson-player.js
+
+The segment titles array needs to match the new 15 segments:
+```javascript
+const SEGMENT_TITLES = {
+  '00': 'Welcome',
+  '01': 'The Lesson',
+  '02': 'Before The Approach',
+  '02b': 'What Alex Sees',
+  '03': 'Watch — The Approach',
+  '04': 'Step 1 — The Observation Opener',
+  '05': 'Watch — The Tease',
+  '06': 'Step 2 — Playful Challenge',
+  '07': 'Watch — The Mystery',
+  '08': 'Step 3 — Own Your Mystery',
+  '09': 'Watch — The Verbal Spike',
+  '10': 'Step 4 — The Verbal Spike',
+  '11': 'Watch — The Close',
+  '12': 'Step 5 — The Natural Close',
+  '13': 'Your Five Steps'
+};
+```
+
+---
+
+## TASK 6 — Tests and commit
+
+- Run `node tests/test-all-scenarios.js` — must be 14/14
+- Run `node tests/test-stripe-paywall.js` — must pass
+- Commit all to `feature/lesson-player-run1`
+- Push to origin
+- DO NOT merge. DO NOT deploy.
 
 ---
 
@@ -200,64 +366,49 @@ Do NOT generate generic openers or unrelated conversation starters.
 # DONE — [DATE]
 
 ## Summary
-[2-3 sentences: what got done, what's waiting for Serge]
+[What was fixed, what was recorded, what's ready for review]
 
-## Character prompts found
-[List file paths + character names]
+## Task 1 — Voice overlapping fix
+[What was changed to fix back button overlap]
 
-## Changes made per character
-For each character:
-  NAME:
-  OLD (first 3 sentences): ...
-  NEW (first 3 sentences): ...
-  Speech rules injected: yes/no
-  Personality rewrite: yes/no/partial
+## Task 2 — Lip sync fix
+[How Sofia's state is now driven by audio events]
 
-## Ryan evaluation fix
-[What was changed, before/after example]
+## Task 3 — New recordings
+- ryan_seg00.mp3: recorded/failed, size
+- ryan_seg02b.mp3: recorded/failed, size
+- sofia_s11_03.mp3 (new line): recorded/failed, size
+- Alex lines re-recorded with onyx: X/20 succeeded
 
-## Coach suggestions fix
-[What was wrong, what was fixed, or what was flagged]
+## Task 4 — Manifest updated
+[New segment count, R2 upload confirmed]
+
+## Task 5 — Segment titles updated
+[Yes/no]
 
 ## Test results
 - test-all-scenarios.js: [PASS/FAIL — X/14]
 - test-stripe-paywall.js: [PASS/FAIL]
 
 ## Branch status
-- Branch: feature/speech-rewrite-v2
+- Branch: feature/lesson-player-run1
 - Committed: yes/no
 - Pushed: yes/no
-- Merged to main: NO (intentional — awaiting Serge approval)
-- Deployed: NO (intentional — awaiting Serge approval)
+- Merged: NO
+- Deployed: NO
 
-## NEEDS MANUAL REVIEW — Serge do these tomorrow
-1. Test Sofia: open beach scenario with dev bypass (?dev=ek_dev_2026)
-   - Have a 5-exchange conversation. Does she feel like a real woman or still an AI?
-   - Mark: APPROVE / REJECT / NEEDS ADJUSTMENT
-
-2. Test Sarah: open house party scenario
-   - Does she react before answering? Does she lead less?
-   - Mark: APPROVE / REJECT / NEEDS ADJUSTMENT
-
-3. Test Nadia: open bookstore scenario
-   - Does she sound like a normal person? No therapist vocabulary?
-   - Mark: APPROVE / REJECT / NEEDS ADJUSTMENT
-
-4. Test 2-3 other characters randomly
-   - Do the speech rules injection make them feel more human?
-   - Mark each: APPROVE / REJECT
-
-5. Test Ryan evaluation
-   - Does it feel like short beats with breathing room, or still a wall of text?
-   - Mark: APPROVE / REJECT
-
-6. Test coach suggestions
-   - Open any scenario, have 3 exchanges, click coach me
-   - Do the 3 suggestions actually respond to what the character just said?
-   - Mark: APPROVE / REJECT
-
-7. Come back to chat with your verdicts — we deploy approved changes immediately.
+## NEEDS MANUAL REVIEW — Serge
+1. npx vercel dev → http://localhost:3000
+2. Clear localStorage lesson keys
+3. Click Start Lesson — does it start with Ryan setting the scene? ("Before we start — let me set the scene...")
+4. Does the new segment "What Alex Sees" play before Alex approaches?
+5. Click back button — do voices overlap or does only one voice play?
+6. Click pause while Sofia is speaking — do her lips stop immediately?
+7. Resume — do lips start again with the audio?
+8. Does Sofia's close line now say "...oh. You're a strange one. A little too direct, aren't you?"
+9. Does Alex sound deeper/more confident with onyx voice?
+10. Does the progress bar show X/15 now?
 
 ## Blockers / flags
-[Anything ambiguous, risky, or incomplete — be specific]
+[Anything incomplete or risky]
 ```
