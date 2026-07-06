@@ -5,14 +5,17 @@
   "scripts": {
     "test": "node scripts/test-auto.js",
     "test:human": "node scripts/test-human.js",
-    "test:all": "npm test && npm run test:human"
+    "test:all": "npm test && npm run test:human",
+    "test:lesson": "node tests/test-lesson-player.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.98.0",
+    "@aws-sdk/client-s3": "^3.1079.0",
     "@fal-ai/client": "^1.10.1",
     "@supabase/supabase-js": "^2.107.0",
-    "dotenv": "^16.0.0",
+    "dotenv": "^16.6.1",
     "kokoro-js": "^1.2.1",
+    "node-fetch": "^3.3.2",
     "stripe": "^22.2.0"
   },
   "devDependencies": {

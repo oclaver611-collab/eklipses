@@ -301,7 +301,9 @@
       if (_aborted || gen !== _playGen) return;
 
       const f = files[i];
-      const url = '/api/lesson-audio?file=' + encodeURIComponent(f.file);
+      const url = f.file.startsWith('ryan_')
+        ? 'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/lessons/lesson1/audio_v2/' + f.file
+        : '/api/lesson-audio?file=' + encodeURIComponent(f.file);
       console.log('[lesson] playing', f.voice, '→', url);
 
       onFileStart(f.voice);
