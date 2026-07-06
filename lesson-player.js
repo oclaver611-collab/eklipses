@@ -243,10 +243,10 @@
       // Only fire if this audio is still the active generation.
       const loadTimeout = setTimeout(() => {
         if (capturedGen === _playGen) {
-          console.warn('[lesson] TIMEOUT 10s — no ended event:', filename);
+          console.warn('[lesson] TIMEOUT 30s — no ended event:', filename);
           done();
         }
-      }, 10000);
+      }, 30000);
 
       if (voice === 'sofia') {
         a.addEventListener('play',  () => setSofiaState(true));

@@ -19,6 +19,7 @@ export default {
     return new Response(object.body, {
       headers: {
         'Content-Type': contentType,
+        'Content-Length': String(object.size),
         'Access-Control-Allow-Origin': '*',
         'Cache-Control': 'public, max-age=31536000',
         'Accept-Ranges': 'bytes',

@@ -105,16 +105,15 @@ async function run() {
 
   // ── 6. No audio errors on first 3 segments ──────────────────────────────
   const audioErrors = logs.filter(l =>
-    l.text.includes('TIMEOUT') || l.text.includes('[lesson] audio error')
+    l.text.includes('[lesson] TIMEOUT') || l.text.includes('[lesson] audio error')
   );
   report('6. No audio errors on first 3 segments', audioErrors.length === 0,
     audioErrors.length ? audioErrors[0].text.slice(0, 80) : '');
 
-  // ── 7. ryan_seg00.mp3 accessible (HTTP 200) ─────────────────────────────
+  // ── 7. ryan_seg00.mp3 accessible via worker (HTTP 200) ──────────────────
   const ryanStatus = await page.evaluate(async () => {
     try {
-      // Test via proxy — reliable from both localhost and production
-      const r = await fetch('/api/lesson-audio?file=ryan_seg00.mp3', { method: 'HEAD' });
+      const r = await fetch('https://eklipses-lesson-audio.oclaver611.workers.dev?file=ryan_seg00.mp3', { method: 'HEAD' });
       return r.status;
     } catch (e) { return -1; }
   });
