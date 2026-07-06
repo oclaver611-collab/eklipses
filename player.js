@@ -3,14 +3,6 @@ let currentScenarioKey = null;
 let currentUserStyle = null;
 let currentCharacterId = "sofia"; // active character — changes when user picks avatar
 
-const RYAN_BOOT_INTROS = [
-  ["Every guy has walked past her. You felt it. You said nothing. That moment stays with you.", "This is where you fix that. Pick a scenario."],
-  ["Most guys never practice. They just hope. You're here — which means you're different.", "Let's find out how good you actually are. Pick a scenario."],
-  ["Guys who practice here approach without hesitation. No theory, no videos.", "Real conversations. Real feedback. Real results. Pick a scenario."],
-  ["I've coached thousands of approaches. Theory doesn't work. Practice does.", "One session here will teach you more than any book or video ever could. Pick one."],
-  ["You already know what to say. You just need to stop being afraid to say it.", "Pick a scenario. Let's find out where you're at."]
-];
-
 // Default character per scenario — overrideable by avatar picker
 const SCENARIO_CHARACTER_MAP = {
   beach:        'sofia',
@@ -77,7 +69,6 @@ let rec = null;
 let listenTimer = null;
 let watchdogInterval = null;
 let session = 0;
-let _ryanIntroSpoken = false;
 const _seenScenarioIntros = new Set(); // tracks which scenario intros have played this session
 
 const els = {
@@ -2562,17 +2553,6 @@ function launchApp() {
     Progress.refreshStreakBadge();
     // Render shelf immediately — playScenario calls stopEverything() which increments session
     renderShelf();
-    const launchSession = session;
-    if (!_ryanIntroSpoken) {
-      _ryanIntroSpoken = true;
-      const _bootLines = RYAN_BOOT_INTROS[Math.floor(Math.random() * RYAN_BOOT_INTROS.length)];
-      await speak(_bootLines[0], 'Ryan');
-      if (session !== launchSession) return; // user clicked a scenario — stop here
-      await pause(400);
-      if (session !== launchSession) return;
-      await speak(_bootLines[1], 'Ryan');
-      if (session !== launchSession) return;
-    }
     ryanOrbSetState('silent');
     // Inject stat bar below Ryan name
     const existingBar = document.getElementById('ek-stat-bar');
