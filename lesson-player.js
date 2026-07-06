@@ -301,11 +301,7 @@
       if (_aborted || gen !== _playGen) return;
 
       const f = files[i];
-      // ryan_* served direct from R2 (large files — proxy buffering caused timeouts)
-      // alex_* and sofia_* served via proxy (CORS headers needed on localhost)
-      const url = f.file.startsWith('ryan_')
-        ? R2_AUDIO_BASE + '/' + f.file
-        : '/api/lesson-audio?file=' + encodeURIComponent(f.file);
+      const url = '/api/lesson-audio?file=' + encodeURIComponent(f.file);
       console.log('[lesson] playing', f.voice, '→', url);
 
       onFileStart(f.voice);
