@@ -79,6 +79,13 @@ const { chromium } = require('playwright');
   console.log('[TEST] DailyLimit.canPlay() =', canPlayResult);
 
   // ── 8. Click first visible scenario card ─────────────────────────────────
+  // Lesson player tab system defaults to LEARN tab — switch to PRACTICE first
+  const practiceTab = page.locator('#ek-tab-practice');
+  if (await practiceTab.count() > 0) {
+    console.log('[TEST] Switching to PRACTICE tab...');
+    await practiceTab.click();
+  }
+
   const cardCount = await page.locator('.nf-card').count();
   console.log(`[TEST] Visible scenario cards: ${cardCount}`);
 
