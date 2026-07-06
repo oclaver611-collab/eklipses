@@ -218,6 +218,9 @@
   // ── Sequential audio player ────────────────────────────────────────
   function playOneAudio(url, voice) {
     const filename = decodeURIComponent(url.split('file=').pop());
+    // Hoist capturedGen before the Promise so the diagnostic log can reference it
+    const capturedGen = _playGen;
+    console.log('[AUDIO] attempting:', filename, 'gen:', _playGen, 'captured:', capturedGen);
     return new Promise(res => {
       const a = new Audio(url);
       _currentAudio = a;
@@ -228,15 +231,15 @@
         if (resolved) return;
         resolved = true;
         clearTimeout(loadTimeout);
-        // Only clear the shared ref if this element is still active — a late timeout
-        // must not null out a newer segment's audio.
+        // Stop and release the audio element — without this, a stale element whose
+        // fetch eventually completes will start playing on top of the new segment.
+        try { a.pause(); a.src = ''; } catch {}
         if (_currentAudio === a) _currentAudio = null;
         res();
       }
 
       // Hard timeout: if 'ended' never fires (error / proxy stall) don't freeze the lesson.
-      // Capture gen at call time — only fire if this audio is still the active generation.
-      const capturedGen = _playGen;
+      // Only fire if this audio is still the active generation.
       const loadTimeout = setTimeout(() => {
         if (capturedGen === _playGen) {
           console.warn('[lesson] TIMEOUT 10s — no ended event:', filename);
@@ -289,6 +292,7 @@
   }
 
   async function playSequence(files, gen) {
+    console.log('[SEQUENCE START] segment:', SEGMENTS[_currentSegIdx]?.id, 'gen:', gen, '_playGen:', _playGen);
     for (let i = 0; i < files.length; i++) {
       if (_aborted || gen !== _playGen) return;
       await whenResumed();
@@ -376,6 +380,7 @@
   // ── Navigation ─────────────────────────────────────────────────────
   function navigate(delta) {
     const newIdx = Math.max(0, Math.min(SEGMENTS.length - 1, _currentSegIdx + delta));
+    console.log('[NAVIGATE] to index:', newIdx, 'killing gen:', _playGen);
     if (_currentAudio) { _currentAudio.pause(); _currentAudio.src = ''; _currentAudio = null; }
     _playGen++;
     if (_resumeResolve) { const fn = _resumeResolve; _resumeResolve = null; fn(); }
