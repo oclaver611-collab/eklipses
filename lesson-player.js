@@ -15,19 +15,21 @@
   const LS_CERT      = 'eklipses_lesson1_certification';
 
   const SEGMENTS = [
-    { id:'01', title:'The Lesson' },
-    { id:'02', title:'Before The Approach' },
-    { id:'03', title:'Watch — The Approach' },
-    { id:'04', title:'Step 1 — The Observation Opener' },
-    { id:'05', title:'Watch — The Tease' },
-    { id:'06', title:'Step 2 — Playful Challenge' },
-    { id:'07', title:'Watch — The Mystery' },
-    { id:'08', title:'Step 3 — Own Your Mystery' },
-    { id:'09', title:'Watch — The Verbal Spike' },
-    { id:'10', title:'Step 4 — The Verbal Spike' },
-    { id:'11', title:'Watch — The Close' },
-    { id:'12', title:'Step 5 — The Natural Close' },
-    { id:'13', title:'Your Five Steps' },
+    { id:'00',  title:'Welcome' },
+    { id:'01',  title:'The Lesson' },
+    { id:'02',  title:'Before The Approach' },
+    { id:'02b', title:'What Alex Sees' },
+    { id:'03',  title:'Watch — The Approach' },
+    { id:'04',  title:'Step 1 — The Observation Opener' },
+    { id:'05',  title:'Watch — The Tease' },
+    { id:'06',  title:'Step 2 — Playful Challenge' },
+    { id:'07',  title:'Watch — The Mystery' },
+    { id:'08',  title:'Step 3 — Own Your Mystery' },
+    { id:'09',  title:'Watch — The Verbal Spike' },
+    { id:'10',  title:'Step 4 — The Verbal Spike' },
+    { id:'11',  title:'Watch — The Close' },
+    { id:'12',  title:'Step 5 — The Natural Close' },
+    { id:'13',  title:'Your Five Steps' },
   ];
 
   // ── localStorage helpers ───────────────────────────────────────────
@@ -161,7 +163,7 @@
       </div>
     `;
     const btn = document.getElementById('ek-start-lesson1');
-    if (btn) btn.onclick = () => openLesson(status === 'in_progress' ? LessonPlayer.getProgress() : '01');
+    if (btn) btn.onclick = () => openLesson(status === 'in_progress' ? LessonPlayer.getProgress() : '00');
   }
 
   function refreshLearnTabStatus() { renderLearnTab(); }
@@ -214,10 +216,16 @@
   }
 
   // ── Sequential audio player ────────────────────────────────────────
-  function playOneAudio(url) {
+  function playOneAudio(url, voice) {
     return new Promise(res => {
       const a = new Audio(url);
       _currentAudio = a;
+      if (voice === 'sofia') {
+        a.addEventListener('play',  () => setSofiaState(true));
+        a.addEventListener('pause', () => setSofiaState(false));
+        a.addEventListener('ended', () => setSofiaState(false));
+        a.addEventListener('error', () => setSofiaState(false));
+      }
       a.onended = () => { console.log('[lesson] audio ended:', url); _currentAudio = null; res(); };
       a.onerror = (e) => { console.warn('[lesson] audio error:', url, e); _currentAudio = null; res(); };
       a.play().catch(e => { console.warn('[lesson] play() rejected:', url, e.message); _currentAudio = null; res(); });
@@ -243,7 +251,7 @@
       console.log('[lesson] playing', f.voice, '→', url);
 
       onFileStart(f.voice);
-      await playOneAudio(url);
+      await playOneAudio(url, f.voice);
       if (_aborted || gen !== _playGen) return;
       onFileEnd(f.voice);
 
@@ -263,13 +271,13 @@
       setSofiaState(false);
     } else if (voice === 'sofia') {
       orbAnimate(false);
-      setOrbSpeaker('ryan');   // orb reverts to RYAN label while Sofia speaks
-      setSofiaState(true);
+      setOrbSpeaker('ryan');
+      // Sofia speaking state is driven by play/pause/ended/error events on the Audio element
     }
   }
 
   function onFileEnd(voice) {
-    if (voice === 'sofia') setSofiaState(false);
+    // Sofia state driven by audio events — nothing needed here
   }
 
   // ── Segment runner ─────────────────────────────────────────────────
@@ -320,8 +328,8 @@
   // ── Navigation ─────────────────────────────────────────────────────
   function navigate(delta) {
     const newIdx = Math.max(0, Math.min(SEGMENTS.length - 1, _currentSegIdx + delta));
+    if (_currentAudio) { _currentAudio.pause(); _currentAudio.currentTime = 0; _currentAudio = null; }
     _playGen++;
-    if (_currentAudio) { _currentAudio.pause(); _currentAudio = null; }
     if (_resumeResolve) { const fn = _resumeResolve; _resumeResolve = null; fn(); }
     _paused = false;
     updatePauseBtn();
@@ -353,7 +361,7 @@
           <div class="elp-progress-bar">
             <div class="elp-progress-fill" id="elp-progress-fill"></div>
           </div>
-          <div class="elp-progress-label" id="elp-progress-label">1 / 13</div>
+          <div class="elp-progress-label" id="elp-progress-label">1 / 15</div>
         </div>
 
         <!-- Completion screen -->
@@ -660,7 +668,7 @@
       setCaption('Audio unavailable — check connection.');
     }
 
-    const startIdx = SEGMENTS.findIndex(s => s.id === (startSegId || '01'));
+    const startIdx = SEGMENTS.findIndex(s => s.id === (startSegId || '00'));
     runSegment(Math.max(0, startIdx));
   }
 
