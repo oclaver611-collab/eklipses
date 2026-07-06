@@ -217,18 +217,62 @@
 
   // ── Sequential audio player ────────────────────────────────────────
   function playOneAudio(url, voice) {
+    const filename = decodeURIComponent(url.split('file=').pop());
     return new Promise(res => {
       const a = new Audio(url);
       _currentAudio = a;
+      let resolved = false;
+      let playStartedAt = null;
+
+      function done() {
+        if (resolved) return;
+        resolved = true;
+        clearTimeout(loadTimeout);
+        // Only clear the shared ref if this element is still active — a late timeout
+        // must not null out a newer segment's audio.
+        if (_currentAudio === a) _currentAudio = null;
+        res();
+      }
+
+      // Hard timeout: if 'ended' never fires (error / proxy stall) don't freeze the lesson
+      const loadTimeout = setTimeout(() => {
+        console.warn('[lesson] TIMEOUT 10s — no ended event:', filename);
+        done();
+      }, 10000);
+
       if (voice === 'sofia') {
         a.addEventListener('play',  () => setSofiaState(true));
         a.addEventListener('pause', () => setSofiaState(false));
         a.addEventListener('ended', () => setSofiaState(false));
         a.addEventListener('error', () => setSofiaState(false));
       }
-      a.onended = () => { console.log('[lesson] audio ended:', url); _currentAudio = null; res(); };
-      a.onerror = (e) => { console.warn('[lesson] audio error:', url, e); _currentAudio = null; res(); };
-      a.play().catch(e => { console.warn('[lesson] play() rejected:', url, e.message); _currentAudio = null; res(); });
+
+      // START log fires on the 'play' event — exactly when audio begins
+      a.addEventListener('play', () => {
+        playStartedAt = Date.now();
+        console.log('[lesson] START', filename);
+      });
+
+      // Only resolve on 'ended' — the sole signal that playback actually completed.
+      // Do NOT resolve on onerror / play().catch(): resolving there is what causes
+      // overlap when the localhost proxy is slow — play() rejects due to buffering
+      // stall, the sequence advances, then the audio loads and plays on top.
+      a.onended = () => {
+        const playedMs = playStartedAt ? Date.now() - playStartedAt : 0;
+        console.log('[lesson] END', filename, '(' + playedMs + 'ms)');
+        if (playedMs < 500) {
+          // Guard: 'ended' fired suspiciously fast — duration may be 0 or NaN.
+          // Wait out the remainder so a corrupt/empty file can't cascade the lesson.
+          console.warn('[lesson] END < 500ms — guarding:', filename, 'only ' + playedMs + 'ms played');
+          setTimeout(done, 500 - playedMs);
+        } else {
+          done();
+        }
+      };
+
+      // Log errors but do NOT resolve — the 10s timeout is the error exit path.
+      a.onerror = (e) => { console.warn('[lesson] audio error:', filename, e); };
+      a.play().catch(e => { console.warn('[lesson] play() rejected:', filename, e.message); });
     });
   }
 
