@@ -150,8 +150,19 @@
         <div class="nf-card-meta">
           <span class="nf-badge nf-badge-duration">⏱ ${duration} min</span>
         </div>
+        <div style="margin-top:6px;"><span class="ek-cert-chip" data-cert-char="" style="display:none;"></span></div>
       </div>
     `;
+
+    // Cert badge — set character ID so refreshCertBadges() can update it
+    const certChip = card.querySelector('.ek-cert-chip');
+    if (certChip) {
+      const charId = (window.SCENARIO_CHARACTER_MAP || {})[key] || '';
+      if (charId) {
+        certChip.setAttribute('data-cert-char', charId);
+        if (window.refreshCertBadges) window.refreshCertBadges();
+      }
+    }
 
     // Click handler: select the scenario via the existing select dropdown
     // This reuses all the existing player.js wiring without modification.

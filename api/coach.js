@@ -4,7 +4,7 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { conversation, scenarioTitle, scenarioKey, opener } = req.body || {};
+  const { conversation, scenarioTitle, scenarioKey, opener, lesson1Complete = false, characterId = 'sofia' } = req.body || {};
 
   if (!conversation?.length) {
     return res.status(400).json({ error: 'No conversation provided' });
@@ -310,7 +310,37 @@ RULES:
 - wouldSheDateHim is ${girlName} speaking in first person.
 - tryNextTime is actual words for this specific conversation, not general advice.
 - Only use things that actually appear in the transcript. Do not invent context.
-- ALL card fields must be filled. No empty strings, no null.`;
+- ALL card fields must be filled. No empty strings, no null.${lesson1Complete ? `
+
+LESSON 1 CHECK — REQUIRED ADDITIONAL SECTION:
+The user has completed Lesson 1. After your general feedback, evaluate the 5 lesson skills:
+
+1. OBSERVATION OPENER: Did they open with something specific and real, or a generic compliment?
+2. PLAYFUL CHALLENGE: Did they create pleasant friction, or did they agree with everything?
+3. MYSTERY: When asked something personal, did they own it comfortably or rush to explain?
+4. VERBAL SPIKE: Did they communicate interest through implication, or state it bluntly or not at all?
+5. NATURAL CLOSE: Did they ask directly and comfortably, or miss the moment?
+
+For each skill: mark DEMONSTRATED or MISSED.
+If 4 or 5 demonstrated: summary = "Lesson 1 skills applied well. One avatar closer to certified."
+If 3 demonstrated: summary = "Halfway there. Come back and focus on the missed skills."
+If 2 or fewer: summary = "The lesson principles were not applied this session. Review and try again."
+
+Keep summary SHORT — 1-2 sentences max. Punchy, not a report.
+
+Add this to your JSON response:
+"lesson1Check": {
+  "skills": {
+    "observationOpener": "DEMONSTRATED" or "MISSED",
+    "playfulChallenge": "DEMONSTRATED" or "MISSED",
+    "mystery": "DEMONSTRATED" or "MISSED",
+    "verbalSpike": "DEMONSTRATED" or "MISSED",
+    "naturalClose": "DEMONSTRATED" or "MISSED"
+  },
+  "score": <number 0-5, count of DEMONSTRATED>,
+  "passed": <true if score >= 4, false otherwise>,
+  "summary": "<1-2 punchy sentences per the rules above>"
+}` : ''}`;
 
   try {
     const mainMessages = [
