@@ -6,6 +6,7 @@
   'use strict';
 
   const R2_BASE      = 'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev';
+  const R2_AUDIO_BASE = R2_BASE + '/lessons/lesson1/audio_v2';
   const R2_MANIFEST  = '/api/lesson-audio?file=manifest.json';
   const SOFIA_IDLE   = R2_BASE + '/sofia_idle.mp4';
   const SOFIA_SPEAK  = R2_BASE + '/sofia_speaking.mp4';
@@ -183,8 +184,9 @@
   // ── Manifest ───────────────────────────────────────────────────────
   async function loadManifest() {
     if (_manifest) return _manifest;
-    console.log('[lesson] fetching manifest from:', R2_MANIFEST);
-    const res = await fetch(R2_MANIFEST);
+    const manifestUrl = R2_MANIFEST + '&t=' + Date.now();
+    console.log('[lesson] fetching manifest from:', manifestUrl);
+    const res = await fetch(manifestUrl);
     if (!res.ok) throw new Error('manifest HTTP ' + res.status);
     _manifest = await res.json();
     const fileList = (_manifest.segments || []).flatMap(s => (s.sequence || s.files || []).map(f => f.file));
@@ -299,7 +301,11 @@
       if (_aborted || gen !== _playGen) return;
 
       const f = files[i];
-      const url = '/api/lesson-audio?file=' + encodeURIComponent(f.file);
+      // ryan_* served direct from R2 (large files — proxy buffering caused timeouts)
+      // alex_* and sofia_* served via proxy (CORS headers needed on localhost)
+      const url = f.file.startsWith('ryan_')
+        ? R2_AUDIO_BASE + '/' + f.file
+        : '/api/lesson-audio?file=' + encodeURIComponent(f.file);
       console.log('[lesson] playing', f.voice, '→', url);
 
       onFileStart(f.voice);
