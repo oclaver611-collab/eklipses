@@ -163,7 +163,7 @@
       </div>
     `;
     const btn = document.getElementById('ek-start-lesson1');
-    if (btn) btn.onclick = () => openLesson(status === 'in_progress' ? LessonPlayer.getProgress() : '00');
+    if (btn) btn.onclick = () => openLesson('00');
   }
 
   function refreshLearnTabStatus() { renderLearnTab(); }
@@ -234,10 +234,14 @@
         res();
       }
 
-      // Hard timeout: if 'ended' never fires (error / proxy stall) don't freeze the lesson
+      // Hard timeout: if 'ended' never fires (error / proxy stall) don't freeze the lesson.
+      // Capture gen at call time — only fire if this audio is still the active generation.
+      const capturedGen = _playGen;
       const loadTimeout = setTimeout(() => {
-        console.warn('[lesson] TIMEOUT 10s — no ended event:', filename);
-        done();
+        if (capturedGen === _playGen) {
+          console.warn('[lesson] TIMEOUT 10s — no ended event:', filename);
+          done();
+        }
       }, 10000);
 
       if (voice === 'sofia') {
@@ -372,7 +376,7 @@
   // ── Navigation ─────────────────────────────────────────────────────
   function navigate(delta) {
     const newIdx = Math.max(0, Math.min(SEGMENTS.length - 1, _currentSegIdx + delta));
-    if (_currentAudio) { _currentAudio.pause(); _currentAudio.currentTime = 0; _currentAudio = null; }
+    if (_currentAudio) { _currentAudio.pause(); _currentAudio.src = ''; _currentAudio = null; }
     _playGen++;
     if (_resumeResolve) { const fn = _resumeResolve; _resumeResolve = null; fn(); }
     _paused = false;
@@ -677,7 +681,7 @@
     _paused   = false;
     _playGen++;
     cancelAnimationFrame(_orbAnim);
-    if (_currentAudio) { _currentAudio.pause(); _currentAudio = null; }
+    if (_currentAudio) { _currentAudio.pause(); _currentAudio.src = ''; _currentAudio = null; }
     if (_resumeResolve) { _resumeResolve(); _resumeResolve = null; }
 
     const existing = document.getElementById('ek-lesson-player');
@@ -720,7 +724,7 @@
     _aborted = true;
     _playGen++;
     cancelAnimationFrame(_orbAnim);
-    if (_currentAudio) { _currentAudio.pause(); _currentAudio = null; }
+    if (_currentAudio) { _currentAudio.pause(); _currentAudio.src = ''; _currentAudio = null; }
     if (_resumeResolve) { _resumeResolve(); _resumeResolve = null; }
     if (_playerEl) { _playerEl.remove(); _playerEl = null; }
     refreshLearnTabStatus();
