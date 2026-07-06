@@ -1,6 +1,5 @@
 // api/lesson-audio.js — Proxy for R2 audio_v2 files (avoids CORS on localhost)
 const R2_BASE = 'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/lessons/lesson1/audio_v2';
-
 const ALLOWED = /^(manifest\.json|[a-z0-9_]+\.mp3)$/i;
 
 module.exports = async function handler(req, res) {
@@ -25,10 +24,33 @@ module.exports = async function handler(req, res) {
     res.setHeader('Content-Type', contentType);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.setHeader('Accept-Ranges', 'bytes');
 
-    const buf = Buffer.from(await r2Res.arrayBuffer());
-    return res.status(200).send(buf);
+    // Pass Content-Length through so the browser knows the file size up front
+    const contentLength = r2Res.headers.get('content-length');
+    if (contentLength) res.setHeader('Content-Length', contentLength);
+
+    res.statusCode = 200;
+
+    // Stream body chunk-by-chunk — the old arrayBuffer() approach buffered the
+    // entire file in the serverless function before sending, which caused fetch
+    // timeouts / failures on Ryan MP3s (500 KB – 1.3 MB).
+    const reader = r2Res.body.getReader();
+    req.on('close', () => { try { reader.cancel(); } catch {} });
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      // Respect backpressure — wait for drain before writing more
+      if (!res.write(value)) {
+        await new Promise(r => res.once('drain', r));
+      }
+    }
+    res.end();
   } catch (err) {
-    return res.status(502).json({ error: 'Upstream error: ' + err.message });
+    if (!res.headersSent) {
+      return res.status(502).json({ error: 'Upstream error: ' + err.message });
+    }
+    res.end();
   }
 };
