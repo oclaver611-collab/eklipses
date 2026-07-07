@@ -239,14 +239,14 @@
         res();
       }
 
-      // Hard timeout: if 'ended' never fires (error / proxy stall) don't freeze the lesson.
-      // Only fire if this audio is still the active generation.
-      const loadTimeout = setTimeout(() => {
+      // Two-phase timeout: short window to catch "never starts", then extended
+      // once playing begins to handle long files (Ryan segs can be 40-60s).
+      let loadTimeout = setTimeout(() => {
         if (capturedGen === _playGen) {
-          console.warn('[lesson] TIMEOUT 30s — no ended event:', filename);
+          console.warn('[lesson] TIMEOUT 15s — audio never started:', filename);
           done();
         }
-      }, 30000);
+      }, 15000);
 
       if (voice === 'sofia') {
         a.addEventListener('play',  () => setSofiaState(true));
@@ -255,10 +255,18 @@
         a.addEventListener('error', () => setSofiaState(false));
       }
 
-      // START log fires on the 'play' event — exactly when audio begins
+      // START log fires on the 'play' event — exactly when audio begins.
+      // Also extends the timeout: once playing, give 120s for ended to fire.
       a.addEventListener('play', () => {
         playStartedAt = Date.now();
         console.log('[lesson] START', filename);
+        clearTimeout(loadTimeout);
+        loadTimeout = setTimeout(() => {
+          if (capturedGen === _playGen) {
+            console.warn('[lesson] TIMEOUT 120s — started but never ended:', filename);
+            done();
+          }
+        }, 120000);
       });
 
       // Only resolve on 'ended' — the sole signal that playback actually completed.
