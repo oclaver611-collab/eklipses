@@ -27,6 +27,7 @@
     { id:'08',  title:'Step 3 — Own Your Mystery' },
     { id:'09',  title:'Watch — The Verbal Spike' },
     { id:'10',  title:'Step 4 — The Verbal Spike' },
+    { id:'10b', title:'Watch — The Close' },
     { id:'11',  title:'Watch — The Close' },
     { id:'12',  title:'Step 5 — The Natural Close' },
     { id:'13',  title:'Your Five Steps' },

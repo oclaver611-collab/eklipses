@@ -1,0 +1,314 @@
+{
+  "version": "3",
+  "generatedAt": "2026-07-07T16:23:11.971Z",
+  "segments": [
+    {
+      "segmentId": "00",
+      "type": "coaching",
+      "title": "Welcome",
+      "files": [
+        {
+          "file": "ryan_seg00.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "01",
+      "type": "coaching",
+      "title": "The Lesson",
+      "files": [
+        {
+          "file": "ryan_seg01.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "02",
+      "type": "coaching",
+      "title": "Before The Approach",
+      "files": [
+        {
+          "file": "ryan_seg02.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "02b",
+      "type": "coaching",
+      "title": "What Alex Sees",
+      "files": [
+        {
+          "file": "ryan_seg02b.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "03",
+      "type": "exchange",
+      "title": "Watch — The Approach",
+      "sequence": [
+        {
+          "file": "alex_s03_01.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "alex_s03_02.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "alex_s03_03.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s03_01.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "sofia_s03_02.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s03_04.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "alex_s03_05.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s03_03.mp3",
+          "voice": "sofia"
+        }
+      ]
+    },
+    {
+      "segmentId": "04",
+      "type": "coaching",
+      "title": "Step 1 — The Observation Opener",
+      "files": [
+        {
+          "file": "ryan_seg04.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "05",
+      "type": "exchange",
+      "title": "Watch — The Tease",
+      "sequence": [
+        {
+          "file": "alex_s05_01.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s05_01.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s05_02.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s05_02.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s05_03.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s05_03.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s05_04.mp3",
+          "voice": "alex"
+        }
+      ]
+    },
+    {
+      "segmentId": "06",
+      "type": "coaching",
+      "title": "Step 2 — Playful Challenge",
+      "files": [
+        {
+          "file": "ryan_seg06.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "07",
+      "type": "exchange",
+      "title": "Watch — The Mystery",
+      "sequence": [
+        {
+          "file": "sofia_s07_01.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s07_01.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s07_02.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s07_02.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s07_03.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s07_03.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s07_04.mp3",
+          "voice": "sofia"
+        }
+      ]
+    },
+    {
+      "segmentId": "08",
+      "type": "coaching",
+      "title": "Step 3 — Own Your Mystery",
+      "files": [
+        {
+          "file": "ryan_seg08.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "09",
+      "type": "exchange",
+      "title": "Watch — The Verbal Spike",
+      "sequence": [
+        {
+          "file": "alex_s09_01.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s09_01.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s09_02.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s09_02.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s09_03.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s09_03.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s09_04.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s09_04.mp3",
+          "voice": "sofia"
+        }
+      ]
+    },
+    {
+      "segmentId": "10",
+      "type": "coaching",
+      "title": "Step 4 — The Verbal Spike",
+      "files": [
+        {
+          "file": "ryan_seg10.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "10b",
+      "type": "coaching",
+      "title": "Watch — The Close",
+      "files": [
+        {
+          "file": "ryan_seg10b.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "11",
+      "type": "exchange",
+      "title": "Watch — The Close",
+      "sequence": [
+        {
+          "file": "alex_s11_01.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s11_01.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s11_02.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s11_02.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s11_03.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s11_03.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s11_04.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s11_04.mp3",
+          "voice": "sofia"
+        }
+      ]
+    },
+    {
+      "segmentId": "12",
+      "type": "coaching",
+      "title": "Step 5 — The Natural Close",
+      "files": [
+        {
+          "file": "ryan_seg12.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "13",
+      "type": "coaching",
+      "title": "Your Five Steps",
+      "files": [
+        {
+          "file": "ryan_seg13.mp3",
+          "voice": "ryan"
+        }
+      ]
+    }
+  ]
+}
