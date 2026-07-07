@@ -92,12 +92,12 @@ async function run() {
     .waitFor({ state: 'visible', timeout: 10000 }).then(() => true).catch(() => false);
   report('4. Start Lesson opens lesson player overlay', playerVisible);
 
-  // ── 5. Manifest loads — version 3 / 15 segments ─────────────────────────
+  // ── 5. Manifest loads — version 3 / 16 segments ─────────────────────────
   await manifestDone;
-  report('5. Manifest loads — version: 3 | segments: 15',
+  report('5. Manifest loads — version: 3 | segments: 16',
     !!manifestLogText &&
     manifestLogText.includes('version: 3') &&
-    manifestLogText.includes('segments: 15'),
+    manifestLogText.includes('segments: 16'),
     manifestLogText ? manifestLogText.replace('[lesson] ', '') : 'no manifest log');
 
   // Wait for first segment audio to play (up to 10s)
@@ -119,9 +119,9 @@ async function run() {
   });
   report('7. ryan_seg00.mp3 returns HTTP 200', ryanStatus === 200, `status: ${ryanStatus}`);
 
-  // ── 8. Progress bar shows 1/15 ───────────────────────────────────────────
+  // ── 8. Progress bar shows 1/16 ───────────────────────────────────────────
   const progressText = (await page.locator('#elp-progress-label').textContent().catch(() => '')).trim();
-  report('8. Progress bar shows 1/15', progressText === '1 / 15', `"${progressText}"`);
+  report('8. Progress bar shows 1/16', progressText === '1 / 16', `"${progressText}"`);
 
   // ── 9. Segment label shows "Welcome" ────────────────────────────────────
   const segTitle = (await page.locator('#elp-seg-title').textContent().catch(() => '')).trim();
