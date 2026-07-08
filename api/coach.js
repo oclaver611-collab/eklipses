@@ -312,34 +312,32 @@ RULES:
 - Only use things that actually appear in the transcript. Do not invent context.
 - ALL card fields must be filled. No empty strings, no null.${lesson1Complete ? `
 
-LESSON 1 CHECK — REQUIRED ADDITIONAL SECTION:
-The user has completed Lesson 1. After your general feedback, evaluate the 5 lesson skills:
+LESSON 1 EVALUATION — One Tequila Makes Ideas Click:
+The user has completed Lesson 1. Score them on these 5 specific skills:
 
-1. OBSERVATION OPENER: Did they open with something specific and real, or a generic compliment?
-2. PLAYFUL CHALLENGE: Did they create pleasant friction, or did they agree with everything?
-3. MYSTERY: When asked something personal, did they own it comfortably or rush to explain?
-4. VERBAL SPIKE: Did they communicate interest through implication, or state it bluntly or not at all?
-5. NATURAL CLOSE: Did they ask directly and comfortably, or miss the moment?
+O — Observation opener: Did they open with something specific they noticed? (not a generic compliment)
+T — Tease: Did they push back playfully when she challenged them?
+M — Mystery: Did they answer personal questions vaguely and comfortably, without over-explaining?
+I — Imply: Did they use implication when she created an opening?
+C — Close: Did they ask directly and naturally when she signaled interest?
 
-For each skill: mark DEMONSTRATED or MISSED.
-If 4 or 5 demonstrated: summary = "Lesson 1 skills applied well. One avatar closer to certified."
-If 3 demonstrated: summary = "Halfway there. Come back and focus on the missed skills."
-If 2 or fewer: summary = "The lesson principles were not applied this session. Review and try again."
+Add TWO fields to your JSON response:
 
-Keep summary SHORT — 1-2 sentences max. Punchy, not a report.
+1. "lesson1Eval" — a spoken paragraph read aloud before the regular feedback. Format exactly like this (fill in the bracketed parts):
+"Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: [PASS or FAIL — one sentence on what they did or didn't do]. T — Tease: [PASS or FAIL — one sentence]. M — Mystery: [PASS or FAIL — one sentence]. I — Imply: [PASS or FAIL — one sentence]. C — Close: [PASS or FAIL — one sentence]."
 
-Add this to your JSON response:
-"lesson1Check": {
+2. "lesson1Check" — for certification tracking:
+{
   "skills": {
-    "observationOpener": "DEMONSTRATED" or "MISSED",
-    "playfulChallenge": "DEMONSTRATED" or "MISSED",
-    "mystery": "DEMONSTRATED" or "MISSED",
-    "verbalSpike": "DEMONSTRATED" or "MISSED",
-    "naturalClose": "DEMONSTRATED" or "MISSED"
+    "observation": "PASS" or "FAIL",
+    "tease": "PASS" or "FAIL",
+    "mystery": "PASS" or "FAIL",
+    "imply": "PASS" or "FAIL",
+    "close": "PASS" or "FAIL"
   },
-  "score": <number 0-5, count of DEMONSTRATED>,
+  "score": <number 0-5, count of PASS>,
   "passed": <true if score >= 4, false otherwise>,
-  "summary": "<1-2 punchy sentences per the rules above>"
+  "summary": "<1-2 punchy sentences: 4-5 PASS = Lesson 1 skills applied well, 3 = Halfway there, 2 or fewer = Review and try again>"
 }` : ''}`;
 
   try {

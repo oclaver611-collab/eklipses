@@ -1984,7 +1984,13 @@ async function runCoachFeedback(mySession) {
 
   if(mySession!==session) return;
 
-  // Speaking order: part1 → trans2 → part2 → trans3 → part3 → trans4 → part4 → tryNextTime → score reveal
+  // Speaking order: [lesson1Eval →] part1 → trans2 → part2 → trans3 → part3 → trans4 → part4 → tryNextTime → score reveal
+  if (f.lesson1Eval && mySession === session) {
+    const l1url = await KokoroSpeech.prefetch(f.lesson1Eval, 'am_adam');
+    await speak(f.lesson1Eval, 'Ryan', () => { els.text.textContent = f.lesson1Eval; }, l1url);
+    if (mySession !== session) return;
+    await pause(600);
+  }
   const coachParts = [f.part1, f.part2, f.part3, f.part4].filter(Boolean);
   const transitions = [f.transition2, f.transition3, f.transition4];
 
