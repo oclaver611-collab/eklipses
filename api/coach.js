@@ -255,18 +255,18 @@ Respond ONLY with valid JSON — no markdown, no preamble:
   "score": <number 1-10>,
   "spokenSummary": "<One punchy sentence. Max 20 words. MUST quote or directly reference a specific line from the transcript — his words or her words. No general statements about confidence or effort.>",
 
-  "part1": "<THE OPENER. Two sentences maximum. Name the move — describe what he did in 5 words or fewer, WITHOUT quoting him verbatim. Then one sentence on how it landed with ${girlName} specifically. NEVER read his message back to him word-for-word. Examples: 'You led with your name. Safe, but flat.' / 'Opening with a compliment. She clocked it.' / 'You went straight for the number. Too fast.' / 'That opener gave her nothing to grab onto.' Name the move. Judge the move. Move on.>",
+  "part1": "<THE OPENER. Minimum 100 characters. Two to three sentences. First sentence: quote their exact opening line (HIM_1) verbatim inside quotes, followed by a dash, then name the move in 5 words or fewer. Second sentence: how it landed with ${girlName} specifically. Optional third sentence: what she registered. Example: 'You said \"hi\" — name-ask with nothing for her to grab. With ${girlName} that goes flat immediately — she needs something real before she gives you anything back.'>",
 
-  "part2": "<THE MIDDLE. Two sentences maximum. Quote the single most revealing exchange: 'When she said [exact ${girlName} quote], you said [exact HIM quote]. [One sentence — what that exchange cost him or earned him with ${girlName}, specific to who she is.]' Be surgical.>",
+  "part2": "<THE MIDDLE. Minimum 150 characters. Two to three sentences. Quote the single most revealing exchange: 'When she said [exact ${girlName} quote], you said [exact HIM quote].' Then one to two sentences on what that exchange cost him or earned him with ${girlName}, specific to who she is. Be surgical — name exactly what she was responding to.>",
 
-  "part3": "<THE CORRECTION. Two sentences maximum. The one moment that hurt him most. Format: 'Instead of [his exact line], say: [exact replacement line] — because [one sentence why it works with ${girlName} specifically].' Write the replacement as something he could actually say. No extra commentary.>",
+  "part3": "<THE CORRECTION. Minimum 300 characters. Two to three sentences. The one moment that hurt him most. Quote his exact line, then give the exact replacement line he should have said. Then explain in one to two sentences why the replacement works with ${girlName} specifically — reference something real about her personality or what she wanted from that moment. Make the replacement feel like something he could actually say.>",
 
-  "part4": "<THE CLOSER. Two sentences maximum. Format: 'Two things to fix: [pattern 1] and [pattern 2]. [One punchy closing line — boxing coach energy, references something specific from this session. No clichés.]' BANNED ENDINGS: 'Practice is the only way through', 'every rep makes you sharper', 'you are closer than you think', 'one more round', 'you will feel the difference', 'you have got something real here', 'push it further', 'you will surprise yourself', 'keep at it', 'practice makes perfect', 'keep pushing'. BANNED WORDS: 'go out there', 'dive deeper', 'aim to', 'work on that', 'dig into', 'push deeper', 'delve', 'delved', 'engage', 'dynamic', 'showcase', 'score is a', 'giving you a', 'I give you'.>",
+  "part4": "<THE CLOSER. Two sentences maximum. Format: 'Two things to fix: [pattern 1] and [pattern 2]. [One punchy closing line — boxing coach energy, references something specific from this session. No clichés.]' BANNED ENDINGS: 'Practice is the only way through', 'every rep makes you sharper', 'you are closer than you think', 'one more round', 'you will feel the difference', 'you have got something real here', 'push it further', 'you will surprise yourself', 'keep at it', 'practice makes perfect', 'keep pushing'. BANNED WORDS: 'go out there', 'dive deeper', 'aim to', 'work on that', 'dig into', 'push deeper', 'delve', 'delved', 'engage', 'dynamic', 'showcase', 'score is a', 'giving you a', 'I give you'. REQUIRED: the final sentence MUST contain one of these motivational words or phrases: 'go again', 'next time', 'try again', 'keep going', 'you got this', 'next session', or 'make all the difference'.>",
 
   "openerBreakdown": "<One sentence on why his opening line (HIM_1 in the transcript) worked or didn't with ${girlName}. Quote it. No banned words.>",
   "bestMoment": "<Quote the single best thing he said verbatim. One sentence on why it landed with ${girlName}. No banned words.>",
   "missedOpportunity": "<Quote the moment he lost the most ground — his exact line and ${girlName}'s exact response. One sentence on what he should have done instead. No banned words.>",
-  "tryNextTime": "<THREE specific lines the user should try in a FUTURE conversation — not quotes of what he already said, but better alternatives tailored to this character and scenario. Each line should feel natural and be something he could actually say next time he's in this situation. Number them 1, 2, 3. Format: '1. [line] 2. [line] 3. [line]' Each line must be specific to ${girlName}'s personality and the scenario — not generic advice that could apply anywhere. Never use 'Tell me more about that' or any generic curiosity prompt. AUTOMATIC FAIL if any of these phrases appear: 'Say something real', 'Ask about the specific', 'Reference what actually happened', 'Tell me more about that'.>",
+  "tryNextTime": "<THREE specific lines the user should try in a FUTURE conversation — not quotes of what he already said, but better alternatives tailored to this character and scenario. Each line should feel natural and be something he could actually say next time he's in this situation. Number them 1, 2, 3. Format: '1. [line] 2. [line] 3. [line]' Each line must be specific to ${girlName}'s personality and the scenario — not generic advice that could apply anywhere. Never use 'Tell me more about that' or any generic curiosity prompt. AUTOMATIC FAIL if any of these phrases appear: 'Say something real', 'Ask about the specific', 'Reference what actually happened', 'Tell me more about that', 'focus on', 'try to', 'make sure', 'be more'.>",
   "wouldSheDateHim": "<'Yes', 'No', or 'Maybe' — then one sentence from ${girlName}'s point of view in first person, about something specific he said or did. No banned words.>"
 }
 
@@ -387,6 +387,10 @@ Add this to your JSON response:
       'ask about the specific thing',
       'reference what actually happened',
       'tell me more about that',
+      'focus on',
+      'try to',
+      'make sure',
+      'be more',
     ];
     const tntGeneric = !feedback.tryNextTime ||
       GENERIC_TNT.some(p => feedback.tryNextTime.toLowerCase().includes(p));
@@ -395,7 +399,7 @@ Add this to your JSON response:
       console.warn('[coach] tryNextTime is generic — retrying for just that field');
       try {
         const tntMessages = [
-          { role: 'system', content: `You are Ryan, a dating coach. Return ONLY valid JSON: {"tryNextTime":"..."}\n\ntryNextTime must be THREE lines the user should try in a FUTURE conversation — not quotes of what he already said, but better alternatives tailored to this character and scenario. Number them 1, 2, 3. Each line must be specific to the character's personality and scenario — not generic advice. BANNED: "Say something real", "Ask about the specific", "Reference what actually happened", "Tell me more about that".` },
+          { role: 'system', content: `You are Ryan, a dating coach. Return ONLY valid JSON: {"tryNextTime":"..."}\n\ntryNextTime must be THREE lines the user should try in a FUTURE conversation — not quotes of what he already said, but better alternatives tailored to this character and scenario. Number them 1, 2, 3. Each line must be specific to the character's personality and scenario — not generic advice. BANNED: "Say something real", "Ask about the specific", "Reference what actually happened", "Tell me more about that", "focus on", "try to", "make sure", "be more".` },
           { role: 'user', content: `Scenario: ${scenarioTitle}\n\nTranscript:\n${transcript}` },
         ];
         const tntRaw = await callLLM(tntMessages, 200);
