@@ -69,6 +69,7 @@ let rec = null;
 let listenTimer = null;
 let watchdogInterval = null;
 let session = 0;
+let _lastInputMode = 'voice'; // tracks whether the most recent listenForUser call used voice or type
 const _seenScenarioIntros = new Set(); // tracks which scenario intros have played this session
 
 const els = {
@@ -1258,6 +1259,7 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
         history: conversationHistory,
         userStyle: currentUserStyle,
         lesson1Complete: localStorage.getItem('eklipses_lesson1_complete') === 'true',
+        voiceInput: _lastInputMode === 'voice',
       }),
       signal: controller.signal,
     });
@@ -1341,6 +1343,7 @@ async function getCharacterResponseFallback(userSaid) {
         characterId: currentCharacterId,
         history: conversationHistory,
         lesson1Complete: localStorage.getItem('eklipses_lesson1_complete') === 'true',
+        voiceInput: _lastInputMode === 'voice',
       }),
       signal: controller.signal,
     });
@@ -1369,6 +1372,29 @@ function createRecognition() {
   return r;
 }
 
+function getInputMode() {
+  return localStorage.getItem('eklipses_input_mode') || 'voice';
+}
+
+function correctSTT(text) {
+  if (!text) return text;
+  let t = text;
+  // "novel Regional" → "novel or journal"
+  t = t.replace(/\bnovel\s+regional\b/gi, 'novel or journal');
+  // "treasury map" → "writing something"
+  t = t.replace(/\btreasury\s+map\b/gi, 'writing something');
+  // "ready you" → "aren't you"
+  t = t.replace(/\bready\s+you\b/gi, "aren't you");
+  // "fitt/fitting" in feeling context
+  t = t.replace(/\bjust\s+my\s+fitt(?:ing)?\b/gi, 'just my feeling');
+  t = t.replace(/\b(it'?s)\s+fitt(?:ing)?\b/gi, '$1 feeling');
+  // "riding" → "writing" only when writing-related context is present
+  if (/\b(book|novel|article|journal|story|piece|draft|chapter|essay|something)\b/i.test(t)) {
+    t = t.replace(/\briding\b/gi, 'writing');
+  }
+  return t;
+}
+
 function showListening(on=true) {
   if (els.listenPill) els.listenPill.style.display=on?'block':'none';
   const orbEl=document.getElementById('ryan-orb');
@@ -1387,11 +1413,14 @@ function showListening(on=true) {
   }
 }
 
-/* ===== listenForUser — Chrome Web Speech API ===== */
+/* ===== listenForUser — Chrome Web Speech API or type input ===== */
 // Dynamic silence detection:
 //   SILENCE_SHORT = 900ms  — fires when last word ends with . ! ? or common sentence-enders
 //   SILENCE_LONG  = 1800ms — fires otherwise (mid-thought, comma pause, etc.)
 function listenForUser(mySession, maxTotalMs) {
+  _lastInputMode = getInputMode();
+  if (_lastInputMode === 'type') return listenForUserType(mySession, maxTotalMs);
+  if (typeof window !== 'undefined' && window._testMode) return Promise.resolve(null);
   return new Promise(resolve=>{
     maxTotalMs=maxTotalMs||30000;
     let accumulated='', interim='', silenceTimer=null, hardTimer=null, currentRec=null;
@@ -1437,7 +1466,7 @@ function listenForUser(mySession, maxTotalMs) {
       showListening(false);
       let final=accumulated.trim();
       if (interim.trim() && !final.toLowerCase().includes(interim.trim().toLowerCase())) final=(final+' '+interim).trim();
-      resolve(final||null);
+      resolve(correctSTT(final)||null);
     }
 
     function scheduleSilence() {
@@ -1515,6 +1544,64 @@ function listenForUser(mySession, maxTotalMs) {
   });
 }
 
+
+/* ===== Type-mode listener — resolves when user submits text ===== */
+function listenForUserType(mySession, maxTotalMs) {
+  return new Promise(resolve => {
+    const wrap = document.getElementById('type-input-wrap');
+    const field = document.getElementById('type-input-field');
+    const sendBtn = document.getElementById('type-send-btn');
+    if (!wrap || !field || !sendBtn) { resolve(null); return; }
+
+    wrap.style.display = 'flex';
+    field.value = '';
+    field.style.height = 'auto';
+    setTimeout(() => field.focus(), 50);
+
+    let resolved = false;
+
+    function cleanup() {
+      wrap.style.display = 'none';
+      sendBtn.removeEventListener('click', onSend);
+      field.removeEventListener('keydown', onKey);
+      field.removeEventListener('input', onInput);
+      clearInterval(sessionPoll);
+      clearTimeout(hardTimer);
+    }
+
+    function submit() {
+      if (resolved) return;
+      const text = field.value.trim();
+      if (!text) return;
+      resolved = true;
+      cleanup();
+      resolve(text);
+    }
+
+    function onSend() { submit(); }
+    function onKey(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); }
+    }
+    function onInput() {
+      field.style.height = 'auto';
+      field.style.height = Math.min(field.scrollHeight, 120) + 'px';
+    }
+
+    sendBtn.addEventListener('click', onSend);
+    field.addEventListener('keydown', onKey);
+    field.addEventListener('input', onInput);
+
+    const sessionPoll = setInterval(() => {
+      if (mySession !== session) {
+        if (!resolved) { resolved = true; cleanup(); resolve(null); }
+      }
+    }, 500);
+
+    const hardTimer = setTimeout(() => {
+      if (!resolved) { resolved = true; cleanup(); resolve(null); }
+    }, maxTotalMs || 30000);
+  });
+}
 
 /* ===== Mary API + TTS warmup — fires silently when a scenario loads ===== */
 // Primes Groq cold start AND OpenAI TTS cold start so first real response has no extra latency.
@@ -2646,13 +2733,54 @@ function updateCoachBtnVisibility() {
 
 bootDefault();
 initCoachBtn();
+initInputModeToggle();
 
-// Test hook — allows browser tests to inject speech without microphone
-if (typeof window !== 'undefined') {
-  window.addEventListener('test:speech', (e) => {
-    if (e.detail?.text && typeof streamCharacterAndSpeak === 'function') {
-      streamCharacterAndSpeak(e.detail.text, session);
+function initInputModeToggle() {
+  const btn = document.getElementById('input-mode-toggle');
+  if (!btn) return;
+
+  function updateToggle() {
+    const mode = getInputMode();
+    if (mode === 'type') {
+      btn.textContent = '🎤';
+      btn.title = 'Switch to voice input';
+      btn.classList.add('type-active');
+    } else {
+      btn.textContent = '⌨️';
+      btn.title = 'Switch to keyboard input';
+      btn.classList.remove('type-active');
     }
+  }
+
+  updateToggle();
+
+  btn.addEventListener('click', () => {
+    const current = getInputMode();
+    const next = current === 'voice' ? 'type' : 'voice';
+    localStorage.setItem('eklipses_input_mode', next);
+    updateToggle();
+    // If switching away from type mode while the input bar is visible, close it
+    if (next === 'voice') {
+      const wrap = document.getElementById('type-input-wrap');
+      if (wrap) wrap.style.display = 'none';
+    }
+  });
+}
+
+// Test hooks — allow browser tests to inject speech and end sessions without microphone
+if (typeof window !== 'undefined') {
+  window._testMode = true; // silences freeConvLoop SR so it never fires concurrent streamCharacterAndSpeak
+  window._testBusy = false;
+  window.addEventListener('test:speech', async (e) => {
+    if (e.detail?.text && typeof streamCharacterAndSpeak === 'function') {
+      window._testBusy = true;
+      await streamCharacterAndSpeak(e.detail.text, session);
+      window._testBusy = false;
+    }
+  });
+  window.addEventListener('test:end-session', () => {
+    stopEverything();
+    runCoachFeedback(session);
   });
 }
 

@@ -1,3 +1,72 @@
+# DONE — July 12, 2026 (Type mode toggle + STT post-processing)
+
+Branch: `feature/stt-improvements` (not merged to main)
+
+---
+
+## TASK 1 — Type Mode Toggle
+
+### What was added
+
+**`index.html`**
+- CSS for `#input-mode-toggle` (fixed bottom-right pill button, 44×44px)
+- CSS for `#type-input-wrap` (fixed full-width bar at bottom of screen)
+- `<button id="input-mode-toggle">` — mic/keyboard toggle button
+- `<div id="type-input-wrap">` — textarea + Send button
+
+**`player.js`**
+- `let _lastInputMode` state variable — tracks whether last `listenForUser` call used voice or type
+- `getInputMode()` — reads `localStorage.getItem('eklipses_input_mode')`, defaults to `'voice'`
+- `listenForUserType(mySession, maxTotalMs)` — resolves when user submits text (Enter or Send click); auto-resizes textarea; hides on submit or session change
+- `listenForUser()` patched — checks `getInputMode()` first; delegates to `listenForUserType()` when in type mode; sets `_lastInputMode`
+- `initInputModeToggle()` — wires click handler; updates button icon/tooltip; closes type bar when switching back to voice
+- Called `initInputModeToggle()` at startup alongside `bootDefault()` / `initCoachBtn()`
+
+### Behavior
+- Default mode: **voice** (`localStorage` key `eklipses_input_mode` absent or `'voice'`)
+- Toggle button always visible (fixed bottom-right). Icon:
+  - 🎤 = currently in voice mode; click to switch to keyboard
+  - ⌨️ = currently in type mode (blue highlight); click to switch back to voice
+- In type mode: microphone never starts; text input bar appears at bottom of screen during each listening turn
+- Enter submits (Shift+Enter inserts newline); Send button also submits
+- Preference persists across page reloads via localStorage key `eklipses_input_mode`
+
+---
+
+## TASK 2 — STT Post-Processing Correction
+
+### Option A — correctSTT() function + per-call note
+
+**`player.js`** — `correctSTT(text)` function (applied in `finish()` inside `listenForUser` before resolving):
+- `"novel Regional"` → `"novel or journal"`
+- `"treasury map"` → `"writing something"`
+- `"ready you"` → `"aren't you"`
+- `"fitt"` / `"fitting"` in context → `"just my feeling"` / `"it's feeling"`
+- `"riding"` → `"writing"` (only when writing-adjacent words present in the transcript)
+
+`streamCharacterAndSpeak` and `getCharacterResponseFallback` now send `voiceInput: true` (voice mode) or `voiceInput: false` (type mode).
+
+**`api/character.js`** and **`api/character-stream.js`** — when `voiceInput: true`, appends per-message note to the user message:
+> `[Note: this response was captured via voice recognition and may contain transcription errors. Interpret charitably and respond to the most likely intended meaning.]`
+
+### Option B — Permanent system prompt note
+
+Both API files now include `STT_NOTE` in every `systemPrompt`:
+> `VOICE INPUT NOTE: The user is speaking via voice recognition software. Their messages may contain speech-to-text errors. Always interpret their responses charitably and respond to the most likely intended meaning, not the literal garbled text.`
+
+---
+
+## Files Changed
+
+| File | Changes |
+|------|---------|
+| `index.html` | Toggle button + type input bar CSS + HTML elements |
+| `player.js` | `_lastInputMode`, `getInputMode()`, `correctSTT()`, `listenForUserType()`, patched `listenForUser()`, `initInputModeToggle()`, `voiceInput` in fetch calls |
+| `api/character.js` | `voiceInput` from req.body, `STT_NOTE`, `effectiveUserMessage`, updated messages array |
+| `api/character-stream.js` | `voiceInput` from req.body, `STT_NOTE`, `effectiveUserMessage`, updated messages array |
+
+---
+
 # DONE — July 6, 2026 (Cloudflare Worker audio proxy + Ryan direct R2 + lesson player test suite)
 
 ## Deploy summary

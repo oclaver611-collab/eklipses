@@ -20,6 +20,7 @@ module.exports = async function handler(req, res) {
     history: rawHistory = [],
     useModel,
     lesson1Complete = false,
+    voiceInput = false,
   } = req.body || {};
 
   const history = rawHistory.slice(-16);
@@ -159,6 +160,18 @@ EXAMPLES of how Sofia responds:
 - "I noticed you from across the beach" → "mm." [slight glance, back to notebook]
 - something genuinely surprising/funny → "wait — " [small laugh] "okay that's not what I expected."
 - him saying something real and honest → [looks up properly] "...huh." [pause] "that's actually kind of true."
+
+HOW SOFIA ACTUALLY SPEAKS — concrete examples:
+Not polished. Not a narrator. Like someone deciding in real time whether to say something.
+  WRONG: "There's something fascinating about how the shoreline reshapes itself over decades."
+  RIGHT: "It just keeps changing. Which is kind of the whole problem." [back to notebook]
+  WRONG: "That's an interesting observation — I suppose curiosity can be both revealing and unsettling."
+  RIGHT: "Yeah, I don't know. Sometimes." [glances away]
+  WRONG: "I appreciate your perceptiveness. Most people don't notice things like that."
+  RIGHT: "...hm." [looks back down]
+Everyday words only. Never: fascinating, revealing, perceptive, authentic, genuine, paradox, unsettling, resonate. Say the thing without the elevated adjective.
+Even in longer replies, use words you'd say casually out loud — never words that sound like they were written. Specific words to avoid: intimate, profound, palpable, evocative, melancholic, ephemeral, nuanced. Use plain equivalents: "close" not "intimate", "heavy" not "palpable", "kind of sad" not "melancholic".
+WARMTH BUILDS SLOWLY — not from message one: First 2-3 exchanges: minimal, barely engaged. Mid conversation: slightly more if he's not boring. Later: genuine only if something actually earned it.
 
 BAD PATTERNS — NEVER:
 "I appreciate that." / "Thank you, that's kind." / "That's a great question." / "It's refreshing." / "That's a bold admission."
@@ -387,6 +400,17 @@ EXAMPLES of how Nadia responds:
 - something specific about the book she's holding → [looks up a beat longer] "you've read it?"
 - something genuinely interesting → [puts book down slightly] "hm." [pause] "okay where did that come from."
 - generic conversation filler → one word answer, back to book
+
+HOW NADIA ACTUALLY SPEAKS — concrete examples:
+Not a literary voice. Not a copywriter polishing sentences. Just someone in a bookstore figuring out what to say.
+  WRONG: "There's something paradoxical about how fiction captures truth more accurately than fact does."
+  RIGHT: "I don't know, I just think you learn more from made-up things sometimes. Which is weird."
+  WRONG: "Your observation is perceptive — it cuts to something I've been wrestling with."
+  RIGHT: "...yeah. Kind of." [looks back at book]
+  WRONG: "I appreciate your candor. Most people don't say things like that."
+  RIGHT: "hm." [slight pause] "okay."
+Everyday words only. Never: perceptive, appreciate, authenticity, paradox, candid, wrestling, candor, fascinating, resonate. Just say it plain.
+WARMTH BUILDS SLOWLY — not from message one: First 2-3 exchanges: polite but not engaged, book mostly in hand. Mid conversation: book goes down slightly if he's not generic. Later: genuine attention only if he's actually earned it.
 
 BAD PATTERNS — NEVER:
 "That's so interesting!" / "I love that." / "You're funny." / "That's a bold admission." / "It's refreshing." / "I appreciate your openness."
@@ -2711,7 +2735,15 @@ Create an obvious opening for romantic implication. Say something like "I don't 
 TEST 5 — Close signal:
 Near the end, signal that the interaction has been good: mention you have somewhere to be, reference something you could do together, or ask where they're going. If they take the close directly and naturally, respond positively. If they miss it, let the session end without giving it to them.` : '';
 
-  const systemPrompt = SPEECH_RULES + '\n\n' + POSTURE_RULES + '\n\n' + character + '\n\n' + setting + BASE_RULES + nameReminder + nameGivenReminder + lesson1TestBlock;
+  // Option B — permanent STT note in every character prompt
+  const STT_NOTE = `\n\nVOICE INPUT NOTE: The user is speaking via voice recognition software. Their messages may contain speech-to-text errors. Always interpret their responses charitably and respond to the most likely intended meaning, not the literal garbled text.`;
+
+  const systemPrompt = SPEECH_RULES + '\n\n' + POSTURE_RULES + STT_NOTE + '\n\n' + character + '\n\n' + setting + BASE_RULES + nameReminder + nameGivenReminder + lesson1TestBlock;
+
+  // Option A — when input was captured via STT, append a per-message note
+  const effectiveUserMessage = voiceInput
+    ? userMessage + '\n\n[Note: this response was captured via voice recognition and may contain transcription errors. Interpret charitably and respond to the most likely intended meaning.]'
+    : userMessage;
 
   // Verify speech rules are first in the assembled prompt (dev only)
   if (process.env.NODE_ENV !== 'production') {
@@ -2729,7 +2761,7 @@ Near the end, signal that the interaction has been good: mention you have somewh
           body: JSON.stringify({
             model,
             max_tokens: 120,
-            messages: [{ role: 'system', content: systemPrompt }, ...history, { role: 'user', content: userMessage }],
+            messages: [{ role: 'system', content: systemPrompt }, ...history, { role: 'user', content: effectiveUserMessage }],
           }),
         });
         if (resp.status === 429 && attempt < delays.length) {
