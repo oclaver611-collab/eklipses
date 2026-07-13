@@ -34,6 +34,7 @@ module.exports = async function handler(req, res) {
     history: rawHistory = [],
     useModel,
     userStyle,
+    voiceInput = false,
   } = req.body || {};
 
   const history = rawHistory.slice(-16);
@@ -3176,7 +3177,15 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
     ? `\n\nCRITICAL: You already told him your name earlier in this conversation. Do NOT say "you haven't asked my name yet" or any variation of it. If he goes for coffee or a number too early, use a different pushback: "You've known me a few minutes. That's not enough." or "Let's see where this goes first."`
     : '';
 
-  const systemPrompt = character + '\n\n' + setting + BASE_RULES + nameReminder + nameGivenReminder;
+  // Option B — permanent STT note in every character prompt
+  const STT_NOTE = `\n\nVOICE INPUT NOTE: The user is speaking via voice recognition software. Their messages may contain speech-to-text errors. Always interpret their responses charitably and respond to the most likely intended meaning, not the literal garbled text.`;
+
+  const systemPrompt = character + '\n\n' + setting + STT_NOTE + BASE_RULES + nameReminder + nameGivenReminder;
+
+  // Option A — when input was captured via STT, append a per-message note
+  const effectiveUserMessage = voiceInput
+    ? userMessage + '\n\n[Note: this response was captured via voice recognition and may contain transcription errors. Interpret charitably and respond to the most likely intended meaning.]'
+    : userMessage;
 
   // ── LLM call: OpenAI primary, Groq fallback ─────────────────────────────
   async function attemptLLM(url, key, model) {
@@ -3189,7 +3198,7 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
           body: JSON.stringify({
             model,
             max_tokens: 300,
-            messages: [{ role: 'system', content: systemPrompt }, ...history, { role: 'user', content: userMessage }],
+            messages: [{ role: 'system', content: systemPrompt }, ...history, { role: 'user', content: effectiveUserMessage }],
           }),
         });
         if (resp.status === 429 && attempt < delays.length) {

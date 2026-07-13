@@ -168,6 +168,43 @@
   .ek-cert-chip.certified { background:rgba(76,175,80,.2); color:#4caf50; }
   .ek-cert-chip.practiced { background:rgba(154,164,178,.12); color:#9aa4b2; }
 
+  /* ===== Input Mode Toggle ===== */
+  #input-mode-toggle {
+    position: fixed; bottom: 80px; right: 16px; z-index: 9998;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #1a1c22; border: 1px solid #2b2e36;
+    color: #cfd6e4; font-size: 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,.4);
+    transition: background .15s, border-color .15s;
+    padding: 0;
+  }
+  #input-mode-toggle:hover { background: #272b34; border-color: #3a3f4b; }
+  #input-mode-toggle.type-active { background: #1a2e3a; border-color: rgba(55,138,221,.5); color: #378ADD; }
+
+  /* ===== Type Input Bar ===== */
+  #type-input-wrap {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 9997;
+    background: #13151a; border-top: 1px solid #2b2e36;
+    padding: 10px 16px; gap: 10px; align-items: flex-end;
+    display: none;
+  }
+  #type-input-field {
+    flex: 1; background: #1d2026; border: 1px solid #2b2e36;
+    border-radius: 10px; color: #e9ecf1; font-size: 15px;
+    padding: 10px 14px; resize: none; outline: none;
+    max-height: 120px; line-height: 1.4; font-family: inherit;
+    overflow-y: auto;
+  }
+  #type-input-field:focus { border-color: #378ADD; }
+  #type-send-btn {
+    background: #378ADD; color: #fff; border: none;
+    border-radius: 10px; padding: 10px 18px; font-size: 14px;
+    font-weight: 700; cursor: pointer; white-space: nowrap;
+    align-self: flex-end; height: 42px;
+  }
+  #type-send-btn:hover { background: #4a94e0; }
+
   /* ===== MOBILE ===== */
   @media (max-width: 600px) {
     /* Topbar: single clean row, hide non-essential items */
@@ -285,6 +322,15 @@
   </footer>
 
   <div id="listenPill" class="pill">🎤 Listening…</div>
+
+  <!-- Input mode toggle (voice ↔ type) -->
+  <button id="input-mode-toggle" title="Switch to keyboard input">🎤</button>
+
+  <!-- Type mode input bar — shown when input mode is 'type' and listenForUser is active -->
+  <div id="type-input-wrap">
+    <textarea id="type-input-field" placeholder="Type your response and press Enter…" rows="1"></textarea>
+    <button id="type-send-btn">Send</button>
+  </div>
 
   <!-- Avatar Picker (opened when user clicks the button) -->
   <div id="avatarPicker" class="picker-backdrop" style="display:none;">
