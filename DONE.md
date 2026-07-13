@@ -65,6 +65,22 @@ Both API files now include `STT_NOTE` in every `systemPrompt`:
 | `api/character.js` | `voiceInput` from req.body, `STT_NOTE`, `effectiveUserMessage`, updated messages array |
 | `api/character-stream.js` | `voiceInput` from req.body, `STT_NOTE`, `effectiveUserMessage`, updated messages array |
 
+## Test Results
+
+| Suite | Result |
+|-------|--------|
+| `node tests/test-all-scenarios.js` | **14/14 PASS** ✅ |
+| `npm run test:lesson` | **15/15 PASS** ✅ |
+| `node tests/test-paywall.js` | FAIL ❌ — pre-existing production regression (fingerprint check overriding localStorage count:3); unrelated to this feature; investigate separately |
+
+## Deploy
+
+- Merged `feature/stt-improvements` → `main` (merge commit `95c15c5`)
+- Tagged: `v-stable-stt-improvements`
+- Pushed to `origin/main`
+- Vercel deploy job: `WFFpc7kBENxCmlbPnJIC` (triggered 2026-07-12)
+- URL: https://eklipses.vercel.app
+
 ---
 
 # DONE — July 6, 2026 (Cloudflare Worker audio proxy + Ryan direct R2 + lesson player test suite)
