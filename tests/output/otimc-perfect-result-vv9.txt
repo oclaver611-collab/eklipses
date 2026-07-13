@@ -1,0 +1,71 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-10T04:21:13.068Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+CONVERSATION TRANSCRIPT:
+  1. O — Observation opener
+     HIM:   "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+     SOFIA: "The sand’s receded, the wildlife’s altered."
+  2. T — Tease
+     HIM:   "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+     SOFIA: "It’s hard to watch things disappear, like pieces of home."
+  3. M — Mystery
+     HIM:   "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+     SOFIA: "I didn’t expect to have this layered conversation while dodging seagulls."
+  4. I — Imply
+     HIM:   "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+     SOFIA: "I suppose I'm just deciding how much of this I want to share and with whom."
+  5. — Follow-up 1
+     HIM:   "Whatever it is — I think you already know."
+     SOFIA: "You seem to enjoy poking around."
+  6. — Follow-up 2
+     HIM:   "You write about things disappearing. Most people find that depressing. You seem to find it worth paying attention to."
+     SOFIA: "Maybe it’s a way of honoring what was here before."
+  7. C — Close
+     HIM:   "I'm walking down to that café on the corner when I leave here. Come with me."
+     SOFIA: "You don’t strike me as someone who’s used to sticking around."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me walk you through the Lesson 1 skills — One Tequila Makes Ideas Click. For Observe, you noticed her glancing up from the notebook, which was a good start. For Tease, you pushed back with a playful challenge about her words, and that landed well. For Mystery, you kept it vague when she asked about you, which was smart. For Imply, you hinted at interest by observing her careful word choice, which worked. For Close, you invited her to the café, but it was too soon and lacked confidence. Next time, lead with a stronger close.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 4/5   Passed: true
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     PASS
+  I (imply):       PASS
+  C (close):       FAIL
+Summary: You did well with observation, tease, mystery, and imply. The close fell flat, though.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 6/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said, 'You keep glancing up from that notebook toward the water' — a solid opener, but you lost some ground after.
+
+PART 1:
+You said she was writing about something she can't quite see yet — a solid observation. With Sofia, that opens the door, but you need to keep the momentum going after that.
+
+PART 2:
+When she said, 'The shoreline feels personal to me; I grew up here,' you said, 'Depends who's asking.' This was a missed opportunity to get into into her feelings about home. She was opening up, and you redirected instead of exploring that thread.
+
+PART 3:
+You said, 'Whatever it is — I think you already know.' You should have said, 'It sounds like there's a lot tied up in that shoreline for you. What do you miss most about it?' This works better because it shows genuine curiosity about her personal something real, which she values. It invites her to share more of her story.
+
+PART 4:
+Two things to fix: your close and following her threads. You had a chance to go further into into her past — don't let it slip away next time.
+
+tryNextTime:
+1. I've been watching the way the light changes here; it's like the whole atmosphere shifts in an instant - does that ever influence your writing?
+2. There's something about this place that feels like a threshold to me - like the edge of something new or the end of something familiar; do you ever feel that way about the shoreline?
+3. If you were to capture this moment, right now, in your notebook - what would be the first words you'd write?
+
+openerBreakdown:    See the feedback above.
+bestMoment:         See the feedback above.
+missedOpportunity:  See the feedback above.
+wouldSheDateHim:    Maybe. You had some real moments but needed to go further into what she opened.

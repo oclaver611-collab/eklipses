@@ -1,0 +1,60 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-09T05:40:08.551Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT:
+  1. O — Observation opener
+     "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+  2. T — Tease
+     "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+  3. M — Mystery
+     "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+  4. I — Imply
+     "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+  5. C — Close
+     "I'm walking down to that café on the corner when I leave here. Come with me."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: PASS. You noticed her looking up from her notebook and made it real. T — Tease: PASS. You pushed back on her safe answer, which kept the tension alive. M — Mystery: PASS. You gave a partial answer about yourself that left her curious. I — Imply: PASS. You hinted at interest by noticing her careful word choice. C — Close: FAIL. You made a move, but it felt a bit rushed and she wasn't ready.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 4/5   Passed: true
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     PASS
+  I (imply):       PASS
+  C (close):       FAIL
+Summary: You did well with observation and teasing, but the close needs work to feel more natural.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 7/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said, 'What is it?' — a solid opener that caught her attention.
+
+PART 1:
+You said she was writing about something she couldn't quite see yet — a solid opener. With Sofia, that caught her attention because it was specific and real, showing you were paying attention.
+
+PART 2:
+When she said, 'The real answer is a mess of nostalgia mixed with frustration,' you said, 'That sounds like the version you've decided is safe to tell strangers.' This earned you points because you challenged her to go further, which she responded to with more honesty.
+
+PART 3:
+The moment that hurt you most was when you said, 'I'm walking down to that café on the corner when I leave here. Come with me.' You should have said, 'What’s so special about that café, anyway?' This works better because it keeps her connect and curious instead of pushing her too fast when she's still processing her thoughts.
+
+PART 4:
+Two things to fix: make your close feel more natural and avoid rushing her. You caught her interest with your observation, now keep that momentum going next time.
+
+tryNextTime:
+1. I've got a story about this beach too, one that involves a midnight swim and a promise to return, want to hear it?
+2. The café has a view of the shore from a different angle, sometimes change in perspective is all we need to see what's been here all along.
+3. Sacred rituals are meant to be respected, but sometimes sharing them with the right person can make them feel even more meaningful, I'd like to be that person for you.
+
+openerBreakdown:    See the feedback above.
+bestMoment:         See the feedback above.
+missedOpportunity:  See the feedback above.
+wouldSheDateHim:    Maybe. You had some real moments but needed to go further into what she opened.

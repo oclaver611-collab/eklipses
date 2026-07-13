@@ -1,0 +1,60 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-09T05:46:06.622Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT:
+  1. O — Observation opener
+     "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+  2. T — Tease
+     "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+  3. M — Mystery
+     "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+  4. I — Imply
+     "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+  5. C — Close
+     "I'm walking down to that café on the corner when I leave here. Come with me."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: PASS. You noticed her looking up from her notebook and made it real. T — Tease: PASS. You pushed back on her safe answer, which kept the tension alive. M — Mystery: PASS. You gave a partial answer about yourself that left her wanting more. I — Imply: PASS. You hinted at interest by observing her word choice. C — Close: FAIL. You made a move but hedged by not asking her name first.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 4/5   Passed: true
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     PASS
+  I (imply):       PASS
+  C (close):       FAIL
+Summary: You did well with observation and teasing, but you missed a clear close. Keep pushing for that direct move.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 7/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said, 'What is it?' — a solid opener that caught her attention.
+
+PART 1:
+You said, 'You keep glancing up from that notebook toward the water' — a real observation that pulled her in. With Sofia, that kind of detail works because she rewards genuine curiosity and specificity.
+
+PART 2:
+When she said, 'It helps to focus on the sand loss instead of how I feel about it,' you said, 'Depends who's asking.' That line showed you were paying attention, but it also pushed her to think deeper about her own words.
+
+PART 3:
+The moment that hurt you most was when you said, 'I'm walking down to that café on the corner when I leave here. Come with me.' Instead, you should have said, 'I’d love to hear your thoughts over coffee. What’s your name?' This works better because it shows genuine interest in her as a person, which Sofia appreciates. It also invites her to share more about herself before making a move.
+
+PART 4:
+Two things to fix: make your close more direct and avoid hedging. You had a solid moment when you said, 'You've been choosing every word carefully this whole conversation.' Next time, go again with more confidence.
+
+tryNextTime:
+1. "You're right, I should have introduced myself first. I'm Ryan — what about you?" 
+2. "I guess I got a bit ahead of myself there. What do you usually look for in a good conversation?" 
+3. "Fair point! How about we start fresh? What’s something you’d love to share that’s not in your notebook?"
+
+openerBreakdown:    See the feedback above.
+bestMoment:         See the feedback above.
+missedOpportunity:  See the feedback above.
+wouldSheDateHim:    Maybe. You had some real moments but needed to go further into what she opened.

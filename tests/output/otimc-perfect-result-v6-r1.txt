@@ -1,0 +1,60 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-09T06:01:30.297Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT:
+  1. O — Observation opener
+     "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+  2. T — Tease
+     "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+  3. M — Mystery
+     "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+  4. I — Imply
+     "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+  5. C — Close
+     "I'm walking down to that café on the corner when I leave here. Come with me."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: PASS. You noticed her glancing up from the notebook, which was real. T — Tease: PASS. You pushed back on her safe answer, creating friction. M — Mystery: PASS. You gave a partial answer about yourself, leaving her wanting more. I — Imply: PASS. You hinted at interest by observing her carefully. C — Close: FAIL. Your last message was direct but lacked a strong follow-up invitation.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 4/5   Passed: true
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     PASS
+  I (imply):       PASS
+  C (close):       FAIL
+Summary: You did well with observation and teasing, but the close fell flat. Keep pushing for stronger invites.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 7/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said, 'What is it?' — a solid opener that caught her attention.
+
+PART 1:
+You said, 'You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet.' — a solid observation opener. With Sofia, that worked because it showed you were paying attention to her and her surroundings, which she values.
+
+PART 2:
+When she said, 'Each storm takes something away. Each summer, it seems different and familiar all at once,' you said, 'Depends who's asking. Some people get the short version, some people get more.' That moment cost you because she was opening up about her feelings on the beach, and you didn’t follow that thread.
+
+PART 3:
+The moment that hurt you most was when you said, 'Depends who's asking. Some people get the short version, some people get more.' Instead, you should have said, 'It sounds like you have a lot of stories tied to this place. What’s the most surprising thing you’ve noticed over the years?' This works better because it directly acknowledges her depth and invites her to share more, which she’s looking for.
+
+PART 4:
+Two things to fix: your follow-up questions and your closing invitation. You need to keep the conversation flowing and make her feel like sharing more. Next time, go further into her stories and let her lead the way.
+
+tryNextTime:
+1. "I get that — sometimes the best stories are the ones we’re still figuring out. What’s the most surprising thing you’ve discovered about this beach over the years?"
+2. "I appreciate your careful choice of words. If you could write a letter to this beach, what would you want it to say?"
+3. "I’m curious about your timeline here. If you could relive one summer on this beach, which one would it be and why?"
+
+openerBreakdown:    See the feedback above.
+bestMoment:         See the feedback above.
+missedOpportunity:  See the feedback above.
+wouldSheDateHim:    Maybe. You had some real moments but needed to go further into what she opened.

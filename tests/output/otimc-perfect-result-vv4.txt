@@ -1,0 +1,69 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-10T03:03:26.032Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+CONVERSATION TRANSCRIPT:
+  1. O — Observation opener
+     HIM:   "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+     SOFIA: "It's frustrating, really."
+  2. T — Tease
+     HIM:   "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+     SOFIA: "This beach is tied to memories — my childhood, the changes over time, the connection to the ocean."
+  3. M — Mystery
+     HIM:   "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+     SOFIA: "Keeps things light."
+  4. I — Imply
+     HIM:   "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+     SOFIA: "This place — it's familiar yet intimate."
+  5. — Follow-up 1
+     HIM:   "Whatever it is — I think you already know."
+     SOFIA: "You’re not here just to chat, are you?"
+  6. — Follow-up 2
+     HIM:   "You write about things disappearing. Most people find that depressing. You seem to find it worth paying attention to."
+     SOFIA: "There's beauty in the impermanence, you know?"
+  7. C — Close
+     HIM:   "I'm walking down to that café on the corner when I leave here. Come with me."
+     SOFIA: "What if we just stay in this moment a while longer."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me walk you through the Lesson 1 skills — One Tequila Makes Ideas Click. For Observe, that one landed. You noticed she was glancing up from her notebook toward the water, which is exactly the move. For Tease, you held your ground when she pushed back, creating small friction without apologizing. For Mystery, you answered partially, revealing something real but leaving her wanting more. For Imply, you communicated romantic interest through subtext, making her feel what you meant without stating it directly. For Close, you made a direct move to continue, inviting her to a café without hedge language.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 5/5   Passed: true
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     PASS
+  I (imply):       PASS
+  C (close):       PASS
+Summary: You applied the Lesson 1 skills well, creating a strong conversation with Sofia.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 8/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said 'That sounds like the version you've decided is safe to tell strangers' — a bold move that worked.
+
+PART 1:
+You opened with a perceptive comment about her writing, noticing something real - a great move that got her attention. With Sofia, that worked because she rewards specificity and genuine curiosity. She registered that you were paying attention to her actions, not just her appearance.
+
+PART 2:
+When she said 'It's deeply personal. This beach is tied to memories — my childhood, the changes over time, the something real to the ocean', you said 'Depends who's asking. Some people get the short version, some people get more. You're somewhere in between'. This exchange earned you her interest because you showed self-awareness and a willingness to share, but also set boundaries. Sofia responded by probing your strategy, showing she was connect and curious.
+
+PART 3:
+The moment that could have been improved was when you said 'Whatever it is — I think you already know'. A better line could have been 'I think we're both deciding how much to reveal'. This replacement works with Sofia because it acknowledges her careful choice of words and invites her to reflect on her own decision-making, creating a sense of mutual understanding and vulnerability.
+
+PART 4:
+Two things to fix: assuming you know what she's thinking and not fully exploring her interests. Next time, try again and see where the conversation takes you - you got this.
+
+tryNextTime:
+1. What draws you to the impermanence of things? 2. How do you think our conversation would change if we were somewhere else? 3. What's the most important thing you've learned from writing about coastal ecology?
+
+openerBreakdown:    Your opening line, 'You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet', worked because it was a specific observation about her behavior, showing you were paying attention.
+bestMoment:         You said 'You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding' - a great line that landed because it showed you were attentive to her communication style and curious about her thoughts.
+missedOpportunity:  When Sofia said 'What if we just stay in this moment a while longer', you could have explored that idea further, asking her what she meant by 'this moment' and what she hoped to experience or discuss.
+wouldSheDateHim:    Maybe, I think he's intriguing and perceptive, but I'm not sure if he's truly interested in me or just looking for someone to talk to.

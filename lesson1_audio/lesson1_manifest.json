@@ -1,0 +1,98 @@
+{
+  "lesson": "lesson1",
+  "generatedAt": "2026-07-04T04:12:10.944Z",
+  "r2Prefix": "lessons/lesson1/audio",
+  "segments": [
+    {
+      "id": "01",
+      "title": "Lesson Intro",
+      "filename": "lesson1_seg01.mp3",
+      "r2Key": "lessons/lesson1/audio/lesson1_seg01.mp3",
+      "status": "success"
+    },
+    {
+      "id": "02",
+      "title": "Before The Approach",
+      "filename": "lesson1_seg02.mp3",
+      "r2Key": "lessons/lesson1/audio/lesson1_seg02.mp3",
+      "status": "success"
+    },
+    {
+      "id": "03",
+      "title": "The Approach — Live Exchange",
+      "filename": "lesson1_seg03.mp3",
+      "r2Key": "lessons/lesson1/audio/lesson1_seg03.mp3",
+      "status": "success"
+    },
+    {
+      "id": "04",
+      "title": "Step 1 — The Observation Opener",
+      "filename": "lesson1_seg04.mp3",
+      "r2Key": "lessons/lesson1/audio/lesson1_seg04.mp3",
+      "status": "success"
+    },
+    {
+      "id": "05",
+      "title": "The Tease — Live Exchange",
+      "filename": "lesson1_seg05.mp3",
+      "r2Key": "lessons/lesson1/audio/lesson1_seg05.mp3",
+      "status": "success"
+    },
+    {
+      "id": "06",
+      "title": "Step 2 — Playful Challenge",
+      "filename": "lesson1_seg06.mp3",
+      "r2Key": "lessons/lesson1/audio/lesson1_seg06.mp3",
+      "status": "success"
+    },
+    {
+      "id": "07",
+      "title": "The Sensitive Topic — Live Exchange",
+      "filename": "lesson1_seg07.mp3",
+      "r2Key": "lessons/lesson1/audio/lesson1_seg07.mp3",
+      "status": "success"
+    },
+    {
+      "id": "08",
+      "title": "Step 3 — Owning Your Mystery",
+      "filename": "lesson1_seg08.mp3",
+      "r2Key": "lessons/lesson1/audio/lesson1_seg08.mp3",
+      "status": "success"
+    },
+    {
+      "id": "09",
+      "title": "The Verbal Spike — Live Exchange",
+      "filename": "lesson1_seg09.mp3",
+      "r2Key": "lessons/lesson1/audio/lesson1_seg09.mp3",
+      "status": "success"
+    },
+    {
+      "id": "10",
+      "title": "Step 4 — The Verbal Spike",
+      "filename": "lesson1_seg10.mp3",
+      "r2Key": "lessons/lesson1/audio/lesson1_seg10.mp3",
+      "status": "success"
+    },
+    {
+      "id": "11",
+      "title": "The Close — Live Exchange",
+      "filename": "lesson1_seg11.mp3",
+      "r2Key": "lessons/lesson1/audio/lesson1_seg11.mp3",
+      "status": "success"
+    },
+    {
+      "id": "12",
+      "title": "Step 5 — The Natural Close",
+      "filename": "lesson1_seg12.mp3",
+      "r2Key": "lessons/lesson1/audio/lesson1_seg12.mp3",
+      "status": "success"
+    },
+    {
+      "id": "13",
+      "title": "Summary and Send-Off",
+      "filename": "lesson1_seg13.mp3",
+      "r2Key": "lessons/lesson1/audio/lesson1_seg13.mp3",
+      "status": "success"
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC EVAL RESULT
+Date:             2026-07-09T03:42:36.808Z
+URL:              http://localhost:3001
+lesson1Complete:  true
+scenario:         beach
+character:        Sofia
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT (One Tequila Makes Ideas Click):
+  1. O — Observation opener
+     "You've been out here writing the whole time — is it something you actually care about, or just a deadline pushing you?"
+  2. T — Tease
+     "That sounds like the polished version. I get the feeling the real one is more interesting."
+  3. M — Mystery
+     "Depends on the day. Today it's following whatever pulls you somewhere and seeing what happens."
+  4. I — Imply
+     "You know where this conversation could go. I'm curious whether you want to find out."
+  5. C — Close
+     "I'd like to keep talking somewhere that isn't a beach. Come get a coffee with me."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL  (lesson1Eval — spoken OTIMC scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: PASS — you noticed she was writing for a long time and asked about it. T — Tease: PASS — you created a little friction with your first question. M — Mystery: FAIL — you didn’t leave her wanting more about yourself. I — Imply: PASS — you hinted at intrigue with her topic. C — Close: PASS — you made a direct ask for coffee. 
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK  (lesson1Check — certification tracking)
+──────────────────────────────────────────────────────────────────────
+Score: 4/5   Passed: false
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     FAIL
+  I (imply):       PASS
+  C (close):       PASS
+Summary: You’re halfway there; good moments but missed chances to dive deeper and create more intrigue.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 6/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You asked, "is it something you actually care about, or just a deadline pushing you?" — she found it fair but wasn't fully drawn in.
+
+PART 1 — opener:
+"You've been out here writing the whole time — is it something you actually care about, or just a deadline pushing you?" — probing open-ended question. It got her talking, but the second half fell flat with Sofia; she can smell insincerity, and you sounded a bit accusatory rather than curious about her real thoughts.
+
+PART 2 — middle:
+When she said, "the real one? It’s a little messy... I just find it hard to disconnect sometimes," you replied, "Depends on the day. Today it's following whatever pulls you somewhere and seeing what happens." That missed a golden chance — she opened up about her struggle, and you sidestepped it instead of go further into something real.
+
+PART 3 — correction:
+You said, "That sounds like the polished version. I get the feeling the real one is more interesting." You should have gone with something like, "What about the real version keeps you from disconnecting?" This works better because it gives her a chance to share her deeper feelings, and that’s what she values. Plus, it shows you noticed her struggle instead of just skimming the surface.
+
+PART 4 — closer:
+Two things to fix: follow her threads more deeply and avoid being too vague. You forced a turn instead of letting the conversation reveal itself naturally. Next time, slow down and explore what she gives you; it could shift everything for you.
+
+tryNextTime:
+1. "Sounds like the real reason is something deeper; what does that feel like for you?" 2. "I find it hard to disconnect too — what does that look like for you?" 3. "The waves can be unpredictable, but so can nice conversations. What do you think is next for us?"
+
+openerBreakdown:    Your opener was probing but felt a bit aggressive with the 'just a deadline' tone; Sofia would prefer more genuine curiosity.
+bestMoment:         You said, "Depends on the day. Today it's following whatever pulls you somewhere and seeing what happens." That was a good attempt to align with her vibe.
+missedOpportunity:  You lost ground when you said, "Depends on the day. Today it's following whatever pulls you somewhere and seeing what happens," and she responded, "That sounds refreshing." You should have grabbed that moment to go further into into her thoughts instead.
+wouldSheDateHim:    Maybe — she might see potential but is skeptical based on his indirectness in responding.
+
+──────────────────────────────────────────────────────────────────────
+PAGE LOGS (coach + session events):
+──────────────────────────────────────────────────────────────────────
+[log] [FC] loop start, elapsed: 9242 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 16926 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 24261 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] streamPromise resolved or timed out
+[log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+[log] [FC] loop start, elapsed: 29985 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 37033 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 43582 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] streamPromise resolved or timed out
+[log] [FC] loop start, elapsed: 50282 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+[log] [FC] loop start, elapsed: 59103 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 65420 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 71305 mySession: 1 session: 1
+[log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+[log] [FC] streamPromise resolved or timed out
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 77456 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 84919 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 90609 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] streamPromise resolved or timed out
+[log] [FC] loop start, elapsed: 98531 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+[log] [FC] loop start, elapsed: 105816 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+[log] [FC] streamPromise resolved or timed out

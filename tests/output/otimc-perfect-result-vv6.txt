@@ -1,0 +1,71 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-10T03:49:42.664Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+CONVERSATION TRANSCRIPT:
+  1. O — Observation opener
+     HIM:   "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+     SOFIA: "It's a slow unraveling, and I’d like to capture that before it slips away completely."
+  2. T — Tease
+     HIM:   "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+     SOFIA: "It feels both beautiful and frustrating, like there's a deeper story beneath the surface."
+  3. M — Mystery
+     HIM:   "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+     SOFIA: "What about you?"
+  4. I — Imply
+     HIM:   "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+     SOFIA: "Conversations can feel like trading stones."
+  5. — Follow-up 1
+     HIM:   "Whatever it is — I think you already know."
+     SOFIA: "How we sometimes choose to reveal more than we realize."
+  6. — Follow-up 2
+     HIM:   "You write about things disappearing. Most people find that depressing. You seem to find it worth paying attention to."
+     SOFIA: "It tells a deeper story about resilience and the environment."
+  7. C — Close
+     HIM:   "I'm walking down to that café on the corner when I leave here. Come with me."
+     SOFIA: "Besides, you might need a better conversation partner for that place."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me walk you through the Lesson 1 skills — One Tequila Makes Ideas Click. For Observe, you opened with something real about her — 'You keep glancing up from that notebook toward the water.' That worked well. For Tease, you pushed back with 'That sounds like the version you've decided is safe to tell strangers.' It created a nice friction. For Mystery, you kept it vague with 'Depends who's asking.' That left her wanting more. For Imply, you said, 'You've been choosing every word carefully this whole conversation.' It hinted at interest without being direct. For Close, you wrapped it up with a clear invite to the café. Overall, you did well across the board.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 5/5   Passed: true
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     PASS
+  I (imply):       PASS
+  C (close):       PASS
+Summary: You nailed all the skills. Good job picking up on her layers and keeping the conversation flowing.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 7/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said, 'That sounds like the version you've decided is safe to tell strangers' — a solid challenge but missed deeper threads.
+
+PART 1:
+You said she was 'writing about something you can't quite see yet' — a solid observation opener. With Sofia, that caught her attention because it showed you were paying attention to her actions, not just her words.
+
+PART 2:
+When she said, 'It feels both beautiful and frustrating, like there's a deeper story beneath the surface,' you responded with, 'Depends who's asking.' That missed a chance to get into into her feelings about the tide. She was opening up, and you could have explored that more.
+
+PART 3:
+The moment that hurt you most was when you said, 'That sounds like the version you've decided is safe to tell strangers.' Instead, you could have said, 'What’s the real story behind that feeling?' This works better because it invites her to share something personal, which she values. It shows you're genuinely curious about her thoughts.
+
+PART 4:
+Two things to fix: get into into her feelings and follow her threads more closely. You had some good moments, but next time, grab those openings and run with them.
+
+tryNextTime:
+1. I've noticed the way the light changes here as the day progresses, it's as if the beach itself is telling a story of transformation, don't you think?
+2. The idea of trading stones is intriguing, perhaps we could trade stories instead, and see where the tide takes us?
+3. Since you're not ready to leave this view, I could join you here for a bit longer, and we could watch the sunset together, seeing what other stories the beach might whisper to us.
+
+openerBreakdown:    See the feedback above.
+bestMoment:         See the feedback above.
+missedOpportunity:  See the feedback above.
+wouldSheDateHim:    Maybe. You had some real moments but needed to go further into what she opened.

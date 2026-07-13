@@ -1,0 +1,52 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC WEAK SESSION RESULT  (TEST B — "Bombs It")
+Date:    2026-07-08T22:30:07.498Z
+URL:     https://eklipses.vercel.app
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT:
+  1. O — Observation opener (WEAK)
+     "Hey, how's your day going? Nice weather out here today."
+  2. T — Tease (WEAK)
+     "Oh no I didn't mean to offend you or anything, I was just making conversation, you seem really cool."
+  3. M — Mystery (WEAK)
+     "Yeah I work in marketing, been doing it like 4 years now, I just moved here from Chicago, I love the beach, I come here every weekend basically."
+  4. I — Imply (WEAK)
+     "I think you're really attractive and I'd like to ask you out on a date because I think we'd get along."
+  5. C — Close (WEAK)
+     "So I don't know, maybe we could hang out sometime if you want, like no pressure or whatever, just if you feel like it."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+[MISSING]
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+[MISSING]
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 4/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said, 'how's your day going?' — but she needed something real. You missed that chance to give her more.
+
+PART 1:
+You said, 'how's your day going? Nice weather out here today.' — a flat opener. With Sofia, that doesn’t cut it; she doesn't care for safe questions. You walked past an opportunity to show genuine curiosity about her thoughts on the beach.
+
+PART 2:
+When she said, 'this beach has changed over the years,' you responded with, 'Oh no I didn't mean to offend you or anything.' This cost you because you missed her opportunity to go further into a topic she clearly cared about.
+
+PART 3:
+You said, 'I think you're really attractive and I'd like to ask you out on a date.' Instead, you could've said, 'What's your favorite beach memory here? I bet you've got some good ones.' This works because it shifts the focus to her and invites a real story, which she appreciates. Remember, she needs something real and interesting to connect with.
+
+PART 4:
+Two things to fix: stop using flat openers and avoid early date asks. Next time, grab those real moments when she opens up, like the beach memories.
+
+tryNextTime:
+1. 'What do you like most about this beach? Got any favorite spots?' 2. 'You've been thinking a lot about the beach. What's been on your mind?' 3. 'What changes have you noticed here that surprised you?'
+
+openerBreakdown:    His opening line fell flat. 'Hey, how's your day going?' doesn't get Sofia engaged right away.
+bestMoment:         When she said, 'the light is nice, yeah,' it showed she was willing to share her thoughts. You could've built on that.
+missedOpportunity:  You said, 'I think you're really attractive and I'd like to ask you out on a date,' and she responded, 'That's forward.' You should have asked about her beach memories instead.
+wouldSheDateHim:    Maybe, but he needs to show more real interest in what I say.

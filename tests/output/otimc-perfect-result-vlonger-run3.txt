@@ -1,0 +1,62 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-10T01:55:49.622Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT:
+  1. O — Observation opener
+     "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+  2. T — Tease
+     "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+  3. M — Mystery
+     "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+  4. I — Imply
+     "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+  5. — Follow-up 1
+     "Whatever it is — I think you already know."
+  6. — Follow-up 2
+     "You write about things disappearing. Most people find that depressing. You seem to find it worth paying attention to."
+  7. C — Close
+     "I'm walking down to that café on the corner when I leave here. Come with me."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: You passed by noticing her glancing up from her notebook. T — Tease: You passed by pushing back with 'That sounds like the version you've decided is safe to tell strangers'. M — Mystery: You passed by giving a partial answer with 'Depends who's asking'. I — Imply: You passed by implying interest with 'You've been choosing every word carefully this whole conversation'. C — Close: You passed by making a direct move to continue with 'I'm walking down to that café on the corner when I leave here. Come with me'.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 5/5   Passed: true
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     PASS
+  I (imply):       PASS
+  C (close):       PASS
+Summary: You applied Lesson 1 skills well, creating a strong conversation flow.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 8/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said 'That sounds like the version you've decided is safe to tell strangers' — bold move.
+
+PART 1:
+You made a 'noticing her' move - it landed well with Sofia because it showed you were paying attention to her actions, not just her appearance.
+
+PART 2:
+When Sofia said 'It’s just that the beach feels different now', you responded with 'That sounds like the version you've decided is safe to tell strangers' — this exchange earned you her interest because you called out her potential guardedness, and she appreciated your perceptiveness.
+
+PART 3:
+The moment that could have been improved was when Sofia asked 'Do you always read the room this well?' — you could have said 'I try to, but it’s not always easy' instead of just giving a partial answer, which would have shown more vulnerability and depth to your character, making the conversation more relatable and interesting to Sofia.
+
+PART 4:
+Two things to fix: assuming too much about her intentions and not sharing more about yourself. Next time, try to balance giving and taking in the conversation, and you got this.
+
+tryNextTime:
+1. Ask her about the stories she finds in what's lost, to explore her interests further. 2. Share a personal experience of finding beauty in fleeting things, to create a sense of mutual understanding. 3. Invite her to walk with you to the café, and then suggest a specific activity or topic to discuss, to make the invitation more engaging and interesting.
+
+openerBreakdown:    Your opening line worked because it was a particular observation about Sofia's behavior, showing you were genuinely interested in what she was doing.
+bestMoment:         You said 'You've been choosing every word carefully this whole conversation' — this landed well with Sofia because it showed you were aware of her cautious nature and willing to acknowledge it.
+missedOpportunity:  When Sofia said 'Maybe I'm just weighing how much I want to share', you could have explored this further by asking 'What makes you hesitant to share?' instead of just saying 'Whatever it is — I think you already know', which would have got into deeper into her thoughts and feelings.
+wouldSheDateHim:    Yes, I think I would consider dating him because when he said 'You've been choosing every word carefully this whole conversation', it showed me he was paying attention to my actions and willing to call out my guardedness in a non-judgmental way.

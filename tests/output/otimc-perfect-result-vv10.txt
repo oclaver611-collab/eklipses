@@ -1,0 +1,71 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-10T04:28:56.426Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+CONVERSATION TRANSCRIPT:
+  1. O — Observation opener
+     HIM:   "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+     SOFIA: "There’s a story to tell in the way the landscape whispers."
+  2. T — Tease
+     HIM:   "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+     SOFIA: "It feels deeply personal, like I’m trying to make sense of childhood memories slipping away with every wave."
+  3. M — Mystery
+     HIM:   "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+     SOFIA: "Makes this moment a little more interesting."
+  4. I — Imply
+     HIM:   "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+     SOFIA: "Sometimes it feels easier to stay in the safe zone, you know?"
+  5. — Follow-up 1
+     HIM:   "Whatever it is — I think you already know."
+     SOFIA: "I see the ebb and flow, but revealing too much can feel like letting the water wash away pieces of me."
+  6. — Follow-up 2
+     HIM:   "You write about things disappearing. Most people find that depressing. You seem to find it worth paying attention to."
+     SOFIA: "Plus, I think it invites us to cherish what we have while we can."
+  7. C — Close
+     HIM:   "I'm walking down to that café on the corner when I leave here. Come with me."
+     SOFIA: "Walking."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me walk you through the Lesson 1 skills — One Tequila Makes Ideas Click. For Observe, you opened with something real about her behavior, which worked well. For Tease, you called her out on her safe answer, and she responded positively. For Mystery, you gave a partial answer about yourself, which left her wanting more. For Imply, you hinted at your interest in her deeper thoughts, and that landed nicely. For Close, you made a direct invite to the café, which was clear and confident.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 5/5   Passed: true
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     PASS
+  I (imply):       PASS
+  C (close):       PASS
+Summary: You nailed all the Lesson 1 skills. Good job pushing her a bit and keeping it interesting.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 7/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said, 'That sounds like the version you've decided is safe to tell strangers' — a solid challenge that got her to open up.
+
+PART 1:
+You said she was writing about something she couldn't quite see yet — a solid observation that opened the door. With Sofia, that caught her attention and made her feel seen, which is key for her to connect more.
+
+PART 2:
+When she said, 'But the truth? It feels deeply personal, like I’m trying to make sense of childhood memories slipping away with every wave,' you said, 'Depends who's asking. Some people get the short version, some people get more.' This earned you points because you acknowledged her depth and kept the conversation flowing.
+
+PART 3:
+The moment that hurt you most was when you said, 'Whatever it is — I think you already know.' Instead, you should have said, 'It sounds like there's a lot beneath the surface. What do you think keeps you from sharing it?' This works better because it invites her to explore her feelings and opens up a deeper conversation, which she clearly values.
+
+PART 4:
+Two things to fix: keep pushing her to reveal more and avoid vague statements. You got her talking about her past — next time, go further into into that.
+
+tryNextTime:
+1. I love how you find beauty in the impermanence of things; it's a unique perspective - would you like to explore more of the coastline with me and see what other hidden gems we can find?
+2. Your writing seems to be a reflection of your soul; I'd be honored if you'd share more of your work with me over a cup of coffee at that café.
+3. The way you describe the tide pulling and pushing resonates deeply with me; let's take a walk along the shore and see if we can find some synchronicity in our thoughts and the rhythm of the waves.
+
+openerBreakdown:    See the feedback above.
+bestMoment:         See the feedback above.
+missedOpportunity:  See the feedback above.
+wouldSheDateHim:    Maybe. You had some real moments but needed to go further into what she opened.

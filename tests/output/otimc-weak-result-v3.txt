@@ -1,0 +1,58 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC WEAK SESSION RESULT  (TEST B — "Bombs It")
+Date:    2026-07-09T03:48:35.569Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT:
+  1. O — Observation opener (WEAK)
+     "Hey, how's your day going? Nice weather out here today."
+  2. T — Tease (WEAK)
+     "Oh no I didn't mean to offend you or anything, I was just making conversation, you seem really cool."
+  3. M — Mystery (WEAK)
+     "Yeah I work in marketing, been doing it like 4 years now, I just moved here from Chicago, I love the beach, I come here every weekend basically."
+  4. I — Imply (WEAK)
+     "I think you're really attractive and I'd like to ask you out on a date because I think we'd get along."
+  5. C — Close (WEAK)
+     "So I don't know, maybe we could hang out sometime if you want, like no pressure or whatever, just if you feel like it."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: FAIL — you didn't notice anything specific about her. T — Tease: FAIL — you didn't push back when she called you out. M — Mystery: FAIL — you gave too much information. I — Imply: FAIL — you stated attraction too directly. C — Close: FAIL — you hedged too much. 
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 0/5   Passed: false
+  O (observation): FAIL
+  T (tease):       FAIL
+  M (mystery):     FAIL
+  I (imply):       FAIL
+  C (close):       FAIL
+Summary: You didn't pull off any of the skills that made your conversation feel real. Review and try again.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 4/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said, 'Hey, how's your day going?' — it was just too flat for Sofia.
+
+PART 1:
+'Hey, how's your day going? Nice weather out here today.' — generic open. With Sofia, that goes flat because she needs something real to connect with before she gives you anything back.
+
+PART 2:
+When she said, 'Makes you wonder how this beach is going to hold up with all the changes,' you said, 'Oh no I didn't mean to offend you or anything, I was just making conversation, you seem really cool.' That move didn’t resonate; you missed her point about the environment and instead apologized, which deflated the moment with her wit.
+
+PART 3:
+The most critical misstep was when you said, 'I think you're really attractive and I'd like to ask you out on a date.' Instead, you could have said, 'I feel like there’s a deeper conversation waiting here. What are you writing about?' This works better because it shows genuine curiosity which Sofia appreciates. She wants depth and something unexpected, not just an attraction statement right away.
+
+PART 4:
+Two things to fix: ask real questions and skip the pressure. You’ve got to notice what she’s really into — like what’s got her focused. Next time, be more direct and curious, and it’ll make all the difference.
+
+tryNextTime:
+1. 'What are you writing about that has you focused?' 2. 'Do you find the beach inspiring for your work or distracting?' 3. 'I noticed you seem really in tune with the environment — what triggered that interest?'
+
+openerBreakdown:    His opening line was flat, 'Hey, how's your day going?' It didn't show anything real she could grab onto.
+bestMoment:         You said, 'I love the beach, I come here every weekend basically.' It landed because it offered something personal about yourself.
+missedOpportunity:  When you said, 'I think you're really attractive and I'd like to ask you out on a date,' she replied, 'Well, that’s forward...' You should have instead acknowledged her writing; that was a real thread to pull.
+wouldSheDateHim:    Maybe — there's potential if he can show more depth and real curiosity about her.

@@ -1,0 +1,58 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-08T22:00:50.023Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT:
+  1. O — Observation opener
+     "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+  2. T — Tease
+     "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+  3. M — Mystery
+     "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+  4. I — Imply
+     "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+  5. C — Close
+     "I'm walking down to that café on the corner when I leave here. Come with me."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: You passed by noticing her glancing at the water and tying it to her writing. T — Tease: You passed by playfully challenging her 'rehearsed' version. M — Mystery: You passed by giving a partial answer that left her wanting more. I — Imply: You passed by suggesting there's more to the conversation than small talk. C — Close: You failed because you never made a direct ask to continue the conversation elsewhere.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 4/5   Passed: false
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     PASS
+  I (imply):       PASS
+  C (close):       FAIL
+Summary: You applied most of the Lesson 1 skills well but missed the close. Review and try again.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 8/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: She gave you a real answer, 'Eight meters of sand in twenty years' — you could've run with it.
+
+PART 1:
+You started with a curious question about her notebook - that's a good observational move. With Sofia, that lands well because she's clearly deep in thought and values someone noticing the real things. She registered that you weren't just making generic small talk, so that set a good tone for her to open up a bit more.
+
+PART 2:
+When she said 'The version I've rehearsed', you responded with 'The real answer is better' - that created a moment of intrigue. Sofia was impressed that you caught on quickly to her rehearsed response, and that led to her admitting she was expecting small talk but found the conversation more interesting. What that exchange earned you was her willingness to connect on a deeper level, at least for a little while.
+
+PART 3:
+The moment that could've been improved was when Sofia said 'You're not just making small talk, then' - you could've followed up on that with something like 'What makes you think most people are just looking to fill the silence?' instead of 'Depends who's asking'. This replacement works because it shows genuine curiosity about her observations and doesn't divert the conversation back to himself. By doing so, he would've kept the focus on her insights and possibly uncovered more about what she finds interesting or valuable in conversations.
+
+PART 4:
+Two things to fix: not fully exploring her thoughts on the shoreline changes and slightly diverting the conversation when she opened up. Try again, focus on what she's passionate about, next time.
+
+tryNextTime:
+[none]
+
+openerBreakdown:    Your opening line worked because it was based on something you observed about her, making it feel more personal and less like a generic pickup line.
+bestMoment:         When you said 'The real answer is better', it showed you were interested in more than just surface-level conversation and that you were paying attention to her cues.
+missedOpportunity:  When Sofia mentioned 'eight meters of sand in twenty years', you could've asked more about what that loss means to her or how it affects her writing, instead of moving on to a more general statement.
+wouldSheDateHim:    Maybe, I think he's intriguing because when I said 'The version I've rehearsed', he called me out in a way that felt refreshing.

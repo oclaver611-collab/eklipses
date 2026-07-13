@@ -1,0 +1,60 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-09T05:12:09.818Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT:
+  1. O — Observation opener
+     "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+  2. T — Tease
+     "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+  3. M — Mystery
+     "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+  4. I — Imply
+     "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+  5. C — Close
+     "I'm walking down to that café on the corner when I leave here. Come with me."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: PASS. You noticed her looking up from the notebook and connected it to her writing. T — Tease: PASS. You pushed back on her safe answer, which kept the tension alive. M — Mystery: PASS. You hinted at your own story without revealing everything. I — Imply: PASS. You implied interest in her deeper thoughts without stating it directly. C — Close: FAIL. You made a move, but it felt abrupt and didn't build on the conversation.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 4/5   Passed: false
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     PASS
+  I (imply):       PASS
+  C (close):       FAIL
+Summary: You did well with observation and teasing, but the close fell flat. Keep building on the conversation next time.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 7/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said, 'What is it?' — a solid opener that caught her attention.
+
+PART 1:
+You said she was writing about something she couldn't quite see yet — a solid observation opener. With Sofia, that landed well because it showed you were paying attention to her actions, not just her appearance.
+
+PART 2:
+When she said, 'Sometimes, it's the personal stuff that reveals the most—like the memories tied to this place,' you said, 'Depends who's asking.' That earned you some ground because it kept the conversation going and hinted at your own layers without giving everything away.
+
+PART 3:
+The moment that hurt you most was when you said, 'I'm walking down to that café on the corner when I leave here. Come with me.' Instead, you should have said, 'I could use a coffee, but I’m curious what you really see when you look at this beach.' This works better because it keeps the focus on her thoughts and invites her to share more, which is what she responds to.
+
+PART 4:
+Two things to fix: make your close feel more natural and keep the focus on her thoughts. You had a good rhythm going, but don’t rush the invite next time — let her share more first. You got this.
+
+tryNextTime:
+1. I've been watching the way the sunlight dances across your face as you talk about the shoreline, and I'm curious, what draws you to this spot at this time of day?
+2. Your description of the beach as layers of history is captivating; have you ever found something interesting washed up on the shore that sparked a story or memory for you?
+3. Since you mentioned memories tied to this place, I'll share one of mine - the smell of saltwater always reminds me of family vacations; do you have a scent that transports you back to a specific moment or place?
+
+openerBreakdown:    See the feedback above.
+bestMoment:         See the feedback above.
+missedOpportunity:  See the feedback above.
+wouldSheDateHim:    Maybe. You had some real moments but needed to go further into what she opened.

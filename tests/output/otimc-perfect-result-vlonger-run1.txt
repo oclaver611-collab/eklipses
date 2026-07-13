@@ -1,0 +1,62 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-10T01:42:57.282Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT:
+  1. O — Observation opener
+     "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+  2. T — Tease
+     "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+  3. M — Mystery
+     "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+  4. I — Imply
+     "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+  5. — Follow-up 1
+     "Whatever it is — I think you already know."
+  6. — Follow-up 2
+     "You write about things disappearing. Most people find that depressing. You seem to find it worth paying attention to."
+  7. C — Close
+     "I'm walking down to that café on the corner when I leave here. Come with me."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: You opened with something you noticed about her, that she kept glancing up from her notebook, so that's a pass. T — Tease: When she pushed back, you held your frame with 'Depends who's asking', that's a pass. M — Mystery: You didn't give away too much about yourself, so that's a pass. I — Imply: You implied interest with 'You've been choosing every word carefully this whole conversation', that's a pass. C — Close: You made a direct move to continue with 'I'm walking down to that café on the corner when I leave here. Come with me', so that's a pass.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 5/5   Passed: true
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     PASS
+  I (imply):       PASS
+  C (close):       PASS
+Summary: You applied Lesson 1 skills well, creating a good conversation flow and closing with a direct invitation.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 8/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said 'That sounds like the version you've decided is safe to tell strangers' and it worked.
+
+PART 1:
+You used a 'noticing her behavior' move - it landed well with Sofia because it showed you were paying attention to her actions and not just her appearance.
+
+PART 2:
+When Sofia said 'Maybe I am keeping it tidy for the moment', you responded with 'Depends who's asking', which earned you a deeper conversation about her writing and her thoughts on loss, showing you were willing to listen and not just offer generic responses.
+
+PART 3:
+The moment that could have been improved was when Sofia said 'Or maybe you just make it easier to think out loud' - you could have said 'Maybe I do, or maybe you're just ready to say what you've been thinking' to create a bit more tension and intrigue, which would have played well with Sofia's personality and her desire for real conversations.
+
+PART 4:
+Two things to fix: not fully exploring the depth of Sofia's emotions when she discussed loss, and not creating more tension before the close. Next time, try to go again and see where the conversation takes you, and don't be afraid to push the boundaries a bit more.
+
+tryNextTime:
+1. 'What's the most difficult thing you've had to write about?' 2. 'Do you find that writing helps you process your thoughts or does it make you realize how much you don't know?' 3. 'If you could go back to any place from your childhood, would you, and why or why not?'
+
+openerBreakdown:    Your opening line worked because it showed you were observing Sofia's behavior and not just making a generic comment.
+bestMoment:         When you said 'You've been choosing every word carefully this whole conversation', it landed well with Sofia because it showed you were paying attention to her and implying that you found her interesting.
+missedOpportunity:  When Sofia said 'Or maybe you just make it easier to think out loud', you could have explored that idea further and created more intimacy, instead of moving on to the close.
+wouldSheDateHim:    Yes, I think I would consider dating him because when he said 'You've been choosing every word carefully this whole conversation', it made me feel like he was really listening to me and trying to understand me.

@@ -1,0 +1,58 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-09T03:36:10.798Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT:
+  1. O — Observation opener
+     "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+  2. T — Tease
+     "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+  3. M — Mystery
+     "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+  4. I — Imply
+     "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+  5. C — Close
+     "I'm walking down to that café on the corner when I leave here. Come with me."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: PASS. You opened with a real observation about her. T — Tease: FAIL. You pushed back too soon and created defensiveness. M — Mystery: PASS. You gave a partial answer that hinted but didn’t spill everything. I — Imply: FAIL. You didn't imply attraction or deeper interest, just challenged her. C — Close: PASS. You made a direct invitation to continue the conversation.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 3/5   Passed: false
+  O (observation): PASS
+  T (tease):       FAIL
+  M (mystery):     PASS
+  I (imply):       FAIL
+  C (close):       PASS
+Summary: Three passes show you’re halfway there; focus on teasing and implying more in your next conversation.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 7/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said, 'You keep glancing up from that notebook toward the water' — that worked because it’s a real observation.
+
+PART 1:
+"You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?" — specific observation opener. With Sofia, this hit because it wasn't flat or generic; you drew her in with something real that she couldn't ignore.
+
+PART 2:
+'When she said, "It's a mix of numbers and memories. I'm tracking how the shoreline has changed over the years," you said, "That sounds like the version you've decided is safe to tell strangers. The real answer is better."' This cost you some ground because she was opening up, and instead of recognizing that, you pushed back a bit too early. She was giving you something real about her work and you left her defensive instead of intrigued.
+
+PART 3:
+You said, "That sounds like the version you've decided is safe to tell strangers. The real answer is better." A better line would have been, "So it's not just data; you're capturing something deeper, right? I'd love to hear more about that light hitting the waves." This works because it acknowledges her point and invites her to share more revealing details, which she craves. You need to keep the focus on her insights — that’s how you keep her intrigued.
+
+PART 4:
+Two things to fix: be careful with pushing back too soon and don't shy away from deeper questions. You picked up on her vibe; now lean into it and ask for more next time. You got this.
+
+tryNextTime:
+1. "So it's about more than just numbers; it's about moments too, right? What’s one moment that stands out to you?" 2. "I get that; you want to keep some things under wraps. What do you think makes it easier to share later?" 3. "You lean into the personal side; I admire that. What else do you think makes a place like this special?"
+
+openerBreakdown:    Your line worked well because it showed you noticed her action, not just her. It sparked interest.
+bestMoment:         You said, "I'm walking down to that café on the corner when I leave here. Come with me." This landed because it was a direct move that invited her to join you.
+missedOpportunity:  You said, "That sounds like the version you've decided is safe to tell strangers. The real answer is better," and she responded with, "Okay, you caught me." Instead, you could have followed her insight instead of challenging her.
+wouldSheDateHim:    Maybe — he noticed real things but needs to show more genuine curiosity about my thoughts.

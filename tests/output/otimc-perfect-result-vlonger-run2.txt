@@ -1,0 +1,62 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-10T01:49:16.972Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT:
+  1. O — Observation opener
+     "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+  2. T — Tease
+     "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+  3. M — Mystery
+     "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+  4. I — Imply
+     "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+  5. — Follow-up 1
+     "Whatever it is — I think you already know."
+  6. — Follow-up 2
+     "You write about things disappearing. Most people find that depressing. You seem to find it worth paying attention to."
+  7. C — Close
+     "I'm walking down to that café on the corner when I leave here. Come with me."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: PASS. You noticed something real about her. T — Tease: PASS. You pushed back slightly. M — Mystery: PASS. You didn't give away too much. I — Imply: PASS. You made her wonder. C — Close: PASS. You made a direct move.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 5/5   Passed: true
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     PASS
+  I (imply):       PASS
+  C (close):       PASS
+Summary: You applied Lesson 1 skills well, creating a real conversation.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 8/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said 'That sounds like the version you've decided is safe to tell strangers' — and it worked.
+
+PART 1:
+You opened with a curious observation - noticing her glancing at the water. With Sofia, that landed well because it showed you were paying attention to something real about her.
+
+PART 2:
+When she said 'It's less about being safe and more about not wanting to get into the weeds', you said 'Depends who's asking. Some people get the short version, some people get more. You're somewhere in between.' That exchange earned you more of her attention because you didn't push for details, showing you respected her boundaries.
+
+PART 3:
+The moment that could have gone better was when she asked what you thought she was holding back. You said 'Whatever it is — I think you already know.' A better response could have been 'Maybe it's something you're still figuring out, and that's what makes this conversation interesting.' This would have shown you were genuinely curious about her thoughts and willing to explore them together, which aligns with Sofia's appreciation for real, unguarded moments.
+
+PART 4:
+Two things to fix: assuming you know what she's thinking and not exploring her thoughts further. Next time, try to go again with a more open-ended question that invites her to share more, and you got this.
+
+tryNextTime:
+1. 'What's the most significant change you've seen in this beach over the years?' 2. 'I've noticed you seem to appreciate the beauty in loss — what draws you to that perspective?' 3. 'If you could share one thing you're currently writing about without worrying about how it sounds, what would it be?'
+
+openerBreakdown:    Your opening line worked because it was based on something you actually observed about Sofia, making it feel more personal and less like a generic pickup line.
+bestMoment:         You said 'You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding' — and it landed well because it showed you were paying attention to her communication style and interested in what she might be thinking.
+missedOpportunity:  When Sofia said 'Want to tell me what's so special about that corner', you could have shared something personal or interesting about the café or the walk, making the invitation more appealing and giving her a reason to join you.
+wouldSheDateHim:    Yes, I think I would consider dating him because when he said 'You've been choosing every word carefully this whole conversation', it made me feel like he was actually listening and trying to understand me.

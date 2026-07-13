@@ -1,0 +1,69 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-10T03:35:48.141Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+CONVERSATION TRANSCRIPT:
+  1. O — Observation opener
+     HIM:   "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+     SOFIA: "It's subtle but kind of massive in its implications."
+  2. T — Tease
+     HIM:   "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+     SOFIA: "There's a certain beauty in those changes, but also a bit of sadness."
+  3. M — Mystery
+     HIM:   "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+     SOFIA: "What makes you curious enough to ask for the long story?"
+  4. I — Imply
+     HIM:   "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+     SOFIA: "A little push and pull."
+  5. — Follow-up 1
+     HIM:   "Whatever it is — I think you already know."
+     SOFIA: "What are you hoping to find in all these questions?"
+  6. — Follow-up 2
+     HIM:   "You write about things disappearing. Most people find that depressing. You seem to find it worth paying attention to."
+     SOFIA: "When you look closely, it becomes more than just sadness."
+  7. C — Close
+     HIM:   "I'm walking down to that café on the corner when I leave here. Come with me."
+     SOFIA: "Walking — got it."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me walk you through the Lesson 1 skills — One Tequila Makes Ideas Click. For Observe, that one landed. You noticed she was glancing up from her notebook toward the water, which is exactly the move. For Tease, you held your frame and pushed back when she gave you a short answer. For Mystery, you answered without giving everything away, which was perfect. For Imply, you communicated romantic interest through subtext, like when you said 'You've been choosing every word carefully this whole conversation.' For Close, you made a direct move to continue without hedge language, which was great.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 5/5   Passed: true
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     PASS
+  I (imply):       PASS
+  C (close):       PASS
+Summary: Lesson 1 skills applied well, you navigated the conversation with ease and created a good dynamic.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 8/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said 'That sounds like the version you've decided is safe to tell strangers.'
+
+PART 1:
+You made a keen observation - noticing her glancing at the water. With Sofia, that move worked because it showed you were paying attention to her behavior, not just her appearance.
+
+PART 2:
+When she said 'The real answer is more messy. It's about watching the water, remembering where the sand used to be,' you said 'Depends who's asking. Some people get the short version, some people get more. You're somewhere in between.' This exchange earned you some credit with Sofia because you didn't push for more information, you just acknowledged the complexity of her answer.
+
+PART 3:
+The moment that could have been improved was when Sofia asked 'What are you hoping to find in all these questions?' You said 'Whatever it is — I think you already know.' A better response could have been 'I'm curious about what you're writing, and I want to understand what draws you to this topic.' This would have shown genuine interest in her work and avoided a potentially cryptic answer.
+
+PART 4:
+Two things to fix: not fully exploring her writing topic and giving a slightly abrupt close. Next time, try to go again with a bit more curiosity about her work, and you got this.
+
+tryNextTime:
+1. 'What's the most interesting thing you've learned from writing about coastal ecology?' 2. 'How do you think your writing reflects your relationship with the ocean?' 3. 'What's one thing you're still trying to figure out in your article?'
+
+openerBreakdown:    Your opening line worked because it was a real observation about her behavior, not a generic compliment.
+bestMoment:         You said 'You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding,' which landed well with Sofia because it showed you were paying attention to her communication style.
+missedOpportunity:  When Sofia said 'What are you hoping to find in all these questions?' you could have got into deeper into her curiosity and explored what she was looking for in the conversation.
+wouldSheDateHim:    Yes, I think I would consider dating him because when he said 'You write about things disappearing. Most people find that depressing. You seem to find it worth paying attention to,' it showed me he was genuinely interested in my perspective.

@@ -1,0 +1,78 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC EVAL RESULT
+Date:             2026-07-08T21:55:45.021Z
+URL:              http://localhost:3001
+lesson1Complete:  true
+scenario:         beach
+character:        Sofia
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT (One Tequila Makes Ideas Click):
+  1. O — Observation opener
+     "You've been out here writing the whole time — is it something you actually care about, or just a deadline pushing you?"
+  2. T — Tease
+     "That sounds like the polished version. I get the feeling the real one is more interesting."
+  3. M — Mystery
+     "Depends on the day. Today it's following whatever pulls you somewhere and seeing what happens."
+  4. I — Imply
+     "You know where this conversation could go. I'm curious whether you want to find out."
+  5. C — Close
+     "I'd like to keep talking somewhere that isn't a beach. Come get a coffee with me."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL  (lesson1Eval — spoken OTIMC scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: PASS, he opened with something he actually noticed about her. T — Tease: FAIL, he didn't really push back when she gave him a slight challenge. M — Mystery: PASS, he didn't reveal too much about himself. I — Imply: PASS, his line about the conversation going somewhere implied interest. C — Close: FAIL, he asked her out but didn't quite nail the delivery.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK  (lesson1Check — certification tracking)
+──────────────────────────────────────────────────────────────────────
+Score: 3/5   Passed: false
+  O (observation): PASS
+  T (tease):       FAIL
+  M (mystery):     PASS
+  I (imply):       PASS
+  C (close):       FAIL
+Summary: Halfway there, review and try again.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 7/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: She said 'the real version is more complicated' — you grabbed it.
+
+PART 1 — opener:
+Your opener was 'You've been out here writing the whole time — is it something you actually care about, or just a deadline pushing you?' — curious question move. With Sofia, that lands pretty well because it's not just a generic compliment. She registered that you noticed something particular about her situation.
+
+PART 2 — middle:
+When she said 'The real version is a bit more complicated', you said 'That sounds like the polished version. I get the feeling the real one is more interesting.' This exchange cost you nothing and earned him a bit of her interest because he showed genuine curiosity about her work. Sofia responds with more than one sentence, which is a good sign.
+
+PART 3 — correction:
+The moment that hurt him most was when he said 'I'd like to keep talking somewhere that isn't a beach. Come get a coffee with me.' A better line could have been 'Want to take a walk and see if the light is as good somewhere else?' because it continues the conversation flow and shows he's still interested in what she's saying. With Sofia, that works because she rewards people who notice real things and are willing to go further.
+
+PART 4 — closer:
+Two things to fix: assuming she drinks coffee and not fully following her thread on the shoreline changes. Next time, try again and you got this.
+
+tryNextTime:
+1. Ask her about a particular aspect of the shoreline she's writing about. 2. Mention something you've noticed about the place that relates to her work. 3. Say you're curious about what she thinks is being lost in the shoreline changes.
+
+openerBreakdown:    Your opening line 'You've been out here writing the whole time — is it something you actually care about, or just a deadline pushing you?' worked with Sofia because it showed you noticed something about her.
+bestMoment:         When you said 'That sounds like the polished version. I get the feeling the real one is more interesting', it landed with Sofia because she appreciated the curiosity.
+missedOpportunity:  When Sofia said 'I think we both know where this could lead', he could have said something like 'Maybe, but I'm more interested in what you're working on' to show he valued her thoughts.
+wouldSheDateHim:    Maybe, I liked that he didn't just take my polite responses as a green light, but I'm still undecided because he moved a bit too fast at the end.
+
+──────────────────────────────────────────────────────────────────────
+PAGE LOGS (coach + session events):
+──────────────────────────────────────────────────────────────────────
+[log] [FC] loop start, elapsed: 1214 mySession: 1 session: 1
+[log] [FC] streamPromise resolved or timed out
+[log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] streamPromise resolved or timed out
+[log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+[log] [FC] loop start, elapsed: 39250 mySession: 1 session: 1
+[log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+[log] [FC] streamPromise resolved or timed out
+[log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+[log] [FC] streamPromise resolved or timed out
+[log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+[log] [FC] streamPromise resolved or timed out

@@ -1,0 +1,60 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-09T05:52:11.657Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT:
+  1. O — Observation opener
+     "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+  2. T — Tease
+     "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+  3. M — Mystery
+     "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+  4. I — Imply
+     "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+  5. C — Close
+     "I'm walking down to that café on the corner when I leave here. Come with me."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: PASS. You noticed her looking up from her notebook and made it real. T — Tease: PASS. You pushed back on her safe answer, which got her to open up. M — Mystery: PASS. You gave a partial answer about yourself, keeping her curious. I — Imply: PASS. You hinted at interest when you said, 'Makes me wonder what you're actually deciding.' C — Close: FAIL. You made a direct move, but it felt a bit abrupt without building up to it.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 4/5   Passed: true
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     PASS
+  I (imply):       PASS
+  C (close):       FAIL
+Summary: You did well with observation and teasing, but the close needs work to feel more natural.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 7/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said, 'What is it?' — a solid opener that got her talking about something real.
+
+PART 1:
+You said she was writing about something she can't quite see yet — a real observation. With Sofia, that opened the door for her to share something deeper, and she did. She responded with a personal story about memory and loss.
+
+PART 2:
+When she said, 'It feels personal. There’s a story about home that’s harder to pin down,' you said, 'Depends who's asking. Some people get the short version, some people get more.' This earned you some ground because you challenged her to go further, but it also felt a bit evasive.
+
+PART 3:
+The moment that hurt you most was when you said, 'I'm walking down to that café on the corner when I leave here. Come with me.' Instead, you should have said, 'I get that feeling of wanting to hold back. What if we just walked and talked a bit more?' This works better because it aligns with her vibe of wanting to share selectively and keeps the conversation flowing without pressure.
+
+PART 4:
+Two things to fix: make your close feel more natural and build on her responses better. You caught her attention with your observations, now keep that momentum going next time.
+
+tryNextTime:
+1. I've been watching the way the light changes here, it's like the whole atmosphere shifts - does that ever happen to you when you're writing?
+2. The way you talk about this place, it's clear it's more than just a location to you - what's the first memory that comes to mind when you think of this beach?
+3. If you were to capture the essence of this shoreline in one sentence, what would it be, and how does that relate to the story you're trying to tell?
+
+openerBreakdown:    See the feedback above.
+bestMoment:         See the feedback above.
+missedOpportunity:  See the feedback above.
+wouldSheDateHim:    Maybe. You had some real moments but needed to go further into what she opened.

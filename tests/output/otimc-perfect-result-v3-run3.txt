@@ -1,0 +1,52 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-09T04:12:17.405Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT:
+  1. O — Observation opener
+     "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+  2. T — Tease
+     "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+  3. M — Mystery
+     "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+  4. I — Imply
+     "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+  5. C — Close
+     "I'm walking down to that café on the corner when I leave here. Come with me."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: PASS — you opened with something she was genuinely doing. T — Tease: PASS — you pushed her to reveal more with wit. M — Mystery: PASS — you left her curious with your own answers. I — Imply: PASS — you hinted at an interest without stating it directly. C — Close: FAIL — your invitation lacked warmth and context. Overall you did well, but sharpen your closing moves.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+[MISSING]
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 7/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said, 'What is it?' — a solid opener that caught her interest on a deeper level.
+
+PART 1:
+"You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?" — strong curiosity opener. With Sofia's attention to detail, this landed well and sparked her to share something meaningful about her article, showing you were invested in the moment instead of just passing time.
+
+PART 2:
+'When she said, "the water's got a funny way of stealing things you can't hold," you said, "That sounds like the version you've decided is safe to tell strangers. The real answer is better." This pushed her a little, which earned you a deeper response about her memories and feelings, showing that you weren't just satisfied with surface-level. You picked up on her hesitation, which kept her connect and contemplating what she really wanted to share next.
+
+PART 3:
+Your moment that hurt you most was when you said, "You seem to be reading the room well." Instead, you could have said, "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding." This works because it credits her thoughtfulness and keeps the conversation in that intriguing zone. She craves someone who notices subtle shifts, and this line builds on that while inviting her to reveal more about her thought process.
+
+PART 4:
+Two things to fix: be bolder with challenges and lead more with your curiosity. You caught on when you said she was choosing her words carefully, but don’t let those moments slip. Keep going — you got this.
+
+tryNextTime:
+1. "What’s your version of asking?" 2. "What’s the deeper story you’re wrestling with today?" 3. "I get that feeling — like the shore is slipping away. What memories does it bring back for you?"
+
+openerBreakdown:    Your opener worked because it sparked a thoughtful response about her writing. 'What is it?' set the stage for something real, which she appreciated.
+bestMoment:         'The water's got a funny way of stealing things you can't hold.' This landed because it revealed her emotional something real to the place.
+missedOpportunity:  'You seem to be reading the room well.' You should have challenged her reflections instead. Playing into her need to share more would have kept her connect.
+wouldSheDateHim:    Maybe — I appreciate that he noticed my words, but I want more depth than he's offered so far.

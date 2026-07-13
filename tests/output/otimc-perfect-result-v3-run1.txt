@@ -1,0 +1,58 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-09T03:59:58.626Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT:
+  1. O — Observation opener
+     "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+  2. T — Tease
+     "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+  3. M — Mystery
+     "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+  4. I — Imply
+     "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+  5. C — Close
+     "I'm walking down to that café on the corner when I leave here. Come with me."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: PASS — you picked up on something real with her. T — Tease: FAIL — you didn't hold your frame when challenged. M — Mystery: PASS — you left her wanting more. I — Imply: PASS — your words suggested interest. C — Close: PASS — you made a direct move. 
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 4/5   Passed: true
+  O (observation): PASS
+  T (tease):       FAIL
+  M (mystery):     PASS
+  I (imply):       PASS
+  C (close):       PASS
+Summary: You applied some skills well but missed opportunities to challenge her and explore deeper. Keep practicing!
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 7/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said, 'What is it?' — a solid opener that drew her in, but you missed deeper threads.
+
+PART 1:
+'You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?' — strong observation opener. With Sofia, it worked because you highlighted something real about her behavior. She had a door open for you right away.
+
+PART 2:
+'When she said, I’m still trying to wrap my head around the way the ocean feels different now, you said, That sounds like the version you've decided is safe to tell strangers. The real answer is better.' You lost a moment here because she was opening up about something deep, and you pushed instead of exploring her thoughts. That could have been a chance to dig further.
+
+PART 3:
+The hardest hit came when you said, 'That sounds like the version you've decided is safe to tell strangers. The real answer is better.' Instead, say, 'That’s a fascinating perspective. What made it feel different for you?' This shows you’re genuinely interested in her thoughts and allows her to share more on a personal level. Sofia needs that depth; your initial comment missed the opportunity.
+
+PART 4:
+Two things to fix: follow her threads more and avoid pushing for answers too hard. She’s got a real story about the ocean—a conversation about feelings like that deserves your full attention. Go again.
+
+tryNextTime:
+1. 'What’s been the most surprising part of that shift for you?' 2. 'I get that. It’s like every wave has a story, right?' 3. 'You said it used to feel like an old friend—how do you relate to it now?'
+
+openerBreakdown:    Your opener worked well because you noticed something specific about her focus and drew her in with curiosity.
+bestMoment:         You said, 'Depends who's asking. Some people get the short version, some people get more.' This line showed some intrigue and held her attention.
+missedOpportunity:  'That sounds like the version you've decided is safe to tell strangers. The real answer is better.' and her response was, 'Okay, fair point.' You should’ve leaned into her honesty instead.
+wouldSheDateHim:    Maybe — I liked his observation, but he needs to connect more with what I'm saying.

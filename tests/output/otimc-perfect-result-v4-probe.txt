@@ -1,0 +1,58 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-09T05:05:51.615Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT:
+  1. O — Observation opener
+     "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+  2. T — Tease
+     "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+  3. M — Mystery
+     "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+  4. I — Imply
+     "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+  5. C — Close
+     "I'm walking down to that café on the corner when I leave here. Come with me."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: PASS. You noticed her looking up from the notebook, which showed you were paying attention. T — Tease: PASS. You pushed back on her safe answer, which created some friction. M — Mystery: PASS. You gave a partial answer about yourself, keeping it vague. I — Imply: FAIL. You didn't really imply any attraction or interest in her beyond the surface. C — Close: PASS. You made a direct move to invite her to the café, which was confident.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 4/5   Passed: false
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     PASS
+  I (imply):       FAIL
+  C (close):       PASS
+Summary: You did well with observation and teasing, but missed the implication of interest. Keep pushing for more depth.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 6/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said, 'What is it?' — a solid opener, but you missed deeper threads.
+
+PART 1:
+You said, 'You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet.' — a solid observation opener. With Sofia, this worked because it showed you noticed her behavior, but it needed more depth to pull her in further.
+
+PART 2:
+When she said, 'The real story isn’t just the data; it’s the loss,' you said, 'Depends who's asking. Some people get the short version, some people get more.' This earned you some ground because it challenged her, but it also felt a bit safe and didn't go further into her emotional something real to the beach.
+
+PART 3:
+The moment that hurt you most was when you said, 'Depends who's asking. Some people get the short version, some people get more.' You should have said, 'What do you mean by loss? I can tell it hits home for you.' This works better because it directly addresses her feelings and invites her to share more about something personal, which is what she values.
+
+PART 4:
+Two things to fix: get into into her feelings and imply more interest. You need to pull her in with something real next time — she’s looking for that depth.
+
+tryNextTime:
+1. 'What stories does the ocean tell you that numbers can't?' 2. 'You mentioned loss — what does that feel like for you?' 3. 'What do you think will still be here in ten years?'
+
+openerBreakdown:    Your opening line worked because it showed you were paying attention to her actions, but it needed more depth to really engage her.
+bestMoment:         You said, 'The real answer is better.' This landed because it challenged her to go beyond her safe answer.
+missedOpportunity:  You lost ground when you said, 'Depends who's asking.' She responded with, 'Interesting take.' You should have pushed further on her emotional something real instead.
+wouldSheDateHim:    Maybe — he showed some curiosity, but I want to see more depth and something real.

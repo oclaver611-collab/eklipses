@@ -43,7 +43,11 @@
       "PowerShell($body = '{\"text\":\"You already know what to say. You just need to stop being afraid to say it.\",\"characterId\":\"ryan\"}'; $resp = Invoke-WebRequest -Method POST -Uri \"https://eklipses.vercel.app/api/tts\" -Headers @{\"x-dev-key\"=\"ek_dev_2026\"} -ContentType \"application/json\" -Body $body; Write-Host \"Status:\" $resp.StatusCode; Write-Host \"Content-Type:\" $resp.Headers[\"Content-Type\"]; Write-Host \"Size:\" $resp.Content.Length)",
       "PowerShell($body = '{\"text\":\"You already know what to say. You just need to stop being afraid to say it.\",\"characterId\":\"ryan\"}'; try { $resp = Invoke-RestMethod -Method POST -Uri \"https://eklipses.vercel.app/api/tts\" -Headers @{\"x-dev-key\"=\"ek_dev_2026\"} -ContentType \"application/json\" -Body $body; Write-Host \"OK — got object back\" } catch { $err = $_.Exception.Response; $reader = New-Object System.IO.StreamReader\\($err.GetResponseStream\\(\\)\\); $body2 = $reader.ReadToEnd\\(\\); Write-Host \"Status:\" $err.StatusCode.value__; Write-Host \"Body:\" $body2 })",
       "PowerShell(Invoke-RestMethod -Uri \"https://eklipses.vercel.app/api/tts\" -Method POST -ContentType \"application/json\" -Body '{\"text\":\"Hey, how are you doing today?\",\"characterId\":\"sofia\"}' -OutFile \"test-fishaudio.mp3\")",
-      "PowerShell(findstr *)"
+      "PowerShell(findstr *)",
+      "PowerShell(cmd /c \"cd /d D:\\\\BUSINESS\\\\executables\\\\love\\\\eklipses\\\\EK7 && type player.js | findstr /n \".\"\" | Select-Object -Skip 1557)",
+      "PowerShell(cmd /c \"cd /d D:\\\\BUSINESS\\\\executables\\\\love\\\\eklipses\\\\EK7 && type player.js | findstr /n /r .\"\"\" | Select-Object -Skip 1557 -First 80)",
+      "PowerShell($lines = Get-Content \"D:\\\\BUSINESS\\\\executables\\\\love\\\\eklipses\\\\EK7\\\\player.js\"; $i = 1; foreach \\($line in $lines\\) { if \\($i -ge 1558 -and $i -le 1640\\) { \"$\\($i\\):$line\" }; $i++ })",
+      "PowerShell($rng = New-Object System.Security.Cryptography.RNGCryptoServiceProvider; $bytes = New-Object byte[] 20; $rng.GetBytes\\($bytes\\); $hex = \\($bytes | ForEach-Object { $_.ToString\\('x2'\\) }\\) -join ''; Write-Output $hex)"
     ]
   }
 }

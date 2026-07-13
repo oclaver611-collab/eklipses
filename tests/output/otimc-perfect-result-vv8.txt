@@ -1,0 +1,71 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-10T04:13:26.370Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+CONVERSATION TRANSCRIPT:
+  1. O — Observation opener
+     HIM:   "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+     SOFIA: "It's about what we lose and what that means for the community."
+  2. T — Tease
+     HIM:   "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+     SOFIA: "Maybe it's more about what's not here anymore."
+  3. M — Mystery
+     HIM:   "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+     SOFIA: "What’s your version?"
+  4. I — Imply
+     HIM:   "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+     SOFIA: "It’s easier that way, sometimes."
+  5. — Follow-up 1
+     HIM:   "Whatever it is — I think you already know."
+     SOFIA: "It’s like watching the tide come in, always shifting."
+  6. — Follow-up 2
+     HIM:   "You write about things disappearing. Most people find that depressing. You seem to find it worth paying attention to."
+     SOFIA: "I think if we don’t pay attention, we risk losing more than just the physical space."
+  7. C — Close
+     HIM:   "I'm walking down to that café on the corner when I leave here. Come with me."
+     SOFIA: "Walking — got it."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me walk you through the Lesson 1 skills — One Tequila Makes Ideas Click. For Observe, you opened strong with a real observation about her notebook and the water. For Tease, when she pushed back with 'You caught that, didn't you?' you didn't challenge her enough. You could have leaned into her comment about messiness. For Mystery, you kept it vague when she asked about your version, which worked well. For Imply, your line about her choosing words carefully hinted at interest without being direct, which is good. For Close, your invite to the café was too quick and lacked warmth, which made it feel flat. You need to build more before asking her to join you somewhere.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 3/5   Passed: false
+  O (observation): PASS
+  T (tease):       FAIL
+  M (mystery):     PASS
+  I (imply):       PASS
+  C (close):       FAIL
+Summary: You did well with observation and mystery, but teasing and closing need work. Let's tighten those up.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 6/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said, 'You keep glancing up from that notebook toward the water' — a solid opener, but you missed deeper threads.
+
+PART 1:
+You said, 'You keep glancing up from that notebook toward the water' — a solid observation opener. With Sofia, that gets her attention, but you need to follow up with something real to keep her connect.
+
+PART 2:
+When she said, 'The shoreline feels familiar, but it’s also unsettling to watch it shift,' you said, 'Depends who's asking. Some people get the short version, some people get more.' This missed a chance to get into into her feelings about the shoreline. She was opening up about something personal, and you redirected instead of exploring it.
+
+PART 3:
+The moment that hurt you most was when you said, 'Whatever it is — I think you already know.' Instead, you should have said, 'I’m curious what you think is worth saying.' This works better because it invites her to share more about her thoughts and feelings, which she values. It shows you're genuinely interested in her perspective, rather than just playing it safe.
+
+PART 4:
+Two things to fix: teasing her responses and closing with more warmth. You need to challenge her a bit more — she’s ready for it. Next time, lean into her insights and keep the conversation flowing.
+
+tryNextTime:
+1. I've been watching you from afar, and your solitude seems like a choice, not a circumstance - what's the difference between being alone and being lonely to you?
+2. The way you describe the shoreline, it's as if you're drawn to the impermanence of it - do you find comfort in the things that don't last?
+3. If the stories we tell are shaped by what's lost, what's the most significant thing you've lost, and how has it influenced the stories you tell about yourself?
+
+openerBreakdown:    See the feedback above.
+bestMoment:         See the feedback above.
+missedOpportunity:  See the feedback above.
+wouldSheDateHim:    Maybe. You had some real moments but needed to go further into what she opened.

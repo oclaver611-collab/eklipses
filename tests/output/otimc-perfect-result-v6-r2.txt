@@ -1,0 +1,60 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-09T06:07:43.854Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT:
+  1. O — Observation opener
+     "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+  2. T — Tease
+     "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+  3. M — Mystery
+     "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+  4. I — Imply
+     "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+  5. C — Close
+     "I'm walking down to that café on the corner when I leave here. Come with me."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: PASS. You noticed her glancing up and made it real. T — Tease: PASS. You pushed back on her safe answer, which created tension. M — Mystery: PASS. You gave a partial answer about yourself, keeping her curious. I — Imply: PASS. You hinted at interest by noticing her careful word choice. C — Close: FAIL. You invited her to join you but did it too soon and with a hedge.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 4/5   Passed: true
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     PASS
+  I (imply):       PASS
+  C (close):       FAIL
+Summary: You did well with observation and teasing, but the close fell flat. Keep pushing for stronger invites.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 7/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said, 'What is it?' — a solid opener that got her talking about something real.
+
+PART 1:
+You said she was writing about something she couldn't quite see yet — a solid opener. With Sofia, that got her talking about the shoreline and her feelings, which is a win. She needs something real to connect with, and you gave her that.
+
+PART 2:
+When she said, 'it's personal. I grew up here,' you said, 'Depends who's asking.' That moment cost you because she was opening up about her feelings, and you shifted the focus back to yourself. She wanted to share more, but you didn’t follow her lead.
+
+PART 3:
+The moment that hurt you most was when you said, 'Depends who's asking.' Instead, you should have said, 'Sounds like it’s a tough balance between personal and factual. What’s the hardest part for you?' This works better because it shows you care about her feelings and invites her to share more, which is what she wants.
+
+PART 4:
+Two things to fix: your timing on invites and following her threads more closely. You had a good moment when she opened up about her feelings — don’t let those slip away next time.
+
+tryNextTime:
+1. I've noticed the way the light reflects off the water here is unique, it's as if it's trying to tell a story of its own, what do you think it would say if it could speak?
+2. The shoreline's transformation over the years is a testament to the dynamic nature of this place, have you ever found solace in the constant change or do you find it unsettling?
+3. As someone who's grown up here, I'm curious, what's the one memory or spot on this beach that remains unchanged for you, a constant amidst all the shifts?
+
+openerBreakdown:    See the feedback above.
+bestMoment:         See the feedback above.
+missedOpportunity:  See the feedback above.
+wouldSheDateHim:    Maybe. You had some real moments but needed to go further into what she opened.

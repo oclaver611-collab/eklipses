@@ -15,7 +15,7 @@ module.exports = async function handler(req, res) {
   }
 
   async function callLLM(messages, maxTokens) {
-    const bodyBase = { max_tokens: maxTokens, messages, response_format: { type: 'json_object' } };
+    const bodyBase = { max_tokens: maxTokens, temperature: 0.1, messages, response_format: { type: 'json_object' } };
     if (process.env.GROQ_API_KEY) {
       try {
         const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -52,8 +52,13 @@ module.exports = async function handler(req, res) {
   };
   const characterLabel = CHARACTER_NAME_MAP[scenarioKey] || 'HER';
 
-  // Build transcript
-  const firstUserMsg = conversation.find(m => m.role === 'user');
+  // Build transcript — strip Sofia's final reply so the C-skill gate evaluates only
+  // his last message, not her reaction (model can't ignore a signal that's in context).
+  const evalConversation = conversation.at(-1)?.role === 'assistant'
+    ? conversation.slice(0, -1)
+    : conversation;
+
+  const firstUserMsg = evalConversation.find(m => m.role === 'user');
   const openerTrimmed = (opener || '').trim();
   const openerAlreadyFirst = !openerTrimmed || (firstUserMsg && firstUserMsg.content.trim() === openerTrimmed);
   const transcriptLines = [];
@@ -61,7 +66,7 @@ module.exports = async function handler(req, res) {
     transcriptLines.push(`HIM_1 (FIRST USER MESSAGE — their opening line): ${openerTrimmed}`);
   }
   let himCount = openerAlreadyFirst ? 0 : 1;
-  conversation.forEach(m => {
+  evalConversation.forEach(m => {
     if (m.role === 'user') {
       himCount++;
       const label = himCount === 1 ? 'HIM_1 (FIRST USER MESSAGE — their opening line)' : `HIM_${himCount}`;
@@ -254,7 +259,19 @@ Respond ONLY with valid JSON — no markdown, no preamble:
 {
   "score": <number 1-10>,
   "spokenSummary": "<One punchy sentence. Max 20 words. MUST quote or directly reference a specific line from the transcript — his words or her words. No general statements about confidence or effort.>",
-
+${lesson1Complete ? `  "lesson1Check": {
+    "skills": {
+      "observation": "<'PASS' or 'FAIL' — apply the strict mechanical criteria from the LESSON 1 EVALUATION section below>",
+      "tease": "<'PASS' or 'FAIL'>",
+      "mystery": "<'PASS' or 'FAIL'>",
+      "imply": "<'PASS' or 'FAIL'>",
+      "close": "<'PASS' or 'FAIL' — two-question gate only: Q1=direct invite present? Q2=hedge language present? Q1=YES and Q2=NO → PASS. Tone, warmth, timing, her reaction = irrelevant to this field.>"
+    },
+    "score": "<number 0-5, count of PASS>",
+    "passed": "<true if score >= 4, false otherwise>",
+    "summary": "<1-2 punchy sentences: 4-5 PASS = Lesson 1 skills applied well, 3 = Halfway there, 2 or fewer = Review and try again>"
+  },
+  "lesson1Eval": "<Spoken coaching paragraph — Ryan talking to the user. Start with 'Let me walk you through the Lesson 1 skills — One Tequila Makes Ideas Click.' Then describe each skill result conversationally, matching the PASS/FAIL verdicts already set in lesson1Check above. Do NOT format as 'O — Observation: PASS.' Instead speak it naturally: 'For Observe', 'For Tease', 'For Mystery', 'For Imply', 'For Close' — then say what happened and whether it worked. One or two coaching sentences per skill. For Close specifically: state the verdict that matches lesson1Check.skills.close, then you MAY add one optional coaching observation about delivery framing (e.g. 'the ask was there — next time lead with it more directly' or 'good invite, maybe let it breathe a beat longer before pulling the trigger'). That optional comment is color only — it must NOT contradict or re-open the verdict. This paragraph is spoken out loud — write it to be heard, not read off a form.>",` : ''}
   "part1": "<THE OPENER. Minimum 100 characters. Two to three sentences. First sentence: quote their exact opening line (HIM_1) verbatim inside quotes, followed by a dash, then name the move in 5 words or fewer. Second sentence: how it landed with ${girlName} specifically. Optional third sentence: what she registered. Example: 'You said \"hi\" — name-ask with nothing for her to grab. With ${girlName} that goes flat immediately — she needs something real before she gives you anything back.'>",
 
   "part2": "<THE MIDDLE. Minimum 150 characters. Two to three sentences. Quote the single most revealing exchange: 'When she said [exact ${girlName} quote], you said [exact HIM quote].' Then one to two sentences on what that exchange cost him or earned him with ${girlName}, specific to who she is. Be surgical — name exactly what she was responding to.>",
@@ -281,15 +298,16 @@ SCORING — 1-10 based on these qualities:
 - Avoiding validation-seeking (does he fish for approval, or just say what he means?)
 - Creating tension/intrigue (does she want to know more about him, or is he an open book?)
 
-SCORE TIERS — CALIBRATE TO THESE:
-1-3 (Bad): He was generic, approval-seeking, or said almost nothing real. A 1: barely spoke or was offensive. A 2: every message was a compliment or fishing for validation, no real questions asked. A 3: asked surface questions but showed zero genuine curiosity about her answers, no content of his own, no moment where he actually engaged with what she said.
-4-5 (Average): He showed up and had a real exchange. He asked at least one genuine question AND followed her thread at least once. Some things landed, some didn't. He wasn't chasing approval the whole time but wasn't memorable either. A 4: curious but clunky, missed most threads. A 5: showed real interest, had one good moment, but no tension created and no real pull.
-6-7 (Good): He asked real questions and followed her threads. He said something that made her respond with more than one sentence. He held his ground at least once. Something he said was real and showed he actually noticed her.
-8-10 (Excellent): She is still thinking about him. He created genuine pull — said things she didn't predict, held tension without filling every silence, made her work slightly for his approval instead of the other way around. A 10 means she'd cancel plans.
+SCORE BANDS — MATCH TO THE BAND THAT FITS THIS CONVERSATION:
+9-10 (Outstanding): Nearly flawless. Strong opener, followed every real thread, built tension, made her work for him, confident close. She is still thinking about him. A 10 means she'd cancel plans.
+7-8 (Solid): Good work with at least one clear misstep. Asked real questions, held his ground, had at least one moment that landed. But something slipped — a fold, a missed thread, a close that could have been stronger.
+5-6 (Mixed): Some good moments undercut by real mistakes. Maybe a decent opener followed by chasing her approval. Maybe curious but clunky — didn't hold his ground, missed the threads that mattered.
+3-4 (Struggled): Struggled with most skills. Generic openers, surface questions, approval-seeking, little to no tension. Had some exchanges but nothing stuck.
+1-2 (Little to no application): Little to no real engagement. Compliments without content, or barely spoke, or was off-putting.
 
-Score honestly. Do NOT apply a score floor. If someone was bad, they get a 2. If average, a 5.
+Score honestly. Do NOT apply a score floor. If someone was bad, they get a 2. If average, a 5. Do not default to 7 out of habit — score based on the specific band above that matches this conversation exactly.
 
-Score honestly from 1-10. Most sessions should score between 3-8. A 7+ requires genuinely strong opener, good thread-following, and a successful close attempt. A 4 means average with missed opportunities. Only give 4 if that accurately describes this specific conversation — do not default to 4.
+LESSON 1 SKILL FAILURES AFFECT SCORE: If this is a Lesson 1 session (lesson1Complete=true) and the user failed any Lesson 1 skill, cap the score at 7, even if the rest of the conversation was strong. A session where all 5 skills pass AND the execution was excellent can reach 8-9. A session with 1+ skill FAIL should not score above 7 regardless of how good the other turns felt.
 
 BANNED PHRASES AND WORDS — if any of these appear anywhere in your output, rewrite that sentence:
 "Right, so here's where", "Now watch this moment", "Now here's the thing", "So — putting it all together",
@@ -313,32 +331,38 @@ RULES:
 - ALL card fields must be filled. No empty strings, no null.${lesson1Complete ? `
 
 LESSON 1 EVALUATION — One Tequila Makes Ideas Click:
-The user has completed Lesson 1. Score them on these 5 specific skills:
+The user has completed Lesson 1. Score them on these 5 skills using the exact definitions below. Read each definition carefully — the CRITICAL notes override your default assumptions.
 
-O — Observation opener: Did they open with something specific they noticed? (not a generic compliment)
-T — Tease: Did they push back playfully when she challenged them?
-M — Mystery: Did they answer personal questions vaguely and comfortably, without over-explaining?
-I — Imply: Did they use implication when she created an opening?
-C — Close: Did they ask directly and naturally when she signaled interest?
+O — Observation opener: Did they open with something specific they NOTICED about her — not a compliment about her appearance?
+PASS = says something only someone genuinely paying attention would notice (her behavior, what she's doing, something real about her in that moment).
+FAIL = "you look nice", "hey how's your day", "nice weather", or anything generic that could be said to anyone anywhere.
 
-Add TWO fields to your JSON response:
+T — Tease / Playful challenge: When she pushed back, challenged him, or gave a short answer — did he hold his frame and push back, or did he fold?
+PASS = doesn't go along with everything, creates small friction, notices something she didn't expect, stays in the same tone without apologizing.
+FAIL = apologizes ("I didn't mean to offend you"), caves immediately, says "you seem really cool" to recover, or just agrees with her.
 
-1. "lesson1Eval" — a spoken paragraph read aloud before the regular feedback. Format exactly like this (fill in the bracketed parts):
-"Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: [PASS or FAIL — one sentence on what they did or didn't do]. T — Tease: [PASS or FAIL — one sentence]. M — Mystery: [PASS or FAIL — one sentence]. I — Imply: [PASS or FAIL — one sentence]. C — Close: [PASS or FAIL — one sentence]."
+M — Mystery / Own your mystery: When she asked a personal question (job, what he does, where he's from, why he's there) — did he answer without giving everything away?
+PASS = partial answer that reveals something real but leaves her wanting more. Short or vague answers that stay comfortable are correct Mystery technique. Example of PASS: "Depends who's asking — some people get the short version, some get more. You're somewhere in between." Example of PASS: answering what a job gives him rather than what the job is.
+FAIL = full resume in one message (lists job title, years of experience, city he moved from, hobbies, everything at once).
+CRITICAL: A short or evasive answer that withholds details IS the correct Mystery move. Do NOT mark M as FAIL just because he didn't give a clear or full explanation — withholding IS the point.
 
-2. "lesson1Check" — for certification tracking:
-{
-  "skills": {
-    "observation": "PASS" or "FAIL",
-    "tease": "PASS" or "FAIL",
-    "mystery": "PASS" or "FAIL",
-    "imply": "PASS" or "FAIL",
-    "close": "PASS" or "FAIL"
-  },
-  "score": <number 0-5, count of PASS>,
-  "passed": <true if score >= 4, false otherwise>,
-  "summary": "<1-2 punchy sentences: 4-5 PASS = Lesson 1 skills applied well, 3 = Halfway there, 2 or fewer = Review and try again>"
-}` : ''}`;
+I — Imply / Verbal spike: Did he communicate romantic interest or attraction through SUBTEXT rather than stating it directly?
+PASS = a line that makes her feel what he means without him announcing it — a real observation about her that signals he finds something specific about her interesting, OR a line that implies where the conversation is going without stating it outright. Example of PASS: "You looked like someone completely fine being alone. Not lonely. Just present. You don't see that often." Example of PASS: "I'm curious whether you want to find out." Example of PASS: "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding." — this implies she is deciding something about him, which is subtext for romantic interest. The gap between what he says and what he means is where this skill lives.
+FAIL = states it directly with no subtext: "I think you're really attractive and I'd like to ask you out."
+CRITICAL: Implication can be about the CONVERSATION'S DIRECTION, not only about himself. Any line that creates tension or suggests something without saying it counts. Do NOT fail Imply just because the line does not use the word "attraction" or "interest" — subtext by definition avoids stating those things directly.
+
+C — Close / Direct comfortable close:
+EVALUATION METHOD: Two questions about his LAST message only. Ignore all prior messages and her responses entirely.
+Question 1: Does his last message make a direct move to continue — invite to a café/bar/walk, ask for her number, or suggest meeting again? If NO → FAIL. If YES → go to Question 2.
+Question 2: Does that move include hedge language — "no pressure", "only if you want", "maybe", "if you're interested", "I don't know", "if you feel like it", or any similar qualifier that softens or hands the decision back? If YES → FAIL. If NO → PASS.
+That is the complete verdict for lesson1Check.skills.close. Stop here. Do not read the conversation context. Do not assess whether she seemed receptive. Do not assess timing, warmth, or build-up.
+PASS examples: "Come with me." = PASS. "Come get a coffee with me." = PASS. "I'm walking down to that café on the corner when I leave here. Come with me." = PASS. "Want to grab coffee?" = PASS. "Give me your number." = PASS.
+FAIL examples: "We should hang out sometime, no pressure." = FAIL (hedge). "Maybe we could grab coffee if you want?" = FAIL (hedge). [conversation ends with no direct invite] = FAIL.
+
+ANTI-FABRICATION RULE for lesson1Eval:
+You are describing what happened in THIS specific conversation from the transcript above. When writing the lesson1Eval sentences, only put words in quotation marks if you are copying them VERBATIM from the transcript. If you are not certain of the exact wording, describe what happened without using quotes — paraphrase instead of quoting. Do not invent lines that she said or that he said.
+
+These fields (lesson1Eval and lesson1Check) are already part of the JSON schema above — fill them based on the criteria and definitions above.` : ''}`;
 
   try {
     const mainMessages = [
@@ -346,7 +370,7 @@ Add TWO fields to your JSON response:
       { role: 'user', content: `Scenario: ${scenarioTitle}\n\nHIS OPENING LINE (HIM_1): "${conversation.find(m => m.role === 'user')?.content?.trim() || ''}"\n\nFull conversation transcript:\n${transcript}\n\nREMINDER: part1 must NAME and JUDGE the move — do NOT quote HIM_1 back verbatim.` },
     ];
     let raw;
-    try { raw = await callLLM(mainMessages, 2000); }
+    try { raw = await callLLM(mainMessages, 5000); }
     catch (llmErr) { return res.status(500).json({ error: llmErr.message }); }
     let feedback;
     try {
@@ -359,7 +383,7 @@ Add TWO fields to your JSON response:
         { role: 'user', content: `Scenario: ${scenarioTitle}\n\nHIS OPENING LINE (HIM_1): "${conversation.find(m => m.role === 'user')?.content?.trim() || ''}"\n\nFull conversation transcript:\n${transcript}\n\nREMINDER: part1 must NAME and JUDGE the move — do NOT quote HIM_1 back verbatim.\n\nCRITICAL: Return ONLY valid JSON. No markdown, no backticks, no preamble. Start with { and end with }.` },
       ];
       try {
-        const retryRaw = await callLLM(retryMessages, 2000);
+        const retryRaw = await callLLM(retryMessages, 5000);
         feedback = JSON.parse(retryRaw);
       } catch(retryErr) {
         return res.status(500).json({ error: 'JSON parse failed after retry: ' + retryErr.message });
@@ -376,6 +400,48 @@ Add TWO fields to your JSON response:
         else if (field === 'spokenSummary') feedback[field] = 'You showed up and had a real conversation — now make it sharper.';
         else if (field === 'part1') feedback[field] = 'You showed up. That is the first step. Now let\'s look at what happened.';
         else feedback[field] = 'See the feedback above.';
+      }
+    }
+
+    // Warn if lesson1 fields are missing when they should be present
+    if (lesson1Complete) {
+      if (!feedback.lesson1Eval || feedback.lesson1Eval.length < 10) console.warn('[coach] lesson1Eval missing despite lesson1Complete=true');
+      if (!feedback.lesson1Check || !feedback.lesson1Check.skills) console.warn('[coach] lesson1Check missing despite lesson1Complete=true');
+
+      if (feedback.lesson1Check?.skills) {
+        // Server-side C verdict: two-question mechanical gate overrides LLM judgment.
+        // LLM consistently applies holistic/tone criteria despite prompt instructions.
+        const lastUserMsg = [...conversation].reverse().find(m => m.role === 'user')?.content?.trim() || '';
+        if (!lastUserMsg) {
+          feedback.lesson1Check.skills.close = 'FAIL';
+        } else {
+          const msgLower = lastUserMsg.toLowerCase();
+          const hedgeWords = [
+            'no pressure', 'if you want', "if you're interested", 'if you feel like',
+            "i don't know", 'i dont know', 'just if', 'or whatever',
+            'maybe we', 'maybe if', 'sometime', 'at some point', 'whenever you',
+          ];
+          const invitePatterns = [
+            /\bcome\b/i, /\blet'?s\b/i, /\bjoin me\b/i, /\bmeet me\b/i, /\bmeet up\b/i,
+            /\bgrab\b/i, /\bget\s+\w*\bcoffee\b/i, /\bget\s+a?\s*drink\b/i,
+            /\bgive me your number\b/i, /\bwalk with me\b/i, /\btext me\b/i,
+            /\bwant to\s+(?:grab|get|come)\b/i, /\bcall me\b/i,
+          ];
+          const hasHedge = hedgeWords.some(hw => msgLower.includes(hw));
+          const hasInvite = invitePatterns.some(p => p.test(lastUserMsg));
+          if (hasHedge) {
+            feedback.lesson1Check.skills.close = 'FAIL';
+          } else if (hasInvite) {
+            feedback.lesson1Check.skills.close = 'PASS';
+          }
+          // else: no invite and no hedge — keep LLM verdict
+        }
+
+        // Recompute score and passed after C override
+        const skills = feedback.lesson1Check.skills;
+        const passCount = ['observation','tease','mystery','imply','close'].filter(k => skills[k] === 'PASS').length;
+        feedback.lesson1Check.score = passCount;
+        feedback.lesson1Check.passed = passCount >= 4;
       }
     }
 
@@ -439,8 +505,14 @@ Add TWO fields to your JSON response:
 
     // Clamp score to valid range — no floor, honest scoring
     feedback.score = Math.min(10, Math.max(1, Math.round(Number(feedback.score) || 5)));
-    // gpt-4o-mini scores too harshly — apply +1 correction for scores below 7
-    if (feedback.score < 7) feedback.score = Math.min(7, feedback.score + 1);
+    // Enforce score cap: any lesson1 skill FAIL → max 7
+    if (lesson1Complete && feedback.lesson1Check?.skills) {
+      const hasAnyFail = ['observation','tease','mystery','imply','close'].some(k => feedback.lesson1Check.skills[k] === 'FAIL');
+      if (hasAnyFail && feedback.score > 7) {
+        feedback.score = 7;
+        console.log('[coach] score capped at 7 due to lesson1 skill FAIL');
+      }
+    }
     console.log(`[coach] score=${feedback.score}`);
 
     // Post-process — guaranteed banned phrase removal

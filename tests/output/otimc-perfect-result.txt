@@ -1,0 +1,58 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-08T19:04:56.779Z
+URL:     https://eklipses.vercel.app
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT:
+  1. O — Observation opener
+     "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+  2. T — Tease
+     "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+  3. M — Mystery
+     "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+  4. I — Imply
+     "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+  5. C — Close
+     "I'm walking down to that café on the corner when I leave here. Come with me."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: You passed because your opening line showed you noticed something about me before we started talking. T — Tease: You passed when you slightly challenged my initial response, showing you can playfully push back. M — Mystery: You failed because when I asked you to share more about digging deeper, you didn't give a clear, personal example. I — Imply: You failed because you didn't imply much about yourself or your interests beyond the surface. C — Close: You failed because your invite to the café felt abrupt and didn't naturally follow from the conversation.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 2/5   Passed: false
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     FAIL
+  I (imply):       FAIL
+  C (close):       FAIL
+Summary: You're halfway there with observing and teasing, but need to work on mystery, implying, and closing.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 7/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: 'You caught me' — Sofia gave you something real.
+
+PART 1:
+You said something that noticed her, a move I'd call 'noticing her gaze'. It landed well with Sofia because she responded with more than just a yes or no. She seemed to register that you were paying attention to what she was doing before you even talked to her.
+
+PART 2:
+When she said 'It feels a lot more complicated than that when you see it in person', you said 'That sounds like the version you've decided is safe to tell strangers. The real answer is better.' This exchange earned you some ground with Sofia because she appreciated that you didn't take her surface-level answer at face value. She was responding to your pushback, showing she's willing to connect in a more meaningful conversation.
+
+PART 3:
+The moment that hurt you most was when you said 'I'm walking down to that café on the corner when I leave here. Come with me.' A better line could have been 'What's the best way to keep exploring this shoreline change you're writing about?' This works better with Sofia because it shows you're genuinely interested in what she's working on and willing to listen more, rather than rushing into a casual invite.
+
+PART 4:
+Two things to fix: assuming she's interested in going somewhere just because you are, and not giving her enough space to share more about her article. Next time, try again, you got this.
+
+tryNextTime:
+1. Ask her about the most significant shoreline change she's observed. 2. Share a personal story about why coastal ecology matters to you. 3. Ask what she hopes people take away from her article about the shoreline.
+
+openerBreakdown:    Your opening line worked because it showed you noticed something particular about her behavior before talking to her.
+bestMoment:         When you said 'That sounds like the version you've decided is safe to tell strangers. The real answer is better' — it landed because you slightly challenged her, and she responded positively to that.
+missedOpportunity:  When Sofia said 'Let’s see if you earn it. What’s your version of go further into?' and you didn't share something personal or a story, you missed a chance to create a mutual sharing moment. Instead, you should have shared a brief story about your own experience with go further into into a topic.
+wouldSheDateHim:    Maybe, I liked when he pushed back and showed he wasn't satisfied with a surface-level answer.

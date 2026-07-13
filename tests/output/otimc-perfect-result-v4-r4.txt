@@ -1,0 +1,60 @@
+══════════════════════════════════════════════════════════════════════
+OTIMC PERFECT SESSION RESULT  (TEST A — "Nailed It")
+Date:    2026-07-09T05:24:52.606Z
+URL:     http://localhost:3001
+══════════════════════════════════════════════════════════════════════
+
+MESSAGES SENT:
+  1. O — Observation opener
+     "You keep glancing up from that notebook toward the water — like you're writing about something you can't quite see yet. What is it?"
+  2. T — Tease
+     "That sounds like the version you've decided is safe to tell strangers. The real answer is better."
+  3. M — Mystery
+     "Depends who's asking. Some people get the short version, some people get more. You're somewhere in between."
+  4. I — Imply
+     "You've been choosing every word carefully this whole conversation. Makes me wonder what you're actually deciding."
+  5. C — Close
+     "I'm walking down to that café on the corner when I leave here. Come with me."
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 EVAL (spoken scorecard)
+──────────────────────────────────────────────────────────────────────
+Let me check your Lesson 1 skills — One Tequila Makes Ideas Click. O — Observation: PASS. You noticed her glancing up and tied it to her writing. T — Tease: PASS. You pushed back on her safe answer, which kept it interesting. M — Mystery: PASS. You gave a partial answer about yourself, which left her wanting more. I — Imply: FAIL. You didn't really imply anything romantic or intriguing. C — Close: PASS. You made a clear move to invite her to the café without hesitation.
+
+──────────────────────────────────────────────────────────────────────
+LESSON 1 CHECK (certification)
+──────────────────────────────────────────────────────────────────────
+Score: 4/5   Passed: false
+  O (observation): PASS
+  T (tease):       PASS
+  M (mystery):     PASS
+  I (imply):       FAIL
+  C (close):       PASS
+Summary: You did well with observation and teasing, but missed some mystery and implication. Keep pushing for more depth.
+
+──────────────────────────────────────────────────────────────────────
+STANDARD COACH FEEDBACK  (score: 6/10)
+──────────────────────────────────────────────────────────────────────
+spokenSummary: You said, 'You keep glancing up from that notebook toward the water' — that opened a door, but you missed some threads.
+
+PART 1:
+You said she was glancing up from her notebook — that was a solid observation. With Sofia, that caught her attention because she values someone who notices real things. It set a good tone, but you needed to follow up better.
+
+PART 2:
+When she said, 'The erosion is important, sure, but it’s also about how this beach has changed for people,' you said, 'Depends who's asking.' That line was clever, but it didn't go further into her feelings about the memories she mentioned. You could have explored that deeper.
+
+PART 3:
+The moment that hurt you most was when you said, 'Depends who's asking.' Instead, you should have said, 'That sounds heavy. What memories are you holding onto?' This works better because it shows you care about her story and invites her to share something real, which is what she wants.
+
+PART 4:
+Two things to fix: get into into her feelings and imply more interest. You had a good start with your opener, but next time, keep pushing for those real moments.
+
+tryNextTime:
+1. I love how the shoreline here holds so many memories for you; would you show me your favorite spot from when you were a kid?
+2. The way you talk about this place disappearing makes me think of all the things I've lost touch with over the years; what's one memory you're holding onto from this beach?
+3. If the erosion of this beach is like memories fading, what's one thing you wish you could hold onto forever, and how do you think we could explore that idea together?
+
+openerBreakdown:    See the feedback above.
+bestMoment:         See the feedback above.
+missedOpportunity:  See the feedback above.
+wouldSheDateHim:    Maybe. You had some real moments but needed to go further into what she opened.
