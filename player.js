@@ -1419,7 +1419,7 @@ function showListening(on=true) {
 //   SILENCE_LONG  = 1800ms — fires otherwise (mid-thought, comma pause, etc.)
 function listenForUser(mySession, maxTotalMs) {
   _lastInputMode = getInputMode();
-  if (_lastInputMode === 'type') return listenForUserType(mySession, maxTotalMs);
+  if (_lastInputMode === 'type') return listenForUserType(mySession);
   if (typeof window !== 'undefined' && window._testMode) return Promise.resolve(null);
   return new Promise(resolve=>{
     maxTotalMs=maxTotalMs||30000;
@@ -1546,7 +1546,10 @@ function listenForUser(mySession, maxTotalMs) {
 
 
 /* ===== Type-mode listener — resolves when user submits text ===== */
-function listenForUserType(mySession, maxTotalMs) {
+// No per-turn timeout in type mode — the input stays open until the user submits.
+// Session termination (7-min timer, stopEverything) is handled by the sessionPoll
+// which fires when mySession !== session.
+function listenForUserType(mySession) {
   return new Promise(resolve => {
     const wrap = document.getElementById('type-input-wrap');
     const field = document.getElementById('type-input-field');
@@ -1566,7 +1569,6 @@ function listenForUserType(mySession, maxTotalMs) {
       field.removeEventListener('keydown', onKey);
       field.removeEventListener('input', onInput);
       clearInterval(sessionPoll);
-      clearTimeout(hardTimer);
     }
 
     function submit() {
@@ -1596,10 +1598,6 @@ function listenForUserType(mySession, maxTotalMs) {
         if (!resolved) { resolved = true; cleanup(); resolve(null); }
       }
     }, 500);
-
-    const hardTimer = setTimeout(() => {
-      if (!resolved) { resolved = true; cleanup(); resolve(null); }
-    }, maxTotalMs || 30000);
   });
 }
 
