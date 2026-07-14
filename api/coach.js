@@ -298,14 +298,16 @@ SCORING — 1-10 based on these qualities:
 - Avoiding validation-seeking (does he fish for approval, or just say what he means?)
 - Creating tension/intrigue (does she want to know more about him, or is he an open book?)
 
-SCORE BANDS — MATCH TO THE BAND THAT FITS THIS CONVERSATION:
-9-10 (Outstanding): Nearly flawless. Strong opener, followed every real thread, built tension, made her work for him, confident close. She is still thinking about him. A 10 means she'd cancel plans.
-7-8 (Solid): Good work with at least one clear misstep. Asked real questions, held his ground, had at least one moment that landed. But something slipped — a fold, a missed thread, a close that could have been stronger.
-5-6 (Mixed): Some good moments undercut by real mistakes. Maybe a decent opener followed by chasing her approval. Maybe curious but clunky — didn't hold his ground, missed the threads that mattered.
-3-4 (Struggled): Struggled with most skills. Generic openers, surface questions, approval-seeking, little to no tension. Had some exchanges but nothing stuck.
-1-2 (Little to no application): Little to no real engagement. Compliments without content, or barely spoke, or was off-putting.
+SCORE BANDS — use the anchor that best matches this conversation:
+10: Flawless execution. Every skill applied with precision, timing, and ease. She'd cancel plans.
+8-9: All 5 skills demonstrated well. Strong opener, tease landed, mystery held, imply worked, close was clean. One minor rough edge allowed.
+6-7: Decent opener, attempted most skills, close was attempted even if imperfect. Real moments but also real misses.
+4-5: Weak opener OR missed 3+ skills. Had some exchanges but the conversation felt flat or approval-seeking overall.
+1-3: Generic opener, no tease, no mystery, no imply, no close. Little to no real engagement. Compliments without content, or barely spoke.
 
-Score honestly. Do NOT apply a score floor. If someone was bad, they get a 2. If average, a 5. Do not default to 7 out of habit — score based on the specific band above that matches this conversation exactly.
+SCORE FLOOR RULE: If the user opened with something specific they noticed (anything that references the scene, what she's doing, or her environment) AND attempted a close at any point — minimum score is 5. It takes multiple critical failures across most skills to score below 4.
+
+Do not default to 7 out of habit — score based on the specific band above. A 4 requires the conversation to have been largely ineffective across most dimensions, not just one missed skill.
 
 LESSON 1 SKILL FAILURES AFFECT SCORE: If this is a Lesson 1 session (lesson1Complete=true) and the user failed any Lesson 1 skill, cap the score at 7, even if the rest of the conversation was strong. A session where all 5 skills pass AND the execution was excellent can reach 8-9. A session with 1+ skill FAIL should not score above 7 regardless of how good the other turns felt.
 
@@ -333,9 +335,10 @@ RULES:
 LESSON 1 EVALUATION — One Tequila Makes Ideas Click:
 The user has completed Lesson 1. Score them on these 5 skills using the exact definitions below. Read each definition carefully — the CRITICAL notes override your default assumptions.
 
-O — Observation opener: Did they open with something specific they NOTICED about her — not a compliment about her appearance?
-PASS = says something only someone genuinely paying attention would notice (her behavior, what she's doing, something real about her in that moment).
-FAIL = "you look nice", "hey how's your day", "nice weather", or anything generic that could be said to anyone anywhere.
+O — Observation opener: Did they open with something specific they NOTICED about the scene — her behavior, what she's doing, what she's holding, or something in the environment?
+PASS = ANY reference to something real and present: "what a beautiful book", "what are you writing", "that looks intense", "what are you working on", a comment on what she's reading or doing, or something about the environment they both share. A question that references what she's holding or doing IS a passing observation — it proves they were paying attention. The opener does not need to be a statement; a question that references the scene counts equally.
+FAIL = ONLY two cases: (1) a compliment about her appearance with no scene reference ("you look beautiful", "you're so pretty", "nice smile"), OR (2) a completely generic opener with zero scene reference ("hey", "how's your day", "nice weather", "can I sit here" with nothing else following it). If the opener mentions ANYTHING specific they noticed — it passes.
+CRITICAL: Do NOT fail O because the opener is phrased as a question. "What are you writing?" = PASS. "What a beautiful book, where did you get it?" = PASS. "That looks like a heavy read" = PASS. Any opener that proves the user noticed something real about her or her surroundings = PASS.
 
 T — Tease / Playful challenge: When she pushed back, challenged him, or gave a short answer — did he hold his frame and push back, or did he fold?
 PASS = doesn't go along with everything, creates small friction, notices something she didn't expect, stays in the same tone without apologizing.
