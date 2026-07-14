@@ -335,10 +335,26 @@ RULES:
 LESSON 1 EVALUATION — One Tequila Makes Ideas Click:
 The user has completed Lesson 1. Score them on these 5 skills using the exact definitions below. Read each definition carefully — the CRITICAL notes override your default assumptions.
 
-O — Observation opener: Did they open with something specific they NOTICED about the scene — her behavior, what she's doing, what she's holding, or something in the environment?
-PASS = ANY reference to something real and present: "what a beautiful book", "what are you writing", "that looks intense", "what are you working on", a comment on what she's reading or doing, or something about the environment they both share. A question that references what she's holding or doing IS a passing observation — it proves they were paying attention. The opener does not need to be a statement; a question that references the scene counts equally.
-FAIL = ONLY two cases: (1) a compliment about her appearance with no scene reference ("you look beautiful", "you're so pretty", "nice smile"), OR (2) a completely generic opener with zero scene reference ("hey", "how's your day", "nice weather", "can I sit here" with nothing else following it). If the opener mentions ANYTHING specific they noticed — it passes.
-CRITICAL: Do NOT fail O because the opener is phrased as a question. "What are you writing?" = PASS. "What a beautiful book, where did you get it?" = PASS. "That looks like a heavy read" = PASS. Any opener that proves the user noticed something real about her or her surroundings = PASS.
+O — Observation opener: Did they reference something specific they noticed about the scene — her behavior, what she's doing, what she's holding, or the environment — at any point in their first 3 messages?
+WINDOW RULE: O does not have to be the literal first line. If the user's first message was generic but they referenced what she was doing in their 2nd or 3rd message, O = PASS. Scan the first 3 user messages before deciding.
+
+PASS examples — these all score PASS, no exceptions:
+- "I noticed you are writing" = PASS
+- "what are you writing?" = PASS
+- "you look like a writer" = PASS
+- "that looks intense, novel or journal?" = PASS
+- "what a beautiful book" = PASS
+- "are you working on something?" = PASS
+- ANY opener that mentions writing, books, reading, what she is doing, the beach, the coffee shop, the notebook, or any element of the physical scene = PASS
+
+FAIL examples — these and only these score FAIL:
+- "you are beautiful" = FAIL (appearance, no scene reference)
+- "hey" = FAIL (zero content)
+- "wow you are italian right?" = FAIL (appearance guess, no scene reference)
+- "nice smile" = FAIL (appearance, no scene reference)
+- A first message that is purely generic AND no scene reference appears in messages 2 or 3 = FAIL
+
+CRITICAL OVERRIDE: If the user says ANYTHING about writing, books, what she's reading, what she's working on, or any physical detail of the scene in their first 3 messages — O = PASS. Do not fail O if scene-referencing language appears anywhere in the first 3 exchanges. A question about what she's doing counts exactly as much as a statement.
 
 T — Tease / Playful challenge: When she pushed back, challenged him, or gave a short answer — did he hold his frame and push back, or did he fold?
 PASS = doesn't go along with everything, creates small friction, notices something she didn't expect, stays in the same tone without apologizing.
