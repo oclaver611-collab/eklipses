@@ -1,20 +1,17 @@
 // ===================================================================
-// Eklipses — Lesson Player Module  (v2 — audio_v2 manifest system)
-// Handles LEARN tab, Lesson 1 player, completion, certification
+// Eklipses — Lesson Player Module  (v3 — multi-lesson)
+// Handles LEARN tab, Lesson 1 + Lesson 2 players, completion
 // ===================================================================
 (function () {
   'use strict';
 
-  const WORKER_BASE  = 'https://eklipses-lesson-audio.oclaver611.workers.dev';
-  const R2_BASE      = 'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev';
-  const SOFIA_IDLE   = R2_BASE + '/sofia_idle.mp4';
-  const SOFIA_SPEAK  = R2_BASE + '/sofia_speaking.mp4';
+  const WORKER_BASE = 'https://eklipses-lesson-audio.oclaver611.workers.dev';
+  const R2_BASE     = 'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev';
+  const SOFIA_IDLE  = R2_BASE + '/sofia_idle.mp4';
+  const SOFIA_SPEAK = R2_BASE + '/sofia_speaking.mp4';
 
-  const LS_PROGRESS  = 'eklipses_lesson1_progress';
-  const LS_COMPLETE  = 'eklipses_lesson1_complete';
-  const LS_CERT      = 'eklipses_lesson1_certification';
-
-  const SEGMENTS = [
+  // ── Lesson 1 segment list (navigation order) ──────────────────────
+  const SEGMENTS1 = [
     { id:'00',  title:'Welcome' },
     { id:'01',  title:'The Lesson' },
     { id:'02',  title:'Before The Approach' },
@@ -33,10 +30,91 @@
     { id:'13',  title:'Your Five Steps' },
   ];
 
-  // ── localStorage helpers ───────────────────────────────────────────
+  // ── Lesson 2 segment list ─────────────────────────────────────────
+  const SEGMENTS2 = [
+    { id:'00', title:'Welcome' },
+    { id:'01', title:'What FRAME Is' },
+    { id:'02', title:'Before the Test' },
+    { id:'03', title:'Watch — The Test' },
+    { id:'04', title:'F — Feel Nothing' },
+    { id:'05', title:'Watch — The Reframe' },
+    { id:'06', title:'R — Reframe' },
+    { id:'07', title:'Watch — The Humor' },
+    { id:'08', title:'A — Add Humor' },
+    { id:'09', title:'Watch — The Qualification' },
+    { id:'10', title:'M — Make Her Qualify' },
+    { id:'11', title:'Watch — The Exit' },
+    { id:'12', title:'E — Exit' },
+    { id:'13', title:'Your Five Steps' },
+  ];
+
+  // ── Lesson config ─────────────────────────────────────────────────
+  const LESSONS = {
+    lesson1: {
+      id:           'lesson1',
+      workerPrefix: '',               // backwards compat: no prefix → lesson1/audio_v2
+      lsProgress:   'eklipses_lesson1_progress',
+      lsComplete:   'eklipses_lesson1_complete',
+      lsCert:       'eklipses_lesson1_certification',
+      segments:     SEGMENTS1,
+      title:        'The Approach',
+      completionSub: '"The Approach" — 5 principles mastered.',
+      completionBody: 'Now put it into practice. The avatars are waiting — and they know exactly what you should be doing.',
+      steps: [
+        'The observation opener',
+        'Playful challenge',
+        'Own your mystery',
+        'The verbal spike',
+        'The natural close',
+      ],
+      mnemonicPhrase: 'One Tequila Makes Ideas Click',
+      mnemonicMap: [
+        { word:'One',     meaning:'Observe something specific' },
+        { word:'Tequila', meaning:'Tease playfully' },
+        { word:'Makes',   meaning:"Mystery — don't give it all away" },
+        { word:'Ideas',   meaning:'Imply your interest' },
+        { word:'Click',   meaning:'Close naturally' },
+      ],
+    },
+    lesson2: {
+      id:           'lesson2',
+      workerPrefix: 'lesson2/',       // file=lesson2/ryan_seg00.mp3 → R2: lessons/lesson2/audio/
+      lsProgress:   'eklipses_lesson2_progress',
+      lsComplete:   'eklipses_lesson2_complete',
+      lsCert:       null,
+      segments:     SEGMENTS2,
+      title:        'Holding Your Ground',
+      completionSub: '"Holding Your Ground" — FRAME mastered.',
+      completionBody: 'You know how to hold your ground when things get uncomfortable. Every test asks the same question — who are you under pressure?',
+      steps: [
+        'F — Feel Nothing: stay still when she tests you',
+        'R — Reframe: flip her framing without arguing',
+        'A — Add Humor: deflect with ease, not defense',
+        'M — Make Her Qualify: stay curious, push deeper',
+        'E — Exit: decision-makers leave first',
+      ],
+      mnemonicPhrase: 'FRAME',
+      mnemonicMap: [
+        { word:'F', meaning:'Feel Nothing — stay still under pressure' },
+        { word:'R', meaning:'Reframe — offer a different way to see it' },
+        { word:'A', meaning:"Add Humor — don't defend, just deflect" },
+        { word:'M', meaning:'Make Her Qualify — stay curious, push deeper' },
+        { word:'E', meaning:'Exit — decision-makers leave first' },
+      ],
+    },
+  };
+
+  // Backwards-compat alias so existing callers work
+  const LS_PROGRESS = 'eklipses_lesson1_progress';
+  const LS_COMPLETE = 'eklipses_lesson1_complete';
+  const LS_CERT     = 'eklipses_lesson1_certification';
+  const SEGMENTS    = SEGMENTS1; // used by public API callers
+
+  // ── localStorage helpers ──────────────────────────────────────────
   function lsGet(key, def) { try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : def; } catch { return def; } }
   function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
 
+  // ── Cert (lesson 1 only) ──────────────────────────────────────────
   function getCert() {
     const raw = lsGet(LS_CERT, null);
     if (raw) return raw;
@@ -47,12 +125,18 @@
   }
   function saveCert(obj) { lsSet(LS_CERT, obj); }
 
-  // ── Public API ─────────────────────────────────────────────────────
+  // ── Per-lesson helpers ────────────────────────────────────────────
+  let _currentLessonId = 'lesson1';
+  function currentLesson()    { return LESSONS[_currentLessonId] || LESSONS.lesson1; }
+  function currentSegments()  { return currentLesson().segments; }
+
+  // ── Public API ────────────────────────────────────────────────────
   window.LessonPlayer = {
-    isComplete:          () => lsGet(LS_COMPLETE, null) === true,
-    getProgress:         () => lsGet(LS_PROGRESS, null),
-    getCertForCharacter: (charId) => { const c = getCert(); return c[charId] || { attempts:0, passed:0, certified:false }; },
-    recordCoachResult:   (charId, passed) => {
+    isComplete:           () => lsGet(LS_COMPLETE, null) === true,
+    isLesson2Complete:    () => lsGet('eklipses_lesson2_complete', null) === true,
+    getProgress:          () => lsGet(LS_PROGRESS, null),
+    getCertForCharacter:  (charId) => { const c = getCert(); return c[charId] || { attempts:0, passed:0, certified:false }; },
+    recordCoachResult:    (charId, passed) => {
       const cert = getCert();
       if (!cert[charId]) cert[charId] = { attempts:0, passed:0, certified:false };
       cert[charId].attempts++;
@@ -65,13 +149,13 @@
     renderLearnTab:  renderLearnTab,
   };
 
-  // ── Tab management ─────────────────────────────────────────────────
+  // ── Tab management ────────────────────────────────────────────────
   function switchTab(tab) {
-    const learnTab   = document.getElementById('ek-learn-tab');
+    const learnTab    = document.getElementById('ek-learn-tab');
     const practiceTab = document.getElementById('ek-practice-wrap');
-    const btnLearn   = document.getElementById('ek-tab-learn');
-    const btnPrac    = document.getElementById('ek-tab-practice');
-    const banner     = document.getElementById('ek-practice-banner');
+    const btnLearn    = document.getElementById('ek-tab-learn');
+    const btnPrac     = document.getElementById('ek-tab-practice');
+    const banner      = document.getElementById('ek-practice-banner');
     if (!learnTab || !practiceTab) return;
     if (tab === 'learn') {
       learnTab.style.display    = '';
@@ -100,36 +184,44 @@
     btnPrac.onclick  = () => switchTab('practice');
     const goL1  = document.getElementById('ek-banner-go-lesson');
     const disBtn = document.getElementById('ek-banner-dismiss');
-    if (goL1)  goL1.onclick  = () => switchTab('learn');
+    if (goL1)   goL1.onclick  = () => switchTab('learn');
     if (disBtn) disBtn.onclick = () => { sessionStorage.setItem('ek-lesson-banner-dismissed','1'); if (banner) banner.style.display='none'; };
     switchTab('learn');
   }
 
-  // ── Learn tab rendering ────────────────────────────────────────────
+  // ── Learn tab rendering ───────────────────────────────────────────
   function getLesson1Status() {
     if (LessonPlayer.isComplete()) return 'completed';
     const prog = LessonPlayer.getProgress();
     if (prog && prog !== '01') return 'in_progress';
     return 'not_started';
   }
+  function getLesson2Status() {
+    if (lsGet('eklipses_lesson2_complete', null) === true) return 'completed';
+    const prog = lsGet('eklipses_lesson2_progress', null);
+    if (prog && prog !== '00') return 'in_progress';
+    return 'not_started';
+  }
   function getCertifiedCount() {
     return Object.values(getCert()).filter(v => v.certified).length;
+  }
+  function statusChip(status) {
+    if (status === 'completed')   return '<span class="ek-lesson-status completed">COMPLETED ✓</span>';
+    if (status === 'in_progress') return '<span class="ek-lesson-status in-progress">IN PROGRESS</span>';
+    return '<span class="ek-lesson-status not-started">NOT STARTED</span>';
   }
 
   function renderLearnTab() {
     const container = document.getElementById('ek-learn-tab');
     if (!container) return;
-    const status     = getLesson1Status();
-    const certCount  = getCertifiedCount();
+
+    const l1Status     = getLesson1Status();
+    const l2Status     = getLesson2Status();
+    const l1Complete   = l1Status === 'completed';
+    const certCount    = getCertifiedCount();
     const totalAvatars = (window.AVATAR_SETS || []).filter(s => !s.hidden).length;
 
-    const statusHtml = status === 'completed'
-      ? '<span class="ek-lesson-status completed">COMPLETED ✓</span>'
-      : status === 'in_progress'
-      ? '<span class="ek-lesson-status in-progress">IN PROGRESS</span>'
-      : '<span class="ek-lesson-status not-started">NOT STARTED</span>';
-
-    const certHtml = status === 'completed'
+    const certHtml = l1Complete
       ? `<div class="ek-cert-bar">
            <div class="ek-cert-label">Certified on <b>${certCount}</b> / ${totalAvatars} avatars
              ${certCount >= 3 ? '<span class="ek-cert-badge">CERTIFIED</span>' : ''}
@@ -140,62 +232,85 @@
          </div>`
       : '';
 
+    const l1BtnLabel = l1Status === 'completed' ? '↺ Review Lesson' : l1Status === 'in_progress' ? '▶ Continue Lesson' : '▶ Start Lesson';
+    const l2BtnLabel = l2Status === 'completed' ? '↺ Review Lesson' : l2Status === 'in_progress' ? '▶ Continue Lesson' : '▶ Start Lesson';
+
+    const l2LockedHtml = `
+      <div class="ek-lesson-card locked">
+        <div class="ek-lesson-card-header">
+          <span class="ek-lesson-num">🔒 LESSON 2</span>
+        </div>
+        <div class="ek-lesson-title">Holding Your Ground</div>
+        <div class="ek-lesson-desc">Complete Lesson 1 to unlock. Learn to handle tests, pushback, and challenges without flinching. 5 core principles. ~10 min.</div>
+      </div>`;
+
+    const l2UnlockedHtml = `
+      <div class="ek-lesson-card">
+        <div class="ek-lesson-card-header">
+          <span class="ek-lesson-num">LESSON 2</span>
+          ${statusChip(l2Status)}
+        </div>
+        <div class="ek-lesson-title">Holding Your Ground</div>
+        <div class="ek-lesson-desc">Learn to handle tests, pushback, and challenges without flinching. 5 core principles. ~10 min.</div>
+        <div class="ek-lesson-mnemonic-tag">FRAME — Feel nothing · Reframe · Add humor · Make her qualify · Exit</div>
+        <button class="ek-start-btn" id="ek-start-lesson2">${l2BtnLabel}</button>
+      </div>`;
+
     container.innerHTML = `
       <div class="ek-learn-inner">
         <div class="ek-lesson-card">
           <div class="ek-lesson-card-header">
             <span class="ek-lesson-num">LESSON 1</span>
-            ${statusHtml}
+            ${statusChip(l1Status)}
           </div>
           <div class="ek-lesson-title">The Approach</div>
           <div class="ek-lesson-desc">Learn how to stop a woman you've never met and make her glad you did. 5 core principles. ~10 min.</div>
           ${certHtml}
-          <button class="ek-start-btn" id="ek-start-lesson1">
-            ${status === 'completed' ? '↺ Review Lesson' : status === 'in_progress' ? '▶ Continue Lesson' : '▶ Start Lesson'}
-          </button>
+          <button class="ek-start-btn" id="ek-start-lesson1">${l1BtnLabel}</button>
         </div>
-        <div class="ek-lesson-card locked">
-          <div class="ek-lesson-card-header">
-            <span class="ek-lesson-num">🔒 LESSON 2</span>
-          </div>
-          <div class="ek-lesson-title">Coming Soon</div>
-          <div class="ek-lesson-desc">Complete Lesson 1 to unlock</div>
-        </div>
+        ${l1Complete ? l2UnlockedHtml : l2LockedHtml}
       </div>
     `;
-    const btn = document.getElementById('ek-start-lesson1');
-    if (btn) btn.onclick = () => openLesson('00');
+
+    const btn1 = document.getElementById('ek-start-lesson1');
+    if (btn1) btn1.onclick = () => openLesson('lesson1', '00');
+
+    const btn2 = document.getElementById('ek-start-lesson2');
+    if (btn2) btn2.onclick = () => openLesson('lesson2', '00');
   }
 
   function refreshLearnTabStatus() { renderLearnTab(); }
 
-  // ── Player state ───────────────────────────────────────────────────
-  let _playerEl    = null;
+  // ── Player state ──────────────────────────────────────────────────
+  let _playerEl      = null;
   let _currentSegIdx = 0;
-  let _aborted     = false;
-  let _manifest    = null;
-  let _playGen     = 0;       // incremented on navigate/open to invalidate in-flight playback
-  let _currentAudio = null;
-  let _paused      = false;
-  let _resumeResolve = null;  // set when waiting for resume
-  let _orbAnim     = null;
-  let _orbT        = 0;
+  let _aborted       = false;
+  let _manifests     = {};      // keyed by lesson id
+  let _playGen       = 0;
+  let _currentAudio  = null;
+  let _paused        = false;
+  let _resumeResolve = null;
+  let _orbAnim       = null;
+  let _orbT          = 0;
 
-  // ── Manifest ───────────────────────────────────────────────────────
+  // ── Manifest (per-lesson cached) ──────────────────────────────────
   async function loadManifest() {
-    if (_manifest) return _manifest;
-    const manifestUrl = WORKER_BASE + '?file=manifest.json&t=' + Date.now();
+    const lesson = currentLesson();
+    if (_manifests[lesson.id]) return _manifests[lesson.id];
+    const prefix     = lesson.workerPrefix;
+    const manifestUrl = WORKER_BASE + '?file=' + encodeURIComponent(prefix + 'manifest.json') + '&t=' + Date.now();
     console.log('[lesson] fetching manifest from:', manifestUrl);
     const res = await fetch(manifestUrl);
     if (!res.ok) throw new Error('manifest HTTP ' + res.status);
-    _manifest = await res.json();
-    const fileList = (_manifest.segments || []).flatMap(s => (s.sequence || s.files || []).map(f => f.file));
-    console.log('[lesson] manifest loaded — version:', _manifest.version, '| segments:', (_manifest.segments || []).length, '| files:', fileList.length);
+    const manifest = await res.json();
+    const fileList = (manifest.segments || []).flatMap(s => (s.sequence || s.files || []).map(f => f.file));
+    console.log('[lesson] manifest loaded — version:', manifest.version, '| segments:', (manifest.segments || []).length, '| files:', fileList.length);
     console.log('[lesson] all files in manifest:', fileList);
-    return _manifest;
+    _manifests[lesson.id] = manifest;
+    return manifest;
   }
 
-  // ── Pause / resume engine ──────────────────────────────────────────
+  // ── Pause / resume ────────────────────────────────────────────────
   function whenResumed() {
     if (!_paused) return Promise.resolve();
     return new Promise(res => { _resumeResolve = res; });
@@ -217,31 +332,26 @@
     if (btn) { btn.textContent = _paused ? '▶' : '⏸'; btn.title = _paused ? 'Resume' : 'Pause'; }
   }
 
-  // ── Sequential audio player ────────────────────────────────────────
+  // ── Sequential audio player ───────────────────────────────────────
   function playOneAudio(url, voice) {
-    const filename = decodeURIComponent(url.split('file=').pop());
-    // Hoist capturedGen before the Promise so the diagnostic log can reference it
+    const filename    = decodeURIComponent(url.split('file=').pop());
     const capturedGen = _playGen;
     console.log('[AUDIO] attempting:', filename, 'gen:', _playGen, 'captured:', capturedGen);
     return new Promise(res => {
       const a = new Audio(url);
       _currentAudio = a;
-      let resolved = false;
+      let resolved     = false;
       let playStartedAt = null;
 
       function done() {
         if (resolved) return;
         resolved = true;
         clearTimeout(loadTimeout);
-        // Stop and release the audio element — without this, a stale element whose
-        // fetch eventually completes will start playing on top of the new segment.
         try { a.pause(); a.src = ''; } catch {}
         if (_currentAudio === a) _currentAudio = null;
         res();
       }
 
-      // Two-phase timeout: short window to catch "never starts", then extended
-      // once playing begins to handle long files (Ryan segs can be 40-60s).
       let loadTimeout = setTimeout(() => {
         if (capturedGen === _playGen) {
           console.warn('[lesson] TIMEOUT 15s — audio never started:', filename);
@@ -256,8 +366,6 @@
         a.addEventListener('error', () => setSofiaState(false));
       }
 
-      // START log fires on the 'play' event — exactly when audio begins.
-      // Also extends the timeout: once playing, give 120s for ended to fire.
       a.addEventListener('play', () => {
         playStartedAt = Date.now();
         console.log('[lesson] START', filename);
@@ -270,16 +378,10 @@
         }, 120000);
       });
 
-      // Only resolve on 'ended' — the sole signal that playback actually completed.
-      // Do NOT resolve on onerror / play().catch(): resolving there is what causes
-      // overlap when the localhost proxy is slow — play() rejects due to buffering
-      // stall, the sequence advances, then the audio loads and plays on top.
       a.onended = () => {
         const playedMs = playStartedAt ? Date.now() - playStartedAt : 0;
         console.log('[lesson] END', filename, '(' + playedMs + 'ms)');
         if (playedMs < 500) {
-          // Guard: 'ended' fired suspiciously fast — duration may be 0 or NaN.
-          // Wait out the remainder so a corrupt/empty file can't cascade the lesson.
           console.warn('[lesson] END < 500ms — guarding:', filename, 'only ' + playedMs + 'ms played');
           setTimeout(done, 500 - playedMs);
         } else {
@@ -287,7 +389,6 @@
         }
       };
 
-      // Log errors but do NOT resolve — the 10s timeout is the error exit path.
       a.onerror = (e) => { console.warn('[lesson] audio error:', filename, e); };
       a.play().catch(e => { console.warn('[lesson] play() rejected:', filename, e.message); });
     });
@@ -295,21 +396,21 @@
 
   async function gapMs(ms, gen) {
     if (_aborted || gen !== _playGen) return;
-    // Don't start the gap if already paused — wait for resume first
     await whenResumed();
     if (_aborted || gen !== _playGen) return;
     await new Promise(res => setTimeout(res, ms));
   }
 
   async function playSequence(files, gen) {
-    console.log('[SEQUENCE START] segment:', SEGMENTS[_currentSegIdx]?.id, 'gen:', gen, '_playGen:', _playGen);
+    const lesson = currentLesson();
+    console.log('[SEQUENCE START] segment:', currentSegments()[_currentSegIdx]?.id, 'gen:', gen, '_playGen:', _playGen);
     for (let i = 0; i < files.length; i++) {
       if (_aborted || gen !== _playGen) return;
       await whenResumed();
       if (_aborted || gen !== _playGen) return;
 
-      const f = files[i];
-      const url = WORKER_BASE + '?file=' + encodeURIComponent(f.file);
+      const f   = files[i];
+      const url = WORKER_BASE + '?file=' + encodeURIComponent(lesson.workerPrefix + f.file);
       console.log('[lesson] playing', f.voice, '→', url);
 
       onFileStart(f.voice);
@@ -321,7 +422,7 @@
     }
   }
 
-  // ── Audio-event driven visual states ──────────────────────────────
+  // ── Audio-event driven visual states ─────────────────────────────
   function onFileStart(voice) {
     if (voice === 'ryan') {
       orbAnimate(true);
@@ -334,37 +435,33 @@
     } else if (voice === 'sofia') {
       orbAnimate(false);
       setOrbSpeaker('ryan');
-      // Sofia speaking state is driven by play/pause/ended/error events on the Audio element
     }
   }
+  function onFileEnd() {}
 
-  function onFileEnd(voice) {
-    // Sofia state driven by audio events — nothing needed here
-  }
-
-  // ── Segment runner ─────────────────────────────────────────────────
+  // ── Segment runner ────────────────────────────────────────────────
   async function runSegment(idx) {
     if (_aborted) return;
-    const seg = SEGMENTS[idx];
+    const segs = currentSegments();
+    const lesson = currentLesson();
+    const seg = segs[idx];
     if (!seg) return;
     _currentSegIdx = idx;
     updateProgress(idx);
-    lsSet(LS_PROGRESS, seg.id);
+    lsSet(lesson.lsProgress, seg.id);
 
-    // Build base display (Ryan orb + Sofia idle) on each segment start
     showRyanWithSofia();
 
-    const gen = _playGen;
+    const gen     = _playGen;
+    const manifest = _manifests[lesson.id];
 
-    // Get file list from manifest
     let files = [];
-    if (_manifest) {
-      const segData = _manifest.segments.find(s => s.segmentId === seg.id);
+    if (manifest) {
+      const segData = manifest.segments.find(s => s.segmentId === seg.id);
       if (segData) files = segData.sequence || segData.files || [];
     }
 
     if (files.length === 0) {
-      // No audio for this segment — auto-advance after a beat
       await new Promise(res => setTimeout(res, 1500));
     } else {
       await playSequence(files, gen);
@@ -372,7 +469,6 @@
 
     if (_aborted || gen !== _playGen) return;
 
-    // Reset visual state, brief inter-segment pause
     orbAnimate(false);
     setSofiaState(false);
     setOrbSpeaker('ryan');
@@ -380,16 +476,17 @@
 
     if (_aborted || gen !== _playGen) return;
 
-    if (idx + 1 >= SEGMENTS.length) {
+    if (idx + 1 >= segs.length) {
       onLessonComplete();
     } else {
       runSegment(idx + 1);
     }
   }
 
-  // ── Navigation ─────────────────────────────────────────────────────
+  // ── Navigation ────────────────────────────────────────────────────
   function navigate(delta) {
-    const newIdx = Math.max(0, Math.min(SEGMENTS.length - 1, _currentSegIdx + delta));
+    const segs   = currentSegments();
+    const newIdx = Math.max(0, Math.min(segs.length - 1, _currentSegIdx + delta));
     console.log('[NAVIGATE] to index:', newIdx, 'killing gen:', _playGen);
     if (_currentAudio) { _currentAudio.pause(); _currentAudio.src = ''; _currentAudio = null; }
     _playGen++;
@@ -399,7 +496,7 @@
     runSegment(newIdx);
   }
 
-  // ── Player HTML ────────────────────────────────────────────────────
+  // ── Player HTML ───────────────────────────────────────────────────
   function buildPlayerHTML() {
     const el = document.createElement('div');
     el.id = 'ek-lesson-player';
@@ -427,36 +524,9 @@
           <div class="elp-progress-label" id="elp-progress-label">1 / 15</div>
         </div>
 
-        <!-- Completion screen -->
+        <!-- Completion screen — filled dynamically by onLessonComplete() -->
         <div class="elp-complete" id="elp-complete" style="display:none">
-          <div class="elp-complete-inner">
-            <div class="elp-complete-check">✓</div>
-            <div class="elp-complete-title">Lesson 1 Complete</div>
-            <div class="elp-complete-sub">"The Approach" — 5 principles mastered.</div>
-            <div class="elp-complete-body">Now put it into practice. The avatars are waiting — and they know exactly what you should be doing.</div>
-            <div class="elp-complete-steps">
-              <div class="elp-step"><span class="elp-step-n">1.</span> The observation opener</div>
-              <div class="elp-step"><span class="elp-step-n">2.</span> Playful challenge</div>
-              <div class="elp-step"><span class="elp-step-n">3.</span> Own your mystery</div>
-              <div class="elp-step"><span class="elp-step-n">4.</span> The verbal spike</div>
-              <div class="elp-step"><span class="elp-step-n">5.</span> The natural close</div>
-            </div>
-            <div class="elp-mnemonic">
-              <div class="elp-mnemonic-label">HOW TO REMEMBER THEM:</div>
-              <div class="elp-mnemonic-phrase">One Tequila Makes Ideas Click</div>
-              <div class="elp-mnemonic-map">
-                <div class="elp-mnemonic-row"><span class="elp-mnemonic-word">One</span><span class="elp-mnemonic-arrow">→</span><span class="elp-mnemonic-meaning">Observe something specific</span></div>
-                <div class="elp-mnemonic-row"><span class="elp-mnemonic-word">Tequila</span><span class="elp-mnemonic-arrow">→</span><span class="elp-mnemonic-meaning">Tease playfully</span></div>
-                <div class="elp-mnemonic-row"><span class="elp-mnemonic-word">Makes</span><span class="elp-mnemonic-arrow">→</span><span class="elp-mnemonic-meaning">Mystery — don't give it all away</span></div>
-                <div class="elp-mnemonic-row"><span class="elp-mnemonic-word">Ideas</span><span class="elp-mnemonic-arrow">→</span><span class="elp-mnemonic-meaning">Imply your interest</span></div>
-                <div class="elp-mnemonic-row"><span class="elp-mnemonic-word">Click</span><span class="elp-mnemonic-arrow">→</span><span class="elp-mnemonic-meaning">Close naturally</span></div>
-              </div>
-            </div>
-            <div class="elp-complete-btns">
-              <button class="elp-btn-primary" id="elp-go-practice">Go to Practice</button>
-              <button class="elp-btn-ghost" id="elp-review-lesson">Review Lesson</button>
-            </div>
-          </div>
+          <div class="elp-complete-inner" id="elp-complete-inner"></div>
         </div>
 
         <!-- Exit confirm dialog -->
@@ -473,6 +543,37 @@
       </div>
     `;
     return el;
+  }
+
+  // ── Completion screen content ─────────────────────────────────────
+  function buildCompletionHTML(lesson) {
+    const stepsHtml = lesson.steps.map((s, i) => `
+      <div class="elp-step"><span class="elp-step-n">${i + 1}.</span> ${s}</div>`).join('');
+
+    const mnemonicRowsHtml = lesson.mnemonicMap.map(r => `
+      <div class="elp-mnemonic-row">
+        <span class="elp-mnemonic-word">${r.word}</span>
+        <span class="elp-mnemonic-arrow">→</span>
+        <span class="elp-mnemonic-meaning">${r.meaning}</span>
+      </div>`).join('');
+
+    const lessonNum = lesson.id === 'lesson1' ? '1' : '2';
+
+    return `
+      <div class="elp-complete-check">✓</div>
+      <div class="elp-complete-title">Lesson ${lessonNum} Complete</div>
+      <div class="elp-complete-sub">${lesson.completionSub}</div>
+      <div class="elp-complete-body">${lesson.completionBody}</div>
+      <div class="elp-complete-steps">${stepsHtml}</div>
+      <div class="elp-mnemonic">
+        <div class="elp-mnemonic-label">HOW TO REMEMBER THEM:</div>
+        <div class="elp-mnemonic-phrase">${lesson.mnemonicPhrase}</div>
+        <div class="elp-mnemonic-map">${mnemonicRowsHtml}</div>
+      </div>
+      <div class="elp-complete-btns">
+        <button class="elp-btn-primary" id="elp-go-practice">Go to Practice</button>
+        <button class="elp-btn-ghost" id="elp-review-lesson">Review Lesson</button>
+      </div>`;
   }
 
   function getPlayerCSS() {
@@ -554,6 +655,9 @@
       .elp-btn-primary:hover { background:#4a94e0; }
       .elp-btn-ghost { background:transparent; color:#9aa4b2; border:1px solid #2b2e36; border-radius:8px; padding:11px 24px; font-size:14px; cursor:pointer; }
       .elp-btn-ghost:hover { background:#1e2028; }
+
+      /* Lesson 2 mnemonic tag on card */
+      .ek-lesson-mnemonic-tag { font-size:12px; color:#556; margin-bottom:14px; line-height:1.5; }
     `;
   }
 
@@ -565,7 +669,7 @@
     document.head.appendChild(style);
   }
 
-  // ── Ryan orb ───────────────────────────────────────────────────────
+  // ── Ryan orb ──────────────────────────────────────────────────────
   function buildRyanOrb() {
     const d = document.createElement('div');
     d.className = 'elp-ryan-orb';
@@ -610,16 +714,11 @@
   function setOrbSpeaker(voice) {
     const el = document.getElementById('elp-orb-name');
     if (!el) return;
-    if (voice === 'alex') {
-      el.textContent = 'ALEX';
-      el.classList.add('alex');
-    } else {
-      el.textContent = 'RYAN';
-      el.classList.remove('alex');
-    }
+    if (voice === 'alex') { el.textContent = 'ALEX'; el.classList.add('alex'); }
+    else                  { el.textContent = 'RYAN'; el.classList.remove('alex'); }
   }
 
-  // ── Sofia video ────────────────────────────────────────────────────
+  // ── Sofia video ───────────────────────────────────────────────────
   function setSofiaState(speaking) {
     const v = document.getElementById('elp-sofia-video');
     if (!v) return;
@@ -628,7 +727,6 @@
     v.play().catch(() => {});
   }
 
-  // ── Stage layout — always Ryan orb + Sofia side by side ───────────
   function showRyanWithSofia() {
     const area = document.getElementById('elp-avatar-area');
     if (!area) return;
@@ -661,36 +759,65 @@
     orbAnimate(false);
   }
 
-  // ── Progress & caption ─────────────────────────────────────────────
+  // ── Progress & caption ────────────────────────────────────────────
   function setCaption(text) {
     const el = document.getElementById('elp-caption');
     if (el) el.textContent = text || '';
   }
 
   function updateProgress(idx) {
+    const segs  = currentSegments();
     const fill  = document.getElementById('elp-progress-fill');
     const label = document.getElementById('elp-progress-label');
     const title = document.getElementById('elp-seg-title');
-    const seg   = SEGMENTS[idx];
+    const seg   = segs[idx];
     if (!fill || !label || !seg) return;
-    fill.style.width  = ((idx + 1) / SEGMENTS.length * 100).toFixed(1) + '%';
-    label.textContent = (idx + 1) + ' / ' + SEGMENTS.length;
+    fill.style.width  = ((idx + 1) / segs.length * 100).toFixed(1) + '%';
+    label.textContent = (idx + 1) + ' / ' + segs.length;
     if (title) title.textContent = seg.title;
     setCaption('');
   }
 
-  // ── Completion ─────────────────────────────────────────────────────
+  // ── Completion ────────────────────────────────────────────────────
   function onLessonComplete() {
-    lsSet(LS_COMPLETE, true);
-    lsSet(LS_PROGRESS, null);
+    const lesson = currentLesson();
+    lsSet(lesson.lsComplete, true);
+    lsSet(lesson.lsProgress, null);
     cancelAnimationFrame(_orbAnim);
+
+    const inner = document.getElementById('elp-complete-inner');
+    if (inner) inner.innerHTML = buildCompletionHTML(lesson);
+
     const el = document.getElementById('elp-complete');
     if (el) el.style.display = '';
+
+    // Wire completion buttons now that they're in the DOM
+    const goPractice = document.getElementById('elp-go-practice');
+    if (goPractice) goPractice.onclick = () => { closeLesson(); switchTab('practice'); };
+
+    const reviewBtn = document.getElementById('elp-review-lesson');
+    if (reviewBtn) reviewBtn.onclick = () => {
+      document.getElementById('elp-complete').style.display = 'none';
+      _aborted = false;
+      _paused  = false;
+      _playGen++;
+      runSegment(0);
+    };
+
     refreshLearnTabStatus();
   }
 
-  // ── Open / close ───────────────────────────────────────────────────
-  async function openLesson(startSegId) {
+  // ── Open / close ──────────────────────────────────────────────────
+  async function openLesson(lessonIdOrSegId, startSegId) {
+    // Backwards compat: openLesson('00') → lesson 1, segment 00
+    if (!lessonIdOrSegId || !String(lessonIdOrSegId).startsWith('lesson')) {
+      _currentLessonId = 'lesson1';
+      startSegId = lessonIdOrSegId || '00';
+    } else {
+      _currentLessonId = lessonIdOrSegId;
+      startSegId = startSegId || '00';
+    }
+
     injectCSS();
     _aborted  = false;
     _paused   = false;
@@ -706,24 +833,14 @@
     document.body.appendChild(_playerEl);
 
     // Wire controls
-    document.getElementById('elp-close').onclick = () => {
-      document.getElementById('elp-exit-confirm').style.display = '';
-    };
+    document.getElementById('elp-close').onclick    = () => { document.getElementById('elp-exit-confirm').style.display = ''; };
     document.getElementById('elp-exit-yes').onclick  = closeLesson;
     document.getElementById('elp-exit-no').onclick   = () => { document.getElementById('elp-exit-confirm').style.display = 'none'; };
     document.getElementById('elp-pause-btn').onclick = togglePause;
     document.getElementById('elp-back-btn').onclick  = () => navigate(-1);
     document.getElementById('elp-fwd-btn').onclick   = () => navigate(1);
-    document.getElementById('elp-go-practice').onclick = () => { closeLesson(); switchTab('practice'); };
-    document.getElementById('elp-review-lesson').onclick = () => {
-      document.getElementById('elp-complete').style.display = 'none';
-      _aborted = false;
-      _paused  = false;
-      _playGen++;
-      runSegment(0);
-    };
 
-    // Load manifest (cached after first call)
+    // Load manifest
     try {
       await loadManifest();
     } catch (e) {
@@ -731,7 +848,8 @@
       setCaption('Audio unavailable — check connection.');
     }
 
-    const startIdx = SEGMENTS.findIndex(s => s.id === (startSegId || '00'));
+    const segs     = currentSegments();
+    const startIdx = segs.findIndex(s => s.id === (startSegId || '00'));
     runSegment(Math.max(0, startIdx));
   }
 
@@ -745,7 +863,7 @@
     refreshLearnTabStatus();
   }
 
-  // ── Certification badge refresh ────────────────────────────────────
+  // ── Certification badge refresh ───────────────────────────────────
   window.refreshCertBadges = function () {
     document.querySelectorAll('[data-cert-char]').forEach(el => {
       const charId = el.getAttribute('data-cert-char');
@@ -764,7 +882,7 @@
     });
   };
 
-  // ── Init ───────────────────────────────────────────────────────────
+  // ── Init ──────────────────────────────────────────────────────────
   function init() {
     injectCSS();
     renderLearnTab();
