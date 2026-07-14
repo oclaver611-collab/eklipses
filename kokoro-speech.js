@@ -5,6 +5,22 @@ const KokoroSpeech = (() => {
   let currentAudio = null;
   let _cancelResolve = null; // resolves any pending speak() promise when cancel() fires
 
+  // Strips intonation markers before text reaches the TTS engine.
+  // Kokoro/Fish Audio treats em-dashes, ellipses, and bracket tags as prosody
+  // cues — removing them lets the engine use its natural default voice.
+  function sanitizeForTTS(text) {
+    if (!text) return text;
+    return text
+      .replace(/\[.*?\]/g, '')         // [pause], [break], any bracket tag
+      .replace(/\*\*(.+?)\*\*/g, '$1') // **bold** → plain
+      .replace(/\*(.+?)\*/g, '$1')     // *italic* → plain
+      .replace(/—|–/g, ', ')           // em/en dash → comma (natural pause, no stress)
+      .replace(/\.{2,}/g, '.')         // ... or .. → single period
+      .replace(/…/g, '.')              // unicode ellipsis → period
+      .replace(/\s+/g, ' ')            // collapse whitespace
+      .trim();
+  }
+
   const VOICE_MAP = {
     'af_nicole':  'ryan',
     'am_michael': 'ryan',
@@ -16,14 +32,15 @@ const KokoroSpeech = (() => {
     if (!text?.trim()) return;
     cancel(); // always stop any in-flight audio before starting a new line
     const charId = VOICE_MAP[voice] || 'ryan';
+    const cleanText = sanitizeForTTS(text);
     let url = prefetchedUrl;
     try {
       if (!url) {
-        console.log(`[TTS] ${charId}: "${text.slice(0,50)}"`);
+        console.log(`[TTS] ${charId}: "${cleanText.slice(0,50)}"`);
         const response = await fetch('/api/tts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, characterId: charId }),
+          body: JSON.stringify({ text: cleanText, characterId: charId }),
         });
         if (!response.ok) {
           console.error('[TTS] API error:', response.status);
@@ -56,11 +73,12 @@ const KokoroSpeech = (() => {
   async function prefetch(text, voice = 'af_nicole') {
     if (!text?.trim()) return null;
     const charId = VOICE_MAP[voice] || 'ryan';
+    const cleanText = sanitizeForTTS(text);
     try {
       const response = await fetch('/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, characterId: charId }),
+        body: JSON.stringify({ text: cleanText, characterId: charId }),
       });
       if (!response.ok) return null;
       const blob = await response.blob();
