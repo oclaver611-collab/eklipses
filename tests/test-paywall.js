@@ -12,6 +12,17 @@ const { chromium } = require('playwright');
   console.log('[TEST] Initial load...');
   await page.goto('https://eklipses.vercel.app', { waitUntil: 'domcontentloaded' });
 
+  // ── 1b. Mock /api/check-session so it returns "not allowed" for this test ──
+  // The real endpoint checks Supabase IP count — we control the browser-side check here.
+  await page.route('**/api/check-session', route => {
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ allowed: false, sessionsUsed: 2, sessionsRemaining: 0 }),
+    });
+  });
+  console.log('[TEST] /api/check-session mocked → allowed:false');
+
   // ── 2. Set state atomically before reload ─────────────────────────────────
   await page.evaluate(() => {
     localStorage.removeItem('ek-dev-key');

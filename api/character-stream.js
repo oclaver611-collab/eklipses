@@ -34,6 +34,8 @@ module.exports = async function handler(req, res) {
     history: rawHistory = [],
     useModel,
     userStyle,
+    lesson1Complete = false,
+    lesson2Complete = false,
     voiceInput = false,
   } = req.body || {};
 
@@ -3180,7 +3182,29 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
   // Option B — permanent STT note in every character prompt
   const STT_NOTE = `\n\nVOICE INPUT NOTE: The user is speaking via voice recognition software. Their messages may contain speech-to-text errors. Always interpret their responses charitably and respond to the most likely intended meaning, not the literal garbled text.`;
 
-  const systemPrompt = character + '\n\n' + setting + STT_NOTE + BASE_RULES + nameReminder + nameGivenReminder;
+  const lesson1TestBlock = (lesson1Complete && characterId === 'sofia') ? `
+
+LESSON 1 TEST MODE — ACTIVE:
+The user has completed Lesson 1. You will naturally create opportunities for them to demonstrate the 5 lesson skills. Do NOT announce that you are testing them.
+
+TEST 1 — Observation opener: If they open with a generic compliment, react flatly. If they make a specific observation, engage with slightly more warmth.
+TEST 2 — Playful challenge: Say something mildly provocative. If they get defensive, lose interest. If they tease back lightly, warm up.
+TEST 3 — Sensitive topic: Ask something that could make them defensive. React to whether they stay comfortable or rush to explain.
+TEST 4 — Verbal spike window: Say something like "I don't usually talk to strangers." If they take the implication subtly, respond with more warmth.
+TEST 5 — Close signal: Signal the interaction has been good. If they close directly and naturally, respond positively.` : '';
+
+  const lesson2TestBlock = (lesson2Complete && characterId === 'sofia') ? `
+
+LESSON 2 TEST MODE — ACTIVE (FRAME):
+The user has completed Lesson 2. Test their ability to hold their ground. Do NOT announce that you are testing them.
+
+TEST F — Feel Nothing: Make a mildly dismissive remark early. If they explain themselves defensively, stay flat. If they stay calm and keep going, soften slightly.
+TEST R — Reframe: Make a limiting statement. If they flip it without arguing, register it with a pause and open slightly.
+TEST A — Add Humor: Challenge their confidence. If they defend themselves earnestly, lose interest. If they acknowledge it with ease, warm up.
+TEST M — Make Her Qualify: Mention something specific. If they ask one real question and listen, open slightly. If they pepper with questions, close down.
+TEST E — Exit signal: Mention something to return to. If they use this as a natural cue to ask for your number or suggest continuing, respond warmly.` : '';
+
+  const systemPrompt = character + '\n\n' + setting + STT_NOTE + BASE_RULES + nameReminder + nameGivenReminder + lesson1TestBlock + lesson2TestBlock;
 
   // Option A — when input was captured via STT, append a per-message note
   const effectiveUserMessage = voiceInput

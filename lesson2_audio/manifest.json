@@ -1,0 +1,351 @@
+{
+  "version": "1",
+  "lesson": "2",
+  "title": "Holding Your Ground",
+  "mnemonic": "FRAME",
+  "generatedAt": "2026-07-14T16:51:54.905Z",
+  "segments": [
+    {
+      "segmentId": "00",
+      "type": "coaching",
+      "title": "Welcome",
+      "files": [
+        {
+          "file": "ryan_seg00.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "01",
+      "type": "coaching",
+      "title": "What FRAME Is",
+      "files": [
+        {
+          "file": "ryan_seg01.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "02",
+      "type": "coaching",
+      "title": "Before the Test",
+      "files": [
+        {
+          "file": "ryan_seg02.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "03",
+      "type": "exchange",
+      "title": "Watch — The Test",
+      "sequence": [
+        {
+          "file": "alex_s03_01.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s03_01.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s03_02.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s03_02.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s03_03.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s03_03.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s03_04.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s03_04.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s03_05.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s03_05.mp3",
+          "voice": "sofia"
+        }
+      ]
+    },
+    {
+      "segmentId": "04",
+      "type": "coaching",
+      "title": "F — Feel Nothing",
+      "files": [
+        {
+          "file": "ryan_seg04.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "05",
+      "type": "exchange",
+      "title": "Watch — The Reframe",
+      "sequence": [
+        {
+          "file": "sofia_s05_01.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s05_01.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s05_02.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s05_02.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s05_03.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s05_03.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s05_04.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s05_04.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s05_05.mp3",
+          "voice": "sofia"
+        }
+      ]
+    },
+    {
+      "segmentId": "06",
+      "type": "coaching",
+      "title": "R — Reframe",
+      "files": [
+        {
+          "file": "ryan_seg06.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "07",
+      "type": "exchange",
+      "title": "Watch — The Humor",
+      "sequence": [
+        {
+          "file": "sofia_s07_01.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s07_01.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s07_02.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s07_02.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s07_03.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s07_03.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s07_04.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s07_04.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s07_05.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s07_05.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s07_06.mp3",
+          "voice": "sofia"
+        }
+      ]
+    },
+    {
+      "segmentId": "08",
+      "type": "coaching",
+      "title": "A — Add Humor",
+      "files": [
+        {
+          "file": "ryan_seg08.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "09",
+      "type": "exchange",
+      "title": "Watch — The Qualification",
+      "sequence": [
+        {
+          "file": "alex_s09_01.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s09_01.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s09_02.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s09_02.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s09_03.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s09_03.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s09_04.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s09_04.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s09_05.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s09_05.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s09_06.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s09_06.mp3",
+          "voice": "sofia"
+        }
+      ]
+    },
+    {
+      "segmentId": "10",
+      "type": "coaching",
+      "title": "M — Make Her Qualify",
+      "files": [
+        {
+          "file": "ryan_seg10.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "11",
+      "type": "exchange",
+      "title": "Watch — The Exit",
+      "sequence": [
+        {
+          "file": "alex_s11_01.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s11_01.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s11_02.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s11_02.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s11_03.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s11_03.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s11_04.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s11_04.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s11_05.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s11_05.mp3",
+          "voice": "sofia"
+        }
+      ]
+    },
+    {
+      "segmentId": "12",
+      "type": "coaching",
+      "title": "E — Exit",
+      "files": [
+        {
+          "file": "ryan_seg12.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "13",
+      "type": "coaching",
+      "title": "Your Five Steps",
+      "files": [
+        {
+          "file": "ryan_seg13.mp3",
+          "voice": "ryan"
+        }
+      ]
+    }
+  ]
+}
