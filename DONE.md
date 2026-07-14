@@ -1,3 +1,44 @@
+# DONE — July 14, 2026 (Lesson 2 FRAME + paywall fix + auto-run pipeline)
+
+## Summary
+- **Commit:** `d1e7b18` — tag `v-stable-lesson2-complete`
+- **Vercel deploy job:** `KjHlNWTEIrVbHnotwxaw`
+- **Tests:** 14/14 scenarios PASS · paywall PASS · 15/15 lesson PASS
+
+## Changes
+
+### Paywall test fix
+`tests/test-paywall.js` — added `page.route('**/api/check-session', ...)` to mock the response as `allowed:false`. Test no longer depends on live Supabase IP count that resets between sessions. FAIL → PASS.
+
+### Lesson 2 — "Holding Your Ground" (FRAME mnemonic)
+14 segments (seg00–seg13) scripted and recorded:
+- **Ryan** (Fish Audio `44b996214285427697767cb469793647`, temp 0.7) — 9 coaching segments
+- **Alex** (OpenAI tts-1-hd onyx) — 20 exchange lines across 5 exchange segments
+- **Sofia** (ElevenLabs Flash v2.5, Rachel `21m00Tcm4TlvDq8ikWAM`) — 25 exchange lines
+
+61 audio files uploaded to R2 at `lessons/lesson2/audio/`. Manifest at `lessons/lesson2/audio/manifest.json`.
+
+**FRAME** = Feel Nothing · Reframe · Add Humor · Make Her Qualify · Exit
+
+Content written to `LESSON2_RYAN_SCRIPTS.md`. Recording script at `scripts/record_lesson2.js`.
+
+### FRAME Sofia test behaviors (character.js + character-stream.js)
+When `lesson2Complete === true` and `characterId === 'sofia'`:
+- 5 test blocks injected into Sofia's systemPrompt (F/R/A/M/E)
+- `lesson2Complete` param added to both character endpoints
+- `lesson2Complete` sent from player.js (reads `eklipses_lesson2_complete` from localStorage)
+
+### Master automation script (`scripts/auto-run.js`)
+7-step pipeline: tests → paywall verify → build lesson 2 audio → verify FRAME → re-test → commit/tag/deploy → generate AUTOMATION_REPORT.md. Timeout fixed to 600s for the 7-minute scenario suite.
+
+## Known gaps (for next session)
+- `lesson-player.js` needs a Lesson 2 card wired — currently only shows Lesson 1
+- Cloudflare Worker may need updating to serve `lessons/lesson2/audio/` prefix
+- `api/coach.js` only evaluates OTIMC (Lesson 1). FRAME coach evaluation not yet written.
+- Sofia ElevenLabs voice is Rachel (`21m00Tcm4TlvDq8ikWAM`). Replace with custom clone if available.
+
+---
+
 # DONE — July 12, 2026 (Type mode toggle + STT post-processing)
 
 Branch: `feature/stt-improvements` (not merged to main)
