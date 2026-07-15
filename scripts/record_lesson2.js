@@ -7,9 +7,8 @@ const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const OUT_DIR     = path.join(__dirname, '..', 'lesson2_audio');
 const FISH_KEY    = process.env.FISH_AUDIO_API_KEY;
 const OPENAI_KEY  = process.env.OPENAI_API_KEY;
-const EL_KEY      = process.env.ELEVENLABS_API_KEY;
 const RYAN_VOICE  = '44b996214285427697767cb469793647';
-const SOFIA_EL_ID = '21m00Tcm4TlvDq8ikWAM'; // Rachel voice — ElevenLabs Flash v2.5
+const SOFIA_VOICE = '836513f294d64aec8403226e69268b1b'; // Fish Audio — same voice as Lesson 1
 const R2_BUCKET   = process.env.R2_BUCKET_NAME || 'eklipses-videos';
 const R2_PREFIX   = 'lessons/lesson2/audio';
 
@@ -303,7 +302,6 @@ async function uploadR2(filename) {
 
   if (!FISH_KEY)   { console.error('FISH_AUDIO_API_KEY missing'); process.exit(1); }
   if (!OPENAI_KEY) { console.error('OPENAI_API_KEY missing'); process.exit(1); }
-  if (!EL_KEY)     { console.error('ELEVENLABS_API_KEY missing'); process.exit(1); }
 
   const allResults = {};
 
@@ -326,13 +324,13 @@ async function uploadR2(filename) {
     allResults[r.file] = r;
   });
 
-  // ── 3. Sofia (ElevenLabs Flash v2.5, sequential) ──────────────────────────
-  console.log(`\n── Sofia (ElevenLabs Flash v2.5, ${SOFIA_LINES.length} lines, sequential) ───────────`);
+  // ── 3. Sofia (Fish Audio — same voice as Lesson 1, sequential) ──────────
+  console.log(`\n── Sofia (Fish Audio ${SOFIA_VOICE}, ${SOFIA_LINES.length} lines, sequential) ──────`);
   for (let i = 0; i < SOFIA_LINES.length; i++) {
-    if (i > 0) await sleep(500);
+    if (i > 0) await sleep(1000);
     const { file, text } = SOFIA_LINES[i];
     process.stdout.write(`  ${file} ...`);
-    const r = await elevenLabsTTS(text, file);
+    const r = await fishTTS(text, SOFIA_VOICE, file);
     process.stdout.write(r.error ? ` FAIL: ${r.error}\n` : ` ${r.kb} KB (${r.ms}ms)\n`);
     allResults[file] = r;
   }
