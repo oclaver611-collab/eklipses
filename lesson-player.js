@@ -132,8 +132,8 @@
 
   // ── Public API ────────────────────────────────────────────────────
   window.LessonPlayer = {
-    isComplete:           () => lsGet(LS_COMPLETE, null) === true,
-    isLesson2Complete:    () => lsGet('eklipses_lesson2_complete', null) === true,
+    isComplete:           () => localStorage.getItem(LS_COMPLETE) === 'true',
+    isLesson2Complete:    () => localStorage.getItem('eklipses_lesson2_complete') === 'true',
     getProgress:          () => lsGet(LS_PROGRESS, null),
     getCertForCharacter:  (charId) => { const c = getCert(); return c[charId] || { attempts:0, passed:0, certified:false }; },
     recordCoachResult:    (charId, passed) => {
@@ -191,14 +191,14 @@
 
   // ── Learn tab rendering ───────────────────────────────────────────
   function getLesson1Status() {
-    if (LessonPlayer.isComplete()) return 'completed';
-    const prog = LessonPlayer.getProgress();
+    if (localStorage.getItem('eklipses_lesson1_complete') === 'true') return 'completed';
+    const prog = localStorage.getItem('eklipses_lesson1_progress');
     if (prog && prog !== '01') return 'in_progress';
     return 'not_started';
   }
   function getLesson2Status() {
-    if (lsGet('eklipses_lesson2_complete', null) === true) return 'completed';
-    const prog = lsGet('eklipses_lesson2_progress', null);
+    if (localStorage.getItem('eklipses_lesson2_complete') === 'true') return 'completed';
+    const prog = localStorage.getItem('eklipses_lesson2_progress');
     if (prog && prog !== '00') return 'in_progress';
     return 'not_started';
   }
@@ -781,8 +781,8 @@
   // ── Completion ────────────────────────────────────────────────────
   function onLessonComplete() {
     const lesson = currentLesson();
-    lsSet(lesson.lsComplete, true);
-    lsSet(lesson.lsProgress, null);
+    localStorage.setItem(lesson.lsComplete, 'true');
+    localStorage.removeItem(lesson.lsProgress);
     cancelAnimationFrame(_orbAnim);
 
     const inner = document.getElementById('elp-complete-inner');
