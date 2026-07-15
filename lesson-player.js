@@ -212,16 +212,14 @@
   }
 
   function renderLearnTab() {
-    const container = document.getElementById('ek-learn-tab');
-    if (!container) return;
+    const el = document.getElementById('lesson1-card');
+    if (!el) return;
 
     const l1Status     = getLesson1Status();
-    const l2Status     = getLesson2Status();
-    const l1Complete   = l1Status === 'completed';
     const certCount    = getCertifiedCount();
     const totalAvatars = (window.AVATAR_SETS || []).filter(s => !s.hidden).length;
 
-    const certHtml = l1Complete
+    const certHtml = l1Status === 'completed'
       ? `<div class="ek-cert-bar">
            <div class="ek-cert-label">Certified on <b>${certCount}</b> / ${totalAvatars} avatars
              ${certCount >= 3 ? '<span class="ek-cert-badge">CERTIFIED</span>' : ''}
@@ -233,18 +231,49 @@
       : '';
 
     const l1BtnLabel = l1Status === 'completed' ? '↺ Review Lesson' : l1Status === 'in_progress' ? '▶ Continue Lesson' : '▶ Start Lesson';
-    const l2BtnLabel = l2Status === 'completed' ? '↺ Review Lesson' : l2Status === 'in_progress' ? '▶ Continue Lesson' : '▶ Start Lesson';
 
-    const l2LockedHtml = `
-      <div class="ek-lesson-card locked">
+    el.innerHTML = `
+      <div class="ek-lesson-card">
         <div class="ek-lesson-card-header">
-          <span class="ek-lesson-num">🔒 LESSON 2</span>
+          <span class="ek-lesson-num">LESSON 1</span>
+          ${statusChip(l1Status)}
         </div>
-        <div class="ek-lesson-title">Holding Your Ground</div>
-        <div class="ek-lesson-desc">Complete Lesson 1 to unlock. Learn to handle tests, pushback, and challenges without flinching. 5 core principles. ~10 min.</div>
+        <div class="ek-lesson-title">The Approach</div>
+        <div class="ek-lesson-desc">Learn how to stop a woman you've never met and make her glad you did. 5 core principles. ~10 min.</div>
+        ${certHtml}
+        <button class="ek-start-btn" id="ek-start-lesson1">${l1BtnLabel}</button>
       </div>`;
 
-    const l2UnlockedHtml = `
+    const btn1 = document.getElementById('ek-start-lesson1');
+    if (btn1) btn1.onclick = () => openLesson('lesson1', '00');
+
+    renderLesson2Card();
+  }
+
+  function renderLesson2Card() {
+    const el = document.getElementById('lesson2-card');
+    if (!el) return;
+
+    const lesson1Done    = localStorage.getItem('eklipses_lesson1_complete') === 'true';
+    const lesson2Done    = localStorage.getItem('eklipses_lesson2_complete') === 'true';
+    const lesson2Progress = localStorage.getItem('eklipses_lesson2_progress');
+
+    if (!lesson1Done) {
+      el.innerHTML = `
+        <div class="ek-lesson-card locked">
+          <div class="ek-lesson-card-header">
+            <span class="ek-lesson-num">🔒 LESSON 2</span>
+          </div>
+          <div class="ek-lesson-title">Holding Your Ground</div>
+          <div class="ek-lesson-desc">Complete Lesson 1 to unlock. Learn to handle tests, pushback, and challenges without flinching. 5 core principles. ~10 min.</div>
+        </div>`;
+      return;
+    }
+
+    const l2Status   = lesson2Done ? 'completed' : (lesson2Progress ? 'in_progress' : 'not_started');
+    const l2BtnLabel = lesson2Done ? '↺ Review Lesson' : (lesson2Progress ? '▶ Continue Lesson' : '▶ Start Lesson');
+
+    el.innerHTML = `
       <div class="ek-lesson-card">
         <div class="ek-lesson-card-header">
           <span class="ek-lesson-num">LESSON 2</span>
@@ -256,30 +285,11 @@
         <button class="ek-start-btn" id="ek-start-lesson2">${l2BtnLabel}</button>
       </div>`;
 
-    container.innerHTML = `
-      <div class="ek-learn-inner">
-        <div class="ek-lesson-card">
-          <div class="ek-lesson-card-header">
-            <span class="ek-lesson-num">LESSON 1</span>
-            ${statusChip(l1Status)}
-          </div>
-          <div class="ek-lesson-title">The Approach</div>
-          <div class="ek-lesson-desc">Learn how to stop a woman you've never met and make her glad you did. 5 core principles. ~10 min.</div>
-          ${certHtml}
-          <button class="ek-start-btn" id="ek-start-lesson1">${l1BtnLabel}</button>
-        </div>
-        ${l1Complete ? l2UnlockedHtml : l2LockedHtml}
-      </div>
-    `;
-
-    const btn1 = document.getElementById('ek-start-lesson1');
-    if (btn1) btn1.onclick = () => openLesson('lesson1', '00');
-
     const btn2 = document.getElementById('ek-start-lesson2');
     if (btn2) btn2.onclick = () => openLesson('lesson2', '00');
   }
 
-  function refreshLearnTabStatus() { renderLearnTab(); }
+  function refreshLearnTabStatus() { renderLearnTab(); renderLesson2Card(); }
 
   // ── Player state ──────────────────────────────────────────────────
   let _playerEl      = null;
@@ -883,9 +893,12 @@
   };
 
   // ── Init ──────────────────────────────────────────────────────────
+  window.openLesson = openLesson;
+
   function init() {
     injectCSS();
     renderLearnTab();
+    renderLesson2Card();
     initTabs();
   }
 
