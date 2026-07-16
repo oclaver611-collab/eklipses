@@ -2894,7 +2894,9 @@ function initInputModeToggle() {
 
 // Test hooks — allow browser tests to inject speech and end sessions without microphone
 if (typeof window !== 'undefined') {
-  window._testMode = true; // silences freeConvLoop SR so it never fires concurrent streamCharacterAndSpeak
+  // Default false for real users. OTIMC test files set window._testMode = true in
+  // context.addInitScript() (runs before this script) to suppress concurrent SR calls.
+  if (window._testMode === undefined) window._testMode = false;
   window._testBusy = false;
   window.addEventListener('test:speech', async (e) => {
     if (e.detail?.text && typeof streamCharacterAndSpeak === 'function') {

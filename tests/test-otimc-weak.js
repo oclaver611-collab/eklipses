@@ -85,6 +85,7 @@ async function run() {
     localStorage.setItem('ek-onboarding-v1', '1');
     localStorage.setItem('ek-dev-key', 'ek_dev_2026');
     localStorage.setItem('eklipses_lesson1_complete', 'true');
+    window._testMode = true; // suppress freeConvLoop SR while test:speech drives streamCharacterAndSpeak
   });
 
   const page = await context.newPage();
