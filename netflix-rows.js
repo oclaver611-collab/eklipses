@@ -164,16 +164,17 @@
       }
     }
 
-    // Click handler: select the scenario via the existing select dropdown
-    // This reuses all the existing player.js wiring without modification.
+    // Click handler: show practice focus modal (or start directly if function unavailable)
     const selectScenario = () => {
-      const select = document.getElementById('scenarioSelect');
-      if (!select) return;
-      select.value = key;
-      // Fire change event so player.js picks it up
-      select.dispatchEvent(new Event('change', { bubbles: true }));
-      // Scroll up to the stage so user sees the player
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (typeof window.showPracticeFocusModal === 'function') {
+        window.showPracticeFocusModal(key);
+      } else {
+        const select = document.getElementById('scenarioSelect');
+        if (!select) return;
+        select.value = key;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     };
 
     card.addEventListener('click', selectScenario);
