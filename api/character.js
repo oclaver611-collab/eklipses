@@ -2717,8 +2717,8 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
     ? `\n\nCRITICAL: You already told him your name earlier in this conversation. Do NOT say "you haven't asked my name yet" or any variation of it. If he goes for coffee or a number too early, use a different pushback: "You've known me a few minutes. That's not enough." or "Let's see where this goes first."`
     : '';
 
-  const showLesson1Tests = practiceFocus === 'lesson1' || practiceFocus === 'both';
-  const showLesson2Tests = practiceFocus === 'lesson2' || practiceFocus === 'both';
+  const showLesson1Tests = practiceFocus === 'lesson1' || practiceFocus === 'both' || practiceFocus === 'all';
+  const showLesson2Tests = practiceFocus === 'lesson2' || practiceFocus === 'both' || practiceFocus === 'all';
   const lesson1TestBlock = (showLesson1Tests && characterId === 'sofia') ? `
 
 LESSON 1 TEST MODE — ACTIVE:

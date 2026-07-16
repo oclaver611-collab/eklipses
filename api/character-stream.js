@@ -3183,8 +3183,8 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
   // Option B — permanent STT note in every character prompt
   const STT_NOTE = `\n\nVOICE INPUT NOTE: The user is speaking via voice recognition software. Their messages may contain speech-to-text errors. Always interpret their responses charitably and respond to the most likely intended meaning, not the literal garbled text.`;
 
-  const showLesson1Tests = practiceFocus === 'lesson1' || practiceFocus === 'both';
-  const showLesson2Tests = practiceFocus === 'lesson2' || practiceFocus === 'both';
+  const showLesson1Tests = practiceFocus === 'lesson1' || practiceFocus === 'both' || practiceFocus === 'all';
+  const showLesson2Tests = practiceFocus === 'lesson2' || practiceFocus === 'both' || practiceFocus === 'all';
   const lesson1TestBlock = (showLesson1Tests && characterId === 'sofia') ? `
 
 LESSON 1 TEST MODE — ACTIVE:

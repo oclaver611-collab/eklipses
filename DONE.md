@@ -1,3 +1,45 @@
+# DONE — July 16, 2026 (Redesign practice modal: 4-option flow)
+
+## Summary
+- **Tests:** 14/14 scenarios PASS · paywall PASS · 15/15 lesson PASS (after deploy)
+- **Tag before commit:** `v-stable-practice-modal-fix`
+
+## Changes
+
+### `player.js`
+- Added `LESSON_REGISTRY` constant — central array of all lessons with `id`, `label`, `lsKey`. Scalable: add new lessons here as they ship.
+- Replaced `showPracticeFocusModal()` entirely. New 4-option design:
+  1. **Latest Lesson** — auto-selects highest completed lesson; starts immediately. Disabled/greyed with "Complete a lesson to unlock" when 0 lessons done.
+  2. **Choose a Lesson →** — accordion that expands inline to a scrollable list of all completed lessons only. Disabled when 0 lessons done.
+  3. **All Lessons** — sets `practiceFocus = 'all'`; hidden when 0 lessons done.
+  4. **Free Practice** — always visible; sets `practiceFocus = 'free'`.
+- "Random" and "Both" options removed (replaced by "Latest Lesson" and "All Lessons").
+
+### `api/character.js`, `api/character-stream.js`
+Added `|| practiceFocus === 'all'` to `showLesson1Tests` and `showLesson2Tests` guards.
+
+### `api/coach.js`
+Added `|| practiceFocus === 'all'` to `lesson1Complete` and `lesson2Complete` overrides.
+
+### `lesson-player.js`
+Exposed `showCompletion: () => onLessonComplete()` on `window.LessonPlayer` public API — fixes pre-existing test 15 failure where `#elp-complete-inner` was empty because the test was revealing the container without populating it.
+
+### `tests/test-lesson-player.js`
+Test 14-15 now calls `window.LessonPlayer.showCompletion()` instead of directly setting `display: ''` on `#elp-complete`. This correctly triggers `buildCompletionHTML(lesson1)` and populates `.elp-mnemonic-phrase` with "One Tequila Makes Ideas Click".
+
+---
+
+# DONE — July 16, 2026 (Fix practice focus modal not appearing)
+
+## Summary
+- **Root cause:** `buildCard()` in `netflix-rows.js` was firing a dropdown `change` event directly, bypassing `showPracticeFocusModal()`. The Session 3 fix only updated `makeCard()` in `player.js` (`.sc-card` elements), which is not the active UI.
+- **Fix:** Updated the `selectScenario` click handler in `netflix-rows.js` to call `window.showPracticeFocusModal(key)` (with fallback to the old dropdown path if the function is unavailable).
+- **Tests:** 14/14 scenarios PASS · paywall PASS
+- **Commit:** `c298740`
+- **Vercel:** deploy job `cxHpMz1TcHO4fNeYTp13`
+
+---
+
 # DONE — July 16, 2026 (Practice Mode Lesson Selector modal)
 
 ## Summary

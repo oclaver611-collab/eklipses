@@ -147,6 +147,7 @@
     },
     openLesson:      openLesson,
     renderLearnTab:  renderLearnTab,
+    showCompletion:  () => onLessonComplete(),
   };
 
   // ── Tab management ────────────────────────────────────────────────

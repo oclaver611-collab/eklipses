@@ -164,9 +164,15 @@ async function run() {
 
   // ── 14-15. Completion screen ─────────────────────────────────────────────
   await page.evaluate(() => {
-    localStorage.setItem('eklipses_lesson1_complete', 'true');
-    const el = document.getElementById('elp-complete');
-    if (el) el.style.display = '';
+    // showCompletion() populates #elp-complete-inner via buildCompletionHTML() and shows the screen
+    if (window.LessonPlayer && window.LessonPlayer.showCompletion) {
+      window.LessonPlayer.showCompletion();
+    } else {
+      // Fallback: just reveal the container (mnemonic phrase won't be populated)
+      localStorage.setItem('eklipses_lesson1_complete', 'true');
+      const el = document.getElementById('elp-complete');
+      if (el) el.style.display = '';
+    }
   });
   await page.waitForTimeout(300);
 

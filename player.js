@@ -2400,48 +2400,107 @@ function makeCard(key) {
   return card;
 }
 
+// Central registry of all lessons — add new entries here as lessons ship.
+// id must match the practiceFocus value sent to the APIs ('lesson1', 'lesson2', …).
+const LESSON_REGISTRY = [
+  { id: 'lesson1', label: 'Lesson 1 — The Approach (OTIMC)',        lsKey: 'eklipses_lesson1_complete' },
+  { id: 'lesson2', label: 'Lesson 2 — Holding Your Ground (FRAME)', lsKey: 'eklipses_lesson2_complete' },
+];
+
 function showPracticeFocusModal(scenarioKey) {
-  const l1 = localStorage.getItem('eklipses_lesson1_complete') === 'true';
-  const l2 = localStorage.getItem('eklipses_lesson2_complete') === 'true';
-  const modal = document.getElementById('practice-focus-modal');
-  const body  = document.getElementById('practice-focus-body');
+  const completed = LESSON_REGISTRY.filter(l => localStorage.getItem(l.lsKey) === 'true');
+  const latest    = completed[completed.length - 1] || null;
+  const modal     = document.getElementById('practice-focus-modal');
+  const body      = document.getElementById('practice-focus-body');
 
-  const opts = [];
-  if (l1) opts.push({ label: 'Lesson 1 — The Approach (OTIMC)',         value: 'lesson1' });
-  if (l2) opts.push({ label: 'Lesson 2 — Holding Your Ground (FRAME)',   value: 'lesson2' });
-  if (l1 && l2) {
-    opts.push({ label: 'Both — Full test', value: 'both' });
-    opts.push({ label: 'Random',           value: 'random' });
+  function start(focus) {
+    localStorage.setItem('eklipses_practice_focus', focus);
+    modal.style.display = 'none';
+    playScenario(scenarioKey, true);
   }
-  opts.push({ label: 'Free Practice — no evaluation', value: 'free' });
 
-  const btnStyle = [
-    'display:block;width:100%;background:#252836;border:1px solid #2f3344;border-radius:10px',
-    'padding:14px 16px;color:#e4e8f1;font-size:14px;font-weight:600;cursor:pointer',
-    'text-align:left;transition:background .15s,border-color .15s',
-  ].join(';');
+  const S    = 'display:block;width:100%;background:#252836;border:1px solid #2f3344;border-radius:10px;padding:14px 16px;color:#e4e8f1;font-size:14px;font-weight:600;cursor:pointer;text-align:left;transition:background .15s,border-color .15s';
+  const SD   = 'display:block;width:100%;background:#1c1e2a;border:1px solid #212333;border-radius:10px;padding:14px 16px;color:#3d4460;font-size:14px;font-weight:600;cursor:default;text-align:left';
+  const SUB  = 'font-size:12px;color:#6b7495;margin-top:3px';
+  const SUBD = 'font-size:12px;color:#2a2e40;margin-top:3px';
+  const HV   = `onmouseover="this.style.background='#2e3245';this.style.borderColor='#4a5070'" onmouseout="this.style.background='#252836';this.style.borderColor='#2f3344'"`;
+  const hasAny = completed.length > 0;
 
-  body.innerHTML =
-    '<p style="font-size:18px;font-weight:700;color:#f0f2f6;margin:0 0 6px">What do you want to practice?</p>' +
-    '<p style="font-size:13px;color:#8a93a8;margin:0 0 20px;line-height:1.5">Sofia will adapt her behavior to test the skills you choose.</p>' +
-    '<div style="display:flex;flex-direction:column;gap:10px">' +
-    opts.map(o =>
-      `<button style="${btnStyle}" data-focus="${o.value}"` +
-      ` onmouseover="this.style.background='#2e3245';this.style.borderColor='#4a5070'"` +
-      ` onmouseout="this.style.background='#252836';this.style.borderColor='#2f3344'"` +
-      `>${o.label}</button>`
-    ).join('') +
-    '</div>';
+  body.innerHTML = `
+<p style="font-size:18px;font-weight:700;color:#f0f2f6;margin:0 0 6px">What do you want to practice?</p>
+<p style="font-size:13px;color:#8a93a8;margin:0 0 18px;line-height:1.5">Sofia will adapt her behavior to your choice.</p>
+<div style="display:flex;flex-direction:column;gap:8px">
 
-  body.querySelectorAll('[data-focus]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      let focus = btn.getAttribute('data-focus');
-      if (focus === 'random') focus = Math.random() < 0.5 ? 'lesson1' : 'lesson2';
-      localStorage.setItem('eklipses_practice_focus', focus);
-      modal.style.display = 'none';
-      playScenario(scenarioKey, true);
+${hasAny
+  ? `<button id="pfm-latest" style="${S}" ${HV}>
+      <div>Latest Lesson</div>
+      <div style="${SUB}">${latest.label.replace(/^Lesson \d+ — /, '')} — your most recently completed lesson</div>
+     </button>`
+  : `<button style="${SD}" disabled>
+      <div>Latest Lesson</div>
+      <div style="${SUBD}">Complete a lesson to unlock</div>
+     </button>`
+}
+
+<div id="pfm-choose-wrap">
+  ${hasAny
+    ? `<button id="pfm-choose-btn" style="${S}" ${HV}>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span>Choose a Lesson</span>
+          <span id="pfm-arrow" style="font-size:16px;transition:transform .2s;display:inline-block">›</span>
+        </div>
+        <div style="${SUB}">Pick which lesson's skills to test</div>
+       </button>`
+    : `<button style="${SD}" disabled>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span>Choose a Lesson</span>
+          <span style="font-size:16px">›</span>
+        </div>
+        <div style="${SUBD}">Complete a lesson to unlock</div>
+       </button>`
+  }
+  <div id="pfm-list" style="display:none;margin-top:6px;background:#141620;border:1px solid #252836;border-radius:10px;overflow:hidden;max-height:224px;overflow-y:auto">
+    ${completed.map(l =>
+      `<button data-lessonid="${l.id}" style="display:block;width:100%;padding:13px 16px;color:#c9d0e8;font-size:13px;font-weight:600;cursor:pointer;text-align:left;background:transparent;border:none;border-bottom:1px solid #1e2132;transition:background .12s" onmouseover="this.style.background='#1e2132'" onmouseout="this.style.background='transparent'">${l.label}</button>`
+    ).join('')}
+  </div>
+</div>
+
+${hasAny
+  ? `<button id="pfm-all" style="${S}" ${HV}>
+      <div>All Lessons</div>
+      <div style="${SUB}">Test every completed lesson's skills in one session</div>
+     </button>`
+  : ''
+}
+
+<button id="pfm-free" style="${S}" data-focus="free" ${HV}>
+  <div>Free Practice</div>
+  <div style="${SUB}">Open conversation — no skill testing or evaluation</div>
+</button>
+
+</div>`;
+
+  if (hasAny) {
+    document.getElementById('pfm-latest').addEventListener('click', () => start(latest.id));
+
+    const chooseBtn = document.getElementById('pfm-choose-btn');
+    const list      = document.getElementById('pfm-list');
+    const arrow     = document.getElementById('pfm-arrow');
+    let open = false;
+    chooseBtn.addEventListener('click', () => {
+      open = !open;
+      list.style.display   = open ? 'block' : 'none';
+      arrow.style.transform = open ? 'rotate(90deg)' : 'rotate(0deg)';
     });
-  });
+    list.querySelectorAll('[data-lessonid]').forEach(btn => {
+      btn.addEventListener('click', () => start(btn.getAttribute('data-lessonid')));
+    });
+
+    document.getElementById('pfm-all').addEventListener('click', () => start('all'));
+  }
+
+  document.getElementById('pfm-free').addEventListener('click', () => start('free'));
 
   modal.style.display = 'flex';
 }
