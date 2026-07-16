@@ -346,6 +346,13 @@
     </div>
   </div>
 
+  <!-- Practice focus selector modal -->
+  <div id="practice-focus-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:99998;align-items:center;justify-content:center;font-family:system-ui,sans-serif" onclick="if(event.target===this){localStorage.setItem('eklipses_practice_focus','free');this.style.display='none'}">
+    <div style="background:#1a1d26;border:1px solid #2b2e3b;border-radius:14px;padding:28px 24px;max-width:360px;width:90%">
+      <div id="practice-focus-body"></div>
+    </div>
+  </div>
+
   <!-- Cancel subscription modal -->
   <div id="ek-cancel-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99999;display:none;align-items:center;justify-content:center;font-family:system-ui,sans-serif">
     <div style="background:#161616;border:1px solid #2a2a2a;border-radius:10px;padding:32px;max-width:380px;width:90%;text-align:center">

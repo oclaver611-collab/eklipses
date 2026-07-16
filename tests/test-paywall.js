@@ -103,6 +103,12 @@ const { chromium } = require('playwright');
   if (cardCount > 0) {
     console.log('[TEST] Clicking first .nf-card...');
     await page.locator('.nf-card').first().click();
+    // Dismiss practice-focus-modal if it appeared (test user has no lessons — only Free Practice shown)
+    try {
+      await page.waitForSelector('#practice-focus-modal button', { timeout: 2000 });
+      console.log('[TEST] Practice focus modal appeared — selecting Free Practice');
+      await page.locator('#practice-focus-modal button[data-focus="free"]').click();
+    } catch (_) { /* modal not shown — ok */ }
   } else {
     console.log('[TEST] No .nf-card found — dispatching scenarioSelect change as fallback');
     await page.evaluate(() => {

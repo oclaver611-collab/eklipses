@@ -36,6 +36,7 @@ module.exports = async function handler(req, res) {
     userStyle,
     lesson1Complete = false,
     lesson2Complete = false,
+    practiceFocus = null,
     voiceInput = false,
   } = req.body || {};
 
@@ -3182,7 +3183,9 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
   // Option B — permanent STT note in every character prompt
   const STT_NOTE = `\n\nVOICE INPUT NOTE: The user is speaking via voice recognition software. Their messages may contain speech-to-text errors. Always interpret their responses charitably and respond to the most likely intended meaning, not the literal garbled text.`;
 
-  const lesson1TestBlock = (lesson1Complete && characterId === 'sofia') ? `
+  const showLesson1Tests = practiceFocus === 'lesson1' || practiceFocus === 'both';
+  const showLesson2Tests = practiceFocus === 'lesson2' || practiceFocus === 'both';
+  const lesson1TestBlock = (showLesson1Tests && characterId === 'sofia') ? `
 
 LESSON 1 TEST MODE — ACTIVE:
 The user has completed Lesson 1. You will naturally create opportunities for them to demonstrate the 5 lesson skills. Do NOT announce that you are testing them.
@@ -3193,7 +3196,7 @@ TEST 3 — Sensitive topic: Ask something that could make them defensive. React 
 TEST 4 — Verbal spike window: Say something like "I don't usually talk to strangers." If they take the implication subtly, respond with more warmth.
 TEST 5 — Close signal: Signal the interaction has been good. If they close directly and naturally, respond positively.` : '';
 
-  const lesson2TestBlock = (lesson2Complete && characterId === 'sofia') ? `
+  const lesson2TestBlock = (showLesson2Tests && characterId === 'sofia') ? `
 
 LESSON 2 TEST MODE — ACTIVE (FRAME):
 The user has completed Lesson 2. Test their ability to hold their ground. Do NOT announce that you are testing them.

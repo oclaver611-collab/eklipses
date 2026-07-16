@@ -1,3 +1,38 @@
+# DONE — July 16, 2026 (Practice Mode Lesson Selector modal)
+
+## Summary
+- **Tests:** 14/14 scenarios PASS · paywall PASS
+- **Vercel:** deploy triggered via deploy steps
+
+## Changes
+
+### STEP 1 — Modal HTML (`index.html`)
+Added `#practice-focus-modal` overlay div (z-index 99998) after the cancel modal. Contains `#practice-focus-body` which is populated dynamically by JS. Backdrop click sets focus to 'free' and closes.
+
+### STEP 2 — Modal logic + API wiring (`player.js`)
+- `makeCard()` now calls `showPracticeFocusModal(key)` instead of `playScenario(key,true)` directly.
+- `showPracticeFocusModal(key)` — builds option buttons based on lesson completion state:
+  - Lesson 1 complete → "Lesson 1 — The Approach (OTIMC)"
+  - Lesson 2 complete → "Lesson 2 — Holding Your Ground (FRAME)"
+  - Both complete → also "Both — Full test" and "Random" (random resolves to lesson1/lesson2 on click)
+  - Always → "Free Practice — no evaluation"
+  - Stores resolved value in `eklipses_practice_focus`, then calls `playScenario(key, true)`.
+- `practiceFocus` added to `/api/character-stream`, `/api/character` fallback, and coach payload.
+
+### STEP 3 — Character API (`api/character.js`)
+Added `practiceFocus = null` param. Replaced `lesson1Complete && characterId === 'sofia'` gate with `showLesson1Tests`/`showLesson2Tests` booleans driven by `practiceFocus`. lesson1/lesson2/both inject corresponding test blocks; free/null → no injection.
+
+### STEP 4 — Character stream API (`api/character-stream.js`)
+Same changes as character.js.
+
+### STEP 5 — Coach API (`api/coach.js`)
+Added `practiceFocus = null` param. `practiceFocus` overrides raw lesson flags: redefines `lesson1Complete`/`lesson2Complete` from it so all downstream eval logic (systemPrompt conditionals, score cap, validation) works without further changes.
+
+### Test fix (`tests/test-paywall.js`)
+Added try/catch to dismiss `#practice-focus-modal` (click `[data-focus="free"]`) before waiting for paywall, so test survives the new modal intercept. Falls through silently on old production code.
+
+---
+
 # DONE — July 15, 2026 (Sofia voice fix + FRAME coach evaluation)
 
 ## Summary

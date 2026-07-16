@@ -4,7 +4,10 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { conversation, scenarioTitle, scenarioKey, opener, lesson1Complete = false, lesson2Complete = false, characterId = 'sofia' } = req.body || {};
+  const { conversation, scenarioTitle, scenarioKey, opener, lesson1Complete: _l1 = false, lesson2Complete: _l2 = false, practiceFocus = null, characterId = 'sofia' } = req.body || {};
+  // practiceFocus overrides raw lesson flags when present
+  const lesson1Complete = practiceFocus ? (practiceFocus === 'lesson1' || practiceFocus === 'both') : _l1;
+  const lesson2Complete = practiceFocus ? (practiceFocus === 'lesson2' || practiceFocus === 'both') : _l2;
 
   if (!conversation?.length) {
     return res.status(400).json({ error: 'No conversation provided' });
