@@ -1567,21 +1567,30 @@ function listenForUserType(mySession) {
 
     let resolved = false;
 
+    function done(text) {
+      if (resolved) return;
+      resolved = true;
+      cleanup();
+      resolve(text);
+    }
+
     function cleanup() {
       wrap.style.display = 'none';
       sendBtn.removeEventListener('click', onSend);
       field.removeEventListener('keydown', onKey);
       field.removeEventListener('input', onInput);
       clearInterval(sessionPoll);
+      window.removeEventListener('eklipses-abort-type-listen', onAbort);
     }
 
+    // Fired when the mic toggle switches back to voice mid-listen — lets playLoop
+    // re-call listenForUser in voice mode for the same turn instead of hanging.
+    function onAbort() { done(null); }
+
     function submit() {
-      if (resolved) return;
       const text = field.value.trim();
       if (!text) return;
-      resolved = true;
-      cleanup();
-      resolve(text);
+      done(text);
     }
 
     function onSend() { submit(); }
@@ -1596,11 +1605,10 @@ function listenForUserType(mySession) {
     sendBtn.addEventListener('click', onSend);
     field.addEventListener('keydown', onKey);
     field.addEventListener('input', onInput);
+    window.addEventListener('eklipses-abort-type-listen', onAbort, { once: true });
 
     const sessionPoll = setInterval(() => {
-      if (mySession !== session) {
-        if (!resolved) { resolved = true; cleanup(); resolve(null); }
-      }
+      if (mySession !== session) { done(null); }
     }, 500);
   });
 }
@@ -2874,8 +2882,10 @@ function initInputModeToggle() {
     const next = current === 'voice' ? 'type' : 'voice';
     localStorage.setItem('eklipses_input_mode', next);
     updateToggle();
-    // If switching away from type mode while the input bar is visible, close it
     if (next === 'voice') {
+      // Signal listenForUserType (if currently waiting) to abort and let playLoop
+      // re-call listenForUser in voice mode for the same turn.
+      window.dispatchEvent(new CustomEvent('eklipses-abort-type-listen'));
       const wrap = document.getElementById('type-input-wrap');
       if (wrap) wrap.style.display = 'none';
     }
