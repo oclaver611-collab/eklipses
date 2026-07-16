@@ -1,3 +1,56 @@
+# DONE — July 15, 2026 (Sofia voice fix + FRAME coach evaluation)
+
+## Summary
+- **Tests:** 14/14 scenarios PASS · paywall PASS
+- **Vercel:** deploy triggered via deploy.bat
+
+## Changes
+
+### TASK 1 — Sofia voice consistency (Lesson 2)
+`scripts/rerecord_l2_sofia.js` re-recorded all 27 sofia_* files in `lessons/lesson2/audio/` using Fish Audio voice `836513f294d64aec8403226e69268b1b` (same as Lesson 1). All 27/27 TTS OK, 27/27 R2 uploaded. Cloudflare Worker redeployed.
+
+### TASK 2 — FRAME coach evaluation (`api/coach.js`)
+- Added `lesson2Complete = false` to body destructuring.
+- Added `lesson2Check` and `lesson2Eval` fields to the JSON schema in `systemPrompt` (gated on `lesson2Complete`).
+- Added FRAME skill definitions at the bottom of `systemPrompt` (F=Feel Nothing, R=Reframe, A=Add Humor, M=Make Her Qualify, E=Exit).
+- Added server-side `lesson2Check` score/passed recomputation (parallel to lesson1 pattern).
+- Added warn logs for missing lesson2 fields.
+- `cleanText` applied to `lesson2Eval`.
+
+### TASK 2 — FRAME coach in player (`player.js`)
+- Added `lesson2Complete` to `coachPayload` (reads `eklipses_lesson2_complete` from localStorage).
+- `lesson2Eval` now spoken after `lesson1Eval` and before `part1` when present.
+- Speaking order: `[lesson1Eval →] [lesson2Eval →] part1 → part2 → part3 → part4`.
+
+---
+
+# DONE — July 14, 2026 (Lesson 2 UI wiring — FRAME lesson player live)
+
+## Summary
+- **Commit:** `edfbedd` — tag `v-stable-lesson2-ui`
+- **Tests:** 14/14 scenarios PASS · paywall PASS · 15/15 lesson PASS
+- **Vercel:** auto-deploys from GitHub push to master
+
+## Changes
+
+### lesson-player.js — multi-lesson refactor
+- `SEGMENTS1` (16) + `SEGMENTS2` (14) + `LESSONS` config object
+- `_currentLessonId` state; `currentLesson()` / `currentSegments()` helpers
+- `loadManifest()` now cached per lesson (`_manifests` object)
+- `playSequence()` prefixes file URLs with `lesson.workerPrefix` (`lesson2/` for L2, empty for L1)
+- `openLesson(lessonIdOrSegId, startSegId)` — backwards-compat: `openLesson('00')` → lesson 1 seg 00
+- `onLessonComplete()` builds completion screen dynamically per lesson (`buildCompletionHTML()`)
+- `renderLearnTab()` shows Lesson 2 card; LOCKED until lesson 1 complete, then shows status chip + FRAME mnemonic tag
+- `LessonPlayer.isLesson2Complete()` exposed on public API
+
+### cloudflare-worker/lesson-audio-worker.js — generic routing
+- Regex updated: `/^(lesson\d+\/)?(manifest\.json|[a-z0-9_]+\.mp3)$/i`
+- `lesson2/X` → `lessons/lesson2/audio/X`
+- bare `X` → `lessons/lesson1/audio_v2/X` (backwards compat)
+- Worker redeployed via `deploy-worker.js`
+
+---
+
 # DONE — July 14, 2026 (Lesson 2 FRAME + paywall fix + auto-run pipeline)
 
 ## Summary

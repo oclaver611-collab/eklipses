@@ -4,7 +4,7 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { conversation, scenarioTitle, scenarioKey, opener, lesson1Complete = false, characterId = 'sofia' } = req.body || {};
+  const { conversation, scenarioTitle, scenarioKey, opener, lesson1Complete = false, lesson2Complete = false, characterId = 'sofia' } = req.body || {};
 
   if (!conversation?.length) {
     return res.status(400).json({ error: 'No conversation provided' });
@@ -272,6 +272,19 @@ ${lesson1Complete ? `  "lesson1Check": {
     "summary": "<1-2 punchy sentences: 4-5 PASS = Lesson 1 skills applied well, 3 = Halfway there, 2 or fewer = Review and try again>"
   },
   "lesson1Eval": "<Spoken coaching paragraph — Ryan talking to the user. Start with 'Let me walk you through the Lesson 1 skills — One Tequila Makes Ideas Click.' Then describe each skill result conversationally, matching the PASS/FAIL verdicts already set in lesson1Check above. Do NOT format as 'O — Observation: PASS.' Instead speak it naturally: 'For Observe', 'For Tease', 'For Mystery', 'For Imply', 'For Close' — then say what happened and whether it worked. One or two coaching sentences per skill. For Close specifically: state the verdict that matches lesson1Check.skills.close, then you MAY add one optional coaching observation about delivery framing (e.g. 'the ask was there — next time lead with it more directly' or 'good invite, maybe let it breathe a beat longer before pulling the trigger'). That optional comment is color only — it must NOT contradict or re-open the verdict. This paragraph is spoken out loud — write it to be heard, not read off a form.>",` : ''}
+${lesson2Complete ? `  "lesson2Check": {
+    "skills": {
+      "feelNothing": "<'PASS' or 'FAIL' — apply the LESSON 2 EVALUATION criteria below>",
+      "reframe": "<'PASS' or 'FAIL'>",
+      "addHumor": "<'PASS' or 'FAIL'>",
+      "makeHerQualify": "<'PASS' or 'FAIL'>",
+      "exit": "<'PASS' or 'FAIL'>"
+    },
+    "score": "<number 0-5, count of PASS>",
+    "passed": "<true if score >= 4, false otherwise>",
+    "summary": "<1-2 punchy sentences: 4-5 PASS = FRAME applied well, 3 = Making progress, 2 or fewer = Review and try again>"
+  },
+  "lesson2Eval": "<Spoken coaching paragraph — Ryan talking to the user. Start with 'Let me walk you through the Lesson 2 skills — FRAME.' Then describe each skill result conversationally, matching the PASS/FAIL verdicts in lesson2Check above. For each skill speak it naturally: 'For Feel Nothing', 'For Reframe', 'For Add Humor', 'For Make Her Qualify', 'For Exit' — then say what happened and whether it worked. One or two coaching sentences per skill. Spoken out loud — write it to be heard, not read off a form.>",` : ''}
   "part1": "<THE OPENER. Minimum 150 characters. Three sentences. ALWAYS begin with a positive: quote ONE specific line the user said anywhere in the conversation that showed curiosity, humor, or confidence, and say in one sentence why it worked. Second sentence: quote their opening line (HIM_1) verbatim inside quotes, name the move in 5 words or fewer, and say how it landed with ${girlName}. Third sentence: the one thing to sharpen next time. Never start part1 with a negative or a critique. The user must hear what to keep doing before hearing what to fix. Example structure: 'When you said [quote from the conversation], that landed — it showed you were paying attention to her, not just running a move. Your opener, [HIM_1 quote], was [name the move] — with ${girlName} that [how it landed]. Next time, [one specific thing to sharpen].'>",
 
   "part2": "<THE MIDDLE. Minimum 150 characters. Two to three sentences. Quote the single most revealing exchange: 'When she said [exact ${girlName} quote], you said [exact HIM quote].' Then one to two sentences on what that exchange cost him or earned him with ${girlName}, specific to who she is. Be surgical — name exactly what she was responding to.>",
@@ -381,7 +394,32 @@ FAIL examples: "We should hang out sometime, no pressure." = FAIL (hedge). "Mayb
 ANTI-FABRICATION RULE for lesson1Eval:
 You are describing what happened in THIS specific conversation from the transcript above. When writing the lesson1Eval sentences, only put words in quotation marks if you are copying them VERBATIM from the transcript. If you are not certain of the exact wording, describe what happened without using quotes — paraphrase instead of quoting. Do not invent lines that she said or that he said.
 
-These fields (lesson1Eval and lesson1Check) are already part of the JSON schema above — fill them based on the criteria and definitions above.` : ''}`;
+These fields (lesson1Eval and lesson1Check) are already part of the JSON schema above — fill them based on the criteria and definitions above.` : ''}${lesson2Complete ? `
+
+LESSON 2 EVALUATION — FRAME: Holding Your Ground:
+Evaluate the user on these 5 skills. Match your verdicts exactly to the lesson2Check fields in the JSON schema above.
+
+F — Feel Nothing: When she tested or challenged him, did he stay visibly unaffected?
+PASS = no flinching, no defending, no explaining himself
+FAIL = got defensive, tensed up, started justifying
+
+R — Reframe It: Did he flip the script back on her at any point?
+PASS = turned her test into something playful or made her qualify herself
+FAIL = accepted her frame, tried to meet her on her terms
+
+A — Add Humor: Did he defuse a tense moment with a light touch?
+PASS = used a joke or playful line to neutralize a test
+FAIL = took the test seriously, got logical or emotional about it
+
+M — Make Her Qualify: Did he create a moment where she had to prove something to him?
+PASS = turned the situation so she was trying to impress him
+FAIL = he was always the one trying to impress her
+
+E — Exit If Needed: Did he show he was willing to walk away or pull back with confidence?
+PASS = pulled back or showed he didn't need her approval
+FAIL = chased, kept talking after she pulled back
+
+These fields (lesson2Eval and lesson2Check) are already part of the JSON schema above — fill them based on the criteria and definitions above.` : ''}`;
 
   try {
     const mainMessages = [
@@ -426,6 +464,21 @@ These fields (lesson1Eval and lesson1Check) are already part of the JSON schema 
     if (lesson1Complete) {
       if (!feedback.lesson1Eval || feedback.lesson1Eval.length < 10) console.warn('[coach] lesson1Eval missing despite lesson1Complete=true');
       if (!feedback.lesson1Check || !feedback.lesson1Check.skills) console.warn('[coach] lesson1Check missing despite lesson1Complete=true');
+    }
+
+    if (lesson2Complete) {
+      if (!feedback.lesson2Eval || feedback.lesson2Eval.length < 10) console.warn('[coach] lesson2Eval missing despite lesson2Complete=true');
+      if (!feedback.lesson2Check || !feedback.lesson2Check.skills) console.warn('[coach] lesson2Check missing despite lesson2Complete=true');
+    }
+
+    if (lesson2Complete && feedback.lesson2Check?.skills) {
+      const skills2 = feedback.lesson2Check.skills;
+      const passCount2 = ['feelNothing', 'reframe', 'addHumor', 'makeHerQualify', 'exit'].filter(k => skills2[k] === 'PASS').length;
+      feedback.lesson2Check.score = passCount2;
+      feedback.lesson2Check.passed = passCount2 >= 4;
+    }
+
+    if (lesson1Complete) {
 
       if (feedback.lesson1Check?.skills) {
         // Server-side C verdict: two-question mechanical gate overrides LLM judgment.
@@ -595,6 +648,8 @@ These fields (lesson1Eval and lesson1Check) are already part of the JSON schema 
     feedback.missedOpportunity = cleanText(feedback.missedOpportunity);
     feedback.bestMoment = cleanText(feedback.bestMoment);
     feedback.wouldSheDateHim = cleanText(feedback.wouldSheDateHim);
+    if (feedback.lesson1Eval) feedback.lesson1Eval = cleanText(feedback.lesson1Eval);
+    if (feedback.lesson2Eval) feedback.lesson2Eval = cleanText(feedback.lesson2Eval);
 
     res.json(feedback);
 

@@ -2019,6 +2019,7 @@ async function runCoachFeedback(mySession) {
     scenarioKey: currentScenarioKey || '',
     opener: firstUserOpener || '',
     lesson1Complete: localStorage.getItem('eklipses_lesson1_complete') === 'true',
+    lesson2Complete: localStorage.getItem('eklipses_lesson2_complete') === 'true',
     characterId: currentCharacterId || 'sofia',
   });
 
@@ -2071,10 +2072,16 @@ async function runCoachFeedback(mySession) {
 
   if(mySession!==session) return;
 
-  // Speaking order: [lesson1Eval →] part1 → trans2 → part2 → trans3 → part3 → trans4 → part4 → tryNextTime → score reveal
+  // Speaking order: [lesson1Eval →] [lesson2Eval →] part1 → trans2 → part2 → trans3 → part3 → trans4 → part4 → tryNextTime → score reveal
   if (f.lesson1Eval && mySession === session) {
     const l1url = await KokoroSpeech.prefetch(f.lesson1Eval, 'am_adam');
     await speak(f.lesson1Eval, 'Ryan', () => { els.text.textContent = f.lesson1Eval; }, l1url);
+    if (mySession !== session) return;
+    await pause(600);
+  }
+  if (f.lesson2Eval && mySession === session) {
+    const l2url = await KokoroSpeech.prefetch(f.lesson2Eval, 'am_adam');
+    await speak(f.lesson2Eval, 'Ryan', () => { els.text.textContent = f.lesson2Eval; }, l2url);
     if (mySession !== session) return;
     await pause(600);
   }
