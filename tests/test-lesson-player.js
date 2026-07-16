@@ -183,6 +183,93 @@ async function run() {
   report('15. Completion screen contains mnemonic phrase',
     mnemonicText === 'One Tequila Makes Ideas Click', `"${mnemonicText}"`);
 
+  // ── 16-18. Mic-toggle mid-conversation regression ───────────────────────────
+  // Regression for commit 19d0278: listenForUserType had no abort path when the
+  // mic toggle fired mid-conversation. The game froze because the Promise only
+  // resolved via text submit or session change — never via a toggle event.
+  // Fix: added window.addEventListener('eklipses-abort-type-listen', onAbort).
+  //
+  // Test 16 (sanity) simulates the PRE-FIX state by monkey-patching addEventListener
+  // to silently drop eklipses-abort-type-listen registrations. The abort event is
+  // then dispatched; without the handler the Promise must hang → timedOut:true.
+  // This confirms the test WOULD have caught the original bug.
+  // Tests 17-18 run with the real fix in place.
+
+  const sanityResult = await page.evaluate(async () => {
+    // Suppress eklipses-abort-type-listen registrations to simulate missing fix
+    const origAddEL = window.addEventListener.bind(window);
+    window.addEventListener = function(type, handler, options) {
+      if (type === 'eklipses-abort-type-listen') return;
+      return origAddEL(type, handler, options);
+    };
+
+    localStorage.setItem('eklipses_input_mode', 'type');
+    const snap = session;
+    const p = listenForUserType(snap);
+    await new Promise(r => setTimeout(r, 150)); // let setup complete
+
+    const wrapShown = document.getElementById('type-input-wrap')?.style.display === 'flex';
+
+    // Dispatch abort event — should have NO effect (handler was never registered)
+    localStorage.setItem('eklipses_input_mode', 'voice');
+    window.dispatchEvent(new CustomEvent('eklipses-abort-type-listen'));
+
+    const outcome = await Promise.race([
+      p.then(val => ({ timedOut: false, val })),
+      new Promise(r => setTimeout(() => r({ timedOut: true }), 1000)),
+    ]);
+
+    window.addEventListener = origAddEL; // restore
+    // Drain the stuck Promise: session change triggers sessionPoll → done(null)
+    stopEverything();
+    await Promise.race([p, new Promise(r => setTimeout(r, 700))]);
+    await new Promise(r => setTimeout(r, 200)); // let session settle
+
+    return { wrapShown, outcome };
+  });
+
+  report('16. [sanity] Pre-fix: abort event ignored when handler missing — Promise hangs',
+    sanityResult.outcome.timedOut === true && sanityResult.wrapShown,
+    sanityResult.outcome.timedOut
+      ? (sanityResult.wrapShown ? 'confirmed — hung 1 s as expected' : 'hung but wrap not shown (DOM missing?)')
+      : 'UNEXPECTED RESOLVE — abort fired without handler (sanity invalid)');
+
+  const abortResult = await page.evaluate(async () => {
+    localStorage.setItem('eklipses_input_mode', 'type');
+    const snap = session; // session may have incremented after stopEverything above
+    const startMs = Date.now();
+    // Call listenForUser — the real playLoop call — routes to listenForUserType in type mode
+    const p = listenForUser(snap, 10000);
+    await new Promise(r => setTimeout(r, 150)); // let setup complete
+
+    const wrapBefore = document.getElementById('type-input-wrap')?.style.display;
+
+    // Simulate mic toggle: set voice in localStorage then dispatch abort event
+    // (exact sequence from initInputModeToggle click handler in player.js)
+    localStorage.setItem('eklipses_input_mode', 'voice');
+    window.dispatchEvent(new CustomEvent('eklipses-abort-type-listen'));
+
+    const outcome = await Promise.race([
+      p.then(val => ({ timedOut: false, val, elapsedMs: Date.now() - startMs })),
+      new Promise(r => setTimeout(() => r({ timedOut: true, elapsedMs: Date.now() - startMs }), 2000)),
+    ]);
+
+    const wrapAfter = document.getElementById('type-input-wrap')?.style.display;
+    const modeAfter = localStorage.getItem('eklipses_input_mode');
+
+    return { wrapBefore, outcome, wrapAfter, modeAfter };
+  });
+
+  report('17. Mic toggle mid-listen — listenForUser resolves null within 2 s (not frozen)',
+    !abortResult.outcome.timedOut && abortResult.outcome.val === null,
+    abortResult.outcome.timedOut
+      ? `TIMED OUT ${abortResult.outcome.elapsedMs}ms — freeze bug present`
+      : `resolved null in ${abortResult.outcome.elapsedMs}ms`);
+
+  report('18. After mic toggle — type wrap hidden and eklipses_input_mode is voice',
+    abortResult.wrapAfter === 'none' && abortResult.modeAfter === 'voice',
+    `wrap="${abortResult.wrapAfter}" mode="${abortResult.modeAfter}"`);
+
   // ── Summary ───────────────────────────────────────────────────────────────
   await browser.close();
 
