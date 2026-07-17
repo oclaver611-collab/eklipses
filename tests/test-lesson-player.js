@@ -238,6 +238,9 @@ async function run() {
     localStorage.setItem('eklipses_input_mode', 'type');
     const snap = session; // session may have incremented after stopEverything above
     const startMs = Date.now();
+    // Set _testMode so the recursive voice re-listen returns null immediately (deterministic)
+    const prevTestMode = window._testMode;
+    window._testMode = true;
     // Call listenForUser — the real playLoop call — routes to listenForUserType in type mode
     const p = listenForUser(snap, 10000);
     await new Promise(r => setTimeout(r, 150)); // let setup complete
@@ -254,6 +257,7 @@ async function run() {
       new Promise(r => setTimeout(() => r({ timedOut: true, elapsedMs: Date.now() - startMs }), 2000)),
     ]);
 
+    window._testMode = prevTestMode;
     const wrapAfter = document.getElementById('type-input-wrap')?.style.display;
     const modeAfter = localStorage.getItem('eklipses_input_mode');
 
@@ -269,6 +273,42 @@ async function run() {
   report('18. After mic toggle — type wrap hidden and eklipses_input_mode is voice',
     abortResult.wrapAfter === 'none' && abortResult.modeAfter === 'voice',
     `wrap="${abortResult.wrapAfter}" mode="${abortResult.modeAfter}"`);
+
+  // ── 19. Mode-switch rescue-line regression ────────────────────────────────
+  // Regression for the bug where type→voice toggle triggered the "No worries,
+  // let's keep going" fallback line. Root cause: listenForUserType resolved null
+  // on abort, and listenForUser returned that null directly to playLoop /
+  // freeConversation, which treated null as genuine silence.
+  // Fix: listenForUser now re-enters voice mode on mode-switch null instead of
+  // returning null to callers. Verified by checking _lastInputMode === 'voice'
+  // after the Promise resolves (proves the recursive voice-mode call happened).
+
+  const modeSwitchResult = await page.evaluate(async () => {
+    const prevTestMode = window._testMode;
+    window._testMode = true; // voice path returns null immediately — no SR needed
+    localStorage.setItem('eklipses_input_mode', 'type');
+    const snap = session;
+
+    const p = listenForUser(snap, 5000);
+    await new Promise(r => setTimeout(r, 100));
+
+    // Simulate toggle
+    localStorage.setItem('eklipses_input_mode', 'voice');
+    window.dispatchEvent(new CustomEvent('eklipses-abort-type-listen'));
+
+    const val = await Promise.race([
+      p,
+      new Promise(r => setTimeout(() => r('TIMEOUT'), 2000)),
+    ]);
+
+    const lastMode = _lastInputMode; // 'voice' proves recursive re-enter happened
+    window._testMode = prevTestMode;
+    return { val, lastMode };
+  });
+
+  report('19. Type→voice toggle — listenForUser re-enters voice mode (no rescue line)',
+    modeSwitchResult.lastMode === 'voice' && modeSwitchResult.val === null,
+    `_lastInputMode="${modeSwitchResult.lastMode}" val="${modeSwitchResult.val}"`);
 
   // ── Summary ───────────────────────────────────────────────────────────────
   await browser.close();

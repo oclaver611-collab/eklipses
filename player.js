@@ -1423,7 +1423,15 @@ function showListening(on=true) {
 //   SILENCE_LONG  = 1800ms — fires otherwise (mid-thought, comma pause, etc.)
 function listenForUser(mySession, maxTotalMs) {
   _lastInputMode = getInputMode();
-  if (_lastInputMode === 'type') return listenForUserType(mySession);
+  if (_lastInputMode === 'type') {
+    return listenForUserType(mySession).then(result => {
+      // null from mode-switch abort: user toggled to voice mid-listen — skip fallback, re-listen in voice
+      if (result === null && mySession === session && getInputMode() === 'voice') {
+        return listenForUser(mySession, maxTotalMs);
+      }
+      return result;
+    });
+  }
   if (typeof window !== 'undefined' && window._testMode) return Promise.resolve(null);
   return new Promise(resolve=>{
     maxTotalMs=maxTotalMs||30000;
