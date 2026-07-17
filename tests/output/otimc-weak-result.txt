@@ -1,30 +1,30 @@
 ══════════════════════════════════════════════════════════════════════
 OTIMC WEAK SESSION RESULT  (TEST B — "Bombs It")
-Date:    2026-07-10T03:14:46.421Z
-URL:     http://localhost:3001
+Date:    2026-07-17T03:04:01.068Z
+URL:     https://eklipses.vercel.app
 ══════════════════════════════════════════════════════════════════════
 
 CONVERSATION TRANSCRIPT:
   1. O — Observation opener (WEAK)
      HIM:   "Hey, how's your day going? Nice weather out here today."
-     SOFIA: "The weather's nice, but you’d think that would be standard for a beach."
+     SOFIA: "It has that warm glow that makes everything feel different."
   2. T — Tease (WEAK)
      HIM:   "Oh no I didn't mean to offend you or anything, I was just making conversation, you seem really cool."
-     SOFIA: "It’s a Tuesday afternoon; who wouldn’t feel a little underwhelmed?"
+     SOFIA: "What brings you here?"
   3. M — Mystery (WEAK)
      HIM:   "Yeah I work in marketing, been doing it like 4 years now, I just moved here from Chicago, I love the beach, I come here every weekend basically."
-     SOFIA: "What brought you to this quieter beach?"
+     SOFIA: "What do you like most about this place?"
   4. I — Imply (WEAK)
      HIM:   "I think you're really attractive and I'd like to ask you out on a date because I think we'd get along."
-     SOFIA: "That's not enough, wouldn’t you say?"
+     SOFIA: "What do you do for fun when you're not at the beach?"
   5. C — Close (WEAK)
      HIM:   "So I don't know, maybe we could hang out sometime if you want, like no pressure or whatever, just if you feel like it."
-     SOFIA: "Let's see if this conversation earns it first."
+     SOFIA: "I’m still getting a feel for you."
 
 ──────────────────────────────────────────────────────────────────────
 LESSON 1 EVAL (spoken scorecard)
 ──────────────────────────────────────────────────────────────────────
-Let me walk you through the Lesson 1 skills - One Tequila Makes Ideas Click. For Observe, that didn't land. You came in with a generic question instead of noticing something real about her. For Tease, you folded when she pushed back. For Mystery, you gave away too much about yourself. For Imply, you stated your interest directly without any subtext. For Close, your last message was too hedgy.
+Let me walk you through the Lesson 1 skills — One Tequila Makes Ideas Click. For Observe, you didn't reference anything specific about the scene. For Tease, you apologized when she gave a short answer. For Mystery, you gave away too much about your job. For Imply, you stated your interest directly. For Close, your invite had hedge language, which softened the ask. None of these skills were applied correctly.
 
 ──────────────────────────────────────────────────────────────────────
 LESSON 1 CHECK (certification)
@@ -35,29 +35,29 @@ Score: 0/5   Passed: false
   M (mystery):     FAIL
   I (imply):       FAIL
   C (close):       FAIL
-Summary: Review and try again. None of the Lesson 1 skills were applied well.
+Summary: Review and try again, none of the Lesson 1 skills were applied well.
 
 ──────────────────────────────────────────────────────────────────────
 STANDARD COACH FEEDBACK  (score: 3/10)
 ──────────────────────────────────────────────────────────────────────
-spokenSummary: You said 'Hey, how's your day going?' - didn't land.
+spokenSummary: She said 'earn it first'.
 
 PART 1:
-You opened with a generic greeting - didn't give her anything to grab. With Sofia, that goes flat immediately - she needs something real before she gives you anything back. She registered that you were trying hard, but it wasn't enough.
+When you said you think she's attractive, that was honest — it showed you were paying attention to her. Your opener was a generic greeting — with Sofia that fell flat. Next time, notice something particular about her or the scene and comment on that.
 
 PART 2:
-When she said 'Offend me? Not yet. You’re just trying hard.', you said 'Oh no I didn't mean to offend you or anything, I was just making conversation, you seem really cool.' That exchange cost you because you apologized and gave a generic compliment instead of pushing back or noticing something real about her. Sofia was responding to your attempt at conversation, but you didn't capitalize on it.
+When she said 'Let's see if this conversation earns it first', you said 'maybe we could hang out sometime if you want' — that showed you weren't listening to her challenge. She was responding to your direct statement of interest, and you should have picked up on that.
 
 PART 3:
-The moment that hurt you most was when you said 'I think you're really attractive and I'd like to ask you out on a date because I think we'd get along.' You should have said something like 'I'm curious about what you're working on, you seem really focused.' That works with Sofia because she rewards genuine curiosity and specificity. She wants to talk about something real, not just be asked out on a date.
+The moment that hurt you most was when you said 'I think you're really attractive and I'd like to ask you out on a date' — instead, you could have said 'I'm curious about you, beyond just this conversation'. This works with Sofia because she rewards genuine curiosity, not direct compliments.
 
 PART 4:
-Two things to fix: folding when she pushes back and stating interest too directly. Next time, try to go again with a bit more edge and see how that changes the conversation.
+Two things to fix: apologizing after she gave a short answer and stating interest too directly. Try again, and next time, you got this.
 
 tryNextTime:
-1. What's the most interesting thing you've learned from your notes so far? 2. You seem like someone who values honesty - what's the most honest thing you've said to someone recently? 3. If you could change one thing about this beach, what would it be?
+1. What's the most interesting thing you've written about lately? 2. You seem like someone who notices details — what do you like about this beach? 3. What's one thing you're looking forward to doing this summer?
 
-openerBreakdown:    Your opening line 'Hey, how's your day going? Nice weather out here today.' didn't work because it was too generic and didn't give Sofia anything to respond to.
-bestMoment:         Your best moment was when you said 'Yeah I work in marketing, been doing it like 4 years now, I just moved here from Chicago, I love the beach, I come here every weekend basically.' - it was still too much information, but at least you were sharing something about yourself.
-missedOpportunity:  When Sofia said 'That's a bit better. No pressure can often mean more pressure, though. You’re smoothing it out, but still. Let's see if this conversation earns it first.', you should have picked up on her dry wit and responded with something that acknowledged it, like 'Fair point, I guess I'm still learning how to ask someone out without being too pushy.'
-wouldSheDateHim:    No, I don't think I'd date him - when he said 'I think you're really attractive and I'd like to ask you out on a date because I think we'd get along.', it felt like he was just trying to get a date, not actually interested in getting to know me.
+openerBreakdown:    His opening line 'Hey, how's your day going? Nice weather out here today' didn't work with Sofia because it was too generic and didn't show he noticed anything particular about her.
+bestMoment:         When he said 'I think you're really attractive', that was at least honest, but it landed poorly because it was too direct.
+missedOpportunity:  When Sofia said 'It's been a bit all over the place', he could have asked what she meant by that, instead of just saying 'oh no' and apologizing.
+wouldSheDateHim:    No, I don't think I'd date him because when I said 'Let's see if this conversation earns it first', he didn't seem to get that I wanted to see more substance in our conversation.

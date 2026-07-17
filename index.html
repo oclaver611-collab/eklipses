@@ -251,7 +251,37 @@
     }
     .name { font-size: 20px; margin: 8px 0 4px; }
     .line { font-size: 14px; padding: 0 12px; }
-  }</style>
+  }
+
+  /* ===== Mnemonic Reminder Pill ===== */
+  #mnemonic-pill { position:fixed;bottom:80px;left:16px;z-index:9990;font-family:system-ui,sans-serif;user-select:none }
+  #mnemonic-pill-collapsed { display:flex;align-items:center;gap:4px }
+  #mnemonic-pill-label {
+    background:#1a1c22;border:1px solid #2b2e36;border-radius:999px;
+    color:#8a93a8;font-size:12px;font-weight:600;padding:5px 12px;
+    cursor:pointer;transition:background .15s,border-color .15s,color .15s;white-space:nowrap
+  }
+  #mnemonic-pill-label:hover { background:#272b34;border-color:#3a3f4b;color:#c5cde8 }
+  #mnemonic-pill-off {
+    background:transparent;border:none;color:#2b2e3b;font-size:15px;
+    cursor:pointer;padding:4px 5px;line-height:1;transition:color .15s
+  }
+  #mnemonic-pill-off:hover { color:#6b7495 }
+  #mnemonic-pill-card {
+    background:#1a1d26;border:1px solid #2b2e3b;border-radius:12px;
+    padding:10px 14px 12px;min-width:220px
+  }
+  #mnemonic-card-head { display:flex;justify-content:space-between;align-items:center;margin-bottom:8px }
+  #mnemonic-card-name { font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6b7495 }
+  #mnemonic-card-collapse {
+    background:transparent;border:none;color:#6b7495;font-size:16px;
+    cursor:pointer;padding:1px 4px;line-height:1;transition:color .15s
+  }
+  #mnemonic-card-collapse:hover { color:#c5cde8 }
+  #mnemonic-items { list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:5px }
+  .mn-item { display:flex;align-items:baseline;gap:8px }
+  .mn-letter { font-size:13px;font-weight:700;color:#e4e8f1;min-width:12px }
+  .mn-meaning { font-size:12px;color:#8a93a8;line-height:1.3 }</style>
 </head>
 <body>
   <div class="topbar">
@@ -335,6 +365,21 @@
   <div id="type-input-wrap">
     <textarea id="type-input-field" placeholder="Type your response and press Enter…" rows="1"></textarea>
     <button id="type-send-btn">Send</button>
+  </div>
+
+  <!-- Mnemonic reminder pill — shown during lesson-specific practice sessions -->
+  <div id="mnemonic-pill" style="display:none">
+    <div id="mnemonic-pill-collapsed">
+      <button id="mnemonic-pill-label">FRAME ▸</button>
+      <button id="mnemonic-pill-off" title="Hide this reminder">×</button>
+    </div>
+    <div id="mnemonic-pill-card" style="display:none">
+      <div id="mnemonic-card-head">
+        <span id="mnemonic-card-name">FRAME</span>
+        <button id="mnemonic-card-collapse" title="Collapse">−</button>
+      </div>
+      <ul id="mnemonic-items"></ul>
+    </div>
   </div>
 
   <!-- Avatar Picker (opened when user clicks the button) -->

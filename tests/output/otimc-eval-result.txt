@@ -1,7 +1,7 @@
 ══════════════════════════════════════════════════════════════════════
 OTIMC EVAL RESULT
-Date:             2026-07-10T04:48:42.306Z
-URL:              http://localhost:3001
+Date:             2026-07-17T03:04:53.569Z
+URL:              https://eklipses.vercel.app
 lesson1Complete:  true
 scenario:         beach
 character:        Sofia
@@ -10,24 +10,24 @@ character:        Sofia
 CONVERSATION TRANSCRIPT (One Tequila Makes Ideas Click):
   1. O — Observation opener
      HIM:   "You've been out here writing the whole time — is it something you actually care about, or just a deadline pushing you?"
-     SOFIA: "What about you?"
+     SOFIA: "This topic feels especially important as we see the changes unfold."
   2. T — Tease
      HIM:   "That sounds like the polished version. I get the feeling the real one is more interesting."
-     SOFIA: "Something about you seems curious—like you're good at reading between the lines."
+     SOFIA: "Do you have any stories that need polishing?"
   3. M — Mystery
      HIM:   "Depends on the day. Today it's following whatever pulls you somewhere and seeing what happens."
-     SOFIA: "But I like the idea of following what draws you in."
+     SOFIA: "The beach seems like a good choice for that kind of wandering."
   4. I — Imply
      HIM:   "You know where this conversation could go. I'm curious whether you want to find out."
-     SOFIA: "It’s not often someone seems genuinely interested."
+     SOFIA: "Curious — got it."
   5. C — Close
      HIM:   "Come get a coffee with me."
-     SOFIA: "What’s the most unexpected thing you’ve learned about yourself this week?"
+     SOFIA: "It's a bit presumptuous, don't you think?"
 
 ──────────────────────────────────────────────────────────────────────
 LESSON 1 EVAL  (lesson1Eval — spoken OTIMC scorecard)
 ──────────────────────────────────────────────────────────────────────
-Let me walk you through the Lesson 1 skills — One Tequila Makes Ideas Click. For Observe, you noticed she was writing and asked about it, which worked well. For Tease, you pushed back on her polished answer, keeping it playful. For Mystery, you gave a vague answer about following what pulls you, which left her wanting more. But for Imply, you didn't really hint at any attraction or interest in her beyond the conversation. And for Close, you asked her to get coffee, but it was too abrupt and lacked a lead-in. Next time, try to build that moment better before the invite.
+Let me walk you through the Lesson 1 skills — One Tequila Makes Ideas Click. For Observe, you nailed it by noticing she was writing and asking about it. For Tease, you pushed back on her polished version, which worked well. For Mystery, you kept it vague when she asked about your stories, which was good. For Imply, you didn't quite create that romantic tension; your line about curiosity felt flat. For Close, you made a direct invite, but it lacked the confidence she needed — you could have framed it better.
 
 ──────────────────────────────────────────────────────────────────────
 LESSON 1 CHECK  (lesson1Check — certification tracking)
@@ -38,29 +38,29 @@ Score: 4/5   Passed: true
   M (mystery):     PASS
   I (imply):       FAIL
   C (close):       PASS
-Summary: You did well with observation, tease, and mystery, but missed on implying interest and closing strong.
+Summary: You did well with observation, tease, and mystery, but missed on imply and close. Keep sharpening those skills.
 
 ──────────────────────────────────────────────────────────────────────
 STANDARD COACH FEEDBACK  (score: 6/10)
 ──────────────────────────────────────────────────────────────────────
-spokenSummary: You asked, 'is it something you actually care about, or just a deadline pushing you?' — it was a solid opener but missed depth.
+spokenSummary: Your opener, 'You've been out here writing the whole time...' showed you were curious, but you missed some real moments.
 
 PART 1 — opener:
-'You've been out here writing the whole time — is it something you actually care about, or just a deadline pushing you?' — it was a solid opener. With Sofia, it got her talking, but it could have been more specific to what she cares about.
+When you said 'is it something you actually care about, or just a deadline pushing you?', that landed — it showed you were curious about her writing. Your opener, 'You've been out here writing the whole time...' was a solid observation — with Sofia that sparked her interest. Next time, go further into into her responses to keep the conversation flowing.
 
 PART 2 — middle:
-'When she said, "There's a lot of frustration behind this paragraph," you said, "That sounds like the polished version." This missed a chance to get into into her frustration and what that means for her writing process, which she clearly cares about.
+When she said 'The real story feels heavier, though — like figuring out how to express loss without it all sounding doom and gloom.', you said 'Depends on the day. Today it's following whatever pulls you somewhere and seeing what happens.' You missed a chance to connect with her deeper feelings about loss and storytelling, which she clearly cares about.
 
 PART 3 — correction:
-The moment that hurt you most was when you said, 'You know where this conversation could go. I'm curious whether you want to find out.' Instead, you should have said, 'I think there's more to your frustration. What’s really going on with this article?' This works better because it shows you’re genuinely interested in her thoughts and feelings, which is what she responds to.
+The moment that hurt you most was when you said, 'You know where this conversation could go. I'm curious whether you want to find out.' Instead, you should have said, 'It sounds like you have a lot on your mind about this topic. What’s the heaviest part for you?' This works better because it shows you’re genuinely interested in her thoughts and feelings, which is what Sofia rewards.
 
 PART 4 — closer:
-Two things to fix: imply interest better and close with more build-up. You need to make her feel the intrigue before asking her out. Next time, try again.
+Two things to fix: sharpen your imply skill and strengthen your close. You had some real moments, but don’t let them slip away next time.
 
 tryNextTime:
-1. I've been watching the way the light changes on the water, it's like the whole scene is being rewritten every minute, and I feel like our conversation is doing the same thing.
-2. The shoreline shifting, that's a powerful metaphor, I wonder if it's reflecting something in your life beyond just the research.
-3. I love how you're trying to capture the essence of this place, it's like you're trying to hold onto something that's inherently fleeting, and I think that's what drew me to you.
+1. I've been watching the waves and thinking about the stories they could tell; what's the most captivating story the shoreline has inspired in you so far?
+2. If you weren't working on your writing today, what's something you might have done instead, and how did you decide on this spot to sit and reflect?
+3. Since you mentioned the changes unfolding on the shoreline, what do you think is the most pressing issue that needs attention, and how do you think your writing can contribute to the conversation?
 
 openerBreakdown:    See the feedback above.
 bestMoment:         See the feedback above.
@@ -70,43 +70,43 @@ wouldSheDateHim:    Maybe. You had some real moments but needed to go further in
 ──────────────────────────────────────────────────────────────────────
 PAGE LOGS (coach + session events):
 ──────────────────────────────────────────────────────────────────────
-[log] [FC] streamPromise resolved or timed out
-[log] [FC] loop start, elapsed: 28665 mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 6581 mySession: 1 session: 1
 [log] [FC] heard: null mySession: 1 session: 1
-[log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
-[log] [FC] loop start, elapsed: 36895 mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 13206 mySession: 1 session: 1
 [log] [FC] heard: null mySession: 1 session: 1
-[log] [FC] loop start, elapsed: 43348 mySession: 1 session: 1
-[log] [FC] heard: null mySession: 1 session: 1
-[log] [FC] streamPromise resolved or timed out
-[log] [FC] loop start, elapsed: 50316 mySession: 1 session: 1
-[log] [FC] heard: null mySession: 1 session: 1
-[log] [FC] loop start, elapsed: 55864 mySession: 1 session: 1
-[log] [FC] heard: null mySession: 1 session: 1
-[log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
-[log] [FC] loop start, elapsed: 61747 mySession: 1 session: 1
-[log] [FC] heard: null mySession: 1 session: 1
-[log] [FC] loop start, elapsed: 68538 mySession: 1 session: 1
-[log] [FC] heard: null mySession: 1 session: 1
-[log] [FC] streamPromise resolved or timed out
-[log] [FC] loop start, elapsed: 74982 mySession: 1 session: 1
-[log] [FC] heard: null mySession: 1 session: 1
-[log] [FC] loop start, elapsed: 80547 mySession: 1 session: 1
-[log] [FC] heard: null mySession: 1 session: 1
-[log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
-[log] [FC] loop start, elapsed: 89247 mySession: 1 session: 1
-[log] [FC] heard: null mySession: 1 session: 1
-[log] [FC] loop start, elapsed: 96168 mySession: 1 session: 1
-[log] [FC] heard: null mySession: 1 session: 1
-[log] [FC] streamPromise resolved or timed out
-[log] [FC] loop start, elapsed: 103545 mySession: 1 session: 1
-[log] [FC] heard: null mySession: 1 session: 1
-[log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
-[log] [FC] loop start, elapsed: 109360 mySession: 1 session: 1
-[log] [FC] heard: null mySession: 1 session: 1
-[log] [FC] loop start, elapsed: 116710 mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 17355 mySession: 1 session: 1
 [log] [FC] heard: null mySession: 1 session: 1
 [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
 [log] [FC] streamPromise resolved or timed out
-[log] [FC] loop start, elapsed: 123252 mySession: 1 session: 1
-[log] [FC] heard: null mySession: 1 session: 2
+[log] [FC] loop start, elapsed: 22723 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 27501 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 33044 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 37637 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+[log] [FC] streamPromise resolved or timed out
+[log] [FC] loop start, elapsed: 43464 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 48356 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 52622 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+[log] [FC] streamPromise resolved or timed out
+[log] [FC] loop start, elapsed: 57670 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 63125 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 67322 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+[log] [FC] streamPromise resolved or timed out
+[log] [FC] loop start, elapsed: 73730 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] loop start, elapsed: 79682 mySession: 1 session: 1
+[log] [FC] heard: null mySession: 1 session: 1
+[log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+[log] [FC] streamPromise resolved or timed out

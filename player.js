@@ -777,6 +777,7 @@ function stopEverything() {
   if (rec) { try{rec.onresult=null;rec.onerror=null;rec.onend=null;rec.stop();}catch{}; rec=null; }
   if (listenTimer) { clearTimeout(listenTimer); listenTimer=null; }
   if (watchdogInterval) { clearInterval(watchdogInterval); watchdogInterval=null; }
+  hideMnemonicPill();
 }
 
 /* ===== Ryan orb ===== */
@@ -1779,6 +1780,8 @@ async function playScenario(key, practice=false) {
   isPractice=practice;
   currentScript=practice?sc.practice:sc.demo;
   stepIndex=0;
+  if (practice) showMnemonicPill(localStorage.getItem('eklipses_practice_focus') || 'free');
+  else hideMnemonicPill();
   if(els.select.value!==key) els.select.value=key;
   if (window.showFullscreenBtn) window.showFullscreenBtn();
   await playLoop(mySession, _introPrefetch);
@@ -2423,6 +2426,72 @@ const LESSON_REGISTRY = [
   { id: 'lesson2', label: 'Lesson 2 — Holding Your Ground (FRAME)', lsKey: 'eklipses_lesson2_complete' },
 ];
 
+// Mnemonic data sourced from lesson-player.js LESSON_DATA.mnemonicMap — keep in sync when lessons change.
+const LESSON_MNEMONICS = {
+  lesson1: {
+    label: 'OTIMC',
+    items: [
+      { letter: 'O', meaning: 'Observe something specific' },
+      { letter: 'T', meaning: 'Tease playfully' },
+      { letter: 'M', meaning: "Mystery — don't give it all away" },
+      { letter: 'I', meaning: 'Imply your interest' },
+      { letter: 'C', meaning: 'Close naturally' },
+    ],
+  },
+  lesson2: {
+    label: 'FRAME',
+    items: [
+      { letter: 'F', meaning: 'Feel Nothing — stay still under pressure' },
+      { letter: 'R', meaning: 'Reframe — offer a different way to see it' },
+      { letter: 'A', meaning: "Add Humor — don't defend, just deflect" },
+      { letter: 'M', meaning: 'Make Her Qualify — stay curious, push deeper' },
+      { letter: 'E', meaning: 'Exit — decision-makers leave first' },
+    ],
+  },
+};
+
+function showMnemonicPill(practiceFocus) {
+  const pill = document.getElementById('mnemonic-pill');
+  if (!pill) return;
+  const data = LESSON_MNEMONICS[practiceFocus];
+  if (!data || localStorage.getItem('eklipses_mnemonic_off') === '1') { pill.style.display = 'none'; return; }
+  document.getElementById('mnemonic-pill-label').textContent = data.label + ' ▸';
+  document.getElementById('mnemonic-card-name').textContent  = data.label;
+  document.getElementById('mnemonic-items').innerHTML = data.items.map(it =>
+    `<li class="mn-item"><span class="mn-letter">${it.letter}</span><span class="mn-meaning">${it.meaning}</span></li>`
+  ).join('');
+  const expanded = localStorage.getItem('eklipses_mnemonic_expanded') === '1';
+  document.getElementById('mnemonic-pill-collapsed').style.display = expanded ? 'none' : 'flex';
+  document.getElementById('mnemonic-pill-card').style.display      = expanded ? 'block' : 'none';
+  pill.style.display = 'block';
+}
+
+function hideMnemonicPill() {
+  const pill = document.getElementById('mnemonic-pill');
+  if (pill) pill.style.display = 'none';
+}
+
+function initMnemonicPill() {
+  const label    = document.getElementById('mnemonic-pill-label');
+  const offBtn   = document.getElementById('mnemonic-pill-off');
+  const collapse = document.getElementById('mnemonic-card-collapse');
+  if (!label) return;
+  label.addEventListener('click', () => {
+    localStorage.setItem('eklipses_mnemonic_expanded', '1');
+    document.getElementById('mnemonic-pill-collapsed').style.display = 'none';
+    document.getElementById('mnemonic-pill-card').style.display      = 'block';
+  });
+  collapse.addEventListener('click', () => {
+    localStorage.setItem('eklipses_mnemonic_expanded', '0');
+    document.getElementById('mnemonic-pill-collapsed').style.display = 'flex';
+    document.getElementById('mnemonic-pill-card').style.display      = 'none';
+  });
+  offBtn.addEventListener('click', () => {
+    localStorage.setItem('eklipses_mnemonic_off', '1');
+    document.getElementById('mnemonic-pill').style.display = 'none';
+  });
+}
+
 function showPracticeFocusModal(scenarioKey) {
   const completed = LESSON_REGISTRY.filter(l => localStorage.getItem(l.lsKey) === 'true');
   const latest    = completed[completed.length - 1] || null;
@@ -2865,6 +2934,7 @@ function updateCoachBtnVisibility() {
 bootDefault();
 initCoachBtn();
 initInputModeToggle();
+initMnemonicPill();
 
 function initInputModeToggle() {
   const btn = document.getElementById('input-mode-toggle');
