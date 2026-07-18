@@ -310,6 +310,45 @@ async function run() {
     modeSwitchResult.lastMode === 'voice' && modeSwitchResult.val === null,
     `_lastInputMode="${modeSwitchResult.lastMode}" val="${modeSwitchResult.val}"`);
 
+  // ── 20. Drill skip choice on second entry ────────────────────────────────
+  // When eklipses_{lesson}_drill_done='1', clicking Latest Lesson in the
+  // practice-focus modal should replace the modal body with the skip choice
+  // (drill-warmup-btn + drill-skip-btn) rather than closing the modal.
+  // Pre-deploy: test will fail (buildDrillSkipHTML not on production yet).
+  // Post-deploy: should pass.
+
+  const drillSkipResult = await page.evaluate(() => {
+    try {
+      localStorage.setItem('eklipses_lesson1_complete', 'true');
+      localStorage.setItem('eklipses_lesson1_drill_done', '1');
+
+      const key = Object.keys(SCENARIOS)[0];
+      showPracticeFocusModal(key);
+
+      const latestBtn = document.getElementById('pfm-latest');
+      if (!latestBtn) return { error: 'pfm-latest not found' };
+      latestBtn.click();
+
+      const modalEl = document.getElementById('practice-focus-modal');
+      return {
+        warmupBtn: !!document.getElementById('drill-warmup-btn'),
+        skipBtn:   !!document.getElementById('drill-skip-btn'),
+        modalOpen: modalEl ? modalEl.style.display !== 'none' : false,
+      };
+    } catch (e) {
+      return { error: e.message };
+    } finally {
+      // Clean up so this test doesn't affect the session state
+      const m = document.getElementById('practice-focus-modal');
+      if (m) m.style.display = 'none';
+      localStorage.removeItem('eklipses_lesson1_drill_done');
+    }
+  });
+
+  report('20. Drill skip choice on second entry (drill_done=1)',
+    !drillSkipResult.error && drillSkipResult.warmupBtn && drillSkipResult.skipBtn && drillSkipResult.modalOpen,
+    drillSkipResult.error || `warmup=${drillSkipResult.warmupBtn} skip=${drillSkipResult.skipBtn} modalOpen=${drillSkipResult.modalOpen}`);
+
   // ── Summary ───────────────────────────────────────────────────────────────
   await browser.close();
 
