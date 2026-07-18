@@ -2450,6 +2450,64 @@ const LESSON_MNEMONICS = {
   },
 };
 
+// Drill rep content per lesson — Sofia's line + pass criteria for each letter.
+const DRILL_REPS = {
+  lesson1: [
+    {
+      letter: 'O', cue: 'Observe',
+      sofiasLine: 'So what made you come talk to me?',
+      criteria: 'PASS if the user names something real they noticed — a detail about her, the scene, or the situation. FAIL if the response is generic ("you seemed interesting") with nothing real attached.',
+    },
+    {
+      letter: 'T', cue: 'Tease',
+      sofiasLine: 'Wow, another guy walking up to me. So original.',
+      criteria: "PASS if the user plays along, teases back, or agrees with a twist — anything that doesn't get defensive or apologetic. FAIL if the user apologizes, over-explains, or tries to convince her they're different.",
+    },
+    {
+      letter: 'M', cue: 'Mystery',
+      sofiasLine: 'So what do you do?',
+      criteria: 'PASS if the user gives a partial, vague, or intriguing answer — even a short deflection counts. FAIL only if the user gives a full resume: job title, company, years, everything at once.',
+    },
+    {
+      letter: 'I', cue: 'Imply',
+      sofiasLine: "I don't really talk to strangers.",
+      criteria: 'PASS if the user implies interest through subtext or quiet confidence — without begging or stating attraction directly. FAIL if the user explicitly declares attraction or over-explains why she should talk to them.',
+    },
+    {
+      letter: 'C', cue: 'Close',
+      sofiasLine: 'This was actually kind of fun.',
+      criteria: 'PASS if the user moves toward a natural next step — number ask, invite somewhere, suggest continuing — without hedge language ("no pressure", "only if you want"). FAIL if the user says something like "yeah it was" with no move.',
+    },
+  ],
+  lesson2: [
+    {
+      letter: 'F', cue: 'Feel Nothing',
+      sofiasLine: 'Are you always this weird?',
+      criteria: 'PASS if the user stays calm — agrees, laughs it off, or turns it back without defending. FAIL if the user gets flustered, apologizes, or over-explains.',
+    },
+    {
+      letter: 'R', cue: 'Reframe',
+      sofiasLine: "You're probably just like every other guy who talks to me.",
+      criteria: 'PASS if the user reframes or flips it — makes her qualify, challenges the assumption, or sidesteps it with confidence. FAIL if the user argues against it, agrees, or rushes to prove they are different.',
+    },
+    {
+      letter: 'A', cue: 'Add Humor',
+      sofiasLine: "I don't think this is going anywhere.",
+      criteria: 'PASS if the user deflects with humor — light, playful, does not take the bait. FAIL if the user gets serious, defensive, or tries to logic her out of it.',
+    },
+    {
+      letter: 'M', cue: 'Make Her Qualify',
+      sofiasLine: "I'm actually pretty interesting, you know.",
+      criteria: "PASS if the user turns it back and makes her prove something — 'prove it', 'I'm listening', bold claim energy. FAIL if the user agrees, compliments her, or says something like 'I'm sure you are'.",
+    },
+    {
+      letter: 'E', cue: 'Exit',
+      sofiasLine: 'I could probably talk to you all night, honestly.',
+      criteria: 'PASS if the user initiates a confident close or natural ending on their terms — number ask, plan, or clean exit. FAIL if the user just keeps talking, trails off, or waits for her to decide.',
+    },
+  ],
+};
+
 function showMnemonicPill(practiceFocus) {
   const pill = document.getElementById('mnemonic-pill');
   if (!pill) return;
@@ -2492,6 +2550,106 @@ function initMnemonicPill() {
   });
 }
 
+function buildDrillSkipHTML(focus) {
+  const lbl = (LESSON_MNEMONICS[focus] || {}).label || focus.toUpperCase();
+  const S  = 'display:block;width:100%;background:#252836;border:1px solid #2f3344;border-radius:10px;padding:14px 16px;color:#e4e8f1;font-size:14px;font-weight:600;cursor:pointer;text-align:left;transition:background .15s,border-color .15s';
+  const HV = `onmouseover="this.style.background='#2e3245';this.style.borderColor='#4a5070'" onmouseout="this.style.background='#252836';this.style.borderColor='#2f3344'"`;
+  return `
+<p style="font-size:18px;font-weight:700;color:#f0f2f6;margin:0 0 6px">Start with a warm-up?</p>
+<p style="font-size:13px;color:#8a93a8;margin:0 0 18px;line-height:1.5">5 quick reps — one for each ${lbl} skill.</p>
+<div style="display:flex;flex-direction:column;gap:8px">
+  <button id="drill-warmup-btn" style="${S}" ${HV}>
+    <div>Warm up first <span style="color:#6b7495;font-size:12px">(5 reps)</span></div>
+    <div style="font-size:12px;color:#6b7495;margin-top:3px">One exchange per skill before the full scenario</div>
+  </button>
+  <button id="drill-skip-btn" style="${S}" ${HV}>
+    <div>Skip to full scenario</div>
+    <div style="font-size:12px;color:#6b7495;margin-top:3px">Jump straight in</div>
+  </button>
+</div>`;
+}
+
+async function runDrill(lessonKey, scenarioKey) {
+  stopEverything();
+  const mySession = session;
+
+  resetConversation();
+  firstUserOpener = null;
+  hideCoachSuggestions();
+  updateCoachBtnVisibility();
+  showMnemonicPill(lessonKey);
+
+  const reps = DRILL_REPS[lessonKey];
+
+  for (let i = 0; i < reps.length; i++) {
+    if (mySession !== session) return;
+    const rep = reps[i];
+
+    // Status card — brief rep indicator before Sofia speaks
+    setMediaForSpeaker('Ryan');
+    els.name.textContent = `Warm-up ${i + 1} / ${reps.length}`;
+    els.text.textContent = `${rep.letter} — ${rep.cue}`;
+    await pause(1200);
+    if (mySession !== session) return;
+
+    // Sofia delivers her line
+    els.name.textContent = getCharacterDisplayName(currentCharacterId);
+    els.text.dataset.pendingText = rep.sofiasLine;
+    await speak(rep.sofiasLine, 'Mary');
+    if (mySession !== session) return;
+
+    // Show her line as context while user composes reply
+    els.name.textContent = 'Your Turn';
+    els.text.textContent = rep.sofiasLine;
+    await pause(300);
+    if (mySession !== session) return;
+
+    const userText = await listenForUser(mySession, 60_000);
+    if (mySession !== session) return;
+    if (!userText) break;  // timeout — skip remaining reps, still launch scenario
+
+    // Lightweight eval
+    let coaching = 'Keep going.';
+    try {
+      const resp = await fetch('/api/drill-eval', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lessonKey, letter: rep.letter, cue: rep.cue,
+          sofiasLine: rep.sofiasLine, userResponse: userText, criteria: rep.criteria,
+        }),
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.coaching) coaching = data.coaching;
+      }
+    } catch (_) {}
+
+    if (mySession !== session) return;
+
+    // Ryan delivers coaching line
+    setMediaForSpeaker('Ryan');
+    els.name.textContent = 'Ryan';
+    els.text.dataset.pendingText = coaching;
+    await speak(coaching, 'Ryan');
+    if (mySession !== session) return;
+    await pause(700);
+  }
+
+  if (mySession !== session) return;
+
+  localStorage.setItem(`eklipses_${lessonKey}_drill_done`, '1');
+  const bridge = "Good. Now let's run the full scenario.";
+  setMediaForSpeaker('Ryan');
+  els.name.textContent = 'Ryan';
+  els.text.dataset.pendingText = bridge;
+  await speak(bridge, 'Ryan');
+  if (mySession !== session) return;
+  await pause(600);
+  if (mySession !== session) return;
+  playScenario(scenarioKey, true);
+}
+
 function showPracticeFocusModal(scenarioKey) {
   const completed = LESSON_REGISTRY.filter(l => localStorage.getItem(l.lsKey) === 'true');
   const latest    = completed[completed.length - 1] || null;
@@ -2500,8 +2658,28 @@ function showPracticeFocusModal(scenarioKey) {
 
   function start(focus) {
     localStorage.setItem('eklipses_practice_focus', focus);
-    modal.style.display = 'none';
-    playScenario(scenarioKey, true);
+    if (!DRILL_REPS[focus]) {
+      // No drill for this focus (Free Practice, All Lessons)
+      modal.style.display = 'none';
+      playScenario(scenarioKey, true);
+      return;
+    }
+    if (localStorage.getItem(`eklipses_${focus}_drill_done`) !== '1') {
+      // First time — forced drill (runDrill calls playScenario internally when done)
+      modal.style.display = 'none';
+      runDrill(focus, scenarioKey);
+      return;
+    }
+    // Subsequent entries — offer skip choice within the same modal
+    body.innerHTML = buildDrillSkipHTML(focus);
+    document.getElementById('drill-warmup-btn').onclick = () => {
+      modal.style.display = 'none';
+      runDrill(focus, scenarioKey);
+    };
+    document.getElementById('drill-skip-btn').onclick = () => {
+      modal.style.display = 'none';
+      playScenario(scenarioKey, true);
+    };
   }
 
   const S    = 'display:block;width:100%;background:#252836;border:1px solid #2f3344;border-radius:10px;padding:14px 16px;color:#e4e8f1;font-size:14px;font-weight:600;cursor:pointer;text-align:left;transition:background .15s,border-color .15s';

@@ -1,30 +1,30 @@
 ══════════════════════════════════════════════════════════════════════
 OTIMC WEAK SESSION RESULT  (TEST B — "Bombs It")
-Date:    2026-07-17T03:04:01.068Z
+Date:    2026-07-17T21:23:05.741Z
 URL:     https://eklipses.vercel.app
 ══════════════════════════════════════════════════════════════════════
 
 CONVERSATION TRANSCRIPT:
   1. O — Observation opener (WEAK)
      HIM:   "Hey, how's your day going? Nice weather out here today."
-     SOFIA: "It has that warm glow that makes everything feel different."
+     SOFIA: "Can you hear the waves?"
   2. T — Tease (WEAK)
      HIM:   "Oh no I didn't mean to offend you or anything, I was just making conversation, you seem really cool."
      SOFIA: "What brings you here?"
   3. M — Mystery (WEAK)
      HIM:   "Yeah I work in marketing, been doing it like 4 years now, I just moved here from Chicago, I love the beach, I come here every weekend basically."
-     SOFIA: "What do you like most about this place?"
+     SOFIA: "Is the constant waves and salt in the air a nice change from city life?"
   4. I — Imply (WEAK)
      HIM:   "I think you're really attractive and I'd like to ask you out on a date because I think we'd get along."
-     SOFIA: "What do you do for fun when you're not at the beach?"
+     SOFIA: "Seems a bit early for that, don’t you think?"
   5. C — Close (WEAK)
      HIM:   "So I don't know, maybe we could hang out sometime if you want, like no pressure or whatever, just if you feel like it."
-     SOFIA: "I’m still getting a feel for you."
+     SOFIA: "What do you like most about the beach?"
 
 ──────────────────────────────────────────────────────────────────────
 LESSON 1 EVAL (spoken scorecard)
 ──────────────────────────────────────────────────────────────────────
-Let me walk you through the Lesson 1 skills — One Tequila Makes Ideas Click. For Observe, you didn't reference anything specific about the scene. For Tease, you apologized when she gave a short answer. For Mystery, you gave away too much about your job. For Imply, you stated your interest directly. For Close, your invite had hedge language, which softened the ask. None of these skills were applied correctly.
+Let me walk you through the Lesson 1 skills — One Tequila Makes Ideas Click. For Observe, you didn't reference something specific about the scene. For Tease, you folded when she shared her frustration. For Mystery, you gave away too much about yourself. For Imply, you stated your interest directly. For Close, your ask was hedged and didn't feel direct.
 
 ──────────────────────────────────────────────────────────────────────
 LESSON 1 CHECK (certification)
@@ -35,29 +35,29 @@ Score: 0/5   Passed: false
   M (mystery):     FAIL
   I (imply):       FAIL
   C (close):       FAIL
-Summary: Review and try again, none of the Lesson 1 skills were applied well.
+Summary: Review and try again — no skills applied well.
 
 ──────────────────────────────────────────────────────────────────────
-STANDARD COACH FEEDBACK  (score: 3/10)
+STANDARD COACH FEEDBACK  (score: 4/10)
 ──────────────────────────────────────────────────────────────────────
-spokenSummary: She said 'earn it first'.
+spokenSummary: She said 'it's been frustrating' — you apologized.
 
 PART 1:
-When you said you think she's attractive, that was honest — it showed you were paying attention to her. Your opener was a generic greeting — with Sofia that fell flat. Next time, notice something particular about her or the scene and comment on that.
+When you said 'Oh no I didn't mean to offend you', that showed you were trying to recover — it was a safe move, but not the best. Your opener was a generic greeting — with Sofia that fell flat. Next time, try to notice something particular about her or the scene.
 
 PART 2:
-When she said 'Let's see if this conversation earns it first', you said 'maybe we could hang out sometime if you want' — that showed you weren't listening to her challenge. She was responding to your direct statement of interest, and you should have picked up on that.
+When she said 'It’s more layered than that', you said 'Yeah I work in marketing' — that didn't grab the conversation. She was responding to your generic question, and you missed the chance to go further into what she meant by 'layered'.
 
 PART 3:
-The moment that hurt you most was when you said 'I think you're really attractive and I'd like to ask you out on a date' — instead, you could have said 'I'm curious about you, beyond just this conversation'. This works with Sofia because she rewards genuine curiosity, not direct compliments.
+The moment that hurt you most was when you said 'I think you're really attractive and I'd like to ask you out on a date' — instead, you could've said 'I'm curious about what you're writing, is it a story or something for work?' That would've worked with Sofia because she values genuine curiosity and specificity.
 
 PART 4:
-Two things to fix: apologizing after she gave a short answer and stating interest too directly. Try again, and next time, you got this.
+Two things to fix: apologizing when not needed and stating interest too directly. Try again, and next time, you got this.
 
 tryNextTime:
-1. What's the most interesting thing you've written about lately? 2. You seem like someone who notices details — what do you like about this beach? 3. What's one thing you're looking forward to doing this summer?
+1. What's the most challenging part of writing about coastal ecology? 2. You seem to appreciate the nuances of this place — what's your favorite aspect of it? 3. If you could write about anything else, what would it be?
 
-openerBreakdown:    His opening line 'Hey, how's your day going? Nice weather out here today' didn't work with Sofia because it was too generic and didn't show he noticed anything particular about her.
-bestMoment:         When he said 'I think you're really attractive', that was at least honest, but it landed poorly because it was too direct.
-missedOpportunity:  When Sofia said 'It's been a bit all over the place', he could have asked what she meant by that, instead of just saying 'oh no' and apologizing.
-wouldSheDateHim:    No, I don't think I'd date him because when I said 'Let's see if this conversation earns it first', he didn't seem to get that I wanted to see more substance in our conversation.
+openerBreakdown:    Your opening line 'Hey, how's your day going? Nice weather out here today' didn't work with Sofia because it was too generic and didn't show you noticed anything particular about her.
+bestMoment:         When you said 'Oh no I didn't mean to offend you', that was an attempt to show empathy, but it didn't quite land with Sofia.
+missedOpportunity:  When Sofia said 'It’s more layered than that', you missed the chance to ask a follow-up question — instead, you should've asked something like 'What do you mean by layered?'
+wouldSheDateHim:    No, I think he moved too fast and didn't show genuine interest in what I was doing.
