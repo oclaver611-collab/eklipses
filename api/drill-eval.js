@@ -17,14 +17,18 @@ User's reply: "${userResponse}"
 Skill: ${letter} — ${cue}
 Pass criteria: ${criteria}
 
-Return ONLY valid JSON: {"pass": true/false, "coaching": "<one direct sentence — casual, specific to what they actually said, max 20 words>"}
-Be honest. If they passed, name one thing that worked. If they missed, name the one thing to fix.
-Never use "engage", "dynamic", "specific" (say "real" instead), "connection". Write like you're talking.`;
+Return ONLY valid JSON: {"pass": true/false, "coaching": "..."}
+
+Coaching rules — read carefully:
+- If PASS: one short sentence naming what specifically worked. Max 20 words.
+- If FAIL: you MUST include a concrete example line the user could have said, responding directly to Sofia's line above. Format exactly: "Try: '[example line]' — [one brief phrase on why it works]." Max 35 words total. The example must be a real reply to what Sofia said, not generic advice.
+- NEVER write abstract descriptions like "add a real detail", "be more mysterious", "show confidence", "be more natural". Always show the actual words instead.
+- Write casually. Never use "engage", "dynamic", "connection", "specific" (say "real" instead).`;
 
   async function callLLM(messages) {
     const body = {
       messages,
-      max_tokens: 120,
+      max_tokens: 160,
       temperature: 0.2,
       response_format: { type: 'json_object' },
     };
