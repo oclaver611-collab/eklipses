@@ -60,6 +60,7 @@ module.exports = async function handler(req, res) {
   const evalConversation = conversation.at(-1)?.role === 'assistant'
     ? conversation.slice(0, -1)
     : conversation;
+  const finalCharResponse = conversation.at(-1)?.role === 'assistant' ? conversation.at(-1).content.trim() : null;
 
   const firstUserMsg = evalConversation.find(m => m.role === 'user');
   const openerTrimmed = (opener || '').trim();
@@ -325,6 +326,10 @@ SCORE FLOOR RULE: If the user opened with something specific they noticed (anyth
 
 Do not default to 7 out of habit — score based on the specific band above. A 4 requires the conversation to have been largely ineffective across most dimensions, not just one missed skill.
 
+FINAL OUTCOME RULE: The user message below includes a "FINAL OUTCOME" label showing ${characterLabel}'s last response. If she agreed to something — coffee, a drink, her number, walking with him, any positive continuation — that is concrete evidence his skills landed. A positive outcome must raise the score meaningfully (typically +1 to +2 points versus the same conversation with a neutral ending), and MUST be explicitly called out in part4 — name what she agreed to and credit the session for it. Do NOT treat a positive outcome as incidental or omit it from the feedback. A neutral or ambiguous ending: score on technique quality alone. A clear rejection (she walks away, shuts it down, explicitly refuses): factor it as negative evidence even if individual turns were good.
+
+RECOGNIZING WELL-EXECUTED MOVES: When the user delivered a confident, complete playful move with stakes or a specific hook — a challenge with a consequence (e.g. "if you get it right, I owe you a coffee"), a frame that puts her on the spot, a line that creates intrigue without spelling it out — identify it by name in the feedback and credit it. If she stayed in the bit for multiple turns or responded with curiosity, that is proof the move landed. Reflect that in bestMoment and in the score. Do not penalize a well-executed practiced line — the only question is whether it worked in this conversation.
+
 LESSON 1 SKILL FAILURES AFFECT SCORE: If this is a Lesson 1 session (lesson1Complete=true) and the user failed any Lesson 1 skill, cap the score at 7, even if the rest of the conversation was strong. A session where all 5 skills pass AND the execution was excellent can reach 8-9. A session with 1+ skill FAIL should not score above 7 regardless of how good the other turns felt.
 
 BANNED PHRASES AND WORDS — if any of these appear anywhere in your output, rewrite that sentence:
@@ -425,9 +430,13 @@ FAIL = chased, kept talking after she pulled back
 These fields (lesson2Eval and lesson2Check) are already part of the JSON schema above — fill them based on the criteria and definitions above.` : ''}`;
 
   try {
+    const finalOutcomeNote = finalCharResponse
+      ? `\n\nFINAL OUTCOME — ${characterLabel}'s last response after his final message:\n"${finalCharResponse}"\n(Apply the FINAL OUTCOME RULE: if she agreed to something, raise the score meaningfully and call it out explicitly in part4.)`
+      : '';
+
     const mainMessages = [
       { role: 'system', content: systemPrompt },
-      { role: 'user', content: `Scenario: ${scenarioTitle}\n\nHIS OPENING LINE (HIM_1): "${conversation.find(m => m.role === 'user')?.content?.trim() || ''}"\n\nFull conversation transcript:\n${transcript}\n\nREMINDER: part1 must NAME and JUDGE the move — do NOT quote HIM_1 back verbatim.` },
+      { role: 'user', content: `Scenario: ${scenarioTitle}\n\nHIS OPENING LINE (HIM_1): "${conversation.find(m => m.role === 'user')?.content?.trim() || ''}"\n\nFull conversation transcript:\n${transcript}${finalOutcomeNote}\n\nREMINDER: part1 must NAME and JUDGE the move — do NOT quote HIM_1 back verbatim.` },
     ];
     let raw;
     try { raw = await callLLM(mainMessages, 5000); }
@@ -440,7 +449,7 @@ These fields (lesson2Eval and lesson2Check) are already part of the JSON schema 
       console.warn('[coach] JSON parse failed, retrying with stricter prompt...');
       const retryMessages = [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: `Scenario: ${scenarioTitle}\n\nHIS OPENING LINE (HIM_1): "${conversation.find(m => m.role === 'user')?.content?.trim() || ''}"\n\nFull conversation transcript:\n${transcript}\n\nREMINDER: part1 must NAME and JUDGE the move — do NOT quote HIM_1 back verbatim.\n\nCRITICAL: Return ONLY valid JSON. No markdown, no backticks, no preamble. Start with { and end with }.` },
+        { role: 'user', content: `Scenario: ${scenarioTitle}\n\nHIS OPENING LINE (HIM_1): "${conversation.find(m => m.role === 'user')?.content?.trim() || ''}"\n\nFull conversation transcript:\n${transcript}${finalOutcomeNote}\n\nREMINDER: part1 must NAME and JUDGE the move — do NOT quote HIM_1 back verbatim.\n\nCRITICAL: Return ONLY valid JSON. No markdown, no backticks, no preamble. Start with { and end with }.` },
       ];
       try {
         const retryRaw = await callLLM(retryMessages, 5000);
