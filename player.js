@@ -75,6 +75,7 @@ const _seenScenarioIntros = new Set(); // tracks which scenario intros have play
 // ── Coached Practice state ──────────────────────────────────────────────────
 const _pauseState = { active: false, resolve: null };
 let _momentCheckPromise = null;  // promise for current in-flight moment check
+let _momentCheckGen     = 0;     // increments to invalidate a check that missed its window
 let _turnSnapshot      = null;   // { history: [...], exchangeCount: N } — taken before each listen
 let _interruptCount    = 0;      // resets per freeConversation; capped at MAX_INTERRUPTS
 const MAX_INTERRUPTS   = 2;      // max coaching interruptions per session
@@ -923,6 +924,7 @@ function stopEverything() {
   try { document.getElementById('ek-coach-interrupt')?.remove(); } catch {}
   _pauseState.active = false;
   if (_pauseState.resolve) { _pauseState.resolve(); _pauseState.resolve = null; }
+  _momentCheckGen++;       // invalidate any in-flight check so it can't fire after session ends
   _momentCheckPromise = null;
 }
 
@@ -932,13 +934,20 @@ function isCoachMode() {
   return localStorage.getItem('eklipses_coached_mode') === '1';
 }
 
-// Waits up to 3 s for any in-flight moment check, then blocks while a coaching interrupt is active.
-// Uses the same mySession guard as every other await in playLoop/freeConversation.
-// NEVER touches the session counter — safe to call mid-loop.
+// Waits for any in-flight moment check (already running during TTS), then blocks if an interrupt
+// fired. Because the check is launched during character TTS playback, it should be resolved or
+// nearly resolved by the time this runs — expected overhead is near-zero on production.
+// Cap: if the check is still pending after 1200 ms, discard it via _momentCheckGen++ so it can
+// never fire late on a future turn. NEVER touches the session counter.
 async function waitIfPaused(mySession) {
   if (_momentCheckPromise) {
-    await Promise.race([_momentCheckPromise, new Promise(r => setTimeout(r, 3000))]);
+    const DISCARD_CAP_MS = 1200;
+    const timedOut = await Promise.race([
+      _momentCheckPromise.then(() => false),
+      new Promise(r => setTimeout(() => r(true), DISCARD_CAP_MS)),
+    ]);
     _momentCheckPromise = null;
+    if (timedOut) _momentCheckGen++; // invalidate — the late-resolving check cannot fire
   }
   if (!_pauseState.active) return;
   await new Promise(resolve => {
@@ -955,10 +964,12 @@ async function waitIfPaused(mySession) {
   });
 }
 
-// Fires the /api/coach-moment check after a character response.
-// Sets _pauseState.active and calls showCoachInterrupt() only on a clear skill failure.
+// Fires the /api/coach-moment check. Launched during character TTS so it runs for free.
+// Captures _momentCheckGen at call time — if the gen increments (waitIfPaused timed out or
+// stopEverything ran) before the result arrives, the interrupt is discarded cleanly.
 // Fails open on any error so the conversation always continues.
 async function checkMoment(userSaid, charResponse, mySession) {
+  const myGen = _momentCheckGen; // snapshot — checked again before firing interrupt
   const practiceFocus = localStorage.getItem('eklipses_practice_focus') || 'free';
   try {
     const controller = new AbortController();
@@ -976,9 +987,9 @@ async function checkMoment(userSaid, charResponse, mySession) {
       }),
     });
     clearTimeout(t);
-    if (!r.ok || mySession !== session) return;
+    if (!r.ok || mySession !== session || myGen !== _momentCheckGen) return;
     const data = await r.json();
-    if (mySession !== session || !data.teachable) return;
+    if (mySession !== session || myGen !== _momentCheckGen || !data.teachable) return;
     _interruptCount++;
     _pauseState.active = true;
     showCoachInterrupt(userSaid, charResponse, data);
@@ -1426,7 +1437,7 @@ let _exchangeCount = 0;
 let firstUserOpener=null;
 function resetConversation() { conversationHistory=[]; _exchangeCount = 0; }
 
-async function streamCharacterAndSpeak(userSaid, mySession) {
+async function streamCharacterAndSpeak(userSaid, mySession, onTextReady = null) {
   // Show thinking state immediately
   els.name.textContent = getCharacterDisplayName(currentCharacterId);
   els.text.textContent = '...';
@@ -1567,7 +1578,14 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
             sentenceQueue.push(payload.sentence);
             if (!isPlayingAudio) processQueue();
           }
-          if (payload.done) { fullText = payload.full || fullText; streamDone = true; }
+          if (payload.done) {
+            fullText = payload.full || fullText;
+            streamDone = true;
+            // Fire the coached-practice moment-check NOW, while TTS is still playing.
+            // By the time all audio finishes and waitIfPaused runs, the API call will
+            // have had the full TTS duration to complete — near-zero overhead.
+            if (onTextReady && fullText) { onTextReady(fullText); onTextReady = null; }
+          }
         } catch {}
       }
     }
@@ -2269,8 +2287,20 @@ async function freeConversation(mySession) {
       continue;
     }
 
+    // ── Coached Practice: launch moment-check via callback so it runs during TTS playback ──
+    // The check fires when payload.done arrives inside streamCharacterAndSpeak (full text known,
+    // audio still playing). By the time TTS finishes + pause(300) elapses + waitIfPaused runs,
+    // the API call has had the full audio duration to complete → near-zero gate overhead.
+    const _shouldCheckMoment = _coachActive && _interruptCount < MAX_INTERRUPTS && said.trim().split(/\s+/).length >= 5;
+    _momentCheckPromise = null;
+
     console.log('[FC] calling streamCharacterAndSpeak');
-    const reply = await streamCharacterAndSpeak(said, mySession);
+    const reply = await streamCharacterAndSpeak(
+      said, mySession,
+      _shouldCheckMoment
+        ? (charText) => { _momentCheckPromise = checkMoment(said, charText, mySession); }
+        : null
+    );
     console.log('[FC] streamCharacterAndSpeak done, mySession:', mySession, 'session:', session);
     firstExchangeDone = true;
     console.log('[FC] firstExchangeDone set, looping back');
@@ -2281,8 +2311,8 @@ async function freeConversation(mySession) {
     }
     if (mySession !== session) break;
 
-    // ── Coached Practice: fire moment-check in the gap before mic re-opens ──
-    if (_coachActive && _interruptCount < MAX_INTERRUPTS && said.trim().split(/\s+/).length >= 5) {
+    // Fallback: onTextReady wasn't triggered (non-streaming path or no fullText) — fire now
+    if (_shouldCheckMoment && !_momentCheckPromise && reply) {
       const lastCharLine = conversationHistory[conversationHistory.length - 1]?.content || '';
       _momentCheckPromise = checkMoment(said, lastCharLine, mySession);
     }
@@ -2291,7 +2321,7 @@ async function freeConversation(mySession) {
     setMediaForSpeaker('Mary');
     els.name.textContent = getCharacterDisplayName(currentCharacterId);
 
-    // ── Coached Practice gate: blocks here if a coaching interrupt was triggered ──
+    // ── Coached Practice gate: blocks if interrupt fired; discards check if still pending ──
     if (_coachActive) {
       await waitIfPaused(mySession);
       if (mySession !== session) break;

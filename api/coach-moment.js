@@ -14,15 +14,18 @@ module.exports = async function handler(req, res) {
   } = req.body || {};
 
   // Client-side filters already gate these, but double-check server-side
-  if (!userMessage.trim()) return res.json({ teachable: false });
-  if (userMessage.trim().split(/\s+/).length < 5) return res.json({ teachable: false });
-  if (exchangeCount <= 1) return res.json({ teachable: false }); // never interrupt the opening
+  const wordCount = userMessage.trim().split(/\s+/).length;
+  if (!userMessage.trim()) { console.log('[coach-moment] skip — empty'); return res.json({ teachable: false }); }
+  if (wordCount < 5) { console.log(`[coach-moment] skip — too short (${wordCount} words)`); return res.json({ teachable: false }); }
+  if (exchangeCount <= 1) { console.log(`[coach-moment] skip — first exchange (count=${exchangeCount})`); return res.json({ teachable: false }); }
 
   const isLesson1 = practiceFocus === 'lesson1';
   const isLesson2 = practiceFocus === 'lesson2';
-  if (!isLesson1 && !isLesson2) return res.json({ teachable: false });
+  if (!isLesson1 && !isLesson2) { console.log(`[coach-moment] skip — focus="${practiceFocus}" not lesson-specific`); return res.json({ teachable: false }); }
 
-  if (!process.env.OPENAI_API_KEY) return res.json({ teachable: false }); // fail open
+  console.log(`[coach-moment] checking — focus:${practiceFocus} exchange:${exchangeCount} words:${wordCount} | "${userMessage.slice(0, 80)}"`);
+
+  if (!process.env.OPENAI_API_KEY) { console.warn('[coach-moment] skip — OPENAI_API_KEY not set'); return res.json({ teachable: false }); }
 
   // ── Skill definitions (condensed — see coach.js for full definitions) ──────
   const lesson1SkillDefs = `
@@ -118,11 +121,18 @@ Exchange number: ${exchangeCount}`;
     let parsed;
     try { parsed = JSON.parse(clean); } catch { return res.json({ teachable: false }); }
 
-    if (!parsed.teachable) return res.json({ teachable: false });
+    if (!parsed.teachable) {
+      console.log('[coach-moment] → not teachable');
+      return res.json({ teachable: false });
+    }
 
     // Validate required fields before passing to client
-    if (!parsed.skill || !parsed.coaching || !parsed.betterLine) return res.json({ teachable: false });
+    if (!parsed.skill || !parsed.coaching || !parsed.betterLine) {
+      console.warn('[coach-moment] → teachable but missing fields, discarding', JSON.stringify(parsed));
+      return res.json({ teachable: false });
+    }
 
+    console.log(`[coach-moment] → TEACHABLE skill:${parsed.skill} (${parsed.skillName}) | "${String(parsed.coaching).slice(0, 80)}"`);
     return res.json({
       teachable:  true,
       skill:      String(parsed.skill).slice(0, 5),
@@ -131,8 +141,8 @@ Exchange number: ${exchangeCount}`;
       betterLine: String(parsed.betterLine).slice(0, 120),
     });
 
-  } catch {
-    // Fail open — network error, timeout, etc.
+  } catch (err) {
+    console.error('[coach-moment] error:', err.message);
     return res.json({ teachable: false });
   }
 };
