@@ -48,7 +48,7 @@ module.exports = async function handler(req, res) {
   // Character name map for transcript labels
   const CHARACTER_NAME_MAP = {
     beach: 'SOFIA', bar: 'AVA', museum: 'ISABELLE',
-    gym: 'ZOE', bookstore: 'NADIA', street: 'JULIA',
+    gym: 'ZOE', bookstore: 'NADIA', street: 'JULIA', wedding: 'CLAIRE',
     rooftop: 'SANNA', house_party: 'SARAH', coffee_shop: 'ANNA',
     art_gallery: 'LEILA', yoga_studio: 'FATOU', airport: 'ELENA',
     supermarket: 'EDEN', office_lobby: 'MAYA', train: 'ERIKA',
@@ -153,6 +153,13 @@ module.exports = async function handler(req, res) {
       whatWorks: `Being honest about why you stopped her — without the smooth packaging. Saying something observational that shows you actually noticed her, not just that she exists. Holding the subtext layer — responding to what she's implying, not just what she said. Not filling every silence.`,
       whatKills: `"I just had to say something." Complimenting her immediately. Over-explaining why you stopped her. Asking generic questions. Trying to extend the conversation with filler. Negotiating for her time instead of earning it.`,
       missedOpportunityExamples: `If she said something with subtext and he responded to the surface — he's not playing the right game. If she held a beat of silence and he rushed to fill it — wrong. If she made an observation about him and he deflected instead of engaging — missed.`,
+    },
+    wedding: {
+      name: 'Claire',
+      profile: `Claire is 30, nurse practitioner. She is in a genuinely good mood tonight — a close friend's wedding, the kind she actually loves and doesn't just attend. She is warm at baseline and gets warmer when someone is genuine, funny, or asks something real. She spends her working life reading people accurately; she notices immediately when someone is performing warmth rather than feeling it. The trap: she is so naturally open that someone can mistake her baseline friendliness for romantic interest before they've earned it.`,
+      whatWorks: `Being real rather than charming — this setting makes social performance feel especially hollow. Asking about the couple or the wedding with actual curiosity, not as a script. Being comfortable in the moment without pushing to extend it. Warm and easy humor over clever-for-its-own-sake. Letting her warmth land without immediately trying to move past it.`,
+      whatKills: `Moving too fast — she has low tolerance for rushing past "we just met" in a setting like this. Generic compliments. Trying to seem impressive at a wedding where nobody is impressed by that. Stacking questions. Treating her warmth as a signal of romantic interest before it's been earned.`,
+      missedOpportunityExamples: `If she said something real about the couple or what the night means to her and he pivoted to himself — that was a free door, missed. If she asked him something genuine and he deflected with a smooth answer instead of being honest — she'll notice. If she slowed into a warm moment and he pushed toward a close instead of staying in it — wrong read entirely.`,
     },
     rooftop: {
       name: 'Sanna',

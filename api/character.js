@@ -2689,7 +2689,7 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
 
   // Detect if character already introduced herself in conversation history
   const charNames = {
-    sofia: 'sofia', ava: 'ava', isabelle: 'isabelle', zoe: 'zoe', nadia: 'nadia', julia: 'julia',
+    sofia: 'sofia', ava: 'ava', isabelle: 'isabelle', zoe: 'zoe', nadia: 'nadia', julia: 'julia', claire: 'claire',
     sanna: 'sanna', sarah: 'sarah', anna: 'anna', leila: 'leila', fatou: 'fatou',
     elena: 'elena', eden: 'eden', maya_office: 'maya', erika: 'erika',
     // Wave 3
@@ -2717,9 +2717,13 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
     ? `\n\nCRITICAL: You already told him your name earlier in this conversation. Do NOT say "you haven't asked my name yet" or any variation of it. If he goes for coffee or a number too early, use a different pushback: "You've known me a few minutes. That's not enough." or "Let's see where this goes first."`
     : '';
 
+  const GRADED_CHARACTERS = new Set([
+    'sofia', 'ava', 'isabelle', 'zoe', 'nadia', 'julia', 'claire',
+    'sanna', 'sarah', 'anna', 'leila', 'fatou', 'elena', 'eden', 'maya_office', 'erika',
+  ]);
   const showLesson1Tests = practiceFocus === 'lesson1' || practiceFocus === 'both' || practiceFocus === 'all';
   const showLesson2Tests = practiceFocus === 'lesson2' || practiceFocus === 'both' || practiceFocus === 'all';
-  const lesson1TestBlock = (showLesson1Tests && characterId === 'sofia') ? `
+  const lesson1TestBlock = (showLesson1Tests && GRADED_CHARACTERS.has(characterId)) ? `
 
 LESSON 1 TEST MODE — ACTIVE:
 The user has completed Lesson 1. You will naturally create opportunities for them to demonstrate the 5 lesson skills. Do NOT announce that you are testing them. These opportunities arise from your natural personality.
@@ -2739,7 +2743,7 @@ Create an obvious opening for romantic implication. Say something like "I don't 
 TEST 5 — Close signal:
 Near the end, signal that the interaction has been good: mention you have somewhere to be, reference something you could do together, or ask where they're going. If they take the close directly and naturally, respond positively. If they miss it, let the session end without giving it to them.` : '';
 
-  const lesson2TestBlock = (showLesson2Tests && characterId === 'sofia') ? `
+  const lesson2TestBlock = (showLesson2Tests && GRADED_CHARACTERS.has(characterId)) ? `
 
 LESSON 2 TEST MODE — ACTIVE (FRAME):
 The user has completed Lesson 2. You will now test their ability to hold their ground under pressure. The FRAME skills they should demonstrate: Feel Nothing, Reframe, Add Humor, Make Her Qualify, Exit. Do NOT announce that you are testing them. Every test arises naturally from your personality.
