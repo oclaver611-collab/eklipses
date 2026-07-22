@@ -136,7 +136,20 @@ Be CONSERVATIVE. Only flag failures that are obvious. When in doubt → teachabl
 Do NOT flag imperfect lines, missed opportunities, or things that "could be better" — only flag clear violations of the skill definitions above.
 
 If a clear failure exists, return:
-{"teachable":true,"skill":"X","skillName":"Full Skill Name","coaching":"One sentence — exactly what went wrong (max 18 words)."}
+{"teachable":true,"skill":"X","skillName":"Full Skill Name","coaching":"..."}
+
+COACHING FORMAT — 1-2 short sentences, max 30 words total:
+Sentence 1: What she is doing psychologically RIGHT NOW (frame it as her move, not the student's mistake).
+Sentence 2: Name the skill plainly using "This is a ___ moment."
+
+Good examples:
+- "She's testing whether you'll fold under a light jab. This is a Tease moment."
+- "She's seeing if you'll accept her frame or offer your own. This is a Reframe moment."
+- "She put something on the table — now she needs to earn your attention. This is a Make Her Qualify moment."
+- "She's signalling the window is open. This is a Close moment."
+- "She threw a test to see if you'll get rattled. This is a Feel Nothing moment."
+
+Write about what SHE is doing. Name the skill in the second sentence. Max 30 words.
 
 If no clear failure, return:
 {"teachable":false}
