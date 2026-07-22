@@ -2,6 +2,65 @@
 // Checks only the active lesson's mnemonic skills. Returns { teachable, skill, skillName, coaching, betterLine }.
 // Conservative by design: only flags unmistakable failures. Fails open on error (no interrupt).
 
+// Curated example lines per skill — shown as "Try this instead" in the interrupt overlay.
+// 3 options per skill; one is picked at random each interrupt so it doesn't feel scripted.
+const BETTER_LINES = {
+  lesson1: {
+    O: [
+      "You've barely touched your drink.",
+      "I clocked that look from across the room.",
+      "Something about you looked like you had somewhere to be.",
+    ],
+    T: [
+      "You're right — and yet here you are.",
+      "I've been called worse.",
+      "That's fine. Most people don't get it right away.",
+    ],
+    M: [
+      "Something that keeps me out of trouble. Mostly.",
+      "I'll tell you once you've earned it.",
+      "Bit of everything — nothing worth explaining tonight.",
+    ],
+    I: [
+      "Give me your number and we'll see.",
+      "Something tells me this isn't the last time we talk.",
+      "I have a feeling we're not done yet.",
+    ],
+    C: [
+      "Give me your number.",
+      "Let's grab coffee this week.",
+      "Come find me before you leave tonight.",
+    ],
+  },
+  lesson2: {
+    F: [
+      "Probably.",
+      "You're not wrong.",
+      "Fair enough.",
+    ],
+    R: [
+      "You talk to me just fine.",
+      "People say that right before they can't stop talking.",
+      "Strangers are just people you haven't figured out yet.",
+    ],
+    A: [
+      "Appreciate the update.",
+      "Bold of you to decide that so fast.",
+      "Okay.",
+    ],
+    M: [
+      "Prove it.",
+      "I'll be the judge of that.",
+      "I've heard that one — convince me.",
+    ],
+    E: [
+      "Give me your number and we'll pick this up.",
+      "I'm heading out — give me your number first.",
+      "Let's not drag this out — give me your number.",
+    ],
+  },
+};
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
@@ -77,7 +136,7 @@ Be CONSERVATIVE. Only flag failures that are obvious. When in doubt → teachabl
 Do NOT flag imperfect lines, missed opportunities, or things that "could be better" — only flag clear violations of the skill definitions above.
 
 If a clear failure exists, return:
-{"teachable":true,"skill":"X","skillName":"Full Skill Name","coaching":"One sentence — exactly what went wrong (max 18 words).","betterLine":"A concrete replacement line they could say right now (max 14 words)."}
+{"teachable":true,"skill":"X","skillName":"Full Skill Name","coaching":"One sentence — exactly what went wrong (max 18 words)."}
 
 If no clear failure, return:
 {"teachable":false}
@@ -127,18 +186,30 @@ Exchange number: ${exchangeCount}`;
     }
 
     // Validate required fields before passing to client
-    if (!parsed.skill || !parsed.coaching || !parsed.betterLine) {
+    if (!parsed.skill || !parsed.coaching) {
       console.warn('[coach-moment] → teachable but missing fields, discarding', JSON.stringify(parsed));
       return res.json({ teachable: false });
     }
 
-    console.log(`[coach-moment] → TEACHABLE skill:${parsed.skill} (${parsed.skillName}) | "${String(parsed.coaching).slice(0, 80)}"`);
+    // Library lookup — pick a random curated line for this skill; fall back to LLM's betterLine
+    const lessonKey   = isLesson1 ? 'lesson1' : 'lesson2';
+    const skillLines  = BETTER_LINES[lessonKey]?.[String(parsed.skill)];
+    const betterLine  = skillLines
+      ? skillLines[Math.floor(Math.random() * skillLines.length)]
+      : String(parsed.betterLine || '').slice(0, 120);
+
+    if (!betterLine) {
+      console.warn('[coach-moment] → teachable but no betterLine (missing from library and LLM), discarding');
+      return res.json({ teachable: false });
+    }
+
+    console.log(`[coach-moment] → TEACHABLE skill:${parsed.skill} (${parsed.skillName}) | "${String(parsed.coaching).slice(0, 80)}" | betterLine source:${skillLines ? 'library' : 'llm'}`);
     return res.json({
       teachable:  true,
       skill:      String(parsed.skill).slice(0, 5),
       skillName:  String(parsed.skillName || parsed.skill).slice(0, 60),
       coaching:   String(parsed.coaching).slice(0, 200),
-      betterLine: String(parsed.betterLine).slice(0, 120),
+      betterLine,
     });
 
   } catch (err) {
