@@ -72,6 +72,14 @@ let session = 0;
 let _lastInputMode = 'voice'; // tracks whether the most recent listenForUser call used voice or type
 const _seenScenarioIntros = new Set(); // tracks which scenario intros have played this session
 
+// ── Coached Practice state ──────────────────────────────────────────────────
+const _pauseState = { active: false, resolve: null };
+let _momentCheckPromise = null;  // promise for current in-flight moment check
+let _momentCheckGen     = 0;     // increments to invalidate a check that missed its window
+let _turnSnapshot      = null;   // { history: [...], exchangeCount: N } — taken before each listen
+let _interruptCount    = 0;      // resets per freeConversation; capped at MAX_INTERRUPTS
+const MAX_INTERRUPTS   = 2;      // max coaching interruptions per session
+
 const els = {
   select:         document.getElementById('scenarioSelect'),
   chooseBtn:      document.getElementById('chooseAvatarBtn'),
@@ -332,6 +340,82 @@ const Progress = (() => {
 
   return { recordSession, refreshStatBar, refreshStreakBadge, getHistoryHTML, getStreak, getBest, getTotal, showDashboard };
 })();
+
+/* ===== Certification ===== */
+// Tiers are computed on-the-fly from existing ek-progress-v1 data (no new storage key).
+// To adjust thresholds, edit the TIERS array — everything else derives from it.
+const Certification = (() => {
+  const TIERS = [
+    { id: 'master', minSessions: 7, minAvg: 8.5, label: 'Master', emoji: '👑', color: '#e8c84a' },
+    { id: 'gold',   minSessions: 5, minAvg: 7.5, label: 'Gold',   emoji: '🥇', color: '#ffb300' },
+    { id: 'silver', minSessions: 5, minAvg: 6.5, label: 'Silver', emoji: '🥈', color: '#9aa4b2' },
+    { id: 'bronze', minSessions: 3, minAvg: 5.0, label: 'Bronze', emoji: '🥉', color: '#c97b40' },
+  ];
+  const BRONZE = TIERS[TIERS.length - 1];
+
+  function getSessionsFor(characterId) {
+    try {
+      const d = JSON.parse(localStorage.getItem('ek-progress-v1')) || {};
+      return ((d.sessions || []).filter(s => (s.characterId || 'sofia') === characterId));
+    } catch { return []; }
+  }
+
+  // Returns the highest earned tier object, or null.
+  function getTier(characterId) {
+    const all = getSessionsFor(characterId);
+    if (!all.length) return null;
+    for (const t of TIERS) {
+      if (all.length < t.minSessions) continue;
+      const recent = all.slice(-t.minSessions);
+      const avg = recent.reduce((s, r) => s + r.score, 0) / recent.length;
+      if (avg >= t.minAvg) return t;
+    }
+    return null;
+  }
+
+  // Small colored pill for the avatar picker — empty string if no tier yet.
+  function getBadgeHTML(characterId) {
+    const t = getTier(characterId);
+    if (!t) return '';
+    return `<div style="display:inline-flex;align-items:center;gap:3px;background:rgba(0,0,0,0.45);` +
+      `border:1px solid ${t.color}55;border-radius:999px;padding:2px 8px;` +
+      `font-size:11px;font-weight:700;color:${t.color};margin-top:5px;letter-spacing:.03em">` +
+      `${t.emoji} ${t.label}</div>`;
+  }
+
+  // One-line status for the feedback card — shows tier earned or nudge toward Bronze.
+  function getProgressHTML(characterId) {
+    const all = getSessionsFor(characterId);
+    const t = getTier(characterId);
+    const name = characterId.charAt(0).toUpperCase() + characterId.slice(1).replace(/_/g, ' ').replace('office', '').trim();
+
+    if (t) {
+      return `<div style="background:#161820;border:1px solid ${t.color}33;border-radius:8px;` +
+        `padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:8px">` +
+        `<span style="font-size:18px">${t.emoji}</span>` +
+        `<div><div style="font-size:12px;font-weight:700;color:${t.color};letter-spacing:.03em">${t.label} — ${name}</div>` +
+        `<div style="font-size:11px;color:#9aa4b2;margin-top:1px">${all.length} session${all.length===1?'':'s'} · avg ${(all.slice(-t.minSessions).reduce((s,r)=>s+r.score,0)/t.minSessions).toFixed(1)}/10</div>` +
+        `</div></div>`;
+    }
+
+    // Progress toward Bronze
+    const needed = BRONZE.minSessions - all.length;
+    if (needed > 0) {
+      return `<div style="font-size:12px;color:#9aa4b2;margin-bottom:10px;padding:0 2px">` +
+        `🥉 ${needed} more session${needed===1?'':'s'} with ${name} to reach Bronze</div>`;
+    }
+    const recent = all.slice(-BRONZE.minSessions);
+    const avg = recent.reduce((s, r) => s + r.score, 0) / recent.length;
+    if (avg < BRONZE.minAvg) {
+      return `<div style="font-size:12px;color:#9aa4b2;margin-bottom:10px;padding:0 2px">` +
+        `🥉 Bronze needs avg ${BRONZE.minAvg} over ${BRONZE.minSessions} sessions — current avg: ${avg.toFixed(1)}</div>`;
+    }
+    return '';
+  }
+
+  return { getTier, getBadgeHTML, getProgressHTML };
+})();
+
 
 /* ===== Daily Session Limit ===== */
 // Three-layer gate: localStorage + FingerprintJS + server-side IP (in api/character.js + api/tts.js)
@@ -629,18 +713,18 @@ const Caption = (() => {
       'z-index:10',
       'width:100%',
       'box-sizing:border-box',
-      'background:rgba(0,0,0,0.97)',
-      'backdrop-filter:blur(6px)',
-      '-webkit-backdrop-filter:blur(6px)',
-      'border-top:1px solid rgba(255,255,255,0.08)',
-      'padding:20px 24px',
+      'background:rgba(0,0,0,0.80)',
+      'backdrop-filter:blur(4px)',
+      '-webkit-backdrop-filter:blur(4px)',
+      'border-top:1px solid rgba(255,200,0,0.18)',
+      'padding:10px 20px 12px',
       'text-align:center',
-      'color:#fff',
-      'font-size:16px',
-      'font-weight:500',
-      'line-height:1.5',
+      'color:#FFD700',
+      'font-size:15px',
+      'font-weight:700',
+      'line-height:1.45',
       'letter-spacing:0.01em',
-      'min-height:200px',
+      'text-shadow:0 1px 4px rgba(0,0,0,0.9)',
       'display:flex',
       'align-items:center',
       'justify-content:center',
@@ -675,6 +759,64 @@ const Caption = (() => {
 })();
 
 
+/* ===== Ambient audio ===== */
+const AmbientAudio = (() => {
+  const R2 = 'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/ambient/';
+  const VOLUME = 0.08; // clearly subordinate to TTS and voice input
+
+  // Explicit map for Wave 1+2 scenarios
+  const CATEGORY_MAP = {
+    beach:        'beach',
+    bar:          'bar',
+    museum:       'museum',
+    gym:          'gym',
+    bookstore:    'bookstore',
+    street:       'street',
+    wedding:      'wedding',
+    rooftop:      'rooftop',
+    house_party:  'party',
+    coffee_shop:  'cafe',
+    art_gallery:  'gallery',
+    yoga_studio:  'yoga',
+    airport:      'airport',
+    supermarket:  'supermarket',
+    office_lobby: 'office',
+    train:        'train',
+  };
+
+  // Derive category for Wave 3 / future scenarios from key name
+  function deriveCategory(key) {
+    if (/beach|ocean|surf/.test(key))                  return 'beach';
+    if (/bar|club|wine|jazz|pub|lounge/.test(key))     return 'bar';
+    if (/cafe|coffee|brunch|bakery/.test(key))         return 'cafe';
+    if (/park|garden|trail|outdoor/.test(key))         return 'park';
+    if (/market/.test(key))                            return 'street';
+    if (/gym|climb|yoga|dance|fitness/.test(key))      return 'gym';
+    if (/museum|library|gallery|exhibit/.test(key))    return 'museum';
+    if (/airport|gate|terminal/.test(key))             return 'airport';
+    if (/train|station/.test(key))                     return 'train';
+    if (/office|interview|work/.test(key))             return 'office';
+    if (/party|pool_party/.test(key))                  return 'party';
+    if (/book|shop|store/.test(key))                   return 'bookstore';
+    if (/rooftop|terrace/.test(key))                   return 'rooftop';
+    if (/street|skate/.test(key))                      return 'street';
+    return 'cafe'; // neutral fallback
+  }
+
+  function play(scenarioKey) {
+    const cat = CATEGORY_MAP[scenarioKey] || deriveCategory(scenarioKey);
+    const el = document.createElement('audio');
+    el.loop = true;
+    el.volume = VOLUME;
+    el.src = `${R2}${cat}.mp3`;
+    // Silently absorb load errors — ambient is atmosphere, not a requirement
+    el.onerror = () => { try { el.remove(); } catch {} };
+    document.body.appendChild(el);
+    el.play().catch(() => {}); // ignore autoplay policy rejections
+  }
+
+  return { play };
+})();
 
 
 
@@ -778,6 +920,139 @@ function stopEverything() {
   if (listenTimer) { clearTimeout(listenTimer); listenTimer=null; }
   if (watchdogInterval) { clearInterval(watchdogInterval); watchdogInterval=null; }
   hideMnemonicPill();
+  // Coached Practice cleanup — dismiss any pending interrupt overlay and release pause gate
+  try { document.getElementById('ek-coach-interrupt')?.remove(); } catch {}
+  _pauseState.active = false;
+  if (_pauseState.resolve) { _pauseState.resolve(); _pauseState.resolve = null; }
+  _momentCheckGen++;       // invalidate any in-flight check so it can't fire after session ends
+  _momentCheckPromise = null;
+}
+
+/* ===== Coached Practice helpers ===== */
+
+function isCoachMode() {
+  return localStorage.getItem('eklipses_coached_mode') === '1';
+}
+
+// Waits for any in-flight moment check (already running during TTS), then blocks if an interrupt
+// fired. Because the check is launched during character TTS playback, it should be resolved or
+// nearly resolved by the time this runs — expected overhead is near-zero on production.
+// Cap: if the check is still pending after 1200 ms, discard it via _momentCheckGen++ so it can
+// never fire late on a future turn. NEVER touches the session counter.
+async function waitIfPaused(mySession) {
+  if (_momentCheckPromise) {
+    const DISCARD_CAP_MS = 1200;
+    const timedOut = await Promise.race([
+      _momentCheckPromise.then(() => false),
+      new Promise(r => setTimeout(() => r(true), DISCARD_CAP_MS)),
+    ]);
+    _momentCheckPromise = null;
+    if (timedOut) _momentCheckGen++; // invalidate — the late-resolving check cannot fire
+  }
+  if (!_pauseState.active) return;
+  await new Promise(resolve => {
+    let id;
+    const done = () => { clearInterval(id); resolve(); };
+    _pauseState.resolve = done;
+    id = setInterval(() => {
+      if (mySession !== session) {
+        _pauseState.active = false;
+        _pauseState.resolve = null;
+        done();
+      }
+    }, 50);
+  });
+}
+
+// Fires the /api/coach-moment check. Launched during character TTS so it runs for free.
+// Captures _momentCheckGen at call time — if the gen increments (waitIfPaused timed out or
+// stopEverything ran) before the result arrives, the interrupt is discarded cleanly.
+// Fails open on any error so the conversation always continues.
+async function checkMoment(userSaid, charResponse, mySession) {
+  const myGen = _momentCheckGen; // snapshot — checked again before firing interrupt
+  const practiceFocus = localStorage.getItem('eklipses_practice_focus') || 'free';
+  try {
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), 7000);
+    const r = await fetch('/api/coach-moment', {
+      method:  'POST',
+      signal:  controller.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        userMessage:       userSaid,
+        characterResponse: charResponse,
+        practiceFocus,
+        exchangeCount:     _exchangeCount,
+        scenarioKey:       currentScenarioKey,
+      }),
+    });
+    clearTimeout(t);
+    if (!r.ok || mySession !== session || myGen !== _momentCheckGen) return;
+    const data = await r.json();
+    if (mySession !== session || myGen !== _momentCheckGen || !data.teachable) return;
+    _interruptCount++;
+    _pauseState.active = true;
+    showCoachInterrupt(userSaid, charResponse, data);
+  } catch { /* fail open — check timed out or errored; conversation continues */ }
+}
+
+function _escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showCoachInterrupt(userLine, charLine, data) {
+  document.getElementById('ek-coach-interrupt')?.remove();
+
+  const ov = document.createElement('div');
+  ov.id = 'ek-coach-interrupt';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:10002;background:rgba(10,11,16,0.97);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;box-sizing:border-box';
+
+  ov.innerHTML = `
+<div style="max-width:480px;width:100%;display:flex;flex-direction:column;gap:16px">
+  <div style="display:flex;align-items:flex-start;gap:14px">
+    <div style="width:44px;height:44px;border-radius:50%;background:#378ADD;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;flex-shrink:0">R</div>
+    <div>
+      <div style="color:#ffb300;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-bottom:4px">Ryan — Coached Practice · ${_escHtml(data.skillName || data.skill)}</div>
+      <div style="color:#e4e8f4;font-size:16px;font-weight:600;line-height:1.45">${_escHtml(data.coaching)}</div>
+    </div>
+  </div>
+
+  <div style="background:#141620;border:1px solid #252836;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px">
+    <div>
+      <div style="color:#5a6280;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px">She reacted to your line</div>
+      <div style="color:#7a849e;font-size:14px;font-style:italic">"${_escHtml(charLine.slice(0,160))}"</div>
+    </div>
+    <div style="border-top:1px solid #1e2132;padding-top:12px">
+      <div style="color:#5a6280;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px">Try this instead</div>
+      <div style="color:#d4d9ec;font-size:15px;font-weight:600">"${_escHtml(data.betterLine)}"</div>
+    </div>
+  </div>
+
+  <button id="ek-interrupt-retry" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:14px 32px;font-size:15px;font-weight:800;cursor:pointer;width:100%;transition:opacity .15s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+    ↩ Try again from here
+  </button>
+  <button id="ek-interrupt-continue" style="background:transparent;color:#4a526e;border:none;font-size:13px;cursor:pointer;padding:4px;transition:color .15s" onmouseover="this.style.color='#8a93a8'" onmouseout="this.style.color='#4a526e'">
+    Skip coaching — continue conversation
+  </button>
+</div>`;
+
+  document.body.appendChild(ov);
+
+  document.getElementById('ek-interrupt-retry').onclick    = () => resumeFromCoachInterrupt(true);
+  document.getElementById('ek-interrupt-continue').onclick = () => resumeFromCoachInterrupt(false);
+}
+
+// doRewind=true: rolls back conversationHistory + exchangeCount to the snapshot taken before the bad turn.
+// doRewind=false: continues from current state (coaching noted but not rewound).
+function resumeFromCoachInterrupt(doRewind) {
+  document.getElementById('ek-coach-interrupt')?.remove();
+  if (doRewind && _turnSnapshot) {
+    conversationHistory = _turnSnapshot.history.slice();
+    _exchangeCount      = _turnSnapshot.exchangeCount;
+  }
+  _turnSnapshot = null;
+  _pauseState.active = false;
+  if (_pauseState.resolve) { _pauseState.resolve(); _pauseState.resolve = null; }
 }
 
 /* ===== Ryan orb ===== */
@@ -1096,6 +1371,7 @@ async function speak(text, speaker, onAudioReady, prefetchedUrl = null) {
       delete els.text.dataset.pendingText;
     }
     if (onAudioReady) onAudioReady();
+    if (speaker === 'Mary') Caption.show(text);
     if (speaker === 'Mary') {
       if (AVATARS._marySpeakingVideo) {
         const el=els.media;
@@ -1109,6 +1385,7 @@ async function speak(text, speaker, onAudioReady, prefetchedUrl = null) {
   };
 
   const switchToIdle=()=>{
+    if (speaker === 'Mary') Caption.hide();
     const doneEl=els.media;
     if(doneEl&&doneEl.id==='ryan-orb') ryanOrbSetState('silent');
     if (speaker === 'Mary' && doneEl && doneEl.tagName === 'VIDEO') {
@@ -1160,7 +1437,7 @@ let _exchangeCount = 0;
 let firstUserOpener=null;
 function resetConversation() { conversationHistory=[]; _exchangeCount = 0; }
 
-async function streamCharacterAndSpeak(userSaid, mySession) {
+async function streamCharacterAndSpeak(userSaid, mySession, onTextReady = null) {
   // Show thinking state immediately
   els.name.textContent = getCharacterDisplayName(currentCharacterId);
   els.text.textContent = '...';
@@ -1196,6 +1473,7 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
       try {
         await speakElevenLabs(sentence, () => {
           if (mySession !== session) return;
+          Caption.show(sentence);
           if (AVATARS._marySpeakingVideo) {
             const el = els.media;
             if (el && el.tagName === 'VIDEO' && (el.getAttribute('src') || '') !== AVATARS._marySpeakingVideo) {
@@ -1229,6 +1507,7 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
 
     // Switch back to idle after all audio done
     if (mySession === session) {
+      Caption.hide();
       const doneEl = els.media;
       if (doneEl && doneEl.tagName === 'VIDEO') {
         const idleSrc = AVATARS._maryIdleVideo || AVATARS.User_Prompt.src;
@@ -1299,7 +1578,14 @@ async function streamCharacterAndSpeak(userSaid, mySession) {
             sentenceQueue.push(payload.sentence);
             if (!isPlayingAudio) processQueue();
           }
-          if (payload.done) { fullText = payload.full || fullText; streamDone = true; }
+          if (payload.done) {
+            fullText = payload.full || fullText;
+            streamDone = true;
+            // Fire the coached-practice moment-check NOW, while TTS is still playing.
+            // By the time all audio finishes and waitIfPaused runs, the API call will
+            // have had the full TTS duration to complete — near-zero overhead.
+            if (onTextReady && fullText) { onTextReady(fullText); onTextReady = null; }
+          }
         } catch {}
       }
     }
@@ -1775,6 +2061,7 @@ async function playScenario(key, practice=false) {
   warmupCharacterApi(key);
   Metrics.bumpView(key); Metrics.refreshUI(key);
   setSceneBackground(key);
+  AmbientAudio.play(key);
   // PostHog — scenario started
   if (window.posthog) posthog.capture('scenario_started', { scenario: key, mode: practice ? 'practice' : 'demo' });
   isPractice=practice;
@@ -1873,6 +2160,10 @@ async function freeConversation(mySession) {
   let freeConvRescueUsed = null;
   let firstExchangeDone = false;
   let silenceCount = 0;
+  _interruptCount = 0;
+  _turnSnapshot   = null;
+  _momentCheckPromise = null;
+  const _coachActive = isCoachMode();
   if (mySession !== session) return;
   const sc = SCENARIOS[currentScenarioKey] || {};
   const FREE_MS = 7 * 60 * 1000, NUDGE_MS = 5 * 60 * 1000;
@@ -1927,6 +2218,8 @@ async function freeConversation(mySession) {
 
     console.log('[FC] loop start, elapsed:', Date.now()-start, 'mySession:', mySession, 'session:', session);
     await pause(500); // brief gap so mic doesn't pick up tail of avatar audio
+    // Snapshot taken here — before each user turn — so a rewind can cleanly restore to this state
+    if (_coachActive) _turnSnapshot = { history: conversationHistory.slice(), exchangeCount: _exchangeCount };
     const said = await listenForUser(mySession, remMs);
     hideCoachSuggestions();
     console.log('[FC] heard:', said, 'mySession:', mySession, 'session:', session);
@@ -1994,8 +2287,20 @@ async function freeConversation(mySession) {
       continue;
     }
 
+    // ── Coached Practice: launch moment-check via callback so it runs during TTS playback ──
+    // The check fires when payload.done arrives inside streamCharacterAndSpeak (full text known,
+    // audio still playing). By the time TTS finishes + pause(300) elapses + waitIfPaused runs,
+    // the API call has had the full audio duration to complete → near-zero gate overhead.
+    const _shouldCheckMoment = _coachActive && _interruptCount < MAX_INTERRUPTS && said.trim().split(/\s+/).length >= 5;
+    _momentCheckPromise = null;
+
     console.log('[FC] calling streamCharacterAndSpeak');
-    const reply = await streamCharacterAndSpeak(said, mySession);
+    const reply = await streamCharacterAndSpeak(
+      said, mySession,
+      _shouldCheckMoment
+        ? (charText) => { _momentCheckPromise = checkMoment(said, charText, mySession); }
+        : null
+    );
     console.log('[FC] streamCharacterAndSpeak done, mySession:', mySession, 'session:', session);
     firstExchangeDone = true;
     console.log('[FC] firstExchangeDone set, looping back');
@@ -2005,9 +2310,22 @@ async function freeConversation(mySession) {
       await speak(randomChoice(["Hmm?", "Say that again?", "What was that?"]), 'Mary');
     }
     if (mySession !== session) break;
+
+    // Fallback: onTextReady wasn't triggered (non-streaming path or no fullText) — fire now
+    if (_shouldCheckMoment && !_momentCheckPromise && reply) {
+      const lastCharLine = conversationHistory[conversationHistory.length - 1]?.content || '';
+      _momentCheckPromise = checkMoment(said, lastCharLine, mySession);
+    }
+
     await pause(300);
     setMediaForSpeaker('Mary');
     els.name.textContent = getCharacterDisplayName(currentCharacterId);
+
+    // ── Coached Practice gate: blocks if interrupt fired; discards check if still pending ──
+    if (_coachActive) {
+      await waitIfPaused(mySession);
+      if (mySession !== session) break;
+    }
   }
 
   clearInterval(timerInterval);
@@ -2270,8 +2588,8 @@ function showFeedbackCard(f) {
   // PostHog — coach feedback viewed
   if (window.posthog) posthog.capture('coach_viewed', { scenario: currentScenarioKey, score: f.score });
   const scoreColor=f.score>=7?'#40c770':f.score>=5?'#ffb300':'#ff6b6b';
-  const isBeach=currentScenarioKey==='beach';
-  const bodyHTML=isBeach?`
+  const charDisplayName=getCharacterDisplayName(currentCharacterId)||'her';
+  const bodyHTML=`
     <div style="display:grid;gap:10px;margin-bottom:14px">
       <div style="background:#161820;border:1px solid #2b2e3a;border-radius:10px;padding:12px">
         <div style="color:#9aa4b2;font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Your opener</div>
@@ -2294,34 +2612,7 @@ function showFeedbackCard(f) {
       <div style="background:#1a1620;border:1px solid #2e1e3a;border-radius:10px;padding:12px;display:flex;align-items:center;gap:12px">
         <div style="font-size:22px">${(f.wouldSheDateHim||'').startsWith('Yes')?'💜':(f.wouldSheDateHim||'').startsWith('No')?'✖':'🤔'}</div>
         <div>
-          <div style="color:#d4a8ff;font-size:11px;font-weight:700;margin-bottom:3px;text-transform:uppercase">Would Sofia date you?</div>
-          <div style="color:#e0d9ff;font-size:13px;line-height:1.5">${f.wouldSheDateHim||'---'}</div>
-        </div>
-      </div>
-    </div>` : `
-    <div style="display:grid;gap:10px;margin-bottom:14px">
-      <div style="background:#161820;border:1px solid #2b2e3a;border-radius:10px;padding:12px">
-        <div style="color:#9aa4b2;font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Your opener</div>
-        <div style="color:#cfd6e4;font-size:13px;line-height:1.6">${f.openerBreakdown||'---'}</div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div style="background:#162016;border:1px solid #1e3a1e;border-radius:10px;padding:12px">
-          <div style="color:#40c770;font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase">Best moment</div>
-          <div style="color:#c8e6c9;font-size:13px;line-height:1.6">${f.bestMoment||'---'}</div>
-        </div>
-        <div style="background:#1e1616;border:1px solid #3a1e1e;border-radius:10px;padding:12px">
-          <div style="color:#ff6b6b;font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase">Missed opportunity</div>
-          <div style="color:#ffcdd2;font-size:13px;line-height:1.6">${f.missedOpportunity||'---'}</div>
-        </div>
-      </div>
-      <div style="background:#1a1730;border:1px solid #2e2a50;border-radius:10px;padding:12px">
-        <div style="color:#a78bfa;font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase">Try this next time</div>
-        <div style="color:#e0d9ff;font-size:14px;font-style:italic">"${f.tryNextTime||f.tryThisLine||'---'}"</div>
-      </div>
-      <div style="background:#1a1620;border:1px solid #2e1e3a;border-radius:10px;padding:12px;display:flex;align-items:center;gap:12px">
-        <div style="font-size:22px">${(f.wouldSheDateHim||'').startsWith('Yes')?'💜':(f.wouldSheDateHim||'').startsWith('No')?'✖':'🤔'}</div>
-        <div>
-          <div style="color:#d4a8ff;font-size:11px;font-weight:700;margin-bottom:3px;text-transform:uppercase">Would she date you?</div>
+          <div style="color:#d4a8ff;font-size:11px;font-weight:700;margin-bottom:3px;text-transform:uppercase">Would ${charDisplayName} date you?</div>
           <div style="color:#e0d9ff;font-size:13px;line-height:1.5">${f.wouldSheDateHim||'---'}</div>
         </div>
       </div>
@@ -2335,6 +2626,7 @@ function showFeedbackCard(f) {
       </div>
       ${bodyHTML}
       ${Progress.getHistoryHTML()}
+      ${Certification.getProgressHTML(currentCharacterId)}
       <div style="text-align:center;margin-top:14px">
         <button onclick="if(window.posthog) posthog.capture('try_again_clicked', {scenario:'${currentScenarioKey}'}); playScenario('${currentScenarioKey}',true)" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:10px 28px;font-size:14px;font-weight:800;cursor:pointer;margin-right:8px">
           Try Again
@@ -2656,8 +2948,13 @@ function showPracticeFocusModal(scenarioKey) {
   const modal     = document.getElementById('practice-focus-modal');
   const body      = document.getElementById('practice-focus-body');
 
-  function start(focus) {
+  function start(focus, coached = false) {
     localStorage.setItem('eklipses_practice_focus', focus);
+    if (coached) {
+      localStorage.setItem('eklipses_coached_mode', '1');
+    } else {
+      localStorage.removeItem('eklipses_coached_mode');
+    }
     if (!DRILL_REPS[focus]) {
       // No drill for this focus (Free Practice, All Lessons)
       modal.style.display = 'none';
@@ -2691,7 +2988,7 @@ function showPracticeFocusModal(scenarioKey) {
 
   body.innerHTML = `
 <p style="font-size:18px;font-weight:700;color:#f0f2f6;margin:0 0 6px">What do you want to practice?</p>
-<p style="font-size:13px;color:#8a93a8;margin:0 0 18px;line-height:1.5">Sofia will adapt her behavior to your choice.</p>
+<p style="font-size:13px;color:#8a93a8;margin:0 0 18px;line-height:1.5">${getCharacterDisplayName(currentCharacterId)||'Your character'} will adapt her behavior to your choice.</p>
 <div style="display:flex;flex-direction:column;gap:8px">
 
 ${hasAny
@@ -2737,6 +3034,17 @@ ${hasAny
   : ''
 }
 
+${hasAny
+  ? `<button id="pfm-coached" style="${S.replace('#252836','#1e2030').replace('#2f3344','#3d3060')}" onmouseover="this.style.background='#28204a';this.style.borderColor='#6a4fbf'" onmouseout="this.style.background='#1e2030';this.style.borderColor='#3d3060'">
+      <div style="display:flex;align-items:center;gap:8px"><span style="font-size:13px">⚡</span><span>Coached Practice</span></div>
+      <div style="${SUB}">Ryan interrupts with real-time coaching on ${latest ? latest.label.replace(/^Lesson \d+ — /, '') : 'lesson'} skills — rewind and retry on the spot</div>
+     </button>`
+  : `<button style="${SD}" disabled>
+      <div style="display:flex;align-items:center;gap:8px"><span style="font-size:13px">⚡</span><span>Coached Practice</span></div>
+      <div style="${SUBD}">Complete a lesson to unlock</div>
+     </button>`
+}
+
 <button id="pfm-free" style="${S}" data-focus="free" ${HV}>
   <div>Free Practice</div>
   <div style="${SUB}">Open conversation — no skill testing or evaluation</div>
@@ -2761,6 +3069,8 @@ ${hasAny
     });
 
     document.getElementById('pfm-all').addEventListener('click', () => start('all'));
+    // Coached Practice: uses latest lesson's skill set + enables mid-conversation interrupts
+    document.getElementById('pfm-coached').addEventListener('click', () => start(latest.id, true));
   }
 
   document.getElementById('pfm-free').addEventListener('click', () => start('free'));
@@ -2777,6 +3087,7 @@ function renderAvatarPicker() {
         <b style="font-size:15px">${s.label}</b>
         <div style="color:#9aa4b2;font-size:12px;margin-top:3px">${s.vibe||''}</div>
         <div style="color:#ffb300;font-size:11px;font-weight:700;margin-top:4px;text-transform:uppercase;letter-spacing:.05em">${s.scenario||''}</div>
+        ${Certification.getBadgeHTML(s.id)}
       </div>
     </div>`).join('');
   els.pickerGrid.querySelectorAll('.pick-card').forEach(card=>{
