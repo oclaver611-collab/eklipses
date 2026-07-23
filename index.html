@@ -226,7 +226,6 @@
       padding: 7px 10px;
       white-space: nowrap;
     }
-    #chooseAvatarBtn { display: none; }
     .metrics { display: none; }
 
     /* Stage: full width, taller frame */
@@ -284,21 +283,8 @@
   .mn-meaning { font-size:12px;color:#8a93a8;line-height:1.3 }</style>
 </head>
 <body>
-  <div class="topbar">
-    <label>Scenario:</label>
-    <select id="scenarioSelect" aria-label="Choose scenario"></select>
-    <button id="chooseAvatarBtn" class="btn-ghost btn-pill">👤 Choose Avatar</button>
-
-    <!-- Streak badge — populated by Progress.refreshStreakBadge() -->
-    <span id="ek-streak-badge" style="display:none;align-items:center;gap:5px;background:#1e1a0e;border:1px solid #7a5500;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700;color:#ffb300;cursor:pointer" title="View progress"></span>
-
-    <!-- Simple metrics UI -->
-    <div class="metrics" style="margin-left:auto">
-      <button id="likeBtn" class="btn-ghost btn-pill">👍 Like <span id="likeCount" class="count">0</span></button>
-      <span>👁️ Views: <b id="viewCount" class="count">0</b></span>
-      <a href="https://tally.so/r/rjJ6k2" target="_blank" class="btn-ghost btn-pill" style="text-decoration:none;padding:8px 10px;border-radius:999px;border:1px solid #2b2e36;background:#2a2e36;color:#e9ecf1;font-size:13px;">💬 Feedback</a>
-    </div>
-  </div>
+  <!-- Streak badge — populated by Progress.refreshStreakBadge() -->
+  <span id="ek-streak-badge" style="display:none;position:fixed;top:10px;right:10px;z-index:9990;align-items:center;gap:5px;background:#1e1a0e;border:1px solid #7a5500;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700;color:#ffb300;cursor:pointer" title="View progress"></span>
 
   <!-- LEARN / PRACTICE Tabs -->
   <div class="ek-tabs">
@@ -338,7 +324,10 @@
     </div>
 
     <aside class="shelf">
-      <h3>Scenarios</h3>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:4px 8px 10px">
+        <span style="font-size:16px;font-weight:600;color:#cfd6e4">Scenarios</span>
+        <button id="chooseAvatarBtn" style="font-size:11px;font-weight:600;background:transparent;border:1px solid #2b2e36;border-radius:999px;color:#9aa4b2;padding:4px 10px;cursor:pointer;transition:color .15s,border-color .15s" onmouseover="this.style.color='#cfd6e4';this.style.borderColor='#3a3f4b'" onmouseout="this.style.color='#9aa4b2';this.style.borderColor='#2b2e36'">👤 Change</button>
+      </div>
       <div id="shelfList" class="sc-list"></div>
       <div id="showMore" class="showmore" style="display:none;"></div>
     </aside>
