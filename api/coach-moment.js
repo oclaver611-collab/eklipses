@@ -3,60 +3,75 @@
 // Conservative by design: only flags unmistakable failures. Fails open on error (no interrupt).
 
 // Curated example lines per skill — shown as "Try this instead" in the interrupt overlay.
-// 3 options per skill; one is picked at random each interrupt so it doesn't feel scripted.
+// Each entry is { text, opener?: true }.
+// opener:true lines only work as first-approach lines and must not be shown mid-conversation.
+// Selection filters by context: early (exchange ≤ 2) allows all lines; mid-conv skips opener-only.
+// If filtering leaves no eligible lines, the LLM's own betterLine is used as fallback.
 const BETTER_LINES = {
   lesson1: {
     O: [
-      "You've barely touched your drink.",
-      "I clocked that look from across the room.",
-      "Something about you looked like you had somewhere to be.",
+      // universal — observation of present behaviour, works at any exchange
+      { text: "You've barely touched your drink." },
+      { text: "You have that look like something's on your mind." },
+      // opener-only — implies you just noticed her from across the room before approaching
+      { text: "I clocked that look from across the room.", opener: true },
+      { text: "Something about you looked like you had somewhere to be.", opener: true },
     ],
     T: [
-      "You're right — and yet here you are.",
-      "I've been called worse.",
-      "That's fine. Most people don't get it right away.",
+      // all universal — direct replies to her pushback, never approach-specific
+      { text: "You're right — and yet here you are." },
+      { text: "I've been called worse." },
+      { text: "That's fine. Most people don't get it right away." },
     ],
     M: [
-      "Something that keeps me out of trouble. Mostly.",
-      "I'll tell you once you've earned it.",
-      "Bit of everything — nothing worth explaining tonight.",
+      // all universal — replies to direct personal questions at any exchange
+      { text: "Something that keeps me out of trouble. Mostly." },
+      { text: "I'll tell you once you've earned it." },
+      { text: "Bit of everything — nothing worth explaining tonight." },
     ],
     I: [
-      "Give me your number and we'll see.",
-      "Something tells me this isn't the last time we talk.",
-      "I have a feeling we're not done yet.",
+      // all universal — imply interest without stating it, work at any point
+      { text: "Give me your number and we'll see." },
+      { text: "Something tells me this isn't the last time we talk." },
+      { text: "I have a feeling we're not done yet." },
     ],
     C: [
-      "Give me your number.",
-      "Let's grab coffee this week.",
-      "Come find me before you leave tonight.",
+      // all universal — direct close lines, work whenever she signals the window
+      { text: "Give me your number." },
+      { text: "Let's grab coffee this week." },
+      { text: "Come find me before you leave tonight." },
     ],
   },
   lesson2: {
     F: [
-      "Probably.",
-      "You're not wrong.",
-      "Fair enough.",
+      // all universal — unbothered replies to any test or jab
+      { text: "Probably." },
+      { text: "You're not wrong." },
+      { text: "Fair enough." },
     ],
     R: [
-      "You talk to me just fine.",
-      "People say that right before they can't stop talking.",
-      "Strangers are just people you haven't figured out yet.",
+      // all universal — reframe replies, work at any exchange
+      { text: "You talk to me just fine." },
+      { text: "People say that right before they can't stop talking." },
+      { text: "Strangers are just people you haven't figured out yet." },
     ],
     A: [
-      "Appreciate the update.",
-      "Bold of you to decide that so fast.",
-      "Okay.",
+      // all universal — humor deflections, work at any exchange
+      { text: "Appreciate the update." },
+      { text: "Bold of you to decide that so fast." },
+      { text: "Okay." },
     ],
     M: [
-      "Prove it.",
-      "I'll be the judge of that.",
-      "I've heard that one — convince me.",
+      // all universal — make-her-qualify replies at any exchange
+      { text: "Prove it." },
+      { text: "I'll be the judge of that." },
+      { text: "I've heard that one — convince me." },
     ],
     E: [
-      "Give me your number and we'll pick this up.",
-      "I'm heading out — give me your number first.",
-      "Let's not drag this out — give me your number.",
+      // all universal — exit-move lines, work whenever the window opens
+      { text: "Give me your number and we'll pick this up." },
+      { text: "I'm heading out — give me your number first." },
+      { text: "Let's not drag this out — give me your number." },
     ],
   },
 };
@@ -136,7 +151,7 @@ Be CONSERVATIVE. Only flag failures that are obvious. When in doubt → teachabl
 Do NOT flag imperfect lines, missed opportunities, or things that "could be better" — only flag clear violations of the skill definitions above.
 
 If a clear failure exists, return:
-{"teachable":true,"skill":"X","skillName":"Full Skill Name","coaching":"..."}
+{"teachable":true,"skill":"X","skillName":"Full Skill Name","coaching":"...","betterLine":"A short line they could say right now in direct reply to her last message (max 12 words)."}
 
 COACHING FORMAT — 1-2 short sentences, max 30 words total:
 Sentence 1: What she is doing psychologically RIGHT NOW (frame it as her move, not the student's mistake).
@@ -173,7 +188,7 @@ Exchange number: ${exchangeCount}`;
       },
       body: JSON.stringify({
         model:      'gpt-4o-mini',
-        max_tokens: 200,
+        max_tokens: 220,
         temperature: 0.1,
         messages: [
           { role: 'system', content: systemPrompt },
@@ -199,24 +214,24 @@ Exchange number: ${exchangeCount}`;
     }
 
     // Validate required fields before passing to client
-    if (!parsed.skill || !parsed.coaching) {
+    if (!parsed.skill || !parsed.coaching || !parsed.betterLine) {
       console.warn('[coach-moment] → teachable but missing fields, discarding', JSON.stringify(parsed));
       return res.json({ teachable: false });
     }
 
-    // Library lookup — pick a random curated line for this skill; fall back to LLM's betterLine
-    const lessonKey   = isLesson1 ? 'lesson1' : 'lesson2';
-    const skillLines  = BETTER_LINES[lessonKey]?.[String(parsed.skill)];
-    const betterLine  = skillLines
-      ? skillLines[Math.floor(Math.random() * skillLines.length)]
-      : String(parsed.betterLine || '').slice(0, 120);
+    // Library lookup — filter by conversation context, then pick at random.
+    // opener:true lines are only shown when exchangeCount <= 2 (still early enough to be the approach).
+    // If filtering leaves nothing, fall back to the LLM's own betterLine which can reply to her actual words.
+    const lessonKey  = isLesson1 ? 'lesson1' : 'lesson2';
+    const allLines   = BETTER_LINES[lessonKey]?.[String(parsed.skill)] || [];
+    const isEarly    = exchangeCount <= 2;
+    const pool       = isEarly ? allLines : allLines.filter(l => !l.opener);
+    const betterLine = pool.length > 0
+      ? pool[Math.floor(Math.random() * pool.length)].text
+      : String(parsed.betterLine).slice(0, 120); // LLM fallback — contextual reply to her words
 
-    if (!betterLine) {
-      console.warn('[coach-moment] → teachable but no betterLine (missing from library and LLM), discarding');
-      return res.json({ teachable: false });
-    }
-
-    console.log(`[coach-moment] → TEACHABLE skill:${parsed.skill} (${parsed.skillName}) | "${String(parsed.coaching).slice(0, 80)}" | betterLine source:${skillLines ? 'library' : 'llm'}`);
+    const betterLineSource = pool.length > 0 ? 'library' : 'llm-fallback';
+    console.log(`[coach-moment] → TEACHABLE skill:${parsed.skill} (${parsed.skillName}) | "${String(parsed.coaching).slice(0, 80)}" | betterLine:${betterLineSource}${pool.length === 0 ? ` (no eligible library lines at exchange ${exchangeCount})` : ''}`);
     return res.json({
       teachable:  true,
       skill:      String(parsed.skill).slice(0, 5),
