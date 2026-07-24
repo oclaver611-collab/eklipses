@@ -12,3 +12,4 @@ test-bar.js
 tests/logs/
 screenshots/
 dev-setup.html
+diag*.js
