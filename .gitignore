@@ -1,9 +1,9 @@
-node_modules/  
-.env 
-.wrangler/ 
-player_current.js 
-test-bar-card.js 
-test-bar.js 
+node_modules/
+.env
+.wrangler/
+player_current.js
+test-bar-card.js
+test-bar.js
 .vercel
 .env*
 *.mp3
@@ -11,3 +11,4 @@ test-bar.js
 *.jpg
 tests/logs/
 screenshots/
+dev-setup.html
