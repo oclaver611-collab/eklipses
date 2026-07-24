@@ -2069,7 +2069,7 @@ async function playScenario(key, practice=false) {
   stepIndex=0;
   if (practice) showMnemonicPill(localStorage.getItem('eklipses_practice_focus') || 'free');
   else hideMnemonicPill();
-  if(els.select.value!==key) els.select.value=key;
+  if(els.select && els.select.value!==key) els.select.value=key;
   if (window.showFullscreenBtn) window.showFullscreenBtn();
   await playLoop(mySession, _introPrefetch);
 }
