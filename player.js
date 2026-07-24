@@ -2684,8 +2684,11 @@ function startListeningYesNo(mySession) {
 /* ===== UI ===== */
 function renderShelf() {
   const keys=Object.keys(SCENARIOS).filter(k=>!SCENARIOS[k].hidden);
-  els.select.innerHTML=keys.map(k=>`<option value="${k}">${SCENARIOS[k].title}</option>`).join('');
-  els.select.onchange=()=>playScenario(els.select.value,false);
+  // #scenarioSelect was removed from index.html (a1ae651) — guard against null
+  if (els.select) {
+    els.select.innerHTML=keys.map(k=>`<option value="${k}">${SCENARIOS[k].title}</option>`).join('');
+    els.select.onchange=()=>playScenario(els.select.value,false);
+  }
   els.shelf.innerHTML='';
   const limit=3;
   keys.slice(0,limit).forEach(k=>els.shelf.appendChild(makeCard(k)));

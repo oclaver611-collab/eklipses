@@ -228,6 +228,13 @@ async function run() {
     // speakElevenLabs is still mocked (fires onStart immediately).
     // /api/character-stream returns a single sentence via SSE.
     // Caption.show() is called inside the onStart callback in processQueue().
+    //
+    // TIMING GUARD: speak('Mary') above uses a 400ms mock wait. The path from
+    // waitForCaption returning to here is ~370ms — just inside the window where
+    // Mary's switchToIdle() / Caption.hide() can fire concurrently with
+    // streamCharacterAndSpeak's Caption.show(), causing a flaky race. An extra
+    // 150ms ensures speak('Mary') has definitely resolved before we start.
+    await captionPage.waitForTimeout(150);
     await captionPage.evaluate(() => Caption.hide());
 
     captionPage.evaluate(() => {
