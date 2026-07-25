@@ -132,8 +132,18 @@ FAIL = defends himself earnestly, gets stiff, explains logically why he's confid
 M — Make Her Qualify: When she brought up something about herself, did he miss the chance to make her prove it?
 FAIL = immediately compliments her, says "I'm sure you are", or agrees without creating any tension.
 
-E — Exit: When she signals she needs to go or pulls back, did he chase?
-FAIL = keeps talking, extends unnecessarily after she signals exit, waits for her to decide, doesn't make a move.`;
+E — Exit: When she clearly signals she is leaving or has already signalled it and he keeps talking instead of making a move.
+FAIL = student keeps extending the conversation AFTER she has explicitly said she needs to go — he does not make a move.
+
+HARD RULES — if ANY of these are true, return teachable:false for E, no exceptions:
+  1. Her response contains a direct question aimed at him (e.g. "What about you?", "Where else do you go?", "What was the best part?") — questions mean she wants to keep talking.
+  2. Her response is longer than 10 words without mentioning she needs to leave.
+  3. Her response does not contain any of: "have to go", "need to go", "should go", "getting late", "get back to", "have to run", "head off", "head out", "leave", "leaving", "gotta go", "got to go".
+  4. She is still contributing new information, asking about him, or showing curiosity.
+
+A genuine Exit signal requires her to EXPLICITLY state she is leaving ("I should probably get back to my friends", "I actually have to run"). Topic changes, context about the setting, and questions back to him are NOT exit signals — they are engagement.
+
+When in doubt: return teachable:false. Missing an Exit is better than interrupting an engaged conversation.`;
 
   const skillDefs = isLesson1 ? lesson1SkillDefs : lesson2SkillDefs;
   const lessonLabel = isLesson1 ? 'OTIMC (Lesson 1 — The Approach)' : 'FRAME (Lesson 2 — Holding Your Ground)';
