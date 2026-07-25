@@ -1803,7 +1803,15 @@ function listenForUser(mySession, maxTotalMs) {
       };
 
       r.onerror=e=>{
-        if(e.error==='aborted') return;
+        if(e.error==='aborted') {
+          // Chrome fires 'aborted' during fullscreen transitions and other browser-level
+          // interruptions. Intentional stops (finish/stopEverything) always null the handlers
+          // before calling r.stop(), so if we reach here the session is still live — restart.
+          if (!resolved && mySession === session) {
+            setTimeout(()=>{ if(!resolved&&mySession===session) startRec(); }, 400);
+          }
+          return;
+        }
         // Fix 4: permission denied is unrecoverable — stop immediately
         if(e.error==='not-allowed'){finish('err_not-allowed');return;}
         if(e.error==='no-speech'){

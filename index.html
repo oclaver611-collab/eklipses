@@ -101,8 +101,8 @@
     height:260px !important;
   }
 
-  /* listening pill */
-  .pill{position:fixed;top:10px;right:10px;background:var(--accent);color:#000;padding:8px 12px;border-radius:20px;font-weight:700;display:none}
+  /* listening pill — position:absolute inside #stageFrame so it renders in fullscreen */
+  .pill{position:absolute;top:10px;right:10px;background:var(--accent);color:#000;padding:8px 12px;border-radius:20px;font-weight:700;display:none;z-index:999}
 
   /* ===== Avatar Picker Overlay ===== */
   .picker-backdrop{
@@ -168,9 +168,9 @@
   .ek-cert-chip.certified { background:rgba(76,175,80,.2); color:#4caf50; }
   .ek-cert-chip.practiced { background:rgba(154,164,178,.12); color:#9aa4b2; }
 
-  /* ===== Input Mode Toggle ===== */
+  /* ===== Input Mode Toggle — position:absolute inside #stageFrame so it renders in fullscreen ===== */
   #input-mode-toggle {
-    position: fixed; bottom: 80px; right: 16px; z-index: 9998;
+    position: absolute; bottom: 60px; right: 12px; z-index: 999;
     width: 44px; height: 44px; border-radius: 50%;
     background: #1a1c22; border: 1px solid #2b2e36;
     color: #cfd6e4; font-size: 20px; cursor: pointer;
@@ -318,6 +318,11 @@
         <video id="sceneBg" class="scene-bg hidden" muted playsinline></video>
         <!-- image/video swapped dynamically -->
         <img id="media" class="media" alt="speaker"/>
+        <!-- Listening indicator and input-mode toggle live inside stageFrame so they
+             remain visible when stageFrame enters fullscreen (Fullscreen API only
+             renders children of the fullscreen element). -->
+        <div id="listenPill" class="pill">🎤 Listening…</div>
+        <button id="input-mode-toggle" title="Switch to keyboard input">🎤</button>
       </div>
       <div id="speakerName" class="name">Ryan</div>
       <div id="lineText" class="line"></div>
@@ -344,11 +349,6 @@
       <a href="#" id="ek-cancel-btn" style="color:#6b7685;text-decoration:none;" onclick="ekCancelSubscription(event)">Cancel subscription</a>
     </span>
   </footer>
-
-  <div id="listenPill" class="pill">🎤 Listening…</div>
-
-  <!-- Input mode toggle (voice ↔ type) -->
-  <button id="input-mode-toggle" title="Switch to keyboard input">🎤</button>
 
   <!-- Type mode input bar — shown when input mode is 'type' and listenForUser is active -->
   <div id="type-input-wrap">
