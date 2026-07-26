@@ -76,6 +76,25 @@ const BETTER_LINES = {
   },
 };
 
+// Deterministic hard gate for Exit (E) skill — code-enforced, not LLM-dependent.
+// Returns true when Exit CANNOT fire: either she asked a question (still engaged)
+// or she used no exit language (never signalled she's leaving).
+function exitCannotFire(characterResponse) {
+  // Any question mark → she's asking him something → engaged, not leaving
+  if (/\?/.test(characterResponse)) return true;
+
+  const r = (characterResponse || '').toLowerCase();
+  const hasExitLanguage =
+    r.includes('have to go')   || r.includes('need to go')   || r.includes('should go')  ||
+    r.includes('getting late') || r.includes('get back to')  || r.includes('have to run') ||
+    r.includes('head off')     || r.includes('head out')     || r.includes('gotta go')    ||
+    r.includes('got to go')    || r.includes('should head')  || r.includes('have to leave') ||
+    r.includes('need to leave') || r.includes("i'm heading") || r.includes('heading out') ||
+    r.includes('heading off')  || /\bleave\b/.test(r)        || /\bleaving\b/.test(r);
+
+  return !hasExitLanguage; // no exit language → she never said she's leaving → Exit cannot fire
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
@@ -96,6 +115,10 @@ module.exports = async function handler(req, res) {
   const isLesson1 = practiceFocus === 'lesson1';
   const isLesson2 = practiceFocus === 'lesson2';
   if (!isLesson1 && !isLesson2) { console.log(`[coach-moment] skip — focus="${practiceFocus}" not lesson-specific`); return res.json({ teachable: false }); }
+
+  // Pre-compute exit gate: deterministic check that overrides any LLM decision on skill E
+  const exitBlocked = isLesson2 && exitCannotFire(characterResponse);
+  if (exitBlocked) console.log('[coach-moment] exit gate active — skill E is blocked for this exchange');
 
   console.log(`[coach-moment] checking — focus:${practiceFocus} exchange:${exchangeCount} words:${wordCount} | "${userMessage.slice(0, 80)}"`);
 
@@ -129,8 +152,9 @@ FAIL = accepts it, backs off, agrees with her limiting statement instead of offe
 A — Add Humor: When she challenged his confidence directly ("you seem sure of yourself"), did he take it seriously?
 FAIL = defends himself earnestly, gets stiff, explains logically why he's confident, apologizes.
 
-M — Make Her Qualify: When she brought up something about herself, did he miss the chance to make her prove it?
-FAIL = immediately compliments her, says "I'm sure you are", or agrees without creating any tension.
+M — Make Her Qualify: When she EXPLICITLY claimed something about herself ("I'm really fun", "I'm well-traveled", "I'm kind of a big deal"), did he immediately validate or agree instead of making her prove it?
+FAIL = immediately compliments her ("I'm sure you are", "Wow that's amazing"), or agrees without any push-back.
+NOT M = she asked him a question, made a neutral observation, or said nothing about herself. A question directed at him is NEVER an M failure — do not flag M when her response is or contains a question.
 
 E — Exit: When she clearly signals she is leaving or has already signalled it and he keeps talking instead of making a move.
 FAIL = student keeps extending the conversation AFTER she has explicitly said she needs to go — he does not make a move.
@@ -148,12 +172,17 @@ When in doubt: return teachable:false. Missing an Exit is better than interrupti
   const skillDefs = isLesson1 ? lesson1SkillDefs : lesson2SkillDefs;
   const lessonLabel = isLesson1 ? 'OTIMC (Lesson 1 — The Approach)' : 'FRAME (Lesson 2 — Holding Your Ground)';
 
+  // Belt-and-suspenders: also tell the LLM when the Exit gate is active (code override below is the real guard)
+  const finalSkillDefs = exitBlocked
+    ? skillDefs + '\n\nGATE ACTIVE FOR THIS EXCHANGE: Her response contains a direct question OR no exit language. Skill E (Exit) is DETERMINISTICALLY BLOCKED — do not return skill=E.'
+    : skillDefs;
+
   const systemPrompt = `You are Ryan, a direct dating coach reviewing a student's last message in a practice session.
 
 Lesson being tested: ${lessonLabel}
 
 SKILL DEFINITIONS:
-${skillDefs}
+${finalSkillDefs}
 
 YOUR JOB: Look at the student's last message ONLY. Check if it contains a CLEAR, unmistakable failure on one of these skills.
 
@@ -217,6 +246,13 @@ Exchange number: ${exchangeCount}`;
 
     let parsed;
     try { parsed = JSON.parse(clean); } catch { return res.json({ teachable: false }); }
+
+    // Deterministic Exit gate override — catches cases where LLM fires E despite hard rules in the prompt.
+    // This is the real enforcement layer; the prompt note above is belt-and-suspenders only.
+    if (exitBlocked && parsed.teachable && parsed.skill === 'E') {
+      console.log('[coach-moment] → Exit gate override: LLM returned E but characterResponse has a question or no exit language — suppressing');
+      return res.json({ teachable: false });
+    }
 
     if (!parsed.teachable) {
       console.log('[coach-moment] → not teachable');
