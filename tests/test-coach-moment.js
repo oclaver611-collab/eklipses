@@ -35,10 +35,13 @@ async function classify(body) {
 // ── test cases ────────────────────────────────────────────────────────────────
 // Each case: { label, body, expectTeachable, expectSkill? }
 // expectTeachable: true = should fire | false = should NOT fire
+//
+// Cases 1-5: original suite (Exit false-positive regression guard)
+// Cases 6-12: extended question-detection coverage (Exit gate edge cases)
 const cases = [
-  // ── The real bug: Sofia asking an engaged follow-up question ──────────────
+  // ── 1. The original bug: Sofia asking an engaged follow-up question ─────
   {
-    label: 'Sofia original bug — engaged question must NOT fire Exit',
+    label: '1. Sofia original bug — engaged question must NOT fire Exit',
     expectTeachable: false,
     body: {
       userMessage: "The beach has a good vibe, yeah. I come here when I need to think.",
@@ -48,11 +51,9 @@ const cases = [
       scenarioKey: 'beach',
     },
   },
-  // ── Genuine exit: she said she needed to go, student keeps chatting ───────
-  // (Exit fires on what the STUDENT does AFTER her exit signal — so the student
-  //  message here is his reply to her "I should get back", where he keeps talking.)
+  // ── 2. Genuine exit: she said she needed to go, student keeps chatting ──
   {
-    label: 'She said she needs to go, student keeps talking — genuine Exit',
+    label: '2. She said she needs to go, student keeps talking — genuine Exit',
     expectTeachable: true,
     expectSkill: 'E',
     body: {
@@ -63,11 +64,9 @@ const cases = [
       scenarioKey: 'beach',
     },
   },
-  // ── Neutral mid-conversation exchange — no failure, no exit ─────────────
-  // Student makes a plain neutral statement; Sofia agrees and mirrors. No test,
-  // no challenge, no claim from her to validate, no exit language. Should be clean.
+  // ── 3. Neutral mid-conversation — no failure, no exit ───────────────────
   {
-    label: 'Neutral exchange, no skill failure — no interrupt expected',
+    label: '3. Neutral exchange, no skill failure — no interrupt expected',
     expectTeachable: false,
     body: {
       userMessage: "Yeah the evenings are better here. Way less crowded.",
@@ -77,9 +76,9 @@ const cases = [
       scenarioKey: 'beach',
     },
   },
-  // ── Context comment + question back — must NOT fire Exit ─────────────────
+  // ── 4. Context comment + question back ──────────────────────────────────
   {
-    label: 'She adds context and asks about him — not Exit',
+    label: '4. She adds context and asks about him — not Exit',
     expectTeachable: false,
     body: {
       userMessage: "Yeah I like the quiet here, it helps me think.",
@@ -89,14 +88,105 @@ const cases = [
       scenarioKey: 'beach',
     },
   },
-  // ── She explicitly says she needs to leave — student still didn't make a move
+  // ── 5. Explicit "I have to run" + student hedges ────────────────────────
   {
-    label: 'Explicit "I have to run", student hedges the close — fires Exit',
+    label: '5. Explicit "I have to run", student hedges the close — fires Exit',
     expectTeachable: true,
     expectSkill: 'E',
     body: {
       userMessage: "Yeah no pressure, maybe we'll run into each other again sometime, who knows.",
       characterResponse: "Yeah I actually have to run — nice talking to you.",
+      practiceFocus: 'lesson2',
+      exchangeCount: 6,
+      scenarioKey: 'beach',
+    },
+  },
+
+  // ── 6. NEW PRODUCTION BUG: "What are you into?" must NOT fire Exit ───────
+  // This is the exact case that recurred in production (Sofia engaging with a question).
+  {
+    label: '6. New Sofia bug — "What are you into?" must NOT fire Exit',
+    expectTeachable: false,
+    body: {
+      userMessage: "The beach has a great vibe. I come here when I need to think.",
+      characterResponse: "How about you share something first? What are you into?",
+      practiceFocus: 'lesson2',
+      exchangeCount: 4,
+      scenarioKey: 'beach',
+    },
+  },
+  // ── 7. Question embedded after a statement ───────────────────────────────
+  {
+    label: '7. Statement then question — not Exit',
+    expectTeachable: false,
+    body: {
+      userMessage: "Yeah I come here most evenings. It clears my head.",
+      characterResponse: "That makes sense. The afternoons are quieter here. What do you usually do on weekends?",
+      practiceFocus: 'lesson2',
+      exchangeCount: 4,
+      scenarioKey: 'beach',
+    },
+  },
+  // ── 8. Question-only short response ─────────────────────────────────────
+  {
+    label: '8. Short question-only response — not Exit',
+    expectTeachable: false,
+    body: {
+      userMessage: "Yeah I know this beach well. Good spot to think.",
+      characterResponse: "Oh really? What brings you here?",
+      practiceFocus: 'lesson2',
+      exchangeCount: 3,
+      scenarioKey: 'beach',
+    },
+  },
+  // ── 9. Long engaged response, no exit language, no question ─────────────
+  // Purely descriptive — she's sharing, not leaving. Gate rule 3 blocks E.
+  {
+    label: '9. Long engaged response, no exit language — not Exit',
+    expectTeachable: false,
+    body: {
+      userMessage: "Yeah the light here at dusk is something else.",
+      characterResponse: "The evenings here are actually the best. Way less crowded, the light is different, the whole vibe changes when the tourists clear out.",
+      practiceFocus: 'lesson2',
+      exchangeCount: 4,
+      scenarioKey: 'beach',
+    },
+  },
+  // ── 10. Mixed: exit language AND a question — question wins ─────────────
+  // She says she should get back but also asks a question. The question mark means
+  // the gate blocks E — she's still showing interest even while signalling she may leave.
+  {
+    label: '10. Exit phrase + question in same response — question wins, not Exit',
+    expectTeachable: false,
+    body: {
+      userMessage: "Yeah I tend to lose track of time here. It's peaceful.",
+      characterResponse: "I should get back to my friends, but what's your name though?",
+      practiceFocus: 'lesson2',
+      exchangeCount: 5,
+      scenarioKey: 'beach',
+    },
+  },
+  // ── 11. "head off" genuine exit + student extends ────────────────────────
+  {
+    label: '11. "head off" genuine exit, student keeps chatting — fires Exit',
+    expectTeachable: true,
+    expectSkill: 'E',
+    body: {
+      userMessage: "Yeah well anyway, there's a really good spot just round the corner, you should check it out some time, I think you'd like it.",
+      characterResponse: "Yeah I have to head off actually, but it was nice meeting you.",
+      practiceFocus: 'lesson2',
+      exchangeCount: 5,
+      scenarioKey: 'beach',
+    },
+  },
+  // ── 12. "heading out" genuine exit + student extends ─────────────────────
+  {
+    label: '12. "heading out" genuine exit, student extends without making a move — fires Exit',
+    expectTeachable: true,
+    expectSkill: 'E',
+    body: {
+      userMessage: "For sure, yeah, anyway the sunsets here are incredible, you should come back in the evening, it's a completely different vibe.",
+      characterResponse: "Yeah I'm heading out now, it was nice talking to you.",
       practiceFocus: 'lesson2',
       exchangeCount: 6,
       scenarioKey: 'beach',
