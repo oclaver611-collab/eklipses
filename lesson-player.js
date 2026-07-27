@@ -288,6 +288,7 @@
     if (btn1) btn1.onclick = () => openLesson('lesson1', '00');
 
     renderLesson2Card();
+    renderLesson3Card();
   }
 
   function renderLesson2Card() {
@@ -327,8 +328,6 @@
 
     const btn2 = document.getElementById('ek-start-lesson2');
     if (btn2) btn2.onclick = () => openLesson('lesson2', '00');
-
-    renderLesson3Card();
   }
 
   function renderLesson3Card() {
