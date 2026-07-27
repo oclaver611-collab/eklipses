@@ -48,6 +48,21 @@
     { id:'13', title:'Your Five Steps' },
   ];
 
+  // ── Lesson 3 segment list ─────────────────────────────────────────
+  const SEGMENTS3 = [
+    { id:'00', title:'Welcome' },
+    { id:'01', title:'What PACE Is' },
+    { id:'02', title:'Watch — The Pause' },
+    { id:'03', title:'P — Pause' },
+    { id:'04', title:'Watch — The Ask-back' },
+    { id:'05', title:'A — Ask-back' },
+    { id:'06', title:'Watch — Contain' },
+    { id:'07', title:'C — Contain' },
+    { id:'08', title:'Watch — Earn' },
+    { id:'09', title:'E — Earn' },
+    { id:'10', title:'Your Four Steps' },
+  ];
+
   // ── Lesson config ─────────────────────────────────────────────────
   const LESSONS = {
     lesson1: {
@@ -100,6 +115,30 @@
         { word:'A', meaning:"Add Humor — don't defend, just deflect" },
         { word:'M', meaning:'Make Her Qualify — stay curious, push deeper' },
         { word:'E', meaning:'Exit — decision-makers leave first' },
+      ],
+    },
+    lesson3: {
+      id:           'lesson3',
+      workerPrefix: 'lesson3/',       // file=lesson3/ryan_seg00.mp3 → R2: lessons/lesson3/audio/
+      lsProgress:   'eklipses_lesson3_progress',
+      lsComplete:   'eklipses_lesson3_complete',
+      lsCert:       null,
+      segments:     SEGMENTS3,
+      title:        'The Long Game',
+      completionSub: '"The Long Game" — PACE mastered.',
+      completionBody: 'The moment things go well is the moment most men ruin it. You now know how to wait.',
+      steps: [
+        'P — Pause: make her wait for the answer',
+        'A — Ask-back: redirect every answer back to her',
+        'C — Contain: hold the compliment, keep the tension',
+        'E — Earn: let her show interest before you match it',
+      ],
+      mnemonicPhrase: 'PACE',
+      mnemonicMap: [
+        { word:'P', meaning:'Pause — make her wait for it' },
+        { word:'A', meaning:'Ask-back — redirect back to her' },
+        { word:'C', meaning:'Contain — hold the compliment' },
+        { word:'E', meaning:'Earn — let her show it first' },
       ],
     },
   };

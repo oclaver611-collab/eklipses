@@ -192,6 +192,157 @@ const cases = [
       scenarioKey: 'beach',
     },
   },
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // PACE (Lesson 3) test cases — cases 13-22
+  // ══════════════════════════════════════════════════════════════════════════
+
+  // ── FALSE-POSITIVE REPRO TESTS — must NOT fire any PACE moment ───────────
+  // These reproduce the class of bug that broke Exit-gate in L2 production:
+  // Sofia asking an engaged/curious question that has nothing to do with PACE.
+
+  // ── 13. FP: Sofia asks general work question — no PACE moment ────────────
+  // Student correctly redirects back, so no A failure. P can't fire (not feelings question).
+  {
+    label: '13. FP repro — general work question with redirect, must NOT trigger any PACE moment',
+    expectTeachable: false,
+    body: {
+      userMessage: "Architecture — been in it a few years, mostly commercial now. What about you, what do you do?",
+      characterResponse: "Architecture — do you design the whole thing or just specific parts of it?",
+      practiceFocus: 'lesson3',
+      exchangeCount: 3,
+      scenarioKey: 'coffee_shop_second_meeting',
+    },
+  },
+
+  // ── 14. FP: Sofia engaged follow-up, student correctly redirects — no PACE moment ──
+  {
+    label: '14. FP repro — engaged follow-up with redirect, must NOT fire any PACE moment',
+    expectTeachable: false,
+    body: {
+      userMessage: "Vietnam was incredible — three months mostly in the south. What about you, have you travelled much?",
+      characterResponse: "What was the best part of Vietnam for you?",
+      practiceFocus: 'lesson3',
+      exchangeCount: 4,
+      scenarioKey: 'coffee_shop_second_meeting',
+    },
+  },
+
+  // ── 15. FP: Single mild compliment directed at her — must NOT fire C ─────
+  // Single, general compliment directed at her (not stacked, not self-answering)
+  {
+    label: '15. FP repro — single compliment directed at her must NOT fire C (not stacked)',
+    expectTeachable: false,
+    body: {
+      userMessage: "You clearly know this place well.",
+      characterResponse: "I've been coming here for two years. What made you pick the same place?",
+      practiceFocus: 'lesson3',
+      exchangeCount: 4,
+      scenarioKey: 'coffee_shop_second_meeting',
+    },
+  },
+
+  // ── TRUE POSITIVE TESTS — should fire the named PACE skill ───────────────
+
+  // ── 16. P fires: she asks "do you like me" and he declares immediately ───
+  {
+    label: '16. P fires — he answers direct feelings question too eagerly',
+    expectTeachable: true,
+    expectSkill: 'P',
+    body: {
+      userMessage: "Yeah honestly I really like you, I've been thinking about you since we met on the beach and I think there's something real here.",
+      characterResponse: "Do you actually like me, or is this just something to do?",
+      practiceFocus: 'lesson3',
+      exchangeCount: 3,
+      scenarioKey: 'coffee_shop_second_meeting',
+    },
+  },
+
+  // ── 17. A fires: she asks about his work, he answers with nothing back ───
+  {
+    label: '17. A fires — she asks about him, he answers fully with no redirect',
+    expectTeachable: true,
+    expectSkill: 'A',
+    body: {
+      userMessage: "I've been in product management for about four years now. Started at a startup, moved to a bigger company last year. It's fine — good team, decent work.",
+      characterResponse: "What kind of products do you work on?",
+      practiceFocus: 'lesson3',
+      exchangeCount: 3,
+      scenarioKey: 'coffee_shop_second_meeting',
+    },
+  },
+
+  // ── 18. C fires: he stacks multiple romantic compliments ─────────────────
+  {
+    label: '18. C fires — student stacks two romantic compliments in one message',
+    expectTeachable: true,
+    expectSkill: 'C',
+    body: {
+      userMessage: "I mean you're genuinely beautiful and I really like you — I keep thinking about our conversation from last time.",
+      characterResponse: "That's sweet.",
+      practiceFocus: 'lesson3',
+      exchangeCount: 3,
+      scenarioKey: 'coffee_shop_second_meeting',
+    },
+  },
+
+  // ── 19. E fires: early date declaration before she's invested ─────────────
+  {
+    label: '19. E fires — early date proposal in exchange 2 before she\'s invested',
+    expectTeachable: true,
+    expectSkill: 'E',
+    body: {
+      userMessage: "I'd really like to take you out properly sometime this week if you're free, I think we should go on an actual date.",
+      characterResponse: "You're easy to talk to.",
+      practiceFocus: 'lesson3',
+      exchangeCount: 2,
+      scenarioKey: 'coffee_shop_second_meeting',
+    },
+  },
+
+  // ── GATE BOUNDARY TESTS ───────────────────────────────────────────────────
+
+  // ── 20. P blocked: personal-history question must NOT trigger P ───────────
+  // Student correctly asks back here, so A also cannot fire — clean exchange.
+  {
+    label: '20. P gate — personal-history question with redirect, must NOT fire any PACE moment',
+    expectTeachable: false,
+    body: {
+      userMessage: "Yeah I grew up in the north — moved here for university. Been here about six years. What about you, are you from here?",
+      characterResponse: "Where did you grow up? You seem like you're not originally from here.",
+      practiceFocus: 'lesson3',
+      exchangeCount: 3,
+      scenarioKey: 'coffee_shop_second_meeting',
+    },
+  },
+
+  // ── 21. E blocked: past exchange 4, E cannot fire even with escalation ────
+  {
+    label: '21. E gate — exchange 5, E gate blocks even if escalation language present',
+    expectTeachable: false,
+    body: {
+      userMessage: "I feel like I'd really like to take you out and see where this goes.",
+      characterResponse: "That's a nice idea.",
+      practiceFocus: 'lesson3',
+      exchangeCount: 5,
+      scenarioKey: 'coffee_shop_second_meeting',
+    },
+  },
+
+  // ── 22. Neutral L3 exchange — no failure expected ─────────────────────────
+  // characterResponse is a statement (no ?) → A gate blocks; no romantic terms → C blocks;
+  // no escalation language → E blocks; no feelings question → P blocks. All 4 gates active.
+  {
+    label: '22. Neutral L3 exchange — no PACE moment expected',
+    expectTeachable: false,
+    body: {
+      userMessage: "The coffee here is pretty good actually. I'm a bit particular about it.",
+      characterResponse: "This place has been around for a long time. The flat white is the one to order.",
+      practiceFocus: 'lesson3',
+      exchangeCount: 4,
+      scenarioKey: 'coffee_shop_second_meeting',
+    },
+  },
 ];
 
 // ── runner ────────────────────────────────────────────────────────────────────

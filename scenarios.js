@@ -1435,6 +1435,40 @@
       { speaker:"Ryan", text:"She's sitting nearby. The departure board says delayed." },
       { speaker:"Ryan", text:"What do you do?" }
     ]
+  },
+
+  // ── Lesson 3 (PACE) practice scenario — second meeting with Sofia ────────
+  coffee_shop_second_meeting: {
+    title: "Coffee Shop — Second meeting. The stakes just changed.",
+    thumb: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/sofia_thumb.jpg",
+    bg: "https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/coffee_bg.jpg?v=2",
+    coldOpen: false,
+    hidden: true,
+    category: "dating",
+    difficulty: 3,
+    duration_min: 10,
+    demo: [
+      { speaker:"Ryan",   text:"A coffee shop. A few days after they first met." },
+      { speaker:"Ryan",   text:"She texted back. She showed up. She's interested — and she knows it." },
+      { speaker:"Ryan",   text:"Now she's going to find out if he does." },
+      { speaker:"Ryan",   text:"Watch how Daniel handles the moment most men fumble." },
+      { speaker:"Mary",   text:"Can I ask you something?" },
+      { speaker:"Daniel", text:"Go ahead." },
+      { speaker:"Mary",   text:"Do you actually like me or is this just something to do?" },
+      { speaker:"Daniel", text:"I haven't decided yet. Ask me again in an hour." },
+      { speaker:"Mary",   text:"..." },
+      { speaker:"Mary",   text:"Okay. That's a better answer than I expected." },
+      { speaker:"Ryan",   text:"See that? She handed him the moment — and he didn't flinch. He didn't declare. He didn't reassure her. He held it. That's PACE." }
+    ],
+    practice: [
+      { speaker:"Ryan", text:"A coffee shop, a few days after you first met. She texted. She showed up. That's already something." },
+      { speaker:"Ryan", text:"She's more open now than the first time. But also more direct. She's gauging your investment." },
+      { speaker:"Ryan", text:"This is the phase most men completely misread. Things are going well — so they relax and give too much, too fast." },
+      { speaker:"Ryan", text:"She may ask you directly how you feel. She may test whether you're seeing other people. She may give you warmth and watch what you do with it." },
+      { speaker:"Ryan", text:"Every one of those moments is a test — not of your feelings, but of your restraint." },
+      { speaker:"Ryan", text:"She's already there when you walk in. She looks up." },
+      { speaker:"Ryan", text:"What do you do?" }
+    ]
   }
 
 };

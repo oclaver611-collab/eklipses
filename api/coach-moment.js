@@ -74,6 +74,32 @@ const BETTER_LINES = {
       { text: "Let's not drag this out — give me your number." },
     ],
   },
+  lesson3: {
+    P: [
+      // universal — Pause responses to direct feelings/exclusivity questions
+      { text: "I haven't decided yet. Ask me again in an hour." },
+      { text: "That's a faster question than I expected." },
+      { text: "Let's find out." },
+    ],
+    A: [
+      // universal — Ask-back redirects after answering about himself
+      { text: "What about you — same question." },
+      { text: "Your turn." },
+      { text: "I'll ask you the same thing." },
+    ],
+    C: [
+      // universal — Contain lines instead of stacking compliments
+      { text: "You already know you're interesting. I don't need to say it." },
+      { text: "I've noticed a few things. I'm keeping them to myself for now." },
+      { text: "Let's call it noted." },
+    ],
+    E: [
+      // universal — Earn lines instead of early escalation declarations
+      { text: "We're not there yet." },
+      { text: "Good things earn themselves." },
+      { text: "I know what I want. I'm not in a rush about it." },
+    ],
+  },
 };
 
 // Deterministic hard gate for Exit (E) skill — code-enforced, not LLM-dependent.
@@ -95,6 +121,80 @@ function exitCannotFire(characterResponse) {
   return !hasExitLanguage; // no exit language → she never said she's leaving → Exit cannot fire
 }
 
+// ── PACE (Lesson 3) deterministic gates — code-enforced, not LLM-dependent ─
+// Each returns true when the corresponding skill CANNOT fire.
+// Goal: block PACE moments from misfiring on Sofia's engaged/curious questions,
+// mirroring the exitCannotFire pattern that fixed the L2 production bug.
+
+// P (Pause) cannot fire unless her response contains a direct question about
+// feelings, interest, or exclusivity. General personal-history questions ("what
+// do you do?", "where are you from?") are Mystery territory (L1) — never P.
+function pauseCannotFire(characterResponse) {
+  const r = (characterResponse || '').toLowerCase();
+  const hasFeelingQuestion =
+    // "do you (actually/really/...) like me"
+    /do you\s+(\w+\s+)?like\s+(me|us)\b/.test(r)  ||
+    // "like me?" anywhere in the response
+    /\blike\s+me\b/.test(r)                         ||
+    // "are you seeing / dating anyone / someone"
+    /are you\s+(\w+\s+)?seeing\s+(anyone|someone)\b/.test(r) ||
+    /are you\s+(\w+\s+)?dating\s+(anyone|someone)\b/.test(r) ||
+    /\bwhat are we\b/.test(r)                       ||
+    /do you have feelings/.test(r)                  ||
+    /how do you feel (about|for) (me|us)/.test(r)   ||
+    /\binterested in me\b/.test(r)                  ||
+    r.includes('are you seeing anyone')             ||
+    r.includes('are you seeing someone')            ||
+    r.includes('seeing other people')               ||
+    r.includes('exclusive')                         ||
+    r.includes('what is this')                      ||
+    r.includes('what are we doing')                 ||
+    r.includes('do you like me')                    ||
+    r.includes('feel about me');
+  return !hasFeelingQuestion;
+}
+
+// A (Ask-back) cannot fire unless she asked him something about himself.
+// If her response has no "?" or no reference to "you", she didn't ask → A blocked.
+function askbackCannotFire(characterResponse) {
+  if (!/\?/.test(characterResponse)) return true; // no question at all → A cannot fire
+  const r = (characterResponse || '').toLowerCase();
+  // Question must reference him — check for second-person pronoun in her question
+  return !/\byou\b/.test(r); // no "you" in her response → she didn't ask about him
+}
+
+// C (Contain) cannot fire unless the student's message stacks multiple distinct
+// romantic/attraction-specific terms. Single casual compliments and general banter
+// are Tease territory (L1) and must not be flagged here.
+function containCannotFire(userMessage) {
+  const u = (userMessage || '').toLowerCase();
+  const romanticPatterns = [
+    /\bbeautiful\b/, /\bstunning\b/, /\bgorgeous\b/, /\battractive\b/,
+    /\bi\s+(really\s+)?like\s+you\b/, /\bi\s+(really\s+)?love\s+you\b/,
+    /\bfalling\s+for\s+you\b/, /\byou['']?re\s+so\s+(beautiful|gorgeous|pretty|amazing|perfect)\b/,
+    /\bi\s+(really\s+)?(like|adore|fancy)\s+you\b/,
+  ];
+  const matchCount = romanticPatterns.filter(p => p.test(u)).length;
+  return matchCount < 2; // need ≥2 distinct romantic terms to qualify as stacked
+}
+
+// E (Earn) cannot fire after the first 4 exchanges (she's had time to invest)
+// or when the student's message contains no escalation language.
+function earnCannotFire(exchangeCount, userMessage) {
+  if (exchangeCount > 4) return true; // past the early-game window
+  const u = (userMessage || '').toLowerCase();
+  const escalationPatterns = [
+    /\bi\s+(really\s+)?(like|love)\s+you\b/,
+    /\bgo\s+out\b/, /\btake\s+you\s+out\b/,
+    /\bask\s+you\s+out\b/, /\bproper\s+date\b/, /\bactual\s+date\b/,
+    /\bi\s+(feel|felt)\s+something\b/,
+    /\bfalling\s+for\s+you\b/,
+    /\bspecial\s+(to\s+me|connection)\b/,
+    /\bnever\s+felt\s+this\b/, /\bhaven'?t\s+felt\s+this\b/,
+  ];
+  return !escalationPatterns.some(p => p.test(u));
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
@@ -114,11 +214,24 @@ module.exports = async function handler(req, res) {
 
   const isLesson1 = practiceFocus === 'lesson1';
   const isLesson2 = practiceFocus === 'lesson2';
-  if (!isLesson1 && !isLesson2) { console.log(`[coach-moment] skip — focus="${practiceFocus}" not lesson-specific`); return res.json({ teachable: false }); }
+  const isLesson3 = practiceFocus === 'lesson3';
+  if (!isLesson1 && !isLesson2 && !isLesson3) { console.log(`[coach-moment] skip — focus="${practiceFocus}" not lesson-specific`); return res.json({ teachable: false }); }
 
-  // Pre-compute exit gate: deterministic check that overrides any LLM decision on skill E
+  // Pre-compute exit gate (L2): deterministic check that overrides any LLM decision on skill E
   const exitBlocked = isLesson2 && exitCannotFire(characterResponse);
   if (exitBlocked) console.log('[coach-moment] exit gate active — skill E is blocked for this exchange');
+
+  // Pre-compute PACE gates (L3): code-enforced overrides per skill
+  const pauseBlocked   = isLesson3 && pauseCannotFire(characterResponse);
+  const askbackBlocked = isLesson3 && askbackCannotFire(characterResponse);
+  const containBlocked = isLesson3 && containCannotFire(userMessage);
+  const earnBlocked    = isLesson3 && earnCannotFire(exchangeCount, userMessage);
+  if (isLesson3) {
+    if (pauseBlocked)   console.log('[coach-moment] PACE gate: P (Pause) blocked — no feelings/exclusivity question in her response');
+    if (askbackBlocked) console.log('[coach-moment] PACE gate: A (Ask-back) blocked — she did not ask about him');
+    if (containBlocked) console.log('[coach-moment] PACE gate: C (Contain) blocked — not enough romantic terms to be stacked');
+    if (earnBlocked)    console.log('[coach-moment] PACE gate: E (Earn) blocked — no escalation language or past early window');
+  }
 
   console.log(`[coach-moment] checking — focus:${practiceFocus} exchange:${exchangeCount} words:${wordCount} | "${userMessage.slice(0, 80)}"`);
 
@@ -169,13 +282,61 @@ A genuine Exit signal requires her to EXPLICITLY state she is leaving ("I should
 
 When in doubt: return teachable:false. Missing an Exit is better than interrupting an engaged conversation.`;
 
-  const skillDefs = isLesson1 ? lesson1SkillDefs : lesson2SkillDefs;
-  const lessonLabel = isLesson1 ? 'OTIMC (Lesson 1 — The Approach)' : 'FRAME (Lesson 2 — Holding Your Ground)';
+  const lesson3SkillDefs = `
+P — Pause: When she asked a DIRECT question about his feelings, interest, or exclusivity ("do you like me?", "are you seeing anyone?", "what are we doing here?", "what is this?"), did he answer too eagerly or directly?
+FAIL = immediately confirms feelings ("yes I like you", "no I'm not seeing anyone") — gives her the answer before she's made to wait for it.
+NOT P = she asked about his job, hobbies, travel, friends, or any personal-history topic. Those are Mystery territory (Lesson 1) — NEVER flag P for those questions.
 
-  // Belt-and-suspenders: also tell the LLM when the Exit gate is active (code override below is the real guard)
-  const finalSkillDefs = exitBlocked
-    ? skillDefs + '\n\nGATE ACTIVE FOR THIS EXCHANGE: Her response contains a direct question OR no exit language. Skill E (Exit) is DETERMINISTICALLY BLOCKED — do not return skill=E.'
-    : skillDefs;
+A — Ask-back: When she asked him something about himself (his work, interests, experiences, opinions), did he answer but end without ANY question or redirect back to her?
+FAIL = his message is entirely about himself with zero curiosity directed back at her — no question mark, no "what about you", no "your turn", no redirect. The turn ends completely on him.
+EXAMPLE FAIL: "I've been in product management for four years. Started at a startup, moved to a bigger company. It's fine — good team, decent work." ← no question back, clear A failure.
+EXAMPLE PASS: "Four years in product management. Started in startups. What about you — what do you do?" ← redirected back.
+NOT A = she made a statement (not a question directed at him), or he did ask a question or redirect.
+
+C — Contain: Did he stack multiple romantic or attraction-specific compliments in one message?
+FAIL = uses two or more of: "you're beautiful", "you're gorgeous", "I really like you", "I'm falling for you", "you're stunning/amazing/perfect" — stacked in one turn.
+NOT C = a single casual compliment, general banter, playful tease, or humor. Those are Tease territory (Lesson 1) — NEVER flag C for normal banter.
+
+E — Earn: In the FIRST 3-4 exchanges, did he make a premature declaration of strong interest, a date proposal, or romantic escalation?
+FAIL = "I really like you", "I want to take you out", "I feel something with you" — declared before she has shown clear investment.
+NOT E = after exchange 4 (she's had time to invest and he's responded), or when he's clearly responding to her unmistakable signal.
+
+IMPORTANT BOUNDARY RULES — never cross these:
+- P fires ONLY on direct feelings/exclusivity questions. If she asked "what do you do?" or "where are you from?" or any job/life question, that is NOT a P moment.
+- A fires ONLY when she asked him something. If her response is a statement with no question, A cannot fire.
+- C fires ONLY when compliments are stacked (2+). One compliment is not C.
+- E fires ONLY in the first 4 exchanges with clear escalation language. After exchange 4, E cannot fire.
+
+PRIORITY RULE — when her response contains a direct feelings/exclusivity question (e.g. "do you like me?", "do you actually like me?", "what are we doing here?", "are you seeing anyone?"), check P FIRST. If the student answered too directly/eagerly, return P — not E. E is only for escalation that happens WITHOUT her asking directly.
+
+When in doubt: return teachable:false. A missed moment is better than a false interrupt.`;
+
+  const skillDefs = isLesson1 ? lesson1SkillDefs : isLesson2 ? lesson2SkillDefs : lesson3SkillDefs;
+  const lessonLabel = isLesson1 ? 'OTIMC (Lesson 1 — The Approach)' : isLesson2 ? 'FRAME (Lesson 2 — Holding Your Ground)' : 'PACE (Lesson 3 — The Long Game)';
+
+  // Belt-and-suspenders: also tell the LLM when gates are active (code overrides below are the real guards)
+  let finalSkillDefs = skillDefs;
+  if (exitBlocked) {
+    finalSkillDefs += '\n\nGATE ACTIVE FOR THIS EXCHANGE: Her response contains a direct question OR no exit language. Skill E (Exit) is DETERMINISTICALLY BLOCKED — do not return skill=E.';
+  }
+  if (isLesson3) {
+    const blocked = [];
+    if (pauseBlocked)   blocked.push('P (Pause) — her response had no feelings/exclusivity question');
+    if (askbackBlocked) blocked.push('A (Ask-back) — she asked him no question');
+    if (containBlocked) blocked.push('C (Contain) — student message had fewer than 2 romantic terms');
+    if (earnBlocked)    blocked.push('E (Earn) — no escalation language or past exchange 4');
+    if (blocked.length) finalSkillDefs += '\n\nPACE GATES ACTIVE: The following skills are DETERMINISTICALLY BLOCKED this exchange — do not return them:\n' + blocked.map(b => '  • ' + b).join('\n');
+
+    // When A is unblocked, the student's message has no "?", AND the message is clearly
+    // a first-person self-answer (starts with I/Yeah I/So I and is substantive) →
+    // add an explicit A hint. This avoids firing on compliments directed at her.
+    const studentHasNoQuestion = !/\?/.test(userMessage);
+    const u = userMessage.trim().toLowerCase();
+    const studentAnsweringAboutSelf = /^(i\b|yeah,?\s+i\b|so i\b|well,?\s+i\b)/.test(u) && userMessage.trim().split(/\s+/).length >= 8;
+    if (!askbackBlocked && studentHasNoQuestion && studentAnsweringAboutSelf) {
+      finalSkillDefs += '\n\nPACE SIGNAL — A (Ask-back): She asked him a question about himself (confirmed by gate). His reply is a first-person self-description with NO question mark and no redirect back to her. This is a textbook A failure. Return skill=A.';
+    }
+  }
 
   const systemPrompt = `You are Ryan, a direct dating coach reviewing a student's last message in a practice session.
 
@@ -247,11 +408,21 @@ Exchange number: ${exchangeCount}`;
     let parsed;
     try { parsed = JSON.parse(clean); } catch { return res.json({ teachable: false }); }
 
-    // Deterministic Exit gate override — catches cases where LLM fires E despite hard rules in the prompt.
+    // Deterministic Exit gate override (L2) — catches cases where LLM fires E despite hard rules in the prompt.
     // This is the real enforcement layer; the prompt note above is belt-and-suspenders only.
     if (exitBlocked && parsed.teachable && parsed.skill === 'E') {
       console.log('[coach-moment] → Exit gate override: LLM returned E but characterResponse has a question or no exit language — suppressing');
       return res.json({ teachable: false });
+    }
+
+    // Deterministic PACE gate overrides (L3) — suppress any skill the code-gate already blocked.
+    if (isLesson3 && parsed.teachable) {
+      const skill = String(parsed.skill).toUpperCase();
+      if ((skill === 'P' && pauseBlocked) || (skill === 'A' && askbackBlocked) ||
+          (skill === 'C' && containBlocked) || (skill === 'E' && earnBlocked)) {
+        console.log(`[coach-moment] → PACE gate override: LLM returned skill=${skill} but gate is active — suppressing`);
+        return res.json({ teachable: false });
+      }
     }
 
     if (!parsed.teachable) {
@@ -259,22 +430,28 @@ Exchange number: ${exchangeCount}`;
       return res.json({ teachable: false });
     }
 
-    // Validate required fields before passing to client
-    if (!parsed.skill || !parsed.coaching || !parsed.betterLine) {
-      console.warn('[coach-moment] → teachable but missing fields, discarding', JSON.stringify(parsed));
+    // Validate required fields before passing to client (betterLine checked after library lookup)
+    if (!parsed.skill || !parsed.coaching) {
+      console.warn('[coach-moment] → teachable but missing skill/coaching, discarding', JSON.stringify(parsed));
       return res.json({ teachable: false });
     }
 
     // Library lookup — filter by conversation context, then pick at random.
     // opener:true lines are only shown when exchangeCount <= 2 (still early enough to be the approach).
     // If filtering leaves nothing, fall back to the LLM's own betterLine which can reply to her actual words.
-    const lessonKey  = isLesson1 ? 'lesson1' : 'lesson2';
+    const lessonKey  = isLesson1 ? 'lesson1' : isLesson2 ? 'lesson2' : 'lesson3';
     const allLines   = BETTER_LINES[lessonKey]?.[String(parsed.skill)] || [];
     const isEarly    = exchangeCount <= 2;
     const pool       = isEarly ? allLines : allLines.filter(l => !l.opener);
     const betterLine = pool.length > 0
       ? pool[Math.floor(Math.random() * pool.length)].text
-      : String(parsed.betterLine).slice(0, 120); // LLM fallback — contextual reply to her words
+      : parsed.betterLine ? String(parsed.betterLine).slice(0, 120) : null;
+
+    // Discard if we have no betterLine from either source
+    if (!betterLine) {
+      console.warn('[coach-moment] → teachable but no betterLine (library empty, LLM omitted), discarding');
+      return res.json({ teachable: false });
+    }
 
     const betterLineSource = pool.length > 0 ? 'library' : 'llm-fallback';
     console.log(`[coach-moment] → TEACHABLE skill:${parsed.skill} (${parsed.skillName}) | "${String(parsed.coaching).slice(0, 80)}" | betterLine:${betterLineSource}${pool.length === 0 ? ` (no eligible library lines at exchange ${exchangeCount})` : ''}`);
