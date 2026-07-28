@@ -367,7 +367,7 @@
 
     const btn3 = document.getElementById('ek-start-lesson3');
     if (btn3) btn3.onclick = () => {
-      if (window.playScenario) window.playScenario('coffee_shop_second_meeting', true);
+      if (window.showPracticeFocusModal) window.showPracticeFocusModal('coffee_shop_second_meeting');
     };
   }
 
