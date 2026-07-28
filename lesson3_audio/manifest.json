@@ -1,0 +1,226 @@
+{
+  "version": "1",
+  "lesson": "3",
+  "title": "The Long Game",
+  "mnemonic": "PACE",
+  "generatedAt": "2026-07-28T04:03:12.048Z",
+  "segments": [
+    {
+      "segmentId": "00",
+      "type": "coaching",
+      "title": "Welcome",
+      "files": [
+        {
+          "file": "ryan_seg00.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "01",
+      "type": "coaching",
+      "title": "What PACE Is",
+      "files": [
+        {
+          "file": "ryan_seg01.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "02",
+      "type": "exchange",
+      "title": "Watch — The Pause",
+      "sequence": [
+        {
+          "file": "sofia_s02_01.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s02_01.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s02_02.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s02_02.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s02_03.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s02_03.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s02_04.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s02_04.mp3",
+          "voice": "alex"
+        }
+      ]
+    },
+    {
+      "segmentId": "03",
+      "type": "coaching",
+      "title": "P — Pause",
+      "files": [
+        {
+          "file": "ryan_seg03.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "04",
+      "type": "exchange",
+      "title": "Watch — The Ask-back",
+      "sequence": [
+        {
+          "file": "sofia_s04_01.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s04_01.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s04_02.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s04_02.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s04_03.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s04_03.mp3",
+          "voice": "alex"
+        }
+      ]
+    },
+    {
+      "segmentId": "05",
+      "type": "coaching",
+      "title": "A — Ask-back",
+      "files": [
+        {
+          "file": "ryan_seg05.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "06",
+      "type": "exchange",
+      "title": "Watch — Contain",
+      "sequence": [
+        {
+          "file": "sofia_s06_01.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s06_01.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s06_02.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s06_02.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s06_03.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s06_03.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s06_04.mp3",
+          "voice": "sofia"
+        }
+      ]
+    },
+    {
+      "segmentId": "07",
+      "type": "coaching",
+      "title": "C — Contain",
+      "files": [
+        {
+          "file": "ryan_seg07.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "08",
+      "type": "exchange",
+      "title": "Watch — Earn",
+      "sequence": [
+        {
+          "file": "sofia_s08_01.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s08_01.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s08_02.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s08_02.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s08_03.mp3",
+          "voice": "sofia"
+        },
+        {
+          "file": "alex_s08_03.mp3",
+          "voice": "alex"
+        },
+        {
+          "file": "sofia_s08_04.mp3",
+          "voice": "sofia"
+        }
+      ]
+    },
+    {
+      "segmentId": "09",
+      "type": "coaching",
+      "title": "E — Earn",
+      "files": [
+        {
+          "file": "ryan_seg09.mp3",
+          "voice": "ryan"
+        }
+      ]
+    },
+    {
+      "segmentId": "10",
+      "type": "coaching",
+      "title": "Your Four Steps",
+      "files": [
+        {
+          "file": "ryan_seg10.mp3",
+          "voice": "ryan"
+        }
+      ]
+    }
+  ]
+}
