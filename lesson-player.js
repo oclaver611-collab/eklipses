@@ -142,6 +142,7 @@
       cert[charId].attempts++;
       if (passed) { cert[charId].passed++; cert[charId].certified = true; }
       saveCert(cert);
+      window.EkProgress?.onCertSaved();
       refreshLearnTabStatus();
       if (window.refreshCertBadges) window.refreshCertBadges();
     },
@@ -794,6 +795,7 @@
     const lesson = currentLesson();
     localStorage.setItem(lesson.lsComplete, 'true');
     localStorage.removeItem(lesson.lsProgress);
+    window.EkProgress?.onLessonComplete();
     cancelAnimationFrame(_orbAnim);
 
     const inner = document.getElementById('elp-complete-inner');
