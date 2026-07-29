@@ -129,7 +129,7 @@
   .metrics .count{font-weight:700}
 
   /* ===== TABS ===== */
-  .ek-tabs { display:flex; gap:6px; padding:10px 16px 0; border-bottom:1px solid var(--stroke); background:var(--bg); }
+  .ek-tabs { display:flex; gap:6px; padding:10px 16px 0; border-bottom:1px solid var(--stroke); background:var(--bg); align-items:center; }
   .ek-tab { background:transparent; border:none; color:#9aa4b2; font-size:14px; font-weight:600; padding:10px 20px; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; letter-spacing:.04em; }
   .ek-tab:hover { color:#cfd6e4; }
   .ek-tab.ek-tab-active { color:#fff; border-bottom-color:#378ADD; }
@@ -286,10 +286,18 @@
   <!-- Streak badge — populated by Progress.refreshStreakBadge() -->
   <span id="ek-streak-badge" style="display:none;position:fixed;top:10px;right:10px;z-index:9990;align-items:center;gap:5px;background:#1e1a0e;border:1px solid #7a5500;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700;color:#ffb300;cursor:pointer" title="View progress"></span>
 
-  <!-- LEARN / PRACTICE Tabs -->
+  <!-- LEARN / PRACTICE Tabs (auth UI lives here as right-side flex child — avoids fixed-position overlap) -->
   <div class="ek-tabs">
     <button class="ek-tab" id="ek-tab-learn">LEARN</button>
     <button class="ek-tab" id="ek-tab-practice">PRACTICE</button>
+    <div style="margin-left:auto;display:flex;align-items:center;padding-bottom:4px;gap:8px">
+      <button id="ek-auth-btn" style="display:none;background:transparent;border:1px solid #2b2e3b;border-radius:999px;color:#9aa4b2;font-size:13px;font-weight:600;padding:5px 14px;cursor:pointer;transition:color .15s,border-color .15s" onmouseover="this.style.color='#e9ecf1';this.style.borderColor='#3a3f4b'" onmouseout="this.style.color='#9aa4b2';this.style.borderColor='#2b2e3b'">Sign in</button>
+      <div id="ek-auth-indicator" style="display:none;align-items:center;gap:8px;background:#1a1d26;border:1px solid #2b2e3b;border-radius:999px;padding:5px 14px;font-size:12px;color:#9aa4b2">
+        <span>👤</span>
+        <span id="ek-auth-email" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+        <button id="ek-auth-logout" style="background:none;border:none;color:#6b7685;font-size:12px;cursor:pointer;padding:0;text-decoration:underline">Log out</button>
+      </div>
+    </div>
   </div>
 
   <!-- LEARN tab content — lesson cards filled dynamically by lesson-player.js -->
@@ -457,6 +465,12 @@
 
   <!-- FingerprintJS — device fingerprint for session rate limiting -->
   <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
+
+  <!-- Supabase browser client (UMD — exposes window.supabase) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+  <!-- Auth + progress sync — must load before lesson-player.js -->
+  <script src="auth.js"></script>
 
   <script src="kokoro-speech.js"></script>
   <script src="player.js"></script>
