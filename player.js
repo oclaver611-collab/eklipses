@@ -3140,12 +3140,12 @@ function showOnboarding(onComplete) {
   ov.style.cssText = 'position:fixed;inset:0;z-index:10001;background:rgba(13,14,18,0.98);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;box-sizing:border-box';
 
   const S1 = '<div style="display:flex;flex-direction:column;align-items:center;gap:20px;max-width:340px;text-align:center">'
-    + '<div style="font-size:52px">&#127917;</div>'
     + '<div style="font-size:28px;font-weight:900;color:#fff;letter-spacing:-0.5px;line-height:1.2">Eklipses</div>'
     + '<div style="font-size:17px;color:#e0e0e0;line-height:1.9;margin-top:4px">'
     + '&ldquo;You already know what to say.<br>You just need to stop being afraid to say it.<br>'
     + '<span style="color:#ffb300;font-weight:700">This is where that changes.</span>&rdquo;</div>'
     + '<button id="ob-btn" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:14px 44px;font-size:16px;font-weight:800;cursor:pointer;margin-top:12px;width:100%;max-width:260px">How does it work? &rarr;</button>'
+    + '<div style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:-8px">Already have an account? <button id="ob-signin" style="background:none;border:none;color:rgba(255,255,255,0.7);font-size:13px;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px">Sign in</button></div>'
     + '</div>';
 
   const S2 = '<div style="display:flex;flex-direction:column;align-items:center;gap:18px;max-width:340px;text-align:center">'
@@ -3182,6 +3182,12 @@ function showOnboarding(onComplete) {
         markOnboardingDone();
         ov.remove();
         onComplete();
+      }
+    };
+    const obSignin = document.getElementById('ob-signin');
+    if (obSignin) obSignin.onclick = () => {
+      if (window.EkAuth && typeof window.EkAuth.showModal === 'function') {
+        window.EkAuth.showModal('signin');
       }
     };
   }
@@ -3305,9 +3311,19 @@ function launchApp() {
         <div id="ek-prog-fill" style="background:#ffb300;height:100%;width:0%;border-radius:6px;transition:width 0.25s ease"></div>
       </div>
       <div id="ek-prog-label" style="font-size:12px;color:rgba(255,255,255,0.6)">Loading AI model...</div>
+    </div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:-4px">
+      Already have an account?
+      <button id="ek-splash-signin" style="background:none;border:none;color:rgba(255,255,255,0.7);font-size:13px;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px">Sign in</button>
     </div>`;
   overlay.appendChild(inner);
   document.body.appendChild(overlay);
+
+  document.getElementById('ek-splash-signin').onclick = () => {
+    if (window.EkAuth && typeof window.EkAuth.showModal === 'function') {
+      window.EkAuth.showModal('signin');
+    }
+  };
 
   let _bootStarted = false;
   document.getElementById('ek-start-btn').onclick=async()=>{
