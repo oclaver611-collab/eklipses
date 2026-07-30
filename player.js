@@ -2026,7 +2026,7 @@ function showStyleSelector() {
 function showCountdown(mySession) {
   return new Promise(resolve => {
     const ov = document.createElement('div');
-    ov.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.55);pointer-events:none';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.55);pointer-events:none';
     const num = document.createElement('div');
     num.style.cssText = 'font-size:120px;font-weight:900;color:#fff;line-height:1;text-shadow:0 4px 32px rgba(0,0,0,0.6);transition:opacity 0.2s ease,transform 0.15s ease';
     ov.appendChild(num);
@@ -2109,8 +2109,6 @@ async function playScenario(key, practice=false) {
   else hideMnemonicPill();
   if(els.select && els.select.value!==key) els.select.value=key;
   if (window.showFullscreenBtn) window.showFullscreenBtn();
-  await showCountdown(mySession);
-  if (mySession !== session) return;
   await playLoop(mySession, _introPrefetch);
 }
 
@@ -2229,6 +2227,9 @@ async function freeConversation(mySession) {
     timerEl.textContent = Math.floor(rem / 60000) + ':' + String(Math.floor((rem % 60000) / 1000)).padStart(2, '0') + ' left';
     if (rem <= 0) clearInterval(timerInterval);
   }, 1000);
+
+  await showCountdown(mySession);
+  if (mySession !== session) { clearInterval(timerInterval); timerEl.remove(); return; }
 
   setMediaForSpeaker('Mary');
   els.name.textContent = getCharacterDisplayName(currentCharacterId);
