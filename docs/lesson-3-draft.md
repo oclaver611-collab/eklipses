@@ -1,139 +1,214 @@
-# EKLIPSES — LESSON 3 DRAFT
-## "Push-Pull"
-**CHASE mnemonic | Style: The Dark Needle | DRAFT — not yet scripted for recording**
+# EKLIPSES — LESSON 3
+## "The Long Game"
+**PACE mnemonic | Style: The Dark Needle | Status: Spec locked — ready to implement**
 
 ---
 
-## SOURCE NOTES
+## DECISIONS LOCKED
 
-The user referenced a creator known as "The Dark Needle" and a specific push-pull video (~1.7M views). Web search confirms The Dark Needle is a real YouTube channel (@thedarkneedle). Multiple push-pull videos exist across dating advice creators but the specific ~1.7M-view Dark Needle video could not be confirmed from search results alone.
+**Mnemonic:** PACE
+**Lesson title:** The Long Game
+**Character:** Sofia (second meeting — coffee-shop)
+**Setting:** coffee_shop_second_meeting (new scenario key added for this lesson)
+**Previous lesson context:** OTIMC (L1) and FRAME (L2) covered the approach and holding ground.
+  L3 covers what happens AFTER the approach lands — the second-meeting dynamic where premature
+  declarations and under-restraint kill interest.
 
-**Open question 1:** Can you confirm the exact video (title or URL) so the script can stay faithful to that version? If not found, this draft is built from the well-established push-pull canon (beyondages.com, innerconfidence.com, practicalpie.com, pickuppros.com) and written in The Dark Needle's established narration style from Lessons 1 and 2.
+---
+
+## WHY THIS TOPIC
+
+Most advice covers what to do in the first 30 seconds. PACE teaches the next phase: what to do
+once she's already interested. The paradox: the moment things go well is when most men destroy them.
+They declare too fast, answer too directly, compliment too much, and escalate too early.
+PACE is about restraint in the phase where restraint is hardest.
 
 ---
 
 ## MNEMONIC
 
-### CHASE
+### PACE
 
-> "The technique is called Push-Pull. The goal is called CHASE."
+> "The moment things go well is the moment most men ruin it. PACE teaches you to wait."
 
-| Letter | Word | One-sentence expansion |
-|--------|------|------------------------|
-| C | Captivate first | Before any tension can exist, she has to feel something — open with a genuine pull that draws her toward you. |
-| H | Hold back | After the pull, introduce space or challenge; she needs to feel the withdrawal to feel the pull was real. |
-| A | Alternate | Oscillate between warmth and distance — the rhythm itself is the technique; neither side alone creates attraction. |
-| S | Sense the investment | After each cycle, read whether she's leaning in more; that confirmation tells you the pattern is working. |
-| E | Escalate with depth | As she invests more, your pulls go deeper and more personal — not louder or more intense. |
-
-**Narrative hook for Ryan's recap:**
-> "By the time you finish this lesson, you will understand something most men never figure out. Attraction is not a steady state. It is a current. And the only way to keep a current flowing — is to alternate direction."
+| Letter | Word      | One-sentence expansion |
+|--------|-----------|------------------------|
+| P      | Pause     | When she asks you directly how you feel, don't answer directly — make her wait for it. |
+| A      | Ask-back  | After every answer about yourself, redirect with a question back to her. |
+| C      | Contain   | Hold back the compliments — stacking romantic declarations early kills tension. |
+| E      | Earn      | Let her demonstrate interest before you match it; declarations only land when she's earned them. |
 
 ---
 
 ## KEY-PHRASE LIBRARY
 
-*2-3 memorizable lines per skill, ready for warm-up drill. Lines marked (pull) or (push) or (combined) for coaching context.*
+*3 curated lines per skill. Universal lines work anywhere in the conversation (no opener constraint).
+Tags: opener: true means approach-only (skip in mid-conversation).*
 
-### C — Captivate first (the pull)
+### P — Pause (when she asks how you feel or about exclusivity)
 
-- "I noticed you before I came over. There was something about the way you were — like you had somewhere more interesting to be." *(pull)*
-- "Most people here are just passing time. You're actually thinking about something." *(pull)*
-- "There's something about you I can't quite place yet. That's why I'm still standing here." *(pull)*
+- { text: "I haven't decided yet. Ask me again in an hour." }                      // universal
+- { text: "That's a faster question than I expected." }                             // universal
+- { text: "Let's find out." }                                                       // universal
 
-### H — Hold back (the push)
+### A — Ask-back (after he answers something about himself)
 
-- "You're interesting. I haven't decided what kind yet." *(push)*
-- "You're doing better than I expected. That's a compliment — mostly." *(push)*
-- "I almost didn't come over. I'm glad I changed my mind — for now." *(push)*
+- { text: "What about you — same question." }                                       // universal
+- { text: "Your turn." }                                                            // universal
+- { text: "I'll ask you the same thing." }                                          // universal
 
-### A — Alternate (pull and push in a single line)
+### C — Contain (when tempted to stack compliments)
 
-- "There's something genuinely rare about you. Also probably a lot of trouble." *(combined)*
-- "I like what you said. I'm not going to tell you which part." *(combined)*
-- "You surprised me just then. That doesn't happen often." *(combined)*
+- { text: "You already know you're interesting. I don't need to say it." }         // universal
+- { text: "I've noticed a few things. I'm keeping them to myself for now." }       // universal
+- { text: "Let's call it noted." }                                                  // universal
 
-### S — Sense the investment
+### E — Earn (instead of early escalation)
 
-*These lines name what you observe — they signal to her that you noticed she's still engaged.*
-
-- "You're still here." *(sense)*
-- "You keep answering. I notice that." *(sense)*
-- "You've been giving me real answers. That tells me something." *(sense)*
-
-### E — Escalate with depth (the deeper pull)
-
-- "I don't usually say this early on — but there's something here worth actually finding out." *(escalated pull)*
-- "You're the kind of person I'd want to still be talking to in two hours. That's not a given for me." *(escalated pull)*
-- "I came over because of one thing. Now I'm staying for a completely different reason." *(escalated pull)*
+- { text: "We're not there yet." }                                                  // universal
+- { text: "Good things earn themselves." }                                          // universal
+- { text: "I know what I want. I'm not in a rush about it." }                      // universal
 
 ---
 
-## SCENARIO OUTLINE
+## PEDAGOGICAL EXPLANATION OVERLAY TEXT
 
-*Rough beats — not yet fully scripted. Follows the Lesson 1 / Lesson 2 format of alternating Ryan narration segments and live exchanges. Ready to be expanded into full segment scripts once topic is approved.*
+*One two-sentence block per skill. Sentence 1 frames what SHE is doing psychologically.
+Sentence 2 names the skill plainly. These are shown in the Coached Practice interrupt overlay.*
 
-**Suggested setting:** Museum or art gallery — good tension environment, slower pace gives the oscillation room to breathe. `museum_bg.jpg` already exists.
+**P — Pause:**
+She's asking you to declare yourself before you've made her work for it — a direct pull designed
+to reveal how much control you have. This is a Pause moment.
 
-**Suggested character:** Nadia (available, museum setting fits). Or Isabelle for variety.
+**A — Ask-back:**
+She just gave you information about herself and is now watching to see whether you're interested
+in her or just waiting for your next turn to speak. This is an Ask-back moment.
 
-**Open question 2:** Which character and setting would you like to use?
+**C — Contain:**
+She's showing you she's receptive, which is exactly when most men pile on the compliments and
+drain the tension they've been building. This is a Contain moment.
+
+**E — Earn:**
+She hasn't shown enough investment yet for you to be declaring interest — escalating now tells
+her she already won, which ends the game. This is an Earn moment.
 
 ---
+
+## MOMENT-DETECTION LOGIC (implemented in api/coach-moment.js)
+
+### Skill definitions passed to LLM
+
+**P — Pause:**
+When she asked a DIRECT question about his feelings, interest, or exclusivity ("do you like me?",
+"are you seeing anyone?", "what are we doing here?"), did he answer too eagerly or directly?
+FAIL = immediately confirms feelings, says "yes I like you", "no I'm not seeing anyone" —
+gives her the answer before she's earned the tension.
+NOT P = she asked about his job, hobbies, travel, or any personal-history topic. Those are
+Mystery's territory from Lesson 1 — P does not apply.
+
+**A — Ask-back:**
+When she asked him about himself (job, interests, experiences), did he answer but fail to
+redirect a question back to her?
+FAIL = gives a complete answer about himself with no question or redirect back, turn ends on him.
+NOT A = she made a statement (not a question), or he did redirect with a question.
+
+**C — Contain:**
+Did he stack multiple romantic/attraction-specific compliments in one message?
+FAIL = uses two or more of: "you're beautiful", "you're gorgeous", "I really like you",
+"I'm falling for you", "you're stunning/amazing/perfect" — stacked in one turn.
+NOT C = single casual compliment, general banter, playful tease, or humor. Those stay Tease
+territory from Lesson 1.
+
+**E — Earn:**
+In the FIRST 3-4 exchanges, did he make a premature declaration of strong interest, a date
+proposal, or romantic escalation?
+FAIL = "I really like you", "I want to take you out", "I feel something with you" — in the
+first 3-4 exchanges before she's shown real investment.
+NOT E = after exchange 4 (she's had time to invest), or when he's responding to her clear signal.
+
+### Deterministic hard gates (code-enforced — not LLM-dependent)
+
+- **P cannot fire** unless her characterResponse contains an explicit feelings/exclusivity question
+  (regex matching: "do you like me", "are you seeing", "what are we", "how do you feel", etc.)
+- **A cannot fire** unless her characterResponse contains a question with "you" in it
+  (she asked about him) — if no ? or question directed at him → A blocked
+- **C cannot fire** unless userMessage contains ≥2 distinct romantic/attraction terms
+- **E cannot fire** if exchangeCount > 4 OR userMessage contains no escalation language
+
+---
+
+## SCENARIO OUTLINE — SOFIA / COFFEE SHOP SECOND MEETING
+
+*Sofia and Alex have met before (beach, Lesson 1 context). This is their second meeting.
+Sofia is more open this time but also more direct — she's gauging whether he's worth more investment.
+She periodically asks direct interest/exclusivity questions to create Pause moments.
+She follows his answers with genuine questions to create Ask-back moments.
+She shows warmth that invites compliments — to create Contain moments.
+She signals investment too fast if he doesn't apply Earn.*
 
 ### BEAT OUTLINE
 
-**SEGMENT 00 — LESSON INTRO (Ryan orb)**
-Ryan explains what push-pull is at the psychological level. Not tricks — intermittent reinforcement is one of the strongest learning signals in human psychology (same mechanism behind why variable-reward slot machines are addictive). The point is not to be hot and cold for manipulation's sake. The point is that a conversation with no tension has no charge. He previews CHASE.
+**SEGMENT 00 — INTRO (Ryan)**
+Ryan introduces the next phase: what happens after the approach lands. The moment she's interested
+is the moment most men blow it. They declare too fast, compliment too much, answer too directly.
+PACE is the skill set that keeps the tension alive once things are going well.
 
-**SEGMENT 01 — C: THE OPENING PULL (Exchange)**
-Alex opens by noticing something real and specific about Nadia's engagement with a piece of art — not her appearance. A genuine pull. She responds with mild interest. He doesn't push yet.
+**SEGMENT 01 — P: THE PAUSE IN ACTION (Exchange)**
+Sofia asks directly: "Do you actually like me or is this just something to do?"
+Alex answers too eagerly — "Yeah I really like you, I think about you all the time."
+She cools slightly. The declaration removed the uncertainty that was creating pull.
 
-**SEGMENT 02 — C EXPLAINED (Ryan)**
-Ryan explains why you must pull first. You can't push someone who hasn't felt drawn in yet. The pull is what creates something to push against. Without the pull, the push is just coldness.
+**SEGMENT 02 — P EXPLAINED (Ryan)**
+Ryan explains what just happened. She asked — he answered. Feels natural. But she wasn't actually
+asking for information. She was testing whether he has the restraint to make her wait for it.
+The answer she wanted was not "yes" — it was something that made her wonder.
 
-**SEGMENT 03 — H: THE HOLD-BACK (Exchange)**
-Nadia warms up slightly. Alex notices — and instead of pressing forward, he pulls back. A casual "I should let you enjoy this actually" or a gentle challenge. She reacts with slight surprise.
+**SEGMENT 03 — A: THE ASK-BACK IN ACTION (Exchange)**
+Sofia asks what he does for work. He gives a complete, detailed answer — and stops.
+She responds briefly. The conversation slows. He had the ball and held it.
 
-**SEGMENT 04 — H EXPLAINED (Ryan)**
-Ryan explains what just happened. She was expecting him to continue. He didn't. That gap — between the warmth she felt and the withdrawal she experienced — is the tension. That tension is attraction. Most men never create it because they're too afraid to risk the withdrawal.
+**SEGMENT 04 — A EXPLAINED (Ryan)**
+Ryan explains: she handed you the volley and you kept it. Every time she asks about you is an
+opportunity to learn more about her. Answer briefly. Redirect. "Your turn" or "What about you?"
+— these lines are not filler; they're the engine of the conversation.
 
-**SEGMENT 05 — A: THE ALTERNATION (Exchange)**
-Alex returns with warmth (pull), then introduces a light challenge again (push). Nadia becomes more engaged — she's asking questions now, not just answering them.
+**SEGMENT 05 — C: THE CONTAIN IN ACTION (Exchange)**
+Sofia laughs at something he says — real warmth, briefly visible. He piles on:
+"I mean it, you're really beautiful, I've been thinking about that since the beach."
+She softens slightly — but something shifts. The moment of tension is gone.
 
-**SEGMENT 06 — A EXPLAINED (Ryan)**
-Ryan explains the rhythm. Not a formula — one-one-one — but a feel. He compares it to music: what makes a song interesting isn't the notes, it's the space between them.
+**SEGMENT 06 — C EXPLAINED (Ryan)**
+Ryan explains the compliment trap. The moment she gave him warmth, he gave it all back
+immediately — and drained the tension he'd been building. The rule is not to never compliment.
+The rule is to not stack them when she's already feeling it. The withheld compliment is more
+powerful than the given one.
 
-**SEGMENT 07 — S: SENSING THE INVESTMENT (Exchange)**
-Nadia asks something about him — she's chasing. Alex notices and names it quietly: "You're still here." She laughs. He stays still, doesn't reward the laugh by rushing forward.
+**SEGMENT 07 — E: THE EARN IN ACTION (Exchange)**
+Third exchange: Alex says "I feel like I haven't felt this way in a while — I'd really like to
+take you out properly." Sofia smiles but it's slightly different now — something settled.
+She didn't earn the declaration. It arrived too soon.
 
-**SEGMENT 08 — S EXPLAINED (Ryan)**
-Ryan explains what sensing investment means. It's not about counting points. It's about recognizing that the pattern is working — and staying in it rather than celebrating it and breaking it.
+**SEGMENT 08 — E EXPLAINED (Ryan)**
+Ryan explains: declarations are not gifts. They're bets. You're telling her exactly how you feel
+before she's shown you that she's worth the risk. Wait. Let her show you. The moment she reveals
+real investment — then you tell her. Not before.
 
-**SEGMENT 09 — E: ESCALATING WITH DEPTH (Exchange)**
-Alex makes a deeper, more personal pull. Not more intense — more real. He shares something genuine. The conversation becomes something else entirely — no longer performance, something actual.
+**SEGMENT 09 — PUTTING IT TOGETHER (Exchange)**
+Alex re-enters the same conversation with PACE applied. He pauses on the direct question,
+redirects after his own answers, holds a compliment back at the moment it would have been most
+expected, and waits until she shows real investment before saying anything close to a declaration.
+The whole tone of the conversation is different.
 
-**SEGMENT 10 — E EXPLAINED (Ryan)**
-Ryan explains that escalation in push-pull isn't volume — it's depth. The early pulls are observations. The later pulls are honesty. The gap between who you are at the start and who you reveal yourself to be — that is what she's been chasing.
-
-**SEGMENT 11 — RECAP AND SEND-OFF (Ryan)**
-CHASE mnemonic restated one letter at a time. Closing line (draft):
-> "She is not chasing the version of you who is always available. She is chasing the version of you who showed her something — and then made her wonder what else there was to find."
-
----
-
-## OPEN QUESTIONS
-
-1. Can you confirm the specific Dark Needle push-pull video? If yes, review the draft against that source before scripting.
-2. Which character and setting? (Suggested: Nadia / museum, or Isabelle / bookstore.)
-3. Is "CHASE" the right mnemonic? Considered alternative: **SPARK** (Signal, Pause, Alternate, Read, Keep it light) — slightly more neutral, slightly less on-the-nose. Your call.
-4. Tone check: Push-pull has a reputation as manipulative in some circles. The current framing follows The Dark Needle's "real principles, not tricks" voice from L1 and L2 — but worth confirming you're comfortable with the intermittent-reinforcement framing explicitly named.
+**SEGMENT 10 — RECAP AND SEND-OFF (Ryan)**
+PACE mnemonic restated. Closing line:
+> "Most men rush because they're afraid the moment will pass. The men who understand PACE know
+> something different: the moment is only available to the man who is willing to wait for it."
 
 ---
 
 ## RECORDING NOTES (for future use, not current phase)
 
 - Same format as Lessons 1 and 2: one MP3 per segment
-- File naming: `lesson3_seg00.mp3`, `lesson3_seg01.mp3`, etc.
+- File naming: `lesson3_seg00.mp3`, `lesson3_seg01.mp3`, … `lesson3_seg10.mp3`
 - Target runtime: 9-12 minutes total
 - Store in R2 under `/lessons/lesson3/audio/`

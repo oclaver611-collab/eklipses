@@ -48,6 +48,21 @@
     { id:'13', title:'Your Five Steps' },
   ];
 
+  // ── Lesson 3 segment list ─────────────────────────────────────────
+  const SEGMENTS3 = [
+    { id:'00', title:'Welcome' },
+    { id:'01', title:'What PACE Is' },
+    { id:'02', title:'Watch — The Pause' },
+    { id:'03', title:'P — Pause' },
+    { id:'04', title:'Watch — The Ask-back' },
+    { id:'05', title:'A — Ask-back' },
+    { id:'06', title:'Watch — Contain' },
+    { id:'07', title:'C — Contain' },
+    { id:'08', title:'Watch — Earn' },
+    { id:'09', title:'E — Earn' },
+    { id:'10', title:'Your Four Steps' },
+  ];
+
   // ── Lesson config ─────────────────────────────────────────────────
   const LESSONS = {
     lesson1: {
@@ -100,6 +115,30 @@
         { word:'A', meaning:"Add Humor — don't defend, just deflect" },
         { word:'M', meaning:'Make Her Qualify — stay curious, push deeper' },
         { word:'E', meaning:'Exit — decision-makers leave first' },
+      ],
+    },
+    lesson3: {
+      id:           'lesson3',
+      workerPrefix: 'lesson3/',       // file=lesson3/ryan_seg00.mp3 → R2: lessons/lesson3/audio/
+      lsProgress:   'eklipses_lesson3_progress',
+      lsComplete:   'eklipses_lesson3_complete',
+      lsCert:       null,
+      segments:     SEGMENTS3,
+      title:        'The Long Game',
+      completionSub: '"The Long Game" — PACE mastered.',
+      completionBody: 'The moment things go well is the moment most men ruin it. You now know how to wait.',
+      steps: [
+        'P — Pause: make her wait for the answer',
+        'A — Ask-back: redirect every answer back to her',
+        'C — Contain: hold the compliment, keep the tension',
+        'E — Earn: let her show interest before you match it',
+      ],
+      mnemonicPhrase: 'PACE',
+      mnemonicMap: [
+        { word:'P', meaning:'Pause — make her wait for it' },
+        { word:'A', meaning:'Ask-back — redirect back to her' },
+        { word:'C', meaning:'Contain — hold the compliment' },
+        { word:'E', meaning:'Earn — let her show it first' },
       ],
     },
   };
@@ -250,6 +289,7 @@
     if (btn1) btn1.onclick = () => openLesson('lesson1', '00');
 
     renderLesson2Card();
+    renderLesson3Card();
   }
 
   function renderLesson2Card() {
@@ -291,7 +331,46 @@
     if (btn2) btn2.onclick = () => openLesson('lesson2', '00');
   }
 
-  function refreshLearnTabStatus() { renderLearnTab(); renderLesson2Card(); }
+  function renderLesson3Card() {
+    const el = document.getElementById('lesson3-card');
+    if (!el) return;
+
+    const lesson2Done     = localStorage.getItem('eklipses_lesson2_complete') === 'true';
+    const lesson3Done     = localStorage.getItem('eklipses_lesson3_complete') === 'true';
+    const lesson3Progress = localStorage.getItem('eklipses_lesson3_progress');
+
+    if (!lesson2Done) {
+      el.innerHTML = `
+        <div class="ek-lesson-card locked">
+          <div class="ek-lesson-card-header">
+            <span class="ek-lesson-num">🔒 LESSON 3</span>
+          </div>
+          <div class="ek-lesson-title">The Long Game</div>
+          <div class="ek-lesson-desc">Complete Lesson 2 to unlock. Learn to slow down when things go well — and make her feel every second of it. 4 core principles. ~10 min.</div>
+        </div>`;
+      return;
+    }
+
+    const l3Status   = lesson3Done ? 'completed' : (lesson3Progress ? 'in_progress' : 'not_started');
+    const l3BtnLabel = lesson3Done ? '↺ Review Lesson' : (lesson3Progress ? '▶ Continue Lesson' : '▶ Start Lesson');
+
+    el.innerHTML = `
+      <div class="ek-lesson-card">
+        <div class="ek-lesson-card-header">
+          <span class="ek-lesson-num">LESSON 3</span>
+          ${statusChip(l3Status)}
+        </div>
+        <div class="ek-lesson-title">The Long Game</div>
+        <div class="ek-lesson-desc">Learn to slow down when things go well — and make her feel every second of it. 4 core principles. ~10 min.</div>
+        <div class="ek-lesson-mnemonic-tag">PACE — Pause · Ask-back · Contain · Earn</div>
+        <button class="ek-start-btn" id="ek-start-lesson3">${l3BtnLabel}</button>
+      </div>`;
+
+    const btn3 = document.getElementById('ek-start-lesson3');
+    if (btn3) btn3.onclick = () => openLesson('lesson3', '00');
+  }
+
+  function refreshLearnTabStatus() { renderLearnTab(); renderLesson2Card(); renderLesson3Card(); }
 
   // ── Player state ──────────────────────────────────────────────────
   let _playerEl      = null;
@@ -569,7 +648,7 @@
         <span class="elp-mnemonic-meaning">${r.meaning}</span>
       </div>`).join('');
 
-    const lessonNum = lesson.id === 'lesson1' ? '1' : '2';
+    const lessonNum = lesson.id.replace('lesson', '');
 
     return `
       <div class="elp-complete-check">✓</div>
