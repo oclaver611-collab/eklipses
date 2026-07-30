@@ -2022,6 +2022,36 @@ function showStyleSelector() {
   });
 }
 
+/* ===== Scenario countdown ===== */
+function showCountdown(mySession) {
+  return new Promise(resolve => {
+    const ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.55);pointer-events:none';
+    const num = document.createElement('div');
+    num.style.cssText = 'font-size:120px;font-weight:900;color:#fff;line-height:1;text-shadow:0 4px 32px rgba(0,0,0,0.6);transition:opacity 0.2s ease,transform 0.15s ease';
+    ov.appendChild(num);
+    document.body.appendChild(ov);
+
+    let beat = 3;
+    function tick() {
+      if (mySession !== session) { ov.remove(); resolve(); return; }
+      num.style.opacity = '1';
+      num.style.transform = 'scale(1)';
+      num.textContent = beat;
+      setTimeout(() => {
+        num.style.opacity = '0';
+        num.style.transform = 'scale(0.85)';
+        setTimeout(() => {
+          beat--;
+          if (beat > 0) tick();
+          else { ov.remove(); resolve(); }
+        }, 200);
+      }, 700);
+    }
+    tick();
+  });
+}
+
 /* ===== Scenario engine ===== */
 async function playScenario(key, practice=false) {
   const sc=SCENARIOS[key]; if(!sc) return;
@@ -2197,6 +2227,9 @@ async function freeConversation(mySession) {
     timerEl.textContent = Math.floor(rem / 60000) + ':' + String(Math.floor((rem % 60000) / 1000)).padStart(2, '0') + ' left';
     if (rem <= 0) clearInterval(timerInterval);
   }, 1000);
+
+  await showCountdown(mySession);
+  if (mySession !== session) { clearInterval(timerInterval); timerEl.remove(); return; }
 
   setMediaForSpeaker('Mary');
   els.name.textContent = getCharacterDisplayName(currentCharacterId);
