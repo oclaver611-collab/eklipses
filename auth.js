@@ -296,28 +296,32 @@
       return;
     }
 
-    // 3. Check existing session.
-    try {
-      const { data: { session } } = await sb.auth.getSession();
-      if (session?.user) {
-        currentUser = session.user;
-        await fetchAndMergeProgress(currentUser.id);
-      }
-    } catch {}
-
-    // 4. Listen for auth changes.
+    // 3. Register listener BEFORE getSession() — if onAuthStateChange comes after,
+    //    the SIGNED_IN event fired when processing an OAuth redirect token is already
+    //    gone and the callback page load shows as logged-out.
     sb.auth.onAuthStateChange(async (event, session) => {
       currentUser = session?.user || null;
       renderAuthState(currentUser);
       if (event === 'SIGNED_IN' && currentUser) {
-        // Migrate any existing localStorage progress, then pull DB on top.
+        // Fresh sign-in (email/password or OAuth redirect): push local progress
+        // first so nothing is lost, then pull DB on top.
         await pushProgressToDb(currentUser.id);
         await fetchAndMergeProgress(currentUser.id);
         hideAuthModal();
+      } else if (event === 'INITIAL_SESSION' && currentUser) {
+        // Returning signed-in user on page load: only pull from DB (don't overwrite
+        // DB with potentially stale local state).
+        await fetchAndMergeProgress(currentUser.id);
       }
     });
 
-    // 5. Render initial state.
+    // 4. Resolve current session — also processes OAuth redirect tokens/codes and
+    //    fires SIGNED_IN (or INITIAL_SESSION) to the listener above.
+    try {
+      await sb.auth.getSession();
+    } catch {}
+
+    // 5. Render auth state (currentUser already set by listener above).
     renderAuthState(currentUser);
     wireStaticButtons();
   }
