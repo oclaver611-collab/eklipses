@@ -580,6 +580,113 @@ async function run() {
 
     await smokePage.close();
 
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // 6. AUTH STATE RENDERS ON PAGE LOAD (existing session in localStorage)
+    // Regression test for bug: renderAuthState() not wired to update
+    // splash/onboarding overlays. player.js creates those overlays
+    // synchronously before auth.js finishes its async init, so the overlays
+    // always showed "Already have an account? Sign in" even for logged-in
+    // users. Fix: renderAuthState(user) now removes those prompts.
+    // ═══════════════════════════════════════════════════════════════════════
+    console.log('\nAuth page-load state tests');
+    console.log('─'.repeat(54));
+
+    const authPage = await browser.newPage();
+
+    // Replace the Supabase CDN script with a minimal mock that immediately
+    // fires INITIAL_SESSION with a fake user — simulates a returning user
+    // whose session was already in localStorage.
+    await authPage.route(/supabase-js/, route => {
+      route.fulfill({
+        contentType: 'application/javascript',
+        body: `
+          window.supabase = {
+            createClient: function(url, key) {
+              return {
+                auth: {
+                  onAuthStateChange: function(cb) {
+                    // Fire after getSession() has returned so renderAuthState(null)
+                    // runs first — proving the fix works for the async update case.
+                    setTimeout(function() {
+                      cb('INITIAL_SESSION', {
+                        user: { id: 'test-user-id', email: 'tester@eklipses.test' },
+                        access_token: 'fake-token-for-test'
+                      });
+                    }, 50);
+                    return { data: { subscription: { unsubscribe: function() {} } } };
+                  },
+                  getSession: async function() {
+                    return { data: { session: null }, error: null };
+                  },
+                  signOut: async function() { return { error: null }; }
+                },
+                from: function() {
+                  return {
+                    select: function() {
+                      return { eq: function() {
+                        return { maybeSingle: async function() { return { data: null, error: null }; } };
+                      }};
+                    },
+                    upsert: async function() { return { error: null }; }
+                  };
+                }
+              };
+            }
+          };
+        `
+      });
+    });
+
+    // Return valid-looking auth config so auth.js creates the client
+    // (the default server fallback returns {} which has no url/anonKey).
+    await authPage.route('**/api/auth-config', route => {
+      route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({ url: 'https://fake.supabase.co', anonKey: 'fake-anon-key' })
+      });
+    });
+
+    await authPage.addInitScript(() => {
+      localStorage.setItem('ek-onboarding-v1', '1'); // skip onboarding → show splash
+    });
+
+    await authPage.goto(BASE, { waitUntil: 'domcontentloaded' });
+
+    // Wait well past the 50ms INITIAL_SESSION delay for renderAuthState to run.
+    await authPage.waitForTimeout(400);
+
+    const authUIState = await authPage.evaluate(() => {
+      const btn           = document.getElementById('ek-auth-btn');
+      const indicator     = document.getElementById('ek-auth-indicator');
+      const splashSignin  = document.getElementById('ek-splash-signin');
+      const obSignin      = document.getElementById('ob-signin');
+      return {
+        btnHidden:         !btn || btn.style.display === 'none',
+        indicatorVisible:  !!indicator && indicator.style.display !== 'none',
+        splashSigninGone:  !splashSignin,
+        obSigninGone:      !obSignin,
+      };
+    });
+
+    report(
+      'Nav sign-in button hidden when session exists on load',
+      authUIState.btnHidden,
+      authUIState.btnHidden ? 'hidden' : 'still visible'
+    );
+    report(
+      'Nav auth indicator visible when session exists on load',
+      authUIState.indicatorVisible,
+      authUIState.indicatorVisible ? 'visible' : 'not visible'
+    );
+    report(
+      'Splash "Already have an account?" removed when logged in',
+      authUIState.splashSigninGone,
+      authUIState.splashSigninGone ? 'removed' : 'still present'
+    );
+
+    await authPage.close();
+
   } finally {
     await browser.close();
     server.close();

@@ -98,6 +98,11 @@
       btn.style.display       = 'none';
       indicator.style.display = 'flex';
       if (emailEl) emailEl.textContent = user.email;
+      // Hide "Already have an account?" prompts on splash / onboarding overlays.
+      // These overlays are created synchronously by player.js before auth resolves,
+      // so renderAuthState is the only place that can update them once auth is known.
+      document.getElementById('ek-splash-signin')?.parentElement?.remove();
+      document.getElementById('ob-signin')?.parentElement?.remove();
     } else {
       btn.style.display       = 'inline-flex';
       indicator.style.display = 'none';
