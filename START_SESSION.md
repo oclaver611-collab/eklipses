@@ -213,7 +213,11 @@ Priority order:
 | player.js | Avatar sets, rescue lines, impatience lines, scenario-character mapping |
 | scripts/heygen-test.js | HeyGen API test (Sanna, Avatar V test) |
 | scripts/heygen-batch.js | HeyGen batch generator (all 9 characters) |
-| scripts/test-auto.js | Automated test suite — run before every push |
+| scripts/test-auto.js | AI output evaluator — run when changing prompts in api/ (`npm run eval`) |
+| tests/test-all-scenarios.js | Playwright suite — 14 scenarios end-to-end |
+| tests/test-paywall.js | Playwright suite — paywall / session limit |
+| tests/test-lesson-player.js | Playwright suite — lesson player UI (20 checks) |
+| tests/test-new-features.js | Playwright suite — captions, auth, Coached Practice (53 checks) |
 
 ---
 
@@ -222,7 +226,16 @@ Priority order:
 ```
 npm test
 ```
-All 3 evaluators must be green (84/84 + 30/30 + 88/88).
+All 4 Playwright browser suites must be green:
+- test-all-scenarios.js  → 14/14 scenarios
+- test-paywall.js        → PASS
+- test-lesson-player.js  → 20/20
+- test-new-features.js   → 53/53
+
+When changing AI prompt logic in api/ (character.js, coach.js, etc.), also run:
+```
+npm run eval
+```
 
 ---
 

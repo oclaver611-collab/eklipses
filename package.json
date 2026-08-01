@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "description": "Eklipses — AI dating practice app",
   "scripts": {
-    "test": "node scripts/test-auto.js",
-    "test:human": "node scripts/test-human.js",
-    "test:all": "npm test && npm run test:human",
-    "test:lesson": "node tests/test-lesson-player.js"
+    "test": "node tests/test-all-scenarios.js && node tests/test-paywall.js && node tests/test-lesson-player.js && node tests/test-new-features.js",
+    "test:scenarios": "node tests/test-all-scenarios.js",
+    "test:paywall": "node tests/test-paywall.js",
+    "test:lesson": "node tests/test-lesson-player.js",
+    "test:features": "node tests/test-new-features.js",
+    "eval": "node scripts/test-auto.js",
+    "eval:human": "node scripts/test-human.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.98.0",
