@@ -1366,7 +1366,9 @@ async function speak(text, speaker, onAudioReady, prefetchedUrl = null) {
 
   const switchToSpeaking=()=>{
     if(mySession!==session) return;
-    if (els.text.dataset.pendingText) {
+    if (speaker === 'Mary') {
+      delete els.text.dataset.pendingText;
+    } else if (els.text.dataset.pendingText) {
       els.text.textContent = els.text.dataset.pendingText;
       delete els.text.dataset.pendingText;
     }
@@ -1468,7 +1470,6 @@ async function streamCharacterAndSpeak(userSaid, mySession, onTextReady = null) 
       }
 
       const sentence = sentenceQueue.shift();
-      els.text.textContent = sentence;
 
       try {
         await speakElevenLabs(sentence, () => {
