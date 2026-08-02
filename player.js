@@ -3082,31 +3082,19 @@ ${hasAny
       <div>Latest Lesson</div>
       <div style="${SUB}">${latest.label.replace(/^Lesson \d+ — /, '')} — your most recently completed lesson</div>
      </button>`
-  : `<button style="${SD}" disabled>
-      <div>Latest Lesson</div>
-      <div style="${SUBD}">Complete a lesson to unlock</div>
-     </button>`
+  : ''
 }
 
 <div id="pfm-choose-wrap">
-  ${hasAny
-    ? `<button id="pfm-choose-btn" style="${S}" ${HV}>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span>Choose a Lesson</span>
-          <span id="pfm-arrow" style="font-size:16px;transition:transform .2s;display:inline-block">›</span>
-        </div>
-        <div style="${SUB}">Pick which lesson's skills to test</div>
-       </button>`
-    : `<button style="${SD}" disabled>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span>Choose a Lesson</span>
-          <span style="font-size:16px">›</span>
-        </div>
-        <div style="${SUBD}">Complete a lesson to unlock</div>
-       </button>`
-  }
+  <button id="pfm-choose-btn" style="${S}" ${HV}>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span>Choose a Lesson</span>
+      <span id="pfm-arrow" style="font-size:16px;transition:transform .2s;display:inline-block">›</span>
+    </div>
+    <div style="${SUB}">Pick which lesson's skills to test</div>
+  </button>
   <div id="pfm-list" style="display:none;margin-top:6px;background:#141620;border:1px solid #252836;border-radius:10px;overflow:hidden;max-height:224px;overflow-y:auto">
-    ${completed.map(l =>
+    ${LESSON_REGISTRY.map(l =>
       `<button data-lessonid="${l.id}" style="display:block;width:100%;padding:13px 16px;color:#c9d0e8;font-size:13px;font-weight:600;cursor:pointer;text-align:left;background:transparent;border:none;border-bottom:1px solid #1e2132;transition:background .12s" onmouseover="this.style.background='#1e2132'" onmouseout="this.style.background='transparent'">${l.label}</button>`
     ).join('')}
   </div>
@@ -3131,8 +3119,11 @@ ${hasAny
      </button>`
 }
 
-<button id="pfm-free" style="${S}" data-focus="free" ${HV}>
-  <div>Free Practice</div>
+<button id="pfm-free" style="${!hasAny ? S.replace('#252836','#1c2a1e').replace('#2f3344','#2a4a2f') : S}" data-focus="free" ${!hasAny ? `onmouseover="this.style.background='#243524';this.style.borderColor='#3a6040'" onmouseout="this.style.background='#1c2a1e';this.style.borderColor='#2a4a2f'"` : HV}>
+  <div style="display:flex;align-items:center;gap:8px">
+    Free Practice
+    ${!hasAny ? '<span style="font-size:11px;color:#5db870;font-weight:600;background:#1a3320;padding:2px 6px;border-radius:4px">Recommended</span>' : ''}
+  </div>
   <div style="${SUB}">Open conversation — no skill testing or evaluation</div>
 </button>
 
@@ -3140,22 +3131,23 @@ ${hasAny
 
   if (hasAny) {
     document.getElementById('pfm-latest').addEventListener('click', () => start(latest.id));
+  }
 
-    const chooseBtn = document.getElementById('pfm-choose-btn');
-    const list      = document.getElementById('pfm-list');
-    const arrow     = document.getElementById('pfm-arrow');
-    let open = false;
-    chooseBtn.addEventListener('click', () => {
-      open = !open;
-      list.style.display   = open ? 'block' : 'none';
-      arrow.style.transform = open ? 'rotate(90deg)' : 'rotate(0deg)';
-    });
-    list.querySelectorAll('[data-lessonid]').forEach(btn => {
-      btn.addEventListener('click', () => start(btn.getAttribute('data-lessonid')));
-    });
+  const chooseBtn = document.getElementById('pfm-choose-btn');
+  const list      = document.getElementById('pfm-list');
+  const arrow     = document.getElementById('pfm-arrow');
+  let open = false;
+  chooseBtn.addEventListener('click', () => {
+    open = !open;
+    list.style.display    = open ? 'block' : 'none';
+    arrow.style.transform = open ? 'rotate(90deg)' : 'rotate(0deg)';
+  });
+  list.querySelectorAll('[data-lessonid]').forEach(btn => {
+    btn.addEventListener('click', () => start(btn.getAttribute('data-lessonid')));
+  });
 
+  if (hasAny) {
     document.getElementById('pfm-all').addEventListener('click', () => start('all'));
-    // Coached Practice: uses latest lesson's skill set + enables mid-conversation interrupts
     document.getElementById('pfm-coached').addEventListener('click', () => start(latest.id, true));
   }
 

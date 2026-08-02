@@ -797,6 +797,73 @@ async function run() {
 
     await l3Page.close();
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // 8. PRACTICE FOCUS MODAL — ZERO-LESSON USER
+    // Confirms the modal shows and lesson options are available even when
+    // no lessons are marked complete (gate removed from "Choose a Lesson").
+    // ═══════════════════════════════════════════════════════════════════════
+    console.log('\nPractice Focus Modal — zero-lesson user tests');
+    console.log('─'.repeat(54));
+
+    const zeroPage = await browser.newPage();
+    await zeroPage.addInitScript(() => {
+      localStorage.setItem('ek-onboarding-v1', '1');
+      // All lesson_complete keys intentionally absent — zero-lesson user
+    });
+    await zeroPage.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await zeroPage.waitForSelector('#ek-start-btn', { timeout: 8000 });
+    await zeroPage.evaluate(() => {
+      if (window.KokoroSpeech) {
+        window.KokoroSpeech.preload  = async () => {};
+        window.KokoroSpeech.speak    = async () => {};
+        window.KokoroSpeech.prefetch = async () => null;
+        window.KokoroSpeech.cancel   = () => {};
+      }
+    });
+    await zeroPage.click('#ek-start-btn');
+    await zeroPage.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 8000 });
+    await zeroPage.evaluate(() => {
+      const t = document.getElementById('ek-tab-practice');
+      if (t) t.click();
+    });
+    await zeroPage.waitForFunction(() => {
+      const w = document.getElementById('ek-practice-wrap');
+      return w && w.style.display !== 'none';
+    }, { timeout: 5000 });
+    await zeroPage.evaluate(() => {
+      const card = document.querySelector('.sc-card');
+      if (card) card.click();
+    });
+    await zeroPage.waitForFunction(() => {
+      const m = document.getElementById('practice-focus-modal');
+      return m && m.style.display !== 'none';
+    }, { timeout: 5000 });
+
+    const zeroState = await zeroPage.evaluate(() => {
+      const body = document.getElementById('practice-focus-body');
+      const html = body ? body.innerHTML : '';
+      return {
+        modalVisible:       !!document.getElementById('practice-focus-modal'),
+        chooseEnabled:      !!document.getElementById('pfm-choose-btn'),
+        latestAbsent:       !document.getElementById('pfm-latest'),
+        freeRecommended:    html.includes('Recommended'),
+        lesson1InList:      html.includes('Lesson 1'),
+      };
+    });
+
+    report(
+      'Zero-lesson user: modal appears with Choose a Lesson enabled, Latest Lesson absent',
+      zeroState.modalVisible && zeroState.chooseEnabled && zeroState.latestAbsent,
+      `modal=${zeroState.modalVisible} choose=${zeroState.chooseEnabled} latestAbsent=${zeroState.latestAbsent}`
+    );
+    report(
+      'Zero-lesson user: Free Practice shows Recommended badge, lesson content available',
+      zeroState.freeRecommended && zeroState.lesson1InList,
+      `recommended=${zeroState.freeRecommended} lesson1inList=${zeroState.lesson1InList}`
+    );
+
+    await zeroPage.close();
+
   } finally {
     await browser.close();
     server.close();
