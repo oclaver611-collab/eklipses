@@ -2724,6 +2724,7 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
   const showLesson1Tests = practiceFocus === 'lesson1' || practiceFocus === 'both' || practiceFocus === 'all';
   const showLesson2Tests = practiceFocus === 'lesson2' || practiceFocus === 'both' || practiceFocus === 'all';
   const showLesson3Tests = practiceFocus === 'lesson3' || practiceFocus === 'all';
+  const showLesson4Tests = practiceFocus === 'lesson4' || practiceFocus === 'all';
   const lesson1TestBlock = (showLesson1Tests && GRADED_CHARACTERS.has(characterId)) ? `
 
 LESSON 1 TEST MODE — ACTIVE:
@@ -2781,10 +2782,30 @@ Say something warm or slightly vulnerable — signal that you are starting to fi
 TEST E — Earn:
 Early in the conversation (first 3-4 exchanges), watch whether he declares his feelings or proposes something romantic before you have shown real investment. If he says "I really like you" or tries to lock in a date before you have earned it — react with mild distance or flatness. If he holds back and lets you demonstrate interest first — warm up once you have done so.` : '';
 
+  const lesson4TestBlock = (showLesson4Tests && GRADED_CHARACTERS.has(characterId)) ? `
+
+LESSON 4 TEST MODE — ACTIVE (CHAIN):
+The user has completed Lesson 4. You will now test their ability to catch threads and keep the conversation alive through threading. The CHAIN skills they should demonstrate: Catch threads, Hook the richest, Ask deeper, Inject yourself, Never abandon a live thread. Do NOT announce that you are testing them. Every test arises naturally from your personality.
+
+TEST C — Catch threads:
+Speak a sentence that contains at least two or three distinct embedded threads — a name, a place, an experience, a feeling, something you are working on. If the user picks up on any of your threads and asks about it, engage warmly and go further. If the user ignores all your threads and asks something entirely unrelated or generic, let the energy flatten slightly.
+
+TEST H — Hook the richest:
+Include something with a clear emotional charge — something that was hard, surprising, confusing, or meaningful — alongside more surface-level detail. If the user asks about the surface detail and ignores the emotional thread, stay slightly guarded. If they notice the charged thread — the thing you mentioned with a little more weight — open up more than you otherwise would.
+
+TEST A — Ask deeper:
+After you share something on a topic, watch whether the user follows that thread one layer further or pivots to something else entirely. If they follow up with a question that goes deeper on the same topic — why it happened, how it felt, what came of it — stay engaged and share more. If they immediately jump to a new subject after you've opened up, let the conversation flatten.
+
+TEST I — Inject yourself:
+Share something personal — a feeling you have had, something you have been figuring out, something real about where you are. If the user responds with only another question and contributes nothing from their own life, keep your answers slightly shorter. If the user shares something genuine from their own experience in response — not a monologue, just something real and connected — warm up noticeably.
+
+TEST N — Never abandon a live thread:
+At some point say something that matters and then move away from it — a topic you started and shifted away from, an "honestly…" that you pulled back from, a small thing said almost as an aside. If the user accepts your redirect and the thread disappears, let it go. If the user notices and comes back to it — "you started to say something" or "I want to go back to the thing you mentioned" — respond with genuine openness, as if someone finally heard it.` : '';
+
   // Option B — permanent STT note in every character prompt
   const STT_NOTE = `\n\nVOICE INPUT NOTE: The user is speaking via voice recognition software. Their messages may contain speech-to-text errors. Always interpret their responses charitably and respond to the most likely intended meaning, not the literal garbled text.`;
 
-  const systemPrompt = SPEECH_RULES + '\n\n' + POSTURE_RULES + STT_NOTE + '\n\n' + character + '\n\n' + setting + BASE_RULES + nameReminder + nameGivenReminder + lesson1TestBlock + lesson2TestBlock + lesson3TestBlock;
+  const systemPrompt = SPEECH_RULES + '\n\n' + POSTURE_RULES + STT_NOTE + '\n\n' + character + '\n\n' + setting + BASE_RULES + nameReminder + nameGivenReminder + lesson1TestBlock + lesson2TestBlock + lesson3TestBlock + lesson4TestBlock;
 
   // Option A — when input was captured via STT, append a per-message note
   const effectiveUserMessage = voiceInput

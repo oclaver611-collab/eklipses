@@ -34,13 +34,13 @@ This is the lesson that makes the entire skill set feel effortless — because o
 |--------|-------|-----------------|
 | 1 — The Approach | OTIMC | How to open and close |
 | 2 — Holding Your Ground | FRAME | How to handle tests and pressure |
-| 3 — Push-Pull | CHASE | How to create tension and pull |
+| 3 — The Long Game | PACE | How to maintain restraint when she's already interested |
 | **4 — The Thread** | **CHAIN** | **How to keep the conversation alive indefinitely** |
 | 5 — The Read | READ | How to demonstrate deep perception |
 
-By Lesson 4, the user can open (L1), hold frame (L2), and create tension (L3). Threading closes the loop for sustained conversation — the skill that makes everything else feel natural rather than effortful. The Read (L5) builds on a live, threaded conversation: you can only cold-read someone you've been actually listening to.
+By Lesson 4, the user can open (L1), hold frame (L2), and restrain themselves when it's going well (L3). Threading closes the loop for sustained conversation — the skill that makes everything else feel natural rather than effortful. The Read (L5) builds on a live, threaded conversation: you can only cold-read someone you've been actually listening to.
 
-**Source credibility:** Project research notes call conversational threading "highest-value technique to build a feature/lesson around." External credibility: Harvard research on follow-up questions (most powerful question type for likability), Science of People, Practical Psychology, Practical Pie. Not fringe.
+**Source credibility:** Project research notes call conversational threading "highest-value technique to build a feature/lesson around." Academic underpinning: Huang et al. (2017, *Journal of Personality and Social Psychology*) found that follow-up questions increase likability by signalling responsiveness — the closest peer-reviewed support for the listening-first approach taught here. Popular treatments (not independent research sources, and not peer-reviewed): Science of People (Vanessa Van Edwards), Practical Psychology and Practical Pie — these are the same creator (Theodore) under two names, both covering the topic as lay communicators.
 
 ---
 
@@ -60,6 +60,10 @@ By Lesson 4, the user can open (L1), hold frame (L2), and create tension (L3). T
 
 **Narrative hook for Ryan's recap:**
 > "She gave you everything you needed. She always does. The only question is whether you were paying enough attention to catch it."
+
+> **Teaching heuristic note — "2–3 embedded topics":** The claim that every sentence contains 2–3 embedded topics is a pedagogical frame, not an empirically measured count. Conversations do branch at topic transitions and skilled listeners do navigate multiple possible directions — that much is supported by conversation analysis research. The "2–3" figure is a coaching anchor to train attention, not a finding from any study. It should be presented in lesson audio as a practical frame, not a fact.
+
+> **Mnemonic letter overlap (flag for future all-lessons recap material):** The letter A in CHAIN ("Ask deeper") uses the same letter as A in PACE ("Ask-back") — different skills in adjacent lessons. Similarly, I in CHAIN ("Inject yourself") uses the same letter as I in OTIMC ("Imply your interest"). Neither is a blocker within individual lessons, but any cross-lesson summary, flashcard set, or combined reference for learners who have completed multiple lessons needs to explicitly distinguish these — otherwise "A = ?" and "I = ?" become ambiguous in review.
 
 ---
 
@@ -91,7 +95,7 @@ By Lesson 4, the user can open (L1), hold frame (L2), and create tension (L3). T
 
 ### I — Inject yourself
 
-*Reciprocal disclosure — brief, genuine, and connected to her thread. Note: research on intimacy accelerators (Aron, 1997) shows that mutual vulnerability on progressively deeper topics is one of the strongest known mechanisms for connection. Threading + injection is the practical implementation of that mechanism without needing a structured protocol.*
+*Reciprocal disclosure — brief, genuine, and connected to her thread. Note: Aron et al. (1997, "The experimental generation of interpersonal closeness," *Personality and Social Psychology Bulletin*) found that structured, escalating mutual self-disclosure produced significantly greater closeness than small-talk in a 45-minute lab interaction. Threading + injection is the practical implementation of that escalating-disclosure dynamic without requiring a formal protocol. (Clarification: "mutual vulnerability" is Brené Brown's framing, not Aron's; the paper's language is reciprocal self-disclosure. "Strongest known mechanism for connection" is not a claim the paper makes — the authors' own title says "some preliminary findings.")*
 
 - "That reminds me of something. I went through something similar — not the same, but close." *(inject)*
 - "I know that feeling. It took me a while to put a word to it." *(inject)*
