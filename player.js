@@ -1541,6 +1541,7 @@ async function streamCharacterAndSpeak(userSaid, mySession, onTextReady = null) 
         userStyle: currentUserStyle,
         lesson1Complete: localStorage.getItem('eklipses_lesson1_complete') === 'true',
         lesson2Complete: localStorage.getItem('eklipses_lesson2_complete') === 'true',
+        lesson3Complete: localStorage.getItem('eklipses_lesson3_complete') === 'true',
         practiceFocus: localStorage.getItem('eklipses_practice_focus') || 'free',
         voiceInput: _lastInputMode === 'voice',
       }),
@@ -1634,12 +1635,13 @@ async function getCharacterResponseFallback(userSaid) {
         history: conversationHistory,
         lesson1Complete: localStorage.getItem('eklipses_lesson1_complete') === 'true',
         lesson2Complete: localStorage.getItem('eklipses_lesson2_complete') === 'true',
+        lesson3Complete: localStorage.getItem('eklipses_lesson3_complete') === 'true',
         practiceFocus: localStorage.getItem('eklipses_practice_focus') || 'free',
         voiceInput: _lastInputMode === 'voice',
       }),
       signal: controller.signal,
     });
-    clearTimeout(timeout);
+  clearTimeout(timeout);
     if (!res.ok) return null;
     const data = await res.json();
     const maryText = data.response;
@@ -2401,6 +2403,7 @@ async function runCoachFeedback(mySession) {
     opener: firstUserOpener || '',
     lesson1Complete: localStorage.getItem('eklipses_lesson1_complete') === 'true',
     lesson2Complete: localStorage.getItem('eklipses_lesson2_complete') === 'true',
+    lesson3Complete: localStorage.getItem('eklipses_lesson3_complete') === 'true',
     practiceFocus: localStorage.getItem('eklipses_practice_focus') || null,
     characterId: currentCharacterId || 'sofia',
   });
@@ -2454,7 +2457,7 @@ async function runCoachFeedback(mySession) {
 
   if(mySession!==session) return;
 
-  // Speaking order: [lesson1Eval →] [lesson2Eval →] part1 → trans2 → part2 → trans3 → part3 → trans4 → part4 → tryNextTime → score reveal
+  // Speaking order: [lesson1Eval →] [lesson2Eval →] [lesson3Eval →] part1 → trans2 → part2 → trans3 → part3 → trans4 → part4 → tryNextTime → score reveal
   if (f.lesson1Eval && mySession === session) {
     const l1url = await KokoroSpeech.prefetch(f.lesson1Eval, 'am_adam');
     await speak(f.lesson1Eval, 'Ryan', () => { els.text.textContent = f.lesson1Eval; }, l1url);
@@ -2464,6 +2467,12 @@ async function runCoachFeedback(mySession) {
   if (f.lesson2Eval && mySession === session) {
     const l2url = await KokoroSpeech.prefetch(f.lesson2Eval, 'am_adam');
     await speak(f.lesson2Eval, 'Ryan', () => { els.text.textContent = f.lesson2Eval; }, l2url);
+    if (mySession !== session) return;
+    await pause(600);
+  }
+  if (f.lesson3Eval && mySession === session) {
+    const l3url = await KokoroSpeech.prefetch(f.lesson3Eval, 'am_adam');
+    await speak(f.lesson3Eval, 'Ryan', () => { els.text.textContent = f.lesson3Eval; }, l3url);
     if (mySession !== session) return;
     await pause(600);
   }
@@ -2761,6 +2770,7 @@ function makeCard(key) {
 const LESSON_REGISTRY = [
   { id: 'lesson1', label: 'Lesson 1 — The Approach (OTIMC)',        lsKey: 'eklipses_lesson1_complete' },
   { id: 'lesson2', label: 'Lesson 2 — Holding Your Ground (FRAME)', lsKey: 'eklipses_lesson2_complete' },
+  { id: 'lesson3', label: 'Lesson 3 — The Long Game (PACE)',        lsKey: 'eklipses_lesson3_complete' },
 ];
 
 // Mnemonic data sourced from lesson-player.js LESSON_DATA.mnemonicMap — keep in sync when lessons change.
@@ -2783,6 +2793,15 @@ const LESSON_MNEMONICS = {
       { letter: 'A', meaning: "Add Humor — don't defend, just deflect" },
       { letter: 'M', meaning: 'Make Her Qualify — stay curious, push deeper' },
       { letter: 'E', meaning: 'Exit — decision-makers leave first' },
+    ],
+  },
+  lesson3: {
+    label: 'PACE',
+    items: [
+      { letter: 'P', meaning: 'Pause — make her wait for it' },
+      { letter: 'A', meaning: 'Ask-back — redirect back to her' },
+      { letter: 'C', meaning: 'Contain — hold the compliment' },
+      { letter: 'E', meaning: 'Earn — let her show it first' },
     ],
   },
 };
@@ -2843,6 +2862,28 @@ const DRILL_REPS = {
       criteria: 'PASS if the user initiates a confident close or natural ending on their terms — number ask, plan, or clean exit. FAIL if the user just keeps talking, trails off, or waits for her to decide.',
     },
   ],
+  lesson3: [
+    {
+      letter: 'P', cue: 'Pause',
+      sofiasLine: 'Do you actually like me, or are you just here for fun?',
+      criteria: "PASS if the user gives a non-direct answer — holds back, deflects, or makes her wait for it. FAIL if the user immediately confirms feelings ('yes I like you', 'no I'm not seeing anyone') without making her earn the answer.",
+    },
+    {
+      letter: 'A', cue: 'Ask-back',
+      sofiasLine: 'What do you actually do for work?',
+      criteria: "PASS if the user answers briefly and then redirects back to her with a question or 'your turn'. FAIL if the user answers entirely about themselves with no question back — turn ends completely on them.",
+    },
+    {
+      letter: 'C', cue: 'Contain',
+      sofiasLine: "I'm actually really enjoying talking to you.",
+      criteria: "PASS if the user receives it calmly without rushing to match or stack compliments — holds the tension. FAIL if the user immediately mirrors with multiple compliments ('you're beautiful, I really like you too') or gives more than they should.",
+    },
+    {
+      letter: 'E', cue: 'Earn',
+      sofiasLine: "So tell me — what do you want from this?",
+      criteria: "PASS if the user lets her show more interest before committing — gives a light or non-answer, or turns it back on her. FAIL if the user immediately declares strong interest ('I really like you', 'I want to take you out') before she has earned it.",
+    },
+  ],
 };
 
 function showMnemonicPill(practiceFocus) {
@@ -2893,10 +2934,10 @@ function buildDrillSkipHTML(focus) {
   const HV = `onmouseover="this.style.background='#2e3245';this.style.borderColor='#4a5070'" onmouseout="this.style.background='#252836';this.style.borderColor='#2f3344'"`;
   return `
 <p style="font-size:18px;font-weight:700;color:#f0f2f6;margin:0 0 6px">Start with a warm-up?</p>
-<p style="font-size:13px;color:#8a93a8;margin:0 0 18px;line-height:1.5">5 quick reps — one for each ${lbl} skill.</p>
+<p style="font-size:13px;color:#8a93a8;margin:0 0 18px;line-height:1.5">${(DRILL_REPS[focus]||[]).length} quick reps — one for each ${lbl} skill.</p>
 <div style="display:flex;flex-direction:column;gap:8px">
   <button id="drill-warmup-btn" style="${S}" ${HV}>
-    <div>Warm up first <span style="color:#6b7495;font-size:12px">(5 reps)</span></div>
+    <div>Warm up first <span style="color:#6b7495;font-size:12px">(${(DRILL_REPS[focus]||[]).length} reps)</span></div>
     <div style="font-size:12px;color:#6b7495;margin-top:3px">One exchange per skill before the full scenario</div>
   </button>
   <button id="drill-skip-btn" style="${S}" ${HV}>

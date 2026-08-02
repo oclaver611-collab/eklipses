@@ -4,10 +4,11 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { conversation, scenarioTitle, scenarioKey, opener, lesson1Complete: _l1 = false, lesson2Complete: _l2 = false, practiceFocus = null, characterId = 'sofia' } = req.body || {};
+  const { conversation, scenarioTitle, scenarioKey, opener, lesson1Complete: _l1 = false, lesson2Complete: _l2 = false, lesson3Complete: _l3 = false, practiceFocus = null, characterId = 'sofia' } = req.body || {};
   // practiceFocus overrides raw lesson flags when present
   const lesson1Complete = practiceFocus ? (practiceFocus === 'lesson1' || practiceFocus === 'both' || practiceFocus === 'all') : _l1;
   const lesson2Complete = practiceFocus ? (practiceFocus === 'lesson2' || practiceFocus === 'both' || practiceFocus === 'all') : _l2;
+  const lesson3Complete = practiceFocus ? (practiceFocus === 'lesson3' || practiceFocus === 'all') : _l3;
 
   if (!conversation?.length) {
     return res.status(400).json({ error: 'No conversation provided' });
@@ -296,6 +297,18 @@ ${lesson2Complete ? `  "lesson2Check": {
     "summary": "<1-2 punchy sentences: 4-5 PASS = FRAME applied well, 3 = Making progress, 2 or fewer = Review and try again>"
   },
   "lesson2Eval": "<Spoken coaching paragraph — Ryan talking to the user. Start with 'Let me walk you through the Lesson 2 skills — FRAME.' Then describe each skill result conversationally, matching the PASS/FAIL verdicts in lesson2Check above. For each skill speak it naturally: 'For Feel Nothing', 'For Reframe', 'For Add Humor', 'For Make Her Qualify', 'For Exit' — then say what happened and whether it worked. One or two coaching sentences per skill. Spoken out loud — write it to be heard, not read off a form.>",` : ''}
+${lesson3Complete ? `  "lesson3Check": {
+    "skills": {
+      "pause": "<'PASS' or 'FAIL' — apply the LESSON 3 EVALUATION criteria below>",
+      "askBack": "<'PASS' or 'FAIL'>",
+      "contain": "<'PASS' or 'FAIL'>",
+      "earn": "<'PASS' or 'FAIL'>"
+    },
+    "score": "<number 0-4, count of PASS>",
+    "passed": "<true if score >= 3, false otherwise>",
+    "summary": "<1-2 punchy sentences: 3-4 PASS = PACE applied well, 2 = Making progress, 1 or fewer = Review and try again>"
+  },
+  "lesson3Eval": "<Spoken coaching paragraph — Ryan talking to the user. Start with 'Let me walk you through the Lesson 3 skills — PACE.' Then describe each skill result conversationally, matching the PASS/FAIL verdicts in lesson3Check above. For each skill speak it naturally: 'For Pause', 'For Ask-back', 'For Contain', 'For Earn' — then say what happened and whether it worked. One or two coaching sentences per skill. Spoken out loud — write it to be heard, not read off a form.>",` : ''}
   "part1": "<THE OPENER. Minimum 150 characters. Three sentences. ALWAYS begin with a positive: quote ONE specific line the user said anywhere in the conversation that showed curiosity, humor, or confidence, and say in one sentence why it worked. Second sentence: quote their opening line (HIM_1) verbatim inside quotes, name the move in 5 words or fewer, and say how it landed with ${girlName}. Third sentence: the one thing to sharpen next time. Never start part1 with a negative or a critique. The user must hear what to keep doing before hearing what to fix. Example structure: 'When you said [quote from the conversation], that landed — it showed you were paying attention to her, not just running a move. Your opener, [HIM_1 quote], was [name the move] — with ${girlName} that [how it landed]. Next time, [one specific thing to sharpen].'>",
 
   "part2": "<THE MIDDLE. Minimum 150 characters. Two to three sentences. Quote the single most revealing exchange: 'When she said [exact ${girlName} quote], you said [exact HIM quote].' Then one to two sentences on what that exchange cost him or earned him with ${girlName}, specific to who she is. Be surgical — name exactly what she was responding to.>",
@@ -434,7 +447,32 @@ E — Exit If Needed: Did he show he was willing to walk away or pull back with 
 PASS = pulled back or showed he didn't need her approval
 FAIL = chased, kept talking after she pulled back
 
-These fields (lesson2Eval and lesson2Check) are already part of the JSON schema above — fill them based on the criteria and definitions above.` : ''}`;
+These fields (lesson2Eval and lesson2Check) are already part of the JSON schema above — fill them based on the criteria and definitions above.` : ''}${lesson3Complete ? `
+
+LESSON 3 EVALUATION — PACE: The Long Game:
+Evaluate the user on these 4 skills. Match your verdicts exactly to the lesson3Check fields in the JSON schema above.
+
+P — Pause: When she asked him a DIRECT question about his feelings, interest, or exclusivity ("do you like me?", "are you seeing anyone?", "what is this for you?") — did he answer too eagerly and directly?
+PASS = holds back, gives a non-direct answer, deflects, or makes her wait — does not immediately confirm or deny feelings.
+FAIL = immediately gives a direct answer ("yes I like you", "no I'm not seeing anyone") without making her earn it.
+NOT P = she asked about his job, hobbies, travel, history, or any personal-topic question. Those are Mystery (L1). Only fire P for direct feelings/exclusivity questions.
+
+A — Ask-back: When she asked him something about himself (work, interests, opinions, experiences) — did he answer and then redirect back to her?
+PASS = answers briefly and turns it back with a question or redirect ("your turn", "what about you").
+FAIL = answers entirely about himself with no question or redirect back — the turn ends completely on him.
+NOT A = she made a statement and did not ask him a question. If no question was directed at him, A cannot fire.
+
+C — Contain: Did he stack multiple romantic or attraction-specific compliments in a single message?
+PASS = receives her warmth without rushing to match it or pile on compliments. Single casual compliment or banter is fine.
+FAIL = stacks two or more romantic terms ("you're beautiful, I really like you", "you're gorgeous and I'm falling for you") in one turn.
+NOT C = a single compliment, playful tease, or general warmth — that is Tease territory (L1) and must not be flagged here.
+
+E — Earn: In the first 3-4 exchanges, did he make a premature declaration of strong interest, date proposal, or romantic escalation before she showed real investment?
+PASS = holds back, lets her demonstrate interest first before matching or escalating.
+FAIL = "I really like you", "I want to take you out", "I feel something with you" — declared in the first 3-4 exchanges before she has earned it.
+NOT E = after the 4th exchange (she has had time to invest), or when he is clearly responding to her unmistakable signal of interest.
+
+These fields (lesson3Eval and lesson3Check) are already part of the JSON schema above — fill them based on the criteria and definitions above.` : ''}`;
 
   try {
     const finalOutcomeNote = finalCharResponse
@@ -488,6 +526,18 @@ These fields (lesson2Eval and lesson2Check) are already part of the JSON schema 
     if (lesson2Complete) {
       if (!feedback.lesson2Eval || feedback.lesson2Eval.length < 10) console.warn('[coach] lesson2Eval missing despite lesson2Complete=true');
       if (!feedback.lesson2Check || !feedback.lesson2Check.skills) console.warn('[coach] lesson2Check missing despite lesson2Complete=true');
+    }
+
+    if (lesson3Complete) {
+      if (!feedback.lesson3Eval || feedback.lesson3Eval.length < 10) console.warn('[coach] lesson3Eval missing despite lesson3Complete=true');
+      if (!feedback.lesson3Check || !feedback.lesson3Check.skills) console.warn('[coach] lesson3Check missing despite lesson3Complete=true');
+    }
+
+    if (lesson3Complete && feedback.lesson3Check?.skills) {
+      const skills3 = feedback.lesson3Check.skills;
+      const passCount3 = ['pause', 'askBack', 'contain', 'earn'].filter(k => skills3[k] === 'PASS').length;
+      feedback.lesson3Check.score = passCount3;
+      feedback.lesson3Check.passed = passCount3 >= 3;
     }
 
     if (lesson2Complete && feedback.lesson2Check?.skills) {
@@ -669,6 +719,7 @@ These fields (lesson2Eval and lesson2Check) are already part of the JSON schema 
     feedback.wouldSheDateHim = cleanText(feedback.wouldSheDateHim);
     if (feedback.lesson1Eval) feedback.lesson1Eval = cleanText(feedback.lesson1Eval);
     if (feedback.lesson2Eval) feedback.lesson2Eval = cleanText(feedback.lesson2Eval);
+    if (feedback.lesson3Eval) feedback.lesson3Eval = cleanText(feedback.lesson3Eval);
 
     res.json(feedback);
 

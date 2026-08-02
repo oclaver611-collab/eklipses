@@ -2723,6 +2723,7 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
   ]);
   const showLesson1Tests = practiceFocus === 'lesson1' || practiceFocus === 'both' || practiceFocus === 'all';
   const showLesson2Tests = practiceFocus === 'lesson2' || practiceFocus === 'both' || practiceFocus === 'all';
+  const showLesson3Tests = practiceFocus === 'lesson3' || practiceFocus === 'all';
   const lesson1TestBlock = (showLesson1Tests && GRADED_CHARACTERS.has(characterId)) ? `
 
 LESSON 1 TEST MODE — ACTIVE:
@@ -2763,10 +2764,27 @@ Create an opening for genuine curiosity. Mention something specific about your w
 TEST E — Exit signal:
 Near the end of a good exchange, mention something you need to return to — "I should probably get back to this" or "I was in the middle of a thought." If they read this correctly and use it as a natural cue to ask for your number or suggest continuing somewhere else, respond warmly. If they ignore the signal and keep pushing to extend, let the session wind down flatly.` : '';
 
+  const lesson3TestBlock = (showLesson3Tests && GRADED_CHARACTERS.has(characterId)) ? `
+
+LESSON 3 TEST MODE — ACTIVE (PACE):
+The user has completed Lesson 3. You will now test their ability to slow down and hold the frame when things go well. The PACE skills they should demonstrate: Pause, Ask-back, Contain, Earn. Do NOT announce that you are testing them. Every test arises naturally from your personality.
+
+TEST P — Pause:
+At some point ask him a direct question about his feelings, interest, or whether he's seeing anyone — "do you like me?", "are you actually interested?", or "what is this for you?" If he answers immediately and directly ("yes I like you", "no I'm not seeing anyone"), register it as overconfidence — he gave her the answer before she had to earn it. If he holds back, gives a non-answer, or makes her wait for it — stay engaged and warm up slightly.
+
+TEST A — Ask-back:
+Ask him something about himself — his work, something he mentioned, or a direct personal question. If he answers entirely about himself and ends the turn with nothing directed back to her — no question, no redirect — let her register it as someone who takes up all the space. If he answers briefly and turns it back to her with a question or redirect — stay curious and engaged.
+
+TEST C — Contain:
+Say something warm or slightly vulnerable — signal that you are starting to find him interesting. If he immediately stacks multiple compliments or mirrors your openness too fast — cool down very slightly. If he receives it without rushing to match your energy and lets the tension sit — stay in the moment.
+
+TEST E — Earn:
+Early in the conversation (first 3-4 exchanges), watch whether he declares his feelings or proposes something romantic before you have shown real investment. If he says "I really like you" or tries to lock in a date before you have earned it — react with mild distance or flatness. If he holds back and lets you demonstrate interest first — warm up once you have done so.` : '';
+
   // Option B — permanent STT note in every character prompt
   const STT_NOTE = `\n\nVOICE INPUT NOTE: The user is speaking via voice recognition software. Their messages may contain speech-to-text errors. Always interpret their responses charitably and respond to the most likely intended meaning, not the literal garbled text.`;
 
-  const systemPrompt = SPEECH_RULES + '\n\n' + POSTURE_RULES + STT_NOTE + '\n\n' + character + '\n\n' + setting + BASE_RULES + nameReminder + nameGivenReminder + lesson1TestBlock + lesson2TestBlock;
+  const systemPrompt = SPEECH_RULES + '\n\n' + POSTURE_RULES + STT_NOTE + '\n\n' + character + '\n\n' + setting + BASE_RULES + nameReminder + nameGivenReminder + lesson1TestBlock + lesson2TestBlock + lesson3TestBlock;
 
   // Option A — when input was captured via STT, append a per-message note
   const effectiveUserMessage = voiceInput

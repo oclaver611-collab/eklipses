@@ -687,6 +687,116 @@ async function run() {
 
     await authPage.close();
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // 7. LESSON 3 (PACE) PRACTICE INJECTION WIRING
+    // Verifies that lesson3 is wired into LESSON_REGISTRY (modal shows it),
+    // LESSON_MNEMONICS (mnemonic pill renders PACE), and that the DRILL_REPS
+    // rep-count is 4 (PACE has 4 skills, not 5 like OTIMC/FRAME).
+    // ═══════════════════════════════════════════════════════════════════════
+    console.log('\nLesson 3 (PACE) injection wiring tests');
+    console.log('─'.repeat(54));
+
+    const l3Page = await browser.newPage();
+
+    await l3Page.addInitScript(() => {
+      localStorage.setItem('ek-onboarding-v1', '1');
+      localStorage.setItem('eklipses_lesson1_complete', 'true');
+      localStorage.setItem('eklipses_lesson2_complete', 'true');
+      localStorage.setItem('eklipses_lesson3_complete', 'true');
+      localStorage.removeItem('eklipses_mnemonic_off');
+    });
+
+    await l3Page.goto(BASE, { waitUntil: 'domcontentloaded' });
+
+    // Stub KokoroSpeech BEFORE clicking start — its preload() is called
+    // immediately on click and blocks overlay removal if not stubbed.
+    await l3Page.waitForSelector('#ek-start-btn', { timeout: 8000 });
+    await l3Page.evaluate(() => {
+      if (window.KokoroSpeech) {
+        window.KokoroSpeech.preload  = async () => {};
+        window.KokoroSpeech.speak    = async () => {};
+        window.KokoroSpeech.prefetch = async () => null;
+        window.KokoroSpeech.cancel   = () => {};
+      }
+    });
+    await l3Page.click('#ek-start-btn');
+    await l3Page.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 8000 });
+
+    // Switch to Practice tab and wait for the shelf to be rendered.
+    // Use JS click (evaluate) to bypass Playwright's visibility pre-check.
+    await l3Page.evaluate(() => {
+      const t = document.getElementById('ek-tab-practice');
+      if (t) t.click();
+    });
+    await l3Page.waitForFunction(() => {
+      const w = document.getElementById('ek-practice-wrap');
+      return w && w.style.display !== 'none';
+    }, { timeout: 5000 });
+
+    // Click the first scenario card via JS to bypass visibility checks.
+    await l3Page.evaluate(() => {
+      const card = document.querySelector('.sc-card');
+      if (card) card.click();
+    });
+
+    // Wait for the Practice Focus Modal to become visible
+    await l3Page.waitForFunction(() => {
+      const m = document.getElementById('practice-focus-modal');
+      return m && m.style.display !== 'none';
+    }, { timeout: 5000 });
+
+    // Test A: modal body contains "Lesson 3" and "PACE"
+    const modalBodyHTML = await l3Page.evaluate(() => {
+      const body = document.getElementById('practice-focus-body');
+      return body ? body.innerHTML : '';
+    });
+    const hasLesson3InModal = modalBodyHTML.includes('Lesson 3') && modalBodyHTML.includes('PACE');
+    report(
+      'Practice Focus Modal shows Lesson 3 — The Long Game (PACE) option',
+      hasLesson3InModal,
+      hasLesson3InModal ? 'found in modal' : `not found — snippet: "${modalBodyHTML.slice(0, 120)}"`
+    );
+
+    // Test B: showMnemonicPill('lesson3') renders PACE label
+    // showMnemonicPill is a function declaration → accessible as window property.
+    const pillResult = await l3Page.evaluate(() => {
+      if (typeof showMnemonicPill !== 'function') return { available: false };
+      showMnemonicPill('lesson3');
+      const pill  = document.getElementById('mnemonic-pill');
+      const label = document.getElementById('mnemonic-pill-label');
+      return {
+        available: true,
+        display:   pill ? pill.style.display : 'missing',
+        labelText: label ? label.textContent : '',
+      };
+    });
+    const paceLabel = pillResult.available && pillResult.labelText.includes('PACE');
+    report(
+      'Mnemonic pill renders PACE label for lesson3 focus',
+      paceLabel,
+      paceLabel ? `label="${pillResult.labelText}"` : `available=${pillResult.available} label="${pillResult.labelText}"`
+    );
+
+    // Test C: drill skip UI shows 4 reps (PACE has 4 skills, not 5)
+    // buildDrillSkipHTML is a function declaration → accessible as window property.
+    const drillSkipHTML = await l3Page.evaluate(() => {
+      localStorage.setItem('eklipses_lesson3_drill_done', '1');
+      if (typeof buildDrillSkipHTML !== 'function') return { available: false, html: '' };
+      return { available: true, html: buildDrillSkipHTML('lesson3') };
+    });
+    const hasFourReps = drillSkipHTML.available &&
+      drillSkipHTML.html.includes('4 reps') &&
+      !drillSkipHTML.html.includes('5 reps');
+    report(
+      'Drill skip HTML shows 4 reps for lesson3 (PACE has 4 skills)',
+      hasFourReps,
+      hasFourReps
+        ? '4 reps confirmed'
+        : `available=${drillSkipHTML.available} snippet="${(drillSkipHTML.html || '').slice(0, 80)}"`
+    );
+
+    await l3Page.close();
+
   } finally {
     await browser.close();
     server.close();
