@@ -2907,28 +2907,28 @@ const DRILL_REPS = {
   lesson4: [
     {
       letter: 'C', cue: 'Catch threads',
-      sofiasLine: "I've been coming here for a while. My sister used to live nearby before she moved for work — she's been all over the place.",
-      criteria: "PASS if the user picks up on one of the specific threads she offered (the sister, the move, being 'all over the place') rather than ignoring them and asking something unrelated. FAIL if the user responds with a generic pivot ('Oh nice, what do you do?') that bypasses what she gave them.",
+      sofiasLine: "I've been here before. My friend used to work here — she moved to Amsterdam a while back. Got a job she'd been after for years.",
+      criteria: "PASS if the user picks up on one of the specific threads she offered (the friend, the move, years of trying for something) rather than ignoring them and asking something unrelated. FAIL if the user responds with a generic pivot ('Oh nice, what do you do?') that bypasses what she gave them.",
     },
     {
       letter: 'H', cue: 'Hook the richest',
-      sofiasLine: "I was here last week actually. It was kind of a weird night — long story. Anyway, it's nice here on weekdays.",
-      criteria: "PASS if the user picks up on 'weird night' or 'long story' — the thread with clear emotional charge — rather than the surface topics. FAIL if the user responds to 'nice here on weekdays' or asks a generic question that ignores the signal she gave.",
+      sofiasLine: "I was here last week. Kind of a weird night. Anyway — it's quieter on weekdays.",
+      criteria: "PASS if the user picks up on 'weird night' — the thread with clear emotional charge — rather than the surface remark about weekdays. FAIL if the user responds to 'quieter on weekdays' or asks a generic question that ignores the signal she gave.",
     },
     {
       letter: 'A', cue: 'Ask deeper',
-      sofiasLine: "I don't usually end up talking to people I just met. I'm pretty selective.",
-      criteria: "PASS if the user asks one question that goes one layer deeper on the same thread — why, what made her that way, what that means for her. FAIL if the user pivots to a new topic, gives a generic reply ('Me too'), or asks something unconnected to what she said.",
+      sofiasLine: "I don't usually end up talking to people I've just met. I'm pretty selective about it.",
+      criteria: "PASS if the user asks one question that goes one layer deeper on the same thread — why, what made her that way, what that actually means in practice. FAIL if the user pivots to a new topic, gives a generic reply ('Me too'), or asks something unconnected to what she said.",
     },
     {
       letter: 'I', cue: 'Inject yourself',
-      sofiasLine: "Honestly, I've been in a weird headspace lately. Like I know what I should be doing but I'm just not feeling it.",
+      sofiasLine: "I've been trying to figure out what I actually want. For a while now. It's kind of exhausting.",
       criteria: "PASS if the user briefly shares something genuine from their own life that connects to what she described — without making it a monologue or pivoting entirely to their own story. FAIL if the user stays in question mode ('What do you mean?'), gives a platitude ('I get that'), or takes over the thread entirely.",
     },
     {
       letter: 'N', cue: 'Never abandon a live thread',
-      sofiasLine: "I used to do something really different before this — but that's a whole thing. Anyway, do you come here often?",
-      criteria: "PASS if the user goes back to the dropped thread ('What was the thing you used to do?') instead of accepting her redirect and answering her question. FAIL if the user answers 'do you come here often' and lets the disclosure she started drop.",
+      sofiasLine: "I used to do something completely different before this. But that's — anyway. Do you come here a lot?",
+      criteria: "PASS if the user goes back to the dropped thread ('What did you used to do?') instead of accepting her redirect and answering her question. FAIL if the user answers her redirect and lets the disclosure she started drop.",
     },
   ],
 };
