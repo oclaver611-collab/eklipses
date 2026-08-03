@@ -967,6 +967,79 @@ async function run() {
 
     await zeroPage.close();
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // 10. LESSON 4 LEARN TAB CARD
+    // Confirms the #lesson4-card placeholder renders correctly:
+    //   — locked (🔒) when lesson3_complete is absent
+    //   — unlocked with Start Lesson button when lesson3_complete = true
+    // ═══════════════════════════════════════════════════════════════════════
+    console.log('\nLesson 4 LEARN tab card tests');
+    console.log('─'.repeat(54));
+
+    // ── locked state: lesson3_complete absent ─────────────────────────────
+    const l4LockedPage = await browser.newPage();
+    await l4LockedPage.addInitScript(() => {
+      localStorage.setItem('ek-onboarding-v1', '1');
+      localStorage.removeItem('eklipses_lesson3_complete');
+      localStorage.removeItem('eklipses_lesson4_complete');
+      localStorage.removeItem('eklipses_lesson4_progress');
+    });
+    await l4LockedPage.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await l4LockedPage.waitForSelector('#ek-start-btn', { timeout: 8000 });
+    await l4LockedPage.click('#ek-start-btn');
+    await l4LockedPage.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 8000 });
+
+    const lockedState = await l4LockedPage.evaluate(() => {
+      const el = document.getElementById('lesson4-card');
+      if (!el) return { found: false };
+      const html = el.innerHTML;
+      return {
+        found:    true,
+        isLocked: html.includes('🔒 LESSON 4'),
+        hasBtn:   !!document.getElementById('ek-start-lesson4'),
+      };
+    });
+    report(
+      'Lesson 4 card: locked when lesson3_complete absent',
+      lockedState.found && lockedState.isLocked && !lockedState.hasBtn,
+      `found=${lockedState.found} locked=${lockedState.isLocked} hasBtn=${lockedState.hasBtn}`
+    );
+    await l4LockedPage.close();
+
+    // ── unlocked state: lesson3_complete = true ────────────────────────────
+    const l4UnlockedPage = await browser.newPage();
+    await l4UnlockedPage.addInitScript(() => {
+      localStorage.setItem('ek-onboarding-v1', '1');
+      localStorage.setItem('eklipses_lesson3_complete', 'true');
+      localStorage.removeItem('eklipses_lesson4_complete');
+      localStorage.removeItem('eklipses_lesson4_progress');
+    });
+    await l4UnlockedPage.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await l4UnlockedPage.waitForSelector('#ek-start-btn', { timeout: 8000 });
+    await l4UnlockedPage.click('#ek-start-btn');
+    await l4UnlockedPage.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 8000 });
+
+    const unlockedState = await l4UnlockedPage.evaluate(() => {
+      const el = document.getElementById('lesson4-card');
+      if (!el) return { found: false };
+      const btn = document.getElementById('ek-start-lesson4');
+      return {
+        found:       true,
+        hasBtn:      !!btn,
+        btnText:     btn ? btn.textContent.trim() : '',
+        hasMnemonic: el.innerHTML.includes('CHAIN'),
+        isNotLocked: !el.innerHTML.includes('🔒'),
+      };
+    });
+    report(
+      'Lesson 4 card: Start Lesson button visible when lesson3_complete = true',
+      unlockedState.found && unlockedState.hasBtn && unlockedState.btnText.includes('Start Lesson') && unlockedState.hasMnemonic,
+      unlockedState.found
+        ? `btn="${unlockedState.btnText}" mnemonic=${unlockedState.hasMnemonic} locked=${!unlockedState.isNotLocked}`
+        : 'lesson4-card element not found'
+    );
+    await l4UnlockedPage.close();
+
   } finally {
     await browser.close();
     server.close();
