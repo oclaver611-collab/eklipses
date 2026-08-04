@@ -1040,6 +1040,189 @@ async function run() {
     );
     await l4UnlockedPage.close();
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // 11. LESSON 5 (TRACE) PRACTICE INJECTION WIRING
+    // Verifies that lesson5 is wired into LESSON_REGISTRY (modal shows it),
+    // LESSON_MNEMONICS (mnemonic pill renders TRACE), DRILL_REPS rep-count
+    // is 5 (TRACE has 5 skills), and Latest Lesson defaults to lesson5.
+    // ═══════════════════════════════════════════════════════════════════════
+    console.log('\nLesson 5 (TRACE) injection wiring tests');
+    console.log('─'.repeat(54));
+
+    const l5Page = await browser.newPage();
+
+    await l5Page.addInitScript(() => {
+      localStorage.setItem('ek-onboarding-v1', '1');
+      localStorage.setItem('eklipses_lesson1_complete', 'true');
+      localStorage.setItem('eklipses_lesson2_complete', 'true');
+      localStorage.setItem('eklipses_lesson3_complete', 'true');
+      localStorage.setItem('eklipses_lesson4_complete', 'true');
+      localStorage.setItem('eklipses_lesson5_complete', 'true');
+      localStorage.removeItem('eklipses_mnemonic_off');
+    });
+
+    await l5Page.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await l5Page.waitForSelector('#ek-start-btn', { timeout: 8000 });
+    await l5Page.evaluate(() => {
+      if (window.KokoroSpeech) {
+        window.KokoroSpeech.preload  = async () => {};
+        window.KokoroSpeech.speak    = async () => {};
+        window.KokoroSpeech.prefetch = async () => null;
+        window.KokoroSpeech.cancel   = () => {};
+      }
+    });
+    await l5Page.click('#ek-start-btn');
+    await l5Page.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 8000 });
+
+    await l5Page.evaluate(() => {
+      const t = document.getElementById('ek-tab-practice');
+      if (t) t.click();
+    });
+    await l5Page.waitForFunction(() => {
+      const w = document.getElementById('ek-practice-wrap');
+      return w && w.style.display !== 'none';
+    }, { timeout: 5000 });
+
+    await l5Page.evaluate(() => {
+      const card = document.querySelector('.sc-card');
+      if (card) card.click();
+    });
+
+    await l5Page.waitForFunction(() => {
+      const m = document.getElementById('practice-focus-modal');
+      return m && m.style.display !== 'none';
+    }, { timeout: 5000 });
+
+    // Test A: modal body contains "Lesson 5" and "TRACE"
+    const l5ModalBodyHTML = await l5Page.evaluate(() => {
+      const body = document.getElementById('practice-focus-body');
+      return body ? body.innerHTML : '';
+    });
+    const hasLesson5InModal = l5ModalBodyHTML.includes('Lesson 5') && l5ModalBodyHTML.includes('TRACE');
+    report(
+      'Practice Focus Modal shows Lesson 5 — The Read (TRACE) option',
+      hasLesson5InModal,
+      hasLesson5InModal ? 'found in modal' : `not found — snippet: "${l5ModalBodyHTML.slice(0, 120)}"`
+    );
+
+    // Test B: showMnemonicPill('lesson5') renders TRACE label
+    const l5PillResult = await l5Page.evaluate(() => {
+      if (typeof showMnemonicPill !== 'function') return { available: false };
+      showMnemonicPill('lesson5');
+      const pill  = document.getElementById('mnemonic-pill');
+      const label = document.getElementById('mnemonic-pill-label');
+      return {
+        available: true,
+        display:   pill ? pill.style.display : 'missing',
+        labelText: label ? label.textContent : '',
+      };
+    });
+    const traceLabel = l5PillResult.available && l5PillResult.labelText.includes('TRACE');
+    report(
+      'Mnemonic pill renders TRACE label for lesson5 focus',
+      traceLabel,
+      traceLabel ? `label="${l5PillResult.labelText}"` : `available=${l5PillResult.available} label="${l5PillResult.labelText}"`
+    );
+
+    // Test C: drill skip UI shows 5 reps (TRACE has 5 skills)
+    const l5DrillSkipHTML = await l5Page.evaluate(() => {
+      localStorage.setItem('eklipses_lesson5_drill_done', '1');
+      if (typeof buildDrillSkipHTML !== 'function') return { available: false, html: '' };
+      return { available: true, html: buildDrillSkipHTML('lesson5') };
+    });
+    const hasTraceReps = l5DrillSkipHTML.available && l5DrillSkipHTML.html.includes('5 reps');
+    report(
+      'Drill skip HTML shows 5 reps for lesson5 (TRACE has 5 skills)',
+      hasTraceReps,
+      hasTraceReps
+        ? '5 reps confirmed'
+        : `available=${l5DrillSkipHTML.available} snippet="${(l5DrillSkipHTML.html || '').slice(0, 80)}"`
+    );
+
+    // Test D: Latest Lesson button shows lesson5 when it is the latest completed
+    const latestIsLesson5 = l5ModalBodyHTML.includes('The Read (TRACE)') &&
+      l5ModalBodyHTML.includes('pfm-latest');
+    report(
+      'Latest Lesson button shows lesson5 when lesson5_complete = true',
+      latestIsLesson5,
+      latestIsLesson5 ? 'Latest Lesson = The Read (TRACE)' : `not found — snippet: "${l5ModalBodyHTML.slice(0, 120)}"`
+    );
+
+    await l5Page.close();
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // 12. LESSON 5 LEARN TAB CARD
+    // Confirms the #lesson5-card placeholder renders correctly:
+    //   — locked (🔒) when lesson4_complete is absent
+    //   — unlocked with Start Lesson button when lesson4_complete = true
+    // ═══════════════════════════════════════════════════════════════════════
+    console.log('\nLesson 5 LEARN tab card tests');
+    console.log('─'.repeat(54));
+
+    // ── locked state: lesson4_complete absent ─────────────────────────────
+    const l5LockedPage = await browser.newPage();
+    await l5LockedPage.addInitScript(() => {
+      localStorage.setItem('ek-onboarding-v1', '1');
+      localStorage.removeItem('eklipses_lesson4_complete');
+      localStorage.removeItem('eklipses_lesson5_complete');
+      localStorage.removeItem('eklipses_lesson5_progress');
+    });
+    await l5LockedPage.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await l5LockedPage.waitForSelector('#ek-start-btn', { timeout: 8000 });
+    await l5LockedPage.click('#ek-start-btn');
+    await l5LockedPage.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 8000 });
+
+    const l5LockedState = await l5LockedPage.evaluate(() => {
+      const el = document.getElementById('lesson5-card');
+      if (!el) return { found: false };
+      const html = el.innerHTML;
+      return {
+        found:    true,
+        isLocked: html.includes('🔒 LESSON 5'),
+        hasBtn:   !!document.getElementById('ek-start-lesson5'),
+      };
+    });
+    report(
+      'Lesson 5 card: locked when lesson4_complete absent',
+      l5LockedState.found && l5LockedState.isLocked && !l5LockedState.hasBtn,
+      `found=${l5LockedState.found} locked=${l5LockedState.isLocked} hasBtn=${l5LockedState.hasBtn}`
+    );
+    await l5LockedPage.close();
+
+    // ── unlocked state: lesson4_complete = true ────────────────────────────
+    const l5UnlockedPage = await browser.newPage();
+    await l5UnlockedPage.addInitScript(() => {
+      localStorage.setItem('ek-onboarding-v1', '1');
+      localStorage.setItem('eklipses_lesson4_complete', 'true');
+      localStorage.removeItem('eklipses_lesson5_complete');
+      localStorage.removeItem('eklipses_lesson5_progress');
+    });
+    await l5UnlockedPage.goto(BASE, { waitUntil: 'domcontentloaded' });
+    await l5UnlockedPage.waitForSelector('#ek-start-btn', { timeout: 8000 });
+    await l5UnlockedPage.click('#ek-start-btn');
+    await l5UnlockedPage.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 8000 });
+
+    const l5UnlockedState = await l5UnlockedPage.evaluate(() => {
+      const el = document.getElementById('lesson5-card');
+      if (!el) return { found: false };
+      const btn = document.getElementById('ek-start-lesson5');
+      return {
+        found:       true,
+        hasBtn:      !!btn,
+        btnText:     btn ? btn.textContent.trim() : '',
+        hasMnemonic: el.innerHTML.includes('TRACE'),
+        isNotLocked: !el.innerHTML.includes('🔒'),
+      };
+    });
+    report(
+      'Lesson 5 card: Start Lesson button visible when lesson4_complete = true',
+      l5UnlockedState.found && l5UnlockedState.hasBtn && l5UnlockedState.btnText.includes('Start Lesson') && l5UnlockedState.hasMnemonic,
+      l5UnlockedState.found
+        ? `btn="${l5UnlockedState.btnText}" mnemonic=${l5UnlockedState.hasMnemonic} locked=${!l5UnlockedState.isNotLocked}`
+        : 'lesson5-card element not found'
+    );
+    await l5UnlockedPage.close();
+
   } finally {
     await browser.close();
     server.close();

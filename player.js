@@ -2781,6 +2781,7 @@ const LESSON_REGISTRY = [
   { id: 'lesson2', label: 'Lesson 2 — Holding Your Ground (FRAME)', lsKey: 'eklipses_lesson2_complete' },
   { id: 'lesson3', label: 'Lesson 3 — The Long Game (PACE)',        lsKey: 'eklipses_lesson3_complete' },
   { id: 'lesson4', label: 'Lesson 4 — The Thread (CHAIN)',          lsKey: 'eklipses_lesson4_complete' },
+  { id: 'lesson5', label: 'Lesson 5 — The Read (TRACE)',           lsKey: 'eklipses_lesson5_complete' },
 ];
 
 // Mnemonic data sourced from lesson-player.js LESSON_DATA.mnemonicMap — keep in sync when lessons change.
@@ -2822,6 +2823,16 @@ const LESSON_MNEMONICS = {
       { letter: 'A', meaning: 'Ask deeper — one layer further on the same thread' },
       { letter: 'I', meaning: 'Inject yourself — share something real and connected' },
       { letter: 'N', meaning: 'Never abandon a live thread — go back to what she lit up about' },
+    ],
+  },
+  lesson5: {
+    label: 'TRACE',
+    items: [
+      { letter: 'T', meaning: 'Track gaze — name it when she holds it too long' },
+      { letter: 'R', meaning: 'Register proximity — notice when she moves closer' },
+      { letter: 'A', meaning: 'Attend to alignment — catch her mirroring your posture' },
+      { letter: 'C', meaning: 'Catch touch — acknowledge brief deliberate contact' },
+      { letter: 'E', meaning: 'Enter — make your move before the window closes' },
     ],
   },
 };
@@ -2929,6 +2940,33 @@ const DRILL_REPS = {
       letter: 'N', cue: 'Never abandon a live thread',
       sofiasLine: "I used to do something completely different before this. But that's — anyway. Do you come here a lot?",
       criteria: "PASS if the user goes back to the dropped thread ('What did you used to do?') instead of accepting her redirect and answering her question. FAIL if the user answers her redirect and lets the disclosure she started drop.",
+    },
+  ],
+  lesson5: [
+    {
+      letter: 'T', cue: 'Track gaze',
+      sofiasLine: "(You hold his gaze a little past where you meant to.) ...so where do you usually end up on a night like this?",
+      criteria: "PASS if the user names or plays with the eye contact — 'don't look away on my account', 'I noticed that', anything that engages the gaze rather than ignoring it. FAIL if the user only answers the conversational question and makes no reference to the stage direction.",
+    },
+    {
+      letter: 'R', cue: 'Register proximity',
+      sofiasLine: "(You're closer than you were. You don't remember crossing the distance.) ...I feel like I've seen you here before.",
+      criteria: "PASS if the user names or plays with the proximity — 'we started much further apart', 'you moved over here', 'I'm not moving'. FAIL if the user only responds to the conversational content and ignores the closeness entirely.",
+    },
+    {
+      letter: 'A', cue: 'Attend to alignment',
+      sofiasLine: "(Your body has settled into the same angle as his — you can't say when.) ...honestly, this place gets better after midnight.",
+      criteria: "PASS if the user names the mirroring — 'you match whoever you're talking to', 'you just did what I did', any acknowledgment of the alignment. FAIL if the user ignores the stage direction and only responds to the surface remark.",
+    },
+    {
+      letter: 'C', cue: 'Catch touch',
+      sofiasLine: "(Your hand settles on his arm for a second. Lifts.) ...sorry. Where were we?",
+      criteria: "PASS if the user names or plays with the touch — 'you did that on purpose', 'that wasn't accidental', any acknowledgment that the contact happened. FAIL if the user ignores it entirely and just resumes conversation.",
+    },
+    {
+      letter: 'E', cue: 'Enter',
+      sofiasLine: "...I should probably go find what I actually came in for. [shifts]",
+      criteria: "PASS if the user makes a direct move with no hedge language — asks for her number, suggests continuing somewhere else, or includes her in what they're doing. FAIL if the user lets the window close, uses hedge language ('maybe we could...'), or asks permission rather than making a statement.",
     },
   ],
 };
