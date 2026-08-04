@@ -759,6 +759,87 @@ const Caption = (() => {
 })();
 
 
+/* ===== TRACE Signal Cue Overlay ===== */
+// Amber italic pill anchored top-center inside stageFrame.
+// Only shown during lesson5 practice when Sofia emits a parenthetical stage direction.
+// Separate from the caption (bottom) so dialogue and signal never occupy the same visual slot.
+const TraceCue = (() => {
+  let overlayEl = null;
+  let fadeTimer = null;
+
+  function getOrCreateOverlay() {
+    if (overlayEl) return overlayEl;
+    const frame = document.getElementById('stageFrame');
+    if (!frame) return null;
+    const el = document.createElement('div');
+    el.id = 'ek-trace-cue';
+    el.style.cssText = [
+      'position:absolute',
+      'top:20px',
+      'left:50%',
+      'transform:translateX(-50%)',
+      'z-index:11',
+      'max-width:calc(100% - 48px)',
+      'text-align:center',
+      'pointer-events:none',
+      'opacity:0',
+      'transition:opacity 0.5s ease',
+    ].join(';');
+    frame.style.position = 'relative';
+    frame.appendChild(el);
+    overlayEl = el;
+    return el;
+  }
+
+  function show(text) {
+    const el = getOrCreateOverlay();
+    if (!el) return;
+    clearTimeout(fadeTimer);
+    el.innerHTML = '<span style="display:inline-block;padding:7px 16px;background:rgba(201,169,110,0.10);border:1px solid rgba(201,169,110,0.20);border-radius:40px;font-size:12.5px;font-style:italic;font-weight:400;color:#c9a96e;letter-spacing:0.01em;line-height:1.5">' + text + '</span>';
+    el.style.opacity = '1';
+    fadeTimer = setTimeout(() => { if (overlayEl) overlayEl.style.opacity = '0'; }, 3500);
+  }
+
+  function hide() {
+    clearTimeout(fadeTimer);
+    if (overlayEl) overlayEl.style.opacity = '0';
+  }
+
+  return { show, hide };
+})();
+
+// Convert Sofia's first-person stage direction to second-person observer perspective.
+// e.g. "Your hand settles on his arm for a second. Lifts." → "Her hand settles on your arm for a second. Lifts."
+function toObserverPov(text) {
+  // Order matters: contractions and specific phrases before generic pronoun swap.
+  const PHYSICAL_VERBS = 'hold|lean|look|reach|move|step|pause|settle|touch|take|shift|turn|stay|sit|stand|lift|place|rest|brush|press|pull|drop|let';
+  return text
+    .replace(/\bYou're\b/g, "She's")
+    .replace(/\byou're\b/g, "she's")
+    .replace(/\bYou've\b/g, "She's")
+    .replace(/\byou've\b/g, "she's")
+    .replace(/\bYou don't\b/g, "She doesn't")
+    .replace(/\byou don't\b/g, "she doesn't")
+    .replace(/\bYou didn't\b/g, "She didn't")
+    .replace(/\byou didn't\b/g, "she didn't")
+    .replace(/\bYou weren't\b/g, "She wasn't")
+    .replace(/\byou weren't\b/g, "she wasn't")
+    .replace(/\bYou were\b/g, "She was")
+    .replace(/\byou were\b/g, "she was")
+    .replace(/\bYou can't\b/g, "She can't")
+    .replace(/\byou can't\b/g, "she can't")
+    // Conjugate common physical-action verbs: "You hold" → "She holds"
+    .replace(new RegExp('\\bYou (' + PHYSICAL_VERBS + ')\\b', 'g'), (_, v) => 'She ' + v + 's')
+    .replace(new RegExp('\\byou (' + PHYSICAL_VERBS + ')\\b', 'g'), (_, v) => 'she ' + v + 's')
+    // Generic pronoun swap (after all specific cases)
+    .replace(/\bYou\b/g, 'She')
+    .replace(/\byou\b/g, 'she')
+    .replace(/\bYour\b/g, 'Her')
+    .replace(/\byour\b/g, 'her')
+    .replace(/\bhis\b/g, 'your');
+}
+
+
 /* ===== Ambient audio ===== */
 const AmbientAudio = (() => {
   const R2 = 'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/ambient/';
@@ -1450,6 +1531,11 @@ async function streamCharacterAndSpeak(userSaid, mySession, onTextReady = null) 
   let fullText = '';
   let usedFallback = false;
   const sentenceQueue = [];
+  // Stateful parenthetical stripper for TRACE stage directions.
+  // The sentence splitter breaks "(Sentence one. Sentence two.)" across multiple events,
+  // so we track whether we're currently inside an open paren and skip until ')' is found.
+  let _traceSkipping = false;
+  let _traceIsFirst  = true;
   let isPlayingAudio = false;
   let streamDone = false;
   let resolveStream;
@@ -1578,12 +1664,33 @@ async function streamCharacterAndSpeak(userSaid, mySession, onTextReady = null) 
           const payload = JSON.parse(line.slice(6));
           if (payload.error) { console.warn('Stream error:', payload.error); break; }
           if (payload.sentence) {
-            sentenceQueue.push(payload.sentence);
+            let s = payload.sentence;
+            // Strip leading parenthetical (TRACE stage direction) before TTS/caption.
+            // Parentheticals can span sentence boundaries, so track open/close state.
+            if (_traceIsFirst) {
+              _traceIsFirst = false;
+              if (s.startsWith('(')) _traceSkipping = true;
+            }
+            if (_traceSkipping) {
+              const closeIdx = s.indexOf(')');
+              if (closeIdx !== -1) {
+                _traceSkipping = false;
+                s = s.slice(closeIdx + 1).trim(); // keep text after the closing ')'
+              } else {
+                s = ''; // entire sentence is inside the parenthetical — skip
+              }
+            }
+            if (s) { sentenceQueue.push(s); }
             if (!isPlayingAudio) processQueue();
           }
           if (payload.done) {
             fullText = payload.full || fullText;
             streamDone = true;
+            // Show TRACE cue when lesson5 is active and response opens with a stage direction.
+            if (localStorage.getItem('eklipses_practice_focus') === 'lesson5') {
+              const traceMatch = fullText.match(/^\(([^)]+)\)/);
+              if (traceMatch) TraceCue.show(toObserverPov(traceMatch[1].trim()));
+            }
             // Fire the coached-practice moment-check NOW, while TTS is still playing.
             // By the time all audio finishes and waitIfPaused runs, the API call will
             // have had the full TTS duration to complete — near-zero overhead.

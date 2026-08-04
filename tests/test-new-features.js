@@ -256,6 +256,130 @@ async function run() {
 
     await captionPage.close();
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // 1b. TRACE SIGNAL CUE
+    // Verifies TraceCue module creates the top-center amber overlay, hides
+    // correctly, strips the parenthetical from caption/TTS during lesson5,
+    // and does NOT fire when practiceFocus is not 'lesson5'.
+    // ═══════════════════════════════════════════════════════════════════════
+    console.log('\nTRACE signal cue tests');
+    console.log('─'.repeat(54));
+
+    const tracePage = await loadPage(browser);
+    tracePage.on('pageerror', err => console.error('[trace page error]', err.message));
+
+    await tracePage.evaluate(() => {
+      window.currentScenarioKey = 'bookstore';
+      window.currentCharacterId = 'sofia';
+    });
+
+    // Test A: TraceCue.show() creates element with text and opacity:1
+    await tracePage.evaluate(() => TraceCue.show('She holds your gaze a beat too long.'));
+    const t_shown = await tracePage.evaluate(() => {
+      const el = document.getElementById('ek-trace-cue');
+      if (!el) return { found: false };
+      const span = el.querySelector('span');
+      return {
+        found:      true,
+        opacity:    el.style.opacity,
+        hasText:    el.textContent.includes('She holds your gaze'),
+        innerHTML:  el.innerHTML,
+        isItalic:   span ? span.style.fontStyle === 'italic' : false,
+      };
+    });
+    report(
+      'TraceCue.show() creates #ek-trace-cue with text and opacity:1',
+      t_shown.found && t_shown.opacity === '1' && t_shown.hasText,
+      t_shown.found ? `opacity=${t_shown.opacity} text=${t_shown.hasText}` : 'element not found'
+    );
+    report(
+      'TraceCue cue is amber italic (#c9a96e)',
+      t_shown.found && t_shown.innerHTML.includes('#c9a96e') && t_shown.isItalic,
+      t_shown.found ? `hasAmber=${t_shown.innerHTML.includes('#c9a96e')} italic=${t_shown.isItalic}` : 'no span'
+    );
+
+    // Test B: TraceCue.hide() sets opacity to 0
+    await tracePage.evaluate(() => TraceCue.hide());
+    await tracePage.waitForTimeout(100);
+    const t_hidden = await tracePage.evaluate(() => {
+      const el = document.getElementById('ek-trace-cue');
+      return el ? el.style.opacity === '0' : false;
+    });
+    report('TraceCue.hide() sets opacity to 0', t_hidden);
+
+    // Test C: streamCharacterAndSpeak() with TRACE parenthetical (lesson5):
+    // — caption shows only the dialogue, not the parenthetical
+    // — TraceCue fires with second-person text when payload.done arrives
+    await tracePage.evaluate(() => {
+      localStorage.setItem('eklipses_practice_focus', 'lesson5');
+      const el = document.getElementById('ek-trace-cue');
+      if (el) el.style.opacity = '0';
+    });
+    await mockTTS(tracePage);
+
+    // Stage direction split across two sentence events (mirrors real sentence splitter behaviour).
+    // Splitter breaks on '.', so the parenthetical becomes:
+    //   event 1: "(You hold his gaze a little past where you meant to."  — no ')', skip
+    //   event 2: "Lifts.) Nice to meet you."                             — ')' at index 6, emit remainder
+    const TRACE_SSE =
+      'data: {"sentence":"(You hold his gaze a little past where you meant to."}\n\n' +
+      'data: {"sentence":"Lifts.) Nice to meet you."}\n\n' +
+      'data: {"done":true,"full":"(You hold his gaze a little past where you meant to. Lifts.) Nice to meet you."}\n\n';
+    await tracePage.route('**/api/character-stream', route =>
+      route.fulfill({ status: 200, contentType: 'text/event-stream', body: TRACE_SSE })
+    );
+
+    await tracePage.evaluate(() => Caption.hide());
+    tracePage.evaluate(() => streamCharacterAndSpeak('hey', session)).catch(() => {});
+
+    const t_captionText = await waitForCaption(tracePage, 4000);
+    report(
+      'TRACE stream: caption shows only dialogue (parenthetical stripped)',
+      t_captionText === 'Nice to meet you.',
+      `caption="${t_captionText}"`
+    );
+    report(
+      'TRACE stream: caption contains no parenthetical characters',
+      t_captionText !== null && !t_captionText.includes('(') && !t_captionText.includes('gaze'),
+      `caption="${t_captionText}"`
+    );
+
+    // Give payload.done time to fire and TraceCue to render
+    await tracePage.waitForTimeout(500);
+    const t_cue = await tracePage.evaluate(() => {
+      const el = document.getElementById('ek-trace-cue');
+      return el ? { opacity: el.style.opacity, text: el.textContent.trim() } : null;
+    });
+    report(
+      'TRACE stream: TraceCue visible after payload.done',
+      t_cue && t_cue.opacity === '1',
+      t_cue ? `opacity=${t_cue.opacity}` : 'element not found'
+    );
+    report(
+      'TRACE stream: TraceCue text uses observer POV (She/her/your)',
+      t_cue && t_cue.text.includes('She') && t_cue.text.includes('your'),
+      t_cue ? `text="${t_cue.text}"` : 'no element'
+    );
+
+    // Test D: No TraceCue when practiceFocus is NOT lesson5
+    await tracePage.evaluate(() => {
+      localStorage.setItem('eklipses_practice_focus', 'free');
+      const el = document.getElementById('ek-trace-cue');
+      if (el) el.style.opacity = '0';
+    });
+    await tracePage.evaluate(() => Caption.hide());
+    tracePage.evaluate(() => streamCharacterAndSpeak('hey', session)).catch(() => {});
+    await waitForCaption(tracePage, 3000);
+    await tracePage.waitForTimeout(300);
+    const t_noCue = await tracePage.evaluate(() => {
+      const el = document.getElementById('ek-trace-cue');
+      return !el || el.style.opacity !== '1';
+    });
+    report('No TraceCue shown when practiceFocus is not lesson5', t_noCue, t_noCue ? 'correctly suppressed' : 'cue wrongly appeared');
+
+    await tracePage.unroute('**/api/character-stream');
+    await tracePage.close();
+
 
     // ═══════════════════════════════════════════════════════════════════════
     // 2. AMBIENT AUDIO
