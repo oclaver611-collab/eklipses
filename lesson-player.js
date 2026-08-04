@@ -77,6 +77,19 @@
     { id:'09', title:'Your Five Steps' },
   ];
 
+  const SEGMENTS5 = [
+    { id:'00', title:'Welcome' },
+    { id:'01', title:'Why Men Miss It' },
+    { id:'02', title:'Watch — The Missed Read' },
+    { id:'03', title:'T — Track · R — Register' },
+    { id:'04', title:'Watch — Catching T and R' },
+    { id:'05', title:'A — Align · C — Catch' },
+    { id:'06', title:'Watch — The Full Cluster' },
+    { id:'07', title:'E — Enter' },
+    { id:'08', title:'Watch — The Window' },
+    { id:'09', title:'Your Five Steps' },
+  ];
+
   // ── Lesson config ─────────────────────────────────────────────────
   const LESSONS = {
     lesson1: {
@@ -179,6 +192,32 @@
         { word:'A', meaning:'Ask deeper — one layer further' },
         { word:'I', meaning:'Inject yourself — share something real' },
         { word:'N', meaning:'Never abandon a live thread' },
+      ],
+    },
+    lesson5: {
+      id:           'lesson5',
+      workerPrefix: 'lesson5/',       // file=lesson5/ryan_seg00.mp3 → R2: lessons/lesson5/audio/
+      lsProgress:   'eklipses_lesson5_progress',
+      lsComplete:   'eklipses_lesson5_complete',
+      lsCert:       null,
+      segments:     SEGMENTS5,
+      title:        'The Read',
+      completionSub: '"The Read" — TRACE mastered.',
+      completionBody: 'She has been sending signals the whole time. Now you know how to read them.',
+      steps: [
+        'T — Track gaze: notice when it holds past the sentence',
+        'R — Register proximity: she moved closer than she had to',
+        'A — Attend to alignment: her posture echoes yours',
+        'C — Catch touch: any contact she initiated deliberately',
+        'E — Enter: three signals confirmed — one direct move',
+      ],
+      mnemonicPhrase: 'TRACE',
+      mnemonicMap: [
+        { word:'T', meaning:'Track gaze — holds past where most people look away' },
+        { word:'R', meaning:'Register proximity — she closed the distance' },
+        { word:'A', meaning:'Attend to alignment — her posture mirrors yours' },
+        { word:'C', meaning:'Catch touch — any contact she initiated' },
+        { word:'E', meaning:'Enter — three signals confirmed, one direct move' },
       ],
     },
   };
@@ -331,6 +370,7 @@
     renderLesson2Card();
     renderLesson3Card();
     renderLesson4Card();
+    renderLesson5Card();
   }
 
   function renderLesson2Card() {
@@ -450,7 +490,46 @@
     if (btn4) btn4.onclick = () => openLesson('lesson4', '00');
   }
 
-  function refreshLearnTabStatus() { renderLearnTab(); renderLesson2Card(); renderLesson3Card(); renderLesson4Card(); }
+  function renderLesson5Card() {
+    const el = document.getElementById('lesson5-card');
+    if (!el) return;
+
+    const lesson4Done     = localStorage.getItem('eklipses_lesson4_complete') === 'true';
+    const lesson5Done     = localStorage.getItem('eklipses_lesson5_complete') === 'true';
+    const lesson5Progress = localStorage.getItem('eklipses_lesson5_progress');
+
+    if (!lesson4Done) {
+      el.innerHTML = `
+        <div class="ek-lesson-card locked">
+          <div class="ek-lesson-card-header">
+            <span class="ek-lesson-num">🔒 LESSON 5</span>
+          </div>
+          <div class="ek-lesson-title">The Read</div>
+          <div class="ek-lesson-desc">Complete Lesson 4 to unlock. Learn to read genuine interest signals — and know exactly when to act on them. 5 core principles. ~12 min.</div>
+        </div>`;
+      return;
+    }
+
+    const l5Status   = lesson5Done ? 'completed' : (lesson5Progress ? 'in_progress' : 'not_started');
+    const l5BtnLabel = lesson5Done ? '↺ Review Lesson' : (lesson5Progress ? '▶ Continue Lesson' : '▶ Start Lesson');
+
+    el.innerHTML = `
+      <div class="ek-lesson-card">
+        <div class="ek-lesson-card-header">
+          <span class="ek-lesson-num">LESSON 5</span>
+          ${statusChip(l5Status)}
+        </div>
+        <div class="ek-lesson-title">The Read</div>
+        <div class="ek-lesson-desc">Learn to read genuine interest signals — and know exactly when to act on them. 5 core principles. ~12 min.</div>
+        <div class="ek-lesson-mnemonic-tag">TRACE — Track · Register · Attend · Catch · Enter</div>
+        <button class="ek-start-btn" id="ek-start-lesson5">${l5BtnLabel}</button>
+      </div>`;
+
+    const btn5 = document.getElementById('ek-start-lesson5');
+    if (btn5) btn5.onclick = () => openLesson('lesson5', '00');
+  }
+
+  function refreshLearnTabStatus() { renderLearnTab(); renderLesson2Card(); renderLesson3Card(); renderLesson4Card(); renderLesson5Card(); }
 
   // ── Player state ──────────────────────────────────────────────────
   let _playerEl      = null;
