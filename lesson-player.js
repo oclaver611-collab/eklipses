@@ -63,6 +63,20 @@
     { id:'10', title:'Your Four Steps' },
   ];
 
+  // ── Lesson 4 segment list ─────────────────────────────────────────
+  const SEGMENTS4 = [
+    { id:'00', title:'Welcome' },
+    { id:'01', title:'Watch — Threading Fail' },
+    { id:'02', title:'What Just Happened' },
+    { id:'03', title:'Watch — C and H' },
+    { id:'04', title:'C — Catch · H — Hook' },
+    { id:'05', title:'Watch — A and I' },
+    { id:'06', title:'A — Ask · I — Inject' },
+    { id:'07', title:'Watch — N' },
+    { id:'08', title:'N — Never Abandon' },
+    { id:'09', title:'Your Five Steps' },
+  ];
+
   // ── Lesson config ─────────────────────────────────────────────────
   const LESSONS = {
     lesson1: {
@@ -139,6 +153,32 @@
         { word:'A', meaning:'Ask-back — redirect back to her' },
         { word:'C', meaning:'Contain — hold the compliment' },
         { word:'E', meaning:'Earn — let her show it first' },
+      ],
+    },
+    lesson4: {
+      id:           'lesson4',
+      workerPrefix: 'lesson4/',       // file=lesson4/ryan_seg00.mp3 → R2: lessons/lesson4/audio/
+      lsProgress:   'eklipses_lesson4_progress',
+      lsComplete:   'eklipses_lesson4_complete',
+      lsCert:       null,
+      segments:     SEGMENTS4,
+      title:        'The Thread',
+      completionSub: '"The Thread" — CHAIN mastered.',
+      completionBody: 'She hands you threads in every sentence. You now know how to catch them.',
+      steps: [
+        'C — Catch threads: hear all of them before you respond',
+        'H — Hook the richest: pick the one with the most charge',
+        'A — Ask deeper: one layer further on the same thread',
+        'I — Inject yourself: share something real and connected',
+        'N — Never abandon a live thread: go back to what she lit up about',
+      ],
+      mnemonicPhrase: 'CHAIN',
+      mnemonicMap: [
+        { word:'C', meaning:'Catch threads — hear all of them first' },
+        { word:'H', meaning:'Hook the richest — pick the charged one' },
+        { word:'A', meaning:'Ask deeper — one layer further' },
+        { word:'I', meaning:'Inject yourself — share something real' },
+        { word:'N', meaning:'Never abandon a live thread' },
       ],
     },
   };
@@ -290,6 +330,7 @@
 
     renderLesson2Card();
     renderLesson3Card();
+    renderLesson4Card();
   }
 
   function renderLesson2Card() {
@@ -370,7 +411,46 @@
     if (btn3) btn3.onclick = () => openLesson('lesson3', '00');
   }
 
-  function refreshLearnTabStatus() { renderLearnTab(); renderLesson2Card(); renderLesson3Card(); }
+  function renderLesson4Card() {
+    const el = document.getElementById('lesson4-card');
+    if (!el) return;
+
+    const lesson3Done     = localStorage.getItem('eklipses_lesson3_complete') === 'true';
+    const lesson4Done     = localStorage.getItem('eklipses_lesson4_complete') === 'true';
+    const lesson4Progress = localStorage.getItem('eklipses_lesson4_progress');
+
+    if (!lesson3Done) {
+      el.innerHTML = `
+        <div class="ek-lesson-card locked">
+          <div class="ek-lesson-card-header">
+            <span class="ek-lesson-num">🔒 LESSON 4</span>
+          </div>
+          <div class="ek-lesson-title">The Thread</div>
+          <div class="ek-lesson-desc">Complete Lesson 3 to unlock. Learn to keep any conversation alive — by going deeper into what she's already given you. 5 core principles. ~10 min.</div>
+        </div>`;
+      return;
+    }
+
+    const l4Status   = lesson4Done ? 'completed' : (lesson4Progress ? 'in_progress' : 'not_started');
+    const l4BtnLabel = lesson4Done ? '↺ Review Lesson' : (lesson4Progress ? '▶ Continue Lesson' : '▶ Start Lesson');
+
+    el.innerHTML = `
+      <div class="ek-lesson-card">
+        <div class="ek-lesson-card-header">
+          <span class="ek-lesson-num">LESSON 4</span>
+          ${statusChip(l4Status)}
+        </div>
+        <div class="ek-lesson-title">The Thread</div>
+        <div class="ek-lesson-desc">Learn to keep any conversation alive — by going deeper into what she's already given you. 5 core principles. ~10 min.</div>
+        <div class="ek-lesson-mnemonic-tag">CHAIN — Catch · Hook · Ask · Inject · Never abandon</div>
+        <button class="ek-start-btn" id="ek-start-lesson4">${l4BtnLabel}</button>
+      </div>`;
+
+    const btn4 = document.getElementById('ek-start-lesson4');
+    if (btn4) btn4.onclick = () => openLesson('lesson4', '00');
+  }
+
+  function refreshLearnTabStatus() { renderLearnTab(); renderLesson2Card(); renderLesson3Card(); renderLesson4Card(); }
 
   // ── Player state ──────────────────────────────────────────────────
   let _playerEl      = null;

@@ -100,6 +100,38 @@ const BETTER_LINES = {
       { text: "I know what I want. I'm not in a rush about it." },
     ],
   },
+  lesson4: {
+    C: [
+      // universal — signal you heard more than the surface topic
+      { text: "Wait — you said something earlier I want to go back to." },
+      { text: "There were at least three things in what you just said. I'm choosing one." },
+      { text: "I heard the main answer. I'm more interested in the thing you said after it." },
+    ],
+    H: [
+      // universal — signal you picked the emotional thread, not the obvious one
+      { text: "Not that part — the other part. The one you said almost like an afterthought." },
+      { text: "I heard what you said. But I'm more interested in the feeling under it." },
+      { text: "That thing you mentioned casually — it wasn't casual." },
+    ],
+    A: [
+      // universal — single questions that go one layer deeper without jumping topic
+      { text: "What did that feel like — not what happened, what it felt like." },
+      { text: "Tell me more about that. Not the what. The why." },
+      { text: "How long have you felt that way?" },
+    ],
+    I: [
+      // universal — brief reciprocal disclosure, connected to her thread, not a monologue
+      { text: "That reminds me of something. I went through something similar — not the same, but close." },
+      { text: "I know that feeling. It took me a while to put a word to it." },
+      { text: "I don't usually bring this up — but what you said connects to something real for me." },
+    ],
+    N: [
+      // universal — return lines; coming back to what she moved past
+      { text: "You mentioned something earlier I keep thinking about — go back to that." },
+      { text: "I keep coming back to that thing you mentioned. Go back there." },
+      { text: "I want to know more about that — the thing you said before we got off track." },
+    ],
+  },
 };
 
 // Deterministic hard gate for Exit (E) skill — code-enforced, not LLM-dependent.
@@ -215,7 +247,8 @@ module.exports = async function handler(req, res) {
   const isLesson1 = practiceFocus === 'lesson1';
   const isLesson2 = practiceFocus === 'lesson2';
   const isLesson3 = practiceFocus === 'lesson3';
-  if (!isLesson1 && !isLesson2 && !isLesson3) { console.log(`[coach-moment] skip — focus="${practiceFocus}" not lesson-specific`); return res.json({ teachable: false }); }
+  const isLesson4 = practiceFocus === 'lesson4';
+  if (!isLesson1 && !isLesson2 && !isLesson3 && !isLesson4) { console.log(`[coach-moment] skip — focus="${practiceFocus}" not lesson-specific`); return res.json({ teachable: false }); }
 
   // Pre-compute exit gate (L2): deterministic check that overrides any LLM decision on skill E
   const exitBlocked = isLesson2 && exitCannotFire(characterResponse);
@@ -232,6 +265,11 @@ module.exports = async function handler(req, res) {
     if (containBlocked) console.log('[coach-moment] PACE gate: C (Contain) blocked — not enough romantic terms to be stacked');
     if (earnBlocked)    console.log('[coach-moment] PACE gate: E (Earn) blocked — no escalation language or past early window');
   }
+
+  // Pre-compute CHAIN gate (L4): N (Never abandon) cannot fire in the first 3 exchanges —
+  // there is no established live thread to abandon that early.
+  const neverBlocked = isLesson4 && exchangeCount <= 3;
+  if (isLesson4 && neverBlocked) console.log('[coach-moment] CHAIN gate: N (Never abandon) blocked — exchange too early for an established thread');
 
   console.log(`[coach-moment] checking — focus:${practiceFocus} exchange:${exchangeCount} words:${wordCount} | "${userMessage.slice(0, 80)}"`);
 
@@ -311,8 +349,33 @@ PRIORITY RULE — when her response contains a direct feelings/exclusivity quest
 
 When in doubt: return teachable:false. A missed moment is better than a false interrupt.`;
 
-  const skillDefs = isLesson1 ? lesson1SkillDefs : isLesson2 ? lesson2SkillDefs : lesson3SkillDefs;
-  const lessonLabel = isLesson1 ? 'OTIMC (Lesson 1 — The Approach)' : isLesson2 ? 'FRAME (Lesson 2 — Holding Your Ground)' : 'PACE (Lesson 3 — The Long Game)';
+  const lesson4SkillDefs = `
+C — Catch threads: When she spoke, did the user ignore all the embedded topics she offered and pivot to something entirely unrelated?
+FAIL = her message contained 2+ distinct threads (names, events, feelings, experiences) and the user's reply references none of them — asks a generic question or changes the subject entirely.
+NOT C = the user picked any thread she actually offered, even the most obvious one. C only fires when ALL threads are abandoned.
+
+H — Hook the richest: When she spoke, did the user pick the obvious/safe topic rather than the thread with the most emotional charge?
+FAIL = her message had a clearly marked emotional thread (something she described as weird, hard, surprising, meaningful, or that she said with feeling) AND the user asked about a surface detail instead — the date, location, basic fact — not the emotional content.
+NOT H = she gave only surface-level information with no emotional thread to pick. H cannot fire if there was no richer thread available.
+
+A — Ask deeper: After picking a thread, did the user pivot to a completely different topic instead of going one layer further?
+FAIL = user picked up a thread, she responded with more, and then user's next message jumps to an entirely new subject — does not ask a follow-up on the same thread, does not go deeper.
+NOT A = the user asked any follow-up question on the same general topic, even imperfect ones. A only fires on full topic abandonment after a thread opened.
+
+I — Inject yourself: When she shared something personal, did the user stay entirely in question mode without sharing anything from their own life?
+FAIL = she disclosed something real (a feeling, a struggle, a personal experience) and the user responded with another question only — no brief personal share, no "I know that feeling", no real connection offered.
+NOT I = the user shared anything about themselves, even briefly. I only fires when the user contributes nothing personal after she has opened up.
+
+N — Never abandon a live thread: Did the user accept her redirect and drop a thread she had visibly lit up about?
+FAIL = earlier in the conversation she said something with clear engagement ("honestly…", lit up on a topic, started to share and pulled back) AND when she changed the subject or redirected, the user followed the redirect and never returned to it.
+NOT N = the exchange is exchange 3 or earlier (no established thread yet), or she never showed visible engagement on any prior topic.
+
+IMPORTANT: CHAIN skills are about what the user does with her words — not about whether the user says something good or impressive. A witty reply that ignores her content fails C. A deep personal question that pivots off-topic fails A. Evaluate strictly on whether the user tracked and responded to what she actually offered.
+
+When in doubt: return teachable:false. Missing a CHAIN moment is better than interrupting a conversation that was already tracking.`;
+
+  const skillDefs = isLesson1 ? lesson1SkillDefs : isLesson2 ? lesson2SkillDefs : isLesson3 ? lesson3SkillDefs : lesson4SkillDefs;
+  const lessonLabel = isLesson1 ? 'OTIMC (Lesson 1 — The Approach)' : isLesson2 ? 'FRAME (Lesson 2 — Holding Your Ground)' : isLesson3 ? 'PACE (Lesson 3 — The Long Game)' : 'CHAIN (Lesson 4 — The Thread)';
 
   // Belt-and-suspenders: also tell the LLM when gates are active (code overrides below are the real guards)
   let finalSkillDefs = skillDefs;
@@ -328,6 +391,7 @@ When in doubt: return teachable:false. A missed moment is better than a false in
     if (blocked.length) finalSkillDefs += '\n\nPACE GATES ACTIVE: The following skills are DETERMINISTICALLY BLOCKED this exchange — do not return them:\n' + blocked.map(b => '  • ' + b).join('\n');
 
     // When A is unblocked, the student's message has no "?", AND the message is clearly
+
     // a first-person self-answer (starts with I/Yeah I/So I and is substantive) →
     // add an explicit A hint. This avoids firing on compliments directed at her.
     const studentHasNoQuestion = !/\?/.test(userMessage);
@@ -336,6 +400,9 @@ When in doubt: return teachable:false. A missed moment is better than a false in
     if (!askbackBlocked && studentHasNoQuestion && studentAnsweringAboutSelf) {
       finalSkillDefs += '\n\nPACE SIGNAL — A (Ask-back): She asked him a question about himself (confirmed by gate). His reply is a first-person self-description with NO question mark and no redirect back to her. This is a textbook A failure. Return skill=A.';
     }
+  }
+  if (isLesson4 && neverBlocked) {
+    finalSkillDefs += '\n\nCHAIN GATE ACTIVE: Skill N (Never abandon) is DETERMINISTICALLY BLOCKED — exchange is too early for an established live thread. Do not return skill=N.';
   }
 
   const systemPrompt = `You are Ryan, a direct dating coach reviewing a student's last message in a practice session.
@@ -425,6 +492,12 @@ Exchange number: ${exchangeCount}`;
       }
     }
 
+    // Deterministic CHAIN gate override (L4) — N cannot fire in early exchanges.
+    if (isLesson4 && parsed.teachable && String(parsed.skill).toUpperCase() === 'N' && neverBlocked) {
+      console.log('[coach-moment] → CHAIN gate override: LLM returned N but exchange too early — suppressing');
+      return res.json({ teachable: false });
+    }
+
     if (!parsed.teachable) {
       console.log('[coach-moment] → not teachable');
       return res.json({ teachable: false });
@@ -439,7 +512,7 @@ Exchange number: ${exchangeCount}`;
     // Library lookup — filter by conversation context, then pick at random.
     // opener:true lines are only shown when exchangeCount <= 2 (still early enough to be the approach).
     // If filtering leaves nothing, fall back to the LLM's own betterLine which can reply to her actual words.
-    const lessonKey  = isLesson1 ? 'lesson1' : isLesson2 ? 'lesson2' : 'lesson3';
+    const lessonKey  = isLesson1 ? 'lesson1' : isLesson2 ? 'lesson2' : isLesson3 ? 'lesson3' : 'lesson4';
     const allLines   = BETTER_LINES[lessonKey]?.[String(parsed.skill)] || [];
     const isEarly    = exchangeCount <= 2;
     const pool       = isEarly ? allLines : allLines.filter(l => !l.opener);

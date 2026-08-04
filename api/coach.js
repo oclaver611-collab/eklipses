@@ -4,11 +4,12 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { conversation, scenarioTitle, scenarioKey, opener, lesson1Complete: _l1 = false, lesson2Complete: _l2 = false, lesson3Complete: _l3 = false, practiceFocus = null, characterId = 'sofia' } = req.body || {};
+  const { conversation, scenarioTitle, scenarioKey, opener, lesson1Complete: _l1 = false, lesson2Complete: _l2 = false, lesson3Complete: _l3 = false, lesson4Complete: _l4 = false, practiceFocus = null, characterId = 'sofia' } = req.body || {};
   // practiceFocus overrides raw lesson flags when present
   const lesson1Complete = practiceFocus ? (practiceFocus === 'lesson1' || practiceFocus === 'both' || practiceFocus === 'all') : _l1;
   const lesson2Complete = practiceFocus ? (practiceFocus === 'lesson2' || practiceFocus === 'both' || practiceFocus === 'all') : _l2;
   const lesson3Complete = practiceFocus ? (practiceFocus === 'lesson3' || practiceFocus === 'all') : _l3;
+  const lesson4Complete = practiceFocus ? (practiceFocus === 'lesson4' || practiceFocus === 'all') : _l4;
 
   if (!conversation?.length) {
     return res.status(400).json({ error: 'No conversation provided' });
@@ -309,6 +310,19 @@ ${lesson3Complete ? `  "lesson3Check": {
     "summary": "<1-2 punchy sentences: 3-4 PASS = PACE applied well, 2 = Making progress, 1 or fewer = Review and try again>"
   },
   "lesson3Eval": "<Spoken coaching paragraph — Ryan talking to the user. Start with 'Let me walk you through the Lesson 3 skills — PACE.' Then describe each skill result conversationally, matching the PASS/FAIL verdicts in lesson3Check above. For each skill speak it naturally: 'For Pause', 'For Ask-back', 'For Contain', 'For Earn' — then say what happened and whether it worked. One or two coaching sentences per skill. Spoken out loud — write it to be heard, not read off a form.>",` : ''}
+${lesson4Complete ? `  "lesson4Check": {
+    "skills": {
+      "catch": "<'PASS' or 'FAIL' — apply the LESSON 4 EVALUATION criteria below>",
+      "hook": "<'PASS' or 'FAIL'>",
+      "ask": "<'PASS' or 'FAIL'>",
+      "inject": "<'PASS' or 'FAIL'>",
+      "never": "<'PASS' or 'FAIL'>"
+    },
+    "score": "<number 0-5, count of PASS>",
+    "passed": "<true if score >= 4, false otherwise>",
+    "summary": "<1-2 punchy sentences: 4-5 PASS = CHAIN applied well, 3 = Making progress, 2 or fewer = Review and try again>"
+  },
+  "lesson4Eval": "<Spoken coaching paragraph — Ryan talking to the user. Start with 'Let me walk you through the Lesson 4 skills — CHAIN.' Then describe each skill result conversationally, matching the PASS/FAIL verdicts in lesson4Check above. For each skill speak it naturally: 'For Catch', 'For Hook', 'For Ask deeper', 'For Inject', 'For Never abandon' — then say what happened and whether it worked. One or two coaching sentences per skill. Spoken out loud — write it to be heard, not read off a form.>",` : ''}
   "part1": "<THE OPENER. Minimum 150 characters. Three sentences. ALWAYS begin with a positive: quote ONE specific line the user said anywhere in the conversation that showed curiosity, humor, or confidence, and say in one sentence why it worked. Second sentence: quote their opening line (HIM_1) verbatim inside quotes, name the move in 5 words or fewer, and say how it landed with ${girlName}. Third sentence: the one thing to sharpen next time. Never start part1 with a negative or a critique. The user must hear what to keep doing before hearing what to fix. Example structure: 'When you said [quote from the conversation], that landed — it showed you were paying attention to her, not just running a move. Your opener, [HIM_1 quote], was [name the move] — with ${girlName} that [how it landed]. Next time, [one specific thing to sharpen].'>",
 
   "part2": "<THE MIDDLE. Minimum 150 characters. Two to three sentences. Quote the single most revealing exchange: 'When she said [exact ${girlName} quote], you said [exact HIM quote].' Then one to two sentences on what that exchange cost him or earned him with ${girlName}, specific to who she is. Be surgical — name exactly what she was responding to.>",
@@ -472,7 +486,39 @@ PASS = holds back, lets her demonstrate interest first before matching or escala
 FAIL = "I really like you", "I want to take you out", "I feel something with you" — declared in the first 3-4 exchanges before she has earned it.
 NOT E = after the 4th exchange (she has had time to invest), or when he is clearly responding to her unmistakable signal of interest.
 
-These fields (lesson3Eval and lesson3Check) are already part of the JSON schema above — fill them based on the criteria and definitions above.` : ''}`;
+These fields (lesson3Eval and lesson3Check) are already part of the JSON schema above — fill them based on the criteria and definitions above.` : ''}${lesson4Complete ? `
+
+LESSON 4 EVALUATION — CHAIN: The Thread:
+Evaluate the user on these 5 skills. Match your verdicts exactly to the lesson4Check fields in the JSON schema above.
+
+C — Catch threads: When she spoke, did the user respond to something she actually said — or did they ignore her content entirely and pivot to something unrelated?
+PASS = user's reply references at least one thing she actually said (a name, event, feeling, detail from her message).
+FAIL = her message contained clear threads and the user's reply references none of them — asks a generic question or changes the subject entirely as if she had said nothing.
+NOT C = she gave no substantive content (a yes/no answer, a single word). If there were no threads to catch, C cannot fire.
+
+H — Hook the richest: When she spoke, did the user pick up on the thread with the most emotional charge, or did they take the safest/most obvious one?
+PASS = user engaged with a thread that had emotional weight — something she described as hard, weird, meaningful, important, or that she said with feeling — even if it was not the first thing she mentioned.
+FAIL = her message had a clearly marked emotional thread AND the user ignored it, instead asking about a surface detail (a date, location, basic fact).
+NOT H = she gave only surface-level information with no emotional thread available. If no richer thread existed, H cannot fire.
+
+A — Ask deeper: After picking a thread, did the user follow it one layer further on the same topic, or did they pivot to something new?
+PASS = user's question or reply stays with the same thread she opened — goes deeper on why, what it felt like, what came of it, or what it meant.
+FAIL = user picked up a thread, she responded with more, and then user's next message jumps to a completely different subject — no follow-through on the thread they just opened.
+NOT A = the user asked any follow-up on the same general topic. A only fires on full topic abandonment after a thread was opened and responded to.
+
+I — Inject yourself: When she shared something personal, did the user contribute something from their own life, or did they stay entirely in question mode?
+PASS = after she disclosed something personal (a feeling, a struggle, an experience), the user offered something genuine from their own life — a brief share, a relatable feeling, a real connection — even if short.
+FAIL = she disclosed something personal and the user responded with another question only — no personal share, no "I know that feeling", no reciprocal disclosure.
+NOT I = she made a surface observation or asked a factual question and did not disclose anything personal. If she didn't open up, I cannot fire.
+
+N — Never abandon a live thread: Did the user return to a thread she had shown real engagement with earlier, or did they let it drop when she redirected?
+PASS = when she had shown clear interest in a topic earlier (lit up, started to share, said something with feeling) and then moved away from it, the user noticed and came back to it — either immediately or later in the conversation.
+FAIL = she had shown visible engagement on a topic earlier in the conversation AND when the topic shifted, the user accepted the redirect and never returned to what she had lit up about.
+NOT N = the conversation is in early exchanges (3 or fewer) — no established live thread exists yet.
+
+IMPORTANT: All CHAIN skills evaluate what the user does with HER words, not whether the user said something interesting or impressive. A clever pivot off-topic fails C. A better question about something she never mentioned fails A. Evaluate strictly on whether the user tracked and deepened what she actually offered.
+
+These fields (lesson4Eval and lesson4Check) are already part of the JSON schema above — fill them based on the criteria and definitions above.` : ''}`;
 
   try {
     const finalOutcomeNote = finalCharResponse
@@ -533,11 +579,23 @@ These fields (lesson3Eval and lesson3Check) are already part of the JSON schema 
       if (!feedback.lesson3Check || !feedback.lesson3Check.skills) console.warn('[coach] lesson3Check missing despite lesson3Complete=true');
     }
 
+    if (lesson4Complete) {
+      if (!feedback.lesson4Eval || feedback.lesson4Eval.length < 10) console.warn('[coach] lesson4Eval missing despite lesson4Complete=true');
+      if (!feedback.lesson4Check || !feedback.lesson4Check.skills) console.warn('[coach] lesson4Check missing despite lesson4Complete=true');
+    }
+
     if (lesson3Complete && feedback.lesson3Check?.skills) {
       const skills3 = feedback.lesson3Check.skills;
       const passCount3 = ['pause', 'askBack', 'contain', 'earn'].filter(k => skills3[k] === 'PASS').length;
       feedback.lesson3Check.score = passCount3;
       feedback.lesson3Check.passed = passCount3 >= 3;
+    }
+
+    if (lesson4Complete && feedback.lesson4Check?.skills) {
+      const skills4 = feedback.lesson4Check.skills;
+      const passCount4 = ['catch', 'hook', 'ask', 'inject', 'never'].filter(k => skills4[k] === 'PASS').length;
+      feedback.lesson4Check.score = passCount4;
+      feedback.lesson4Check.passed = passCount4 >= 4;
     }
 
     if (lesson2Complete && feedback.lesson2Check?.skills) {
@@ -720,6 +778,7 @@ These fields (lesson3Eval and lesson3Check) are already part of the JSON schema 
     if (feedback.lesson1Eval) feedback.lesson1Eval = cleanText(feedback.lesson1Eval);
     if (feedback.lesson2Eval) feedback.lesson2Eval = cleanText(feedback.lesson2Eval);
     if (feedback.lesson3Eval) feedback.lesson3Eval = cleanText(feedback.lesson3Eval);
+    if (feedback.lesson4Eval) feedback.lesson4Eval = cleanText(feedback.lesson4Eval);
 
     res.json(feedback);
 

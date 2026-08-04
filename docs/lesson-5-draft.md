@@ -31,7 +31,7 @@ Cold reading is the practice of making specific, insightful observations about s
 |--------|-------|-----------------|
 | 1 — The Approach | OTIMC | How to open and close |
 | 2 — Holding Your Ground | FRAME | How to handle tests and pressure |
-| 3 — Push-Pull | CHASE | How to create tension and pull |
+| 3 — The Long Game | PACE | How to maintain restraint when she's already interested |
 | 4 — The Thread | CHAIN | How to keep the conversation alive indefinitely |
 | **5 — The Read** | **READ** | **How to demonstrate deep perception** |
 

@@ -1542,6 +1542,7 @@ async function streamCharacterAndSpeak(userSaid, mySession, onTextReady = null) 
         lesson1Complete: localStorage.getItem('eklipses_lesson1_complete') === 'true',
         lesson2Complete: localStorage.getItem('eklipses_lesson2_complete') === 'true',
         lesson3Complete: localStorage.getItem('eklipses_lesson3_complete') === 'true',
+        lesson4Complete: localStorage.getItem('eklipses_lesson4_complete') === 'true',
         practiceFocus: localStorage.getItem('eklipses_practice_focus') || 'free',
         voiceInput: _lastInputMode === 'voice',
       }),
@@ -1636,6 +1637,7 @@ async function getCharacterResponseFallback(userSaid) {
         lesson1Complete: localStorage.getItem('eklipses_lesson1_complete') === 'true',
         lesson2Complete: localStorage.getItem('eklipses_lesson2_complete') === 'true',
         lesson3Complete: localStorage.getItem('eklipses_lesson3_complete') === 'true',
+        lesson4Complete: localStorage.getItem('eklipses_lesson4_complete') === 'true',
         practiceFocus: localStorage.getItem('eklipses_practice_focus') || 'free',
         voiceInput: _lastInputMode === 'voice',
       }),
@@ -2404,6 +2406,7 @@ async function runCoachFeedback(mySession) {
     lesson1Complete: localStorage.getItem('eklipses_lesson1_complete') === 'true',
     lesson2Complete: localStorage.getItem('eklipses_lesson2_complete') === 'true',
     lesson3Complete: localStorage.getItem('eklipses_lesson3_complete') === 'true',
+    lesson4Complete: localStorage.getItem('eklipses_lesson4_complete') === 'true',
     practiceFocus: localStorage.getItem('eklipses_practice_focus') || null,
     characterId: currentCharacterId || 'sofia',
   });
@@ -2457,7 +2460,7 @@ async function runCoachFeedback(mySession) {
 
   if(mySession!==session) return;
 
-  // Speaking order: [lesson1Eval →] [lesson2Eval →] [lesson3Eval →] part1 → trans2 → part2 → trans3 → part3 → trans4 → part4 → tryNextTime → score reveal
+  // Speaking order: [lesson1Eval →] [lesson2Eval →] [lesson3Eval →] [lesson4Eval →] part1 → trans2 → part2 → trans3 → part3 → trans4 → part4 → tryNextTime → score reveal
   if (f.lesson1Eval && mySession === session) {
     const l1url = await KokoroSpeech.prefetch(f.lesson1Eval, 'am_adam');
     await speak(f.lesson1Eval, 'Ryan', () => { els.text.textContent = f.lesson1Eval; }, l1url);
@@ -2473,6 +2476,12 @@ async function runCoachFeedback(mySession) {
   if (f.lesson3Eval && mySession === session) {
     const l3url = await KokoroSpeech.prefetch(f.lesson3Eval, 'am_adam');
     await speak(f.lesson3Eval, 'Ryan', () => { els.text.textContent = f.lesson3Eval; }, l3url);
+    if (mySession !== session) return;
+    await pause(600);
+  }
+  if (f.lesson4Eval && mySession === session) {
+    const l4url = await KokoroSpeech.prefetch(f.lesson4Eval, 'am_adam');
+    await speak(f.lesson4Eval, 'Ryan', () => { els.text.textContent = f.lesson4Eval; }, l4url);
     if (mySession !== session) return;
     await pause(600);
   }
@@ -2771,6 +2780,7 @@ const LESSON_REGISTRY = [
   { id: 'lesson1', label: 'Lesson 1 — The Approach (OTIMC)',        lsKey: 'eklipses_lesson1_complete' },
   { id: 'lesson2', label: 'Lesson 2 — Holding Your Ground (FRAME)', lsKey: 'eklipses_lesson2_complete' },
   { id: 'lesson3', label: 'Lesson 3 — The Long Game (PACE)',        lsKey: 'eklipses_lesson3_complete' },
+  { id: 'lesson4', label: 'Lesson 4 — The Thread (CHAIN)',          lsKey: 'eklipses_lesson4_complete' },
 ];
 
 // Mnemonic data sourced from lesson-player.js LESSON_DATA.mnemonicMap — keep in sync when lessons change.
@@ -2802,6 +2812,16 @@ const LESSON_MNEMONICS = {
       { letter: 'A', meaning: 'Ask-back — redirect back to her' },
       { letter: 'C', meaning: 'Contain — hold the compliment' },
       { letter: 'E', meaning: 'Earn — let her show it first' },
+    ],
+  },
+  lesson4: {
+    label: 'CHAIN',
+    items: [
+      { letter: 'C', meaning: 'Catch threads — hear all of them before you respond' },
+      { letter: 'H', meaning: 'Hook the richest — pick the one with the most charge' },
+      { letter: 'A', meaning: 'Ask deeper — one layer further on the same thread' },
+      { letter: 'I', meaning: 'Inject yourself — share something real and connected' },
+      { letter: 'N', meaning: 'Never abandon a live thread — go back to what she lit up about' },
     ],
   },
 };
@@ -2882,6 +2902,33 @@ const DRILL_REPS = {
       letter: 'E', cue: 'Earn',
       sofiasLine: "So tell me — what do you want from this?",
       criteria: "PASS if the user lets her show more interest before committing — gives a light or non-answer, or turns it back on her. FAIL if the user immediately declares strong interest ('I really like you', 'I want to take you out') before she has earned it.",
+    },
+  ],
+  lesson4: [
+    {
+      letter: 'C', cue: 'Catch threads',
+      sofiasLine: "I've been here before. My friend used to work here — she moved to Amsterdam a while back. Got a job she'd been after for years.",
+      criteria: "PASS if the user picks up on one of the specific threads she offered (the friend, the move, years of trying for something) rather than ignoring them and asking something unrelated. FAIL if the user responds with a generic pivot ('Oh nice, what do you do?') that bypasses what she gave them.",
+    },
+    {
+      letter: 'H', cue: 'Hook the richest',
+      sofiasLine: "I was here last week. Kind of a weird night. Anyway — it's quieter on weekdays.",
+      criteria: "PASS if the user picks up on 'weird night' — the thread with clear emotional charge — rather than the surface remark about weekdays. FAIL if the user responds to 'quieter on weekdays' or asks a generic question that ignores the signal she gave.",
+    },
+    {
+      letter: 'A', cue: 'Ask deeper',
+      sofiasLine: "I don't usually end up talking to people I've just met. I'm pretty selective about it.",
+      criteria: "PASS if the user asks one question that goes one layer deeper on the same thread — why, what made her that way, what that actually means in practice. FAIL if the user pivots to a new topic, gives a generic reply ('Me too'), or asks something unconnected to what she said.",
+    },
+    {
+      letter: 'I', cue: 'Inject yourself',
+      sofiasLine: "I've been trying to figure out what I actually want. For a while now. It's kind of exhausting.",
+      criteria: "PASS if the user briefly shares something genuine from their own life that connects to what she described — without making it a monologue or pivoting entirely to their own story. FAIL if the user stays in question mode ('What do you mean?'), gives a platitude ('I get that'), or takes over the thread entirely.",
+    },
+    {
+      letter: 'N', cue: 'Never abandon a live thread',
+      sofiasLine: "I used to do something completely different before this. But that's — anyway. Do you come here a lot?",
+      criteria: "PASS if the user goes back to the dropped thread ('What did you used to do?') instead of accepting her redirect and answering her question. FAIL if the user answers her redirect and lets the disclosure she started drop.",
     },
   ],
 };
