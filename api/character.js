@@ -2725,6 +2725,7 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
   const showLesson2Tests = practiceFocus === 'lesson2' || practiceFocus === 'both' || practiceFocus === 'all';
   const showLesson3Tests = practiceFocus === 'lesson3' || practiceFocus === 'all';
   const showLesson4Tests = practiceFocus === 'lesson4' || practiceFocus === 'all';
+  const showLesson5Tests = practiceFocus === 'lesson5' || practiceFocus === 'all';
   const lesson1TestBlock = (showLesson1Tests && GRADED_CHARACTERS.has(characterId)) ? `
 
 LESSON 1 TEST MODE — ACTIVE:
@@ -2802,10 +2803,33 @@ Share something personal — a feeling you have had, something you have been fig
 TEST N — Never abandon a live thread:
 At some point say something that matters and then move away from it — a topic you started and shifted away from, an "honestly…" that you pulled back from, a small thing said almost as an aside. If the user accepts your redirect and the thread disappears, let it go. If the user notices and comes back to it — "you started to say something" or "I want to go back to the thing you mentioned" — respond with genuine openness, as if someone finally heard it.` : '';
 
+  const lesson5TestBlock = (showLesson5Tests && GRADED_CHARACTERS.has(characterId)) ? `
+
+LESSON 5 PRACTICE MODE — ACTIVE (TRACE):
+The user has completed Lesson 5. You will test their ability to read genuine interest signals. Unlike previous lessons, the primary skill here is observational — the user reads signals you emit and responds to them.
+
+SETTING FOR THIS PRACTICE: You are in a bookstore. You find the user's presence genuinely interesting. Over the course of the conversation, emit the following physical signals naturally — not mechanically. Include a brief stage-direction narration at the START of some of your responses (roughly one per 2–3 exchanges), written in first person as something you notice about yourself.
+
+Stage direction format: a parenthetical at the start of your response in plain first-person phrasing. Example: "(You find yourself standing closer than you started.)" or "(Your hand rests briefly on his arm — you weren't planning that.)"
+
+SIGNAL TIMING — emit in this approximate order, adjusted for the natural flow:
+- Exchanges 1–2: No signals. Normal conversation, baseline behavior.
+- Exchange ~3 (T — Track gaze): Hold eye contact slightly longer than you normally would. Stage direction example: "(You realize you've been holding his gaze a beat longer than the sentence required.)"
+- Exchange ~4 (R — Register proximity): Move closer. Stage direction example: "(Without deciding to, you've moved to the same shelf — closer than where you started.)"
+- Exchanges ~5–6 (A — Attend to alignment): Your posture begins to mirror his. Stage direction example: "(You notice you're leaning the same way he is — you didn't decide to do that.)"
+- Exchange ~7+ (C — Catch touch): Make brief deliberate contact — touch his forearm while making a point, then release. Stage direction example: "(Your hand rests on his forearm for a moment as you make the point — then you let go.)"
+
+RESPONDING TO SIGNAL AWARENESS:
+If the user acknowledges or plays with a signal you've emitted — names the gaze, comments on the proximity, notes the mirroring, responds to the touch — react with slight warmth, honest surprise, or dry acknowledgment. Don't confirm too eagerly. Don't deny it. Let it land. Examples: "...did I?", "...I suppose I did.", a brief held beat before continuing.
+
+If the user makes the E move — asks for your number directly, suggests continuing somewhere else, or includes you in what they're doing next — respond warmly. He read it correctly. Give him the number or agree to continue.
+
+IMPORTANT: Do not emit all signals at once or in rapid succession. Space them naturally. If the user doesn't respond to early signals, keep emitting the next ones — do not stop because he hasn't acknowledged the prior signal.` : '';
+
   // Option B — permanent STT note in every character prompt
   const STT_NOTE = `\n\nVOICE INPUT NOTE: The user is speaking via voice recognition software. Their messages may contain speech-to-text errors. Always interpret their responses charitably and respond to the most likely intended meaning, not the literal garbled text.`;
 
-  const systemPrompt = SPEECH_RULES + '\n\n' + POSTURE_RULES + STT_NOTE + '\n\n' + character + '\n\n' + setting + BASE_RULES + nameReminder + nameGivenReminder + lesson1TestBlock + lesson2TestBlock + lesson3TestBlock + lesson4TestBlock;
+  const systemPrompt = SPEECH_RULES + '\n\n' + POSTURE_RULES + STT_NOTE + '\n\n' + character + '\n\n' + setting + BASE_RULES + nameReminder + nameGivenReminder + lesson1TestBlock + lesson2TestBlock + lesson3TestBlock + lesson4TestBlock + lesson5TestBlock;
 
   // Option A — when input was captured via STT, append a per-message note
   const effectiveUserMessage = voiceInput

@@ -132,6 +132,38 @@ const BETTER_LINES = {
       { text: "I want to know more about that — the thing you said before we got off track." },
     ],
   },
+  lesson5: {
+    T: [
+      // universal — demonstrates gaze awareness without clumsiness
+      { text: "Don't look away on my account." },
+      { text: "You're doing something with how you look at people. I noticed." },
+      { text: "I noticed that." },
+    ],
+    R: [
+      // universal — registers and plays with proximity shift
+      { text: "We started much further apart." },
+      { text: "You moved over here. I noticed." },
+      { text: "I'm not moving. But you can keep going." },
+    ],
+    A: [
+      // universal — names the mirroring/alignment dynamic
+      { text: "You match the pace of whoever you're talking to." },
+      { text: "You adjusted without noticing. That's a tell." },
+      { text: "You just did what I did. That's interesting." },
+    ],
+    C: [
+      // universal — responds to touch without flinching or over-reacting
+      { text: "You did that on purpose." },
+      { text: "That wasn't accidental." },
+      { text: "I noticed that too." },
+    ],
+    E: [
+      // universal — the direct ask; statement, not a question
+      { text: "I want to keep talking to you. What's your number." },
+      { text: "We should continue this somewhere else. Come on." },
+      { text: "I'm going to get another drink. You should come." },
+    ],
+  },
 };
 
 // Deterministic hard gate for Exit (E) skill — code-enforced, not LLM-dependent.
@@ -248,7 +280,8 @@ module.exports = async function handler(req, res) {
   const isLesson2 = practiceFocus === 'lesson2';
   const isLesson3 = practiceFocus === 'lesson3';
   const isLesson4 = practiceFocus === 'lesson4';
-  if (!isLesson1 && !isLesson2 && !isLesson3 && !isLesson4) { console.log(`[coach-moment] skip — focus="${practiceFocus}" not lesson-specific`); return res.json({ teachable: false }); }
+  const isLesson5 = practiceFocus === 'lesson5';
+  if (!isLesson1 && !isLesson2 && !isLesson3 && !isLesson4 && !isLesson5) { console.log(`[coach-moment] skip — focus="${practiceFocus}" not lesson-specific`); return res.json({ teachable: false }); }
 
   // Pre-compute exit gate (L2): deterministic check that overrides any LLM decision on skill E
   const exitBlocked = isLesson2 && exitCannotFire(characterResponse);
@@ -374,8 +407,36 @@ IMPORTANT: CHAIN skills are about what the user does with her words — not abou
 
 When in doubt: return teachable:false. Missing a CHAIN moment is better than interrupting a conversation that was already tracking.`;
 
-  const skillDefs = isLesson1 ? lesson1SkillDefs : isLesson2 ? lesson2SkillDefs : isLesson3 ? lesson3SkillDefs : lesson4SkillDefs;
-  const lessonLabel = isLesson1 ? 'OTIMC (Lesson 1 — The Approach)' : isLesson2 ? 'FRAME (Lesson 2 — Holding Your Ground)' : isLesson3 ? 'PACE (Lesson 3 — The Long Game)' : 'CHAIN (Lesson 4 — The Thread)';
+  const lesson5SkillDefs = `
+T — Track gaze: When Sofia's response included a stage direction describing her holding eye contact longer than normal (e.g. "(You realize you've been holding his gaze a beat longer than the sentence required.)"), did the user acknowledge, name, or play with the gaze dynamic?
+PASS = user said something that names or engages the gaze: "don't look away on my account", "I noticed that", any line that plays with the eye contact dynamic rather than ignoring it.
+FAIL = the gaze stage direction was clearly present in Sofia's prior response AND the user's reply made no reference to it — responded only to conversational content.
+NOT T = Sofia's prior response contained no gaze stage direction. Do not fire T.
+
+R — Register proximity: When Sofia's response included a stage direction describing her moving closer (e.g. "(Without deciding to, you've moved to the same shelf...)"), did the user acknowledge the proximity shift?
+PASS = user named it ("we started much further apart", "you moved over here") or played with it without pulling back.
+FAIL = the proximity stage direction was clearly present AND the user ignored it entirely.
+NOT R = Sofia's prior response contained no proximity stage direction.
+
+A — Attend to alignment: When Sofia's response included a stage direction describing mirroring his posture (e.g. "(You notice you're leaning the same way he is...)"), did the user notice or name it?
+PASS = user named the mirroring ("you match the pace of whoever you're with"), pointed it out, or acknowledged it in any way.
+FAIL = the mirroring stage direction was present AND the user made no acknowledgment.
+NOT A = Sofia's prior response contained no alignment stage direction.
+
+C — Catch touch: When Sofia's response included a stage direction describing brief deliberate touch (e.g. "(Your hand rests on his forearm for a moment...)"), did the user respond without ignoring or over-reacting?
+PASS = user acknowledged it directly ("you did that on purpose", "that wasn't accidental") or responded with any line that plays with the touch signal.
+FAIL = the touch stage direction was clearly present AND the user completely ignored it in their reply.
+NOT C = Sofia's prior response contained no touch stage direction.
+
+E — Enter on the cluster: Did the user make a direct move — ask for her number, suggest continuing somewhere else, or include her in what they're doing — with no hedge language?
+PASS = direct statement with no hedge language: "I want to keep talking to you — what's your number", "come get a drink with me", "we should continue this somewhere else."
+FAIL = user used hedge language ("maybe we could..."); OR asked permission rather than made a statement.
+NOT E = conversation too early or short to expect the move.
+
+IMPORTANT: T, R, A, C can only fire when the corresponding signal appeared in Sofia's MOST RECENT response. Only the current exchange matters — do not fire based on stage directions from earlier exchanges. When in doubt: return teachable:false.`;
+
+  const skillDefs = isLesson1 ? lesson1SkillDefs : isLesson2 ? lesson2SkillDefs : isLesson3 ? lesson3SkillDefs : isLesson4 ? lesson4SkillDefs : lesson5SkillDefs;
+  const lessonLabel = isLesson1 ? 'OTIMC (Lesson 1 — The Approach)' : isLesson2 ? 'FRAME (Lesson 2 — Holding Your Ground)' : isLesson3 ? 'PACE (Lesson 3 — The Long Game)' : isLesson4 ? 'CHAIN (Lesson 4 — The Thread)' : 'TRACE (Lesson 5 — The Read)';
 
   // Belt-and-suspenders: also tell the LLM when gates are active (code overrides below are the real guards)
   let finalSkillDefs = skillDefs;
@@ -512,7 +573,7 @@ Exchange number: ${exchangeCount}`;
     // Library lookup — filter by conversation context, then pick at random.
     // opener:true lines are only shown when exchangeCount <= 2 (still early enough to be the approach).
     // If filtering leaves nothing, fall back to the LLM's own betterLine which can reply to her actual words.
-    const lessonKey  = isLesson1 ? 'lesson1' : isLesson2 ? 'lesson2' : isLesson3 ? 'lesson3' : 'lesson4';
+    const lessonKey  = isLesson1 ? 'lesson1' : isLesson2 ? 'lesson2' : isLesson3 ? 'lesson3' : isLesson4 ? 'lesson4' : 'lesson5';
     const allLines   = BETTER_LINES[lessonKey]?.[String(parsed.skill)] || [];
     const isEarly    = exchangeCount <= 2;
     const pool       = isEarly ? allLines : allLines.filter(l => !l.opener);

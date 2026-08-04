@@ -1,146 +1,405 @@
 # EKLIPSES — LESSON 5 DRAFT
-## "The Read" — Cold Reading
-**READ mnemonic | Style: The Dark Needle | DRAFT — not yet scripted for recording**
+## "The Read" — Interest Signal Reading
+**TRACE mnemonic — LOCKED | Style: The Dark Needle | Status: Fully scripted — pending review before audio**
 
-> **Status:** Topic, mnemonic, character, and setting finalized. Ready to script.
+> **Status:** Mnemonic finalized. Full scenario dialogue, key-phrase library, drill reps, and pedagogical overlays scripted. Ready for review; do not begin audio generation until approved.
 
 ---
 
-## CHOICES LOCKED (for review, not approval)
+## DECISIONS LOCKED
 
-**Mnemonic:** READ (confirmed — four-letter mnemonic, each letter tracks directly to the moment in the technique)
+**Mnemonic:** TRACE (confirmed)
+| Letter | Word | One-sentence expansion |
+|--------|------|------------------------|
+| T | Track gaze | Notice duration and pattern — sustained eye contact beyond conversational need, the look-away-look-back cycle, holding on yours during a pause. |
+| R | Register proximity | Has she moved closer than the space or social context requires? Voluntary range reduction is one of the strongest documented signals of interest. |
+| A | Attend to alignment | Does her body echo yours — posture, lean, pace — without any deliberate reason? Behavioral mirroring only operates toward people we're drawn to. |
+| C | Catch touch initiation | Any contact she made that she didn't have to — arm, knee, shoulder. Brief, deliberate. These are almost never accidental. |
+| E | Enter once you see the cluster | Three or more of the above in a twenty-minute window is a confirmed read. One direct, unhurried move: close the distance, ask for the number, suggest continuing somewhere else. |
 
-**Character: Isabelle / bookstore setting**
-Isabelle is already embedded in the beat outline. Her energy in AVATAR_SETS ("intellectual & curious", museum scenario) maps naturally to the perceptive-stranger frame cold reading requires — she is someone who observes carefully, so she's a credible foil. The bookstore is the right setting (`bookstore_bg.jpg` exists): quieter pace, intellectual framing, and the act of browsing books gives visible behaviour to observe and read before opening. Note: in the avatar picker Isabelle's primary scenario is the museum; here she appears as a lesson demonstration character in a different context, which is fine.
+**Core skill:** Interest signal reading — not cold reading of personality. The skill teaches recognition of behaviorally documented attraction signals (Moore 1985, Grammer et al. 1996, Chartrand & Bargh 1999, Kellerman et al. 1989). Students learn to detect a *cluster* of signals, not a single event.
 
-**Tone:** Genuine observation framing — the full technique but positioned as "how to see someone clearly," not Barnum-statement mentalism. The distinction is explicit: specific reads (grounded in what you actually observed) versus generic reads (landing on anyone). The lesson teaches the former.
+**Character:** Sofia — teaching demonstration character across all five lessons. Slow-warming energy means her signals build gradually, demonstrating that the skill requires trained attention rather than obvious display.
 
-**Scope on "Emotional Perception" reframe:** Keeping the "Cold Reading" framing and the term "The Read" for the lesson title. The technique is real and the name is direct. If tone is a concern on review, it's easy to soften the positioning without changing the underlying content.
+**Setting:** Bookstore (`bookstore_bg.jpg` — confirmed to exist from prior draft notes). Quieter environment makes proximity shifts more meaningful; observable browsing behavior gives Ryan visual material to narrate.
+
+**Structure:** 10 segments. 6 Ryan coaching segments (00, 01, 03, 05, 07, 09), 4 exchange segments (02, 04, 06, 08). Matches L4.
 
 ---
 
 ## WHY THIS TOPIC
 
-**Rationale for Lesson 5:**
+**Rationale for Lesson 5 as capstone:**
 
-Cold reading is the practice of making specific, insightful observations about someone's personality or inner world using only observable signals — energy, posture, pace, what they notice, how they carry themselves. When done well, it makes you appear deeply perceptive — almost uncanny. That perception is powerfully attractive.
+After four lessons, a student can start a conversation (L1), hold ground under pressure (L2), pace himself when things go well (L3), and sustain a conversation indefinitely through threading (L4). The remaining gap: he cannot tell whether the conversation is actually going anywhere. Most men resolve this badly — either advancing too early on social courtesy mistaken for interest, or failing to advance at all on genuine interest because they cannot read it. Lesson 5 closes the arc.
 
-**Why it fits here in the progression:**
-
-| Lesson | Skill | What it teaches |
+| Lesson | Skill | What it handles |
 |--------|-------|-----------------|
-| 1 — The Approach | OTIMC | How to open and close |
-| 2 — Holding Your Ground | FRAME | How to handle tests and pressure |
-| 3 — The Long Game | PACE | How to maintain restraint when she's already interested |
-| 4 — The Thread | CHAIN | How to keep the conversation alive indefinitely |
-| **5 — The Read** | **READ** | **How to demonstrate deep perception** |
+| 1 — The Approach | OTIMC | Starting the conversation; the initial close |
+| 2 — Holding Your Ground | FRAME | Adversity, tests, social pressure |
+| 3 — The Long Game | PACE | Not self-sabotaging when things are going well |
+| 4 — The Thread | CHAIN | Sustaining conversation through deep listening |
+| **5 — The Read** | **TRACE** | **Reading genuine interest vs. social courtesy; knowing when and how to advance** |
 
-Lesson 5 is the culminating skill. The observation opener in Lesson 1 is a shallow cold read — a single behavioural observation used as a conversation starter. Lesson 5 goes deeper: this is the full technique for making someone feel genuinely seen. Threading (L4) is the prerequisite — you can only read someone you've been actually listening to. The Read is what L4's conversation makes possible.
+Threading (L4) is the prerequisite — you can only read someone you've been actually listening to. The Read is what a CHAIN conversation makes possible.
 
-Women consistently report that "he understood me" is one of the most attractive qualities in a man. Cold reading is the skill that creates that feeling deliberately, not by luck.
+**Research basis:**
 
-**Source credibility:** Girls Chase (extensive written guides), Absolute Ability, Czar Dating, Unapologetic Man Podcast (Jedi Mind Trick episode). Taught across most serious dating curricula. Not fringe.
+- **Moore (1985)** — "Nonverbal courtship patterns in women: Context and consequences," *Ethology and Sociobiology*, 6(4), 237–247. Catalogued 52 distinct nonverbal courtship behaviors via naturalistic observation across contexts. Key finding: signal *frequency* (not any single signal) predicted male approach success. Women who emitted multiple signals in a short window were almost never rejected when approached; women who emitted few were frequently rejected.
 
----
+- **Grammer, Kruck, Juette & Eibl-Eibesfeldt (1996)** — "Non-verbal behavior as courtship signals," *Evolution and Human Behavior*, 17(6), 371–390. Men detected female interest signals at barely above chance in real-time interaction, while trained coders identified them reliably from video. The gap is the skill gap this lesson closes.
 
-## MNEMONIC
+- **Chartrand & Bargh (1999)** — "The chameleon effect," *Journal of Personality and Social Psychology*, 76(6), 893–910. Unconscious behavioral mirroring operates toward people we feel positively toward, below the threshold of conscious awareness. Bidirectional: it reflects liking and reinforces it.
 
-### READ
+- **Kellerman, Lewis & Laird (1989)** — "Looking and loving," *Journal of Research in Personality*, 23(2), 145–161. Sustained mutual gaze predicts felt attraction. Extended eye contact without conversational justification is a documented signal distinct from polite attention.
 
-> "Most men listen to respond. This lesson teaches you to listen to understand — and then to say what you understand in a way she has never heard from a stranger."
-
-| Letter | Word | One-sentence expansion |
-|--------|------|------------------------|
-| R | Register before you speak | Observe her energy, pace, posture, and what she notices before making any assessment — the raw material comes first. |
-| E | Express as a feeling | Frame the read as a sense you get, not a fact you know — "you seem like someone who..." lands; "you are someone who..." kills it. |
-| A | Allow the response | Give her space to confirm, redirect, or push back — don't defend the read and don't collapse if she corrects you. |
-| D | Dig one layer deeper | If she connects with the read, follow it into something real; that transition from observation to conversation is where intimacy begins. |
-
-**Narrative hook for Ryan's recap:**
-> "The question is not whether she will tell you who she is. She already is. The question is whether you are paying enough attention to see it."
+- **Givens (1978)** — "The nonverbal basis of attraction," *Psychiatry*, 41(4), 346–359. Five-phase courtship sequence (attention → recognition → interaction → sexual arousal → resolution); the attention and recognition phases are almost entirely nonverbal and precede any verbal exchange.
 
 ---
 
 ## KEY-PHRASE LIBRARY
 
-### R — Register before you speak
+*3 curated lines per skill. These are spoken lines for Alex in practice/lesson context. Tags: opener: true = approach-only (these lines are contextually specific to an opening beat).*
 
-*These are internal beats, not spoken lines — but Ryan will need phrases to teach the observation habit. Some lines signal to her that you've been watching:*
+### T — Track gaze
 
-- "I've been watching you since you sat down. I have a theory." *(spoken — signals observation)*
-- "Give me a second. I noticed something." *(spoken — buys time to form the read)*
-- "You've been here a while. I can tell you haven't found what you were looking for yet." *(spoken — observation-based opening)*
+*Lines that respond to or name the gaze pattern without calling it out clumsily:*
 
-### E — Express as a feeling
+- "Don't look away on my account." *(gaze-hold line — universal)*
+- "You're doing something with how you look at people. I noticed it from the start." *(names it lightly — universal)*
+- *(hold eye contact one beat past where most people would break it — no words needed)* *(non-verbal move — universal)*
 
-*The "you seem like" construction. These are observation-grounded reads, not generic Barnum statements:*
+### R — Register proximity
 
-- "You seem like someone who holds a lot back. Not because you're shy — because you're selective." *(perception read)*
-- "I get the sense that you've been underestimated by most of the people in your life." *(emotional read)*
-- "You carry something that most people here wouldn't notice. I noticed it." *(presence read)*
+*Lines that play with or acknowledge the closed distance:*
 
-### A — Allow the response
+- "We started much further apart." *(playful observation — universal)*
+- *(lean back slightly, create the space — see if she fills it)* *(non-verbal test — universal)*
+- "You moved over here. I noticed." *(direct, not accusatory — universal)*
 
-*Non-defensive space-giving lines. The silence often does the work better than any line:*
+### A — Attend to alignment
 
-- "I could be completely wrong. Tell me." *(allow)*
-- "That's just what I see from the outside. You'll know better than I do." *(allow)*
-- *(beat of silence after the read — don't fill it)* *(allow)*
+*The chameleon test — these are mostly non-verbal, but naming lines exist:*
 
-### D — Dig one layer deeper
+- *(shift posture slightly, wait 30–60 seconds, note if she mirrors it)* *(internal test — universal)*
+- "You match the pace of whoever you're talking to. That's a specific quality." *(names the mirroring indirectly — universal)*
+- *(no line — register the alignment internally, continue the conversation)* *(universal)*
 
-*Follow-up lines after she confirms. The move from observation to genuine conversation:*
+### C — Catch touch initiation
 
-- "That tracks. Why do you think that is?" *(dig)*
-- "I want to understand that better — not the fact, the feeling behind it." *(dig)*
-- "Go on. I'm listening differently now." *(dig)*
+*Lines for after she's made contact:*
 
----
+- *(sustained eye contact in response — no words)* *(universal)*
+- "You did that on purpose." *(certain, light — universal)*
+- *(brief reciprocal touch of equal or slightly lesser weight — do not escalate immediately)* *(non-verbal move — universal)*
 
-## SCENARIO OUTLINE
+### E — Enter once you see the cluster
 
-*Rough beats — not yet fully scripted. Follows the Lesson 1–4 format of alternating Ryan narration and live exchanges.*
+*The bridge-to-action: three or more signals confirmed → one direct move. Statement, not question:*
 
-**Setting: Bookstore** (`bookstore_bg.jpg` exists)
-**Character: Isabelle** (intellectual & curious — ideal foil for the perceptive-stranger cold reading dynamic)
-
----
-
-### BEAT OUTLINE
-
-**SEGMENT 00 — LESSON INTRO (Ryan)**
-Ryan opens with a question: what's the most attractive thing a man can do in a conversation? Not a line. Not a tease. Make her feel understood. Like he sees something real. This lesson teaches how to do that deliberately — through observation, not luck. He previews READ.
-
-**SEGMENT 01 — BEFORE THE READ (Ryan)**
-Ryan explains the R step. Most men look at women. They don't register them. He walks through what to observe: energy level (high or contained?), pace (quick answers or considered?), what she's drawn to, how she holds herself, what she avoids. This is the data.
-
-**SEGMENT 02 — WATCH: THE OBSERVATION (Exchange)**
-Alex approaches Isabelle in a bookstore. Instead of opening immediately, he takes a few seconds. Then: "I've been watching you for a minute. I have a theory." She looks up: "About what?" He delivers the read — something specific about how she engages with books (not browsing, studying; like she's looking for confirmation of something she already suspects).
-
-**SEGMENT 03 — E EXPLAINED (Ryan)**
-Ryan breaks down the framing: "you seem like" versus "you are." He explains the difference between Barnum statements — the general ones that land on anyone — and specific reads grounded in what you actually observed. Specific reads are harder but far more powerful. They say: I was paying attention to you specifically.
-
-**SEGMENT 04 — WATCH: THE RESPONSE AND ALLOW (Exchange)**
-Isabelle reacts — surprised, slightly guarded. "That's oddly specific." Alex doesn't back down but doesn't double down: "I could be wrong. Am I?" She pauses. Confirms. He stays quiet. Doesn't rush.
-
-**SEGMENT 05 — A EXPLAINED (Ryan)**
-Ryan explains why most men destroy the moment here. They get excited that the read landed and they keep talking — explaining how they knew, listing other things they noticed. The silence after a confirmed read is where the connection lives. Don't fill it.
-
-**SEGMENT 06 — WATCH: DIGGING DEEPER (Exchange)**
-After the pause, Alex asks: "Why do you think that is?" Isabelle opens up — something real. He responds with a follow-up that shows he tracked what she said, not just waiting for his turn to speak.
-
-**SEGMENT 07 — D EXPLAINED (Ryan)**
-Ryan explains the shift. The read got the door open. The dig is what you do once you're inside. It's not more cold reading — it's genuine curiosity. The skill was the key. The conversation itself is what you were after.
-
-**SEGMENT 08 — RECAP AND SEND-OFF (Ryan)**
-READ mnemonic restated one letter at a time. Closing line (draft):
-> "She has met men who looked at her. She has rarely met a man who saw her. That is the difference this lesson teaches. And it is a difference she will feel long after the conversation ends."
+- "I want to keep talking to you. What's your number." *(universal)*
+- "We should continue this somewhere quieter. Come on." *(universal)*
+- "I'm going to get another drink. You should come." *(low-pressure inclusion — universal)*
 
 ---
 
-## RECORDING NOTES (for future use, not current phase)
+## DRILL REPS (coach-moment.js format)
+
+*Lines used in coached practice mode when the user demonstrates TRACE skills. Note: T, R, A, C are observational skills — in the text-based practice format, coaching fires when the user demonstrates awareness of the dynamic (naming it) or when they make the active move (E). Design note: the practice-mode coaching for TRACE should fire primarily on E (the verbal move) and on T/A lines that demonstrate perceptive attention. R and C signals in a text conversation require Sofia to describe her own physical behavior, which the character prompts handle.*
+
+```js
+lesson5: {
+  T: [
+    // universal — demonstrates gaze awareness without clumsiness
+    { text: "Don't look away on my account." },
+    { text: "You're doing something with how you look at people. I noticed." },
+    { text: "I noticed that." }, // intentionally minimal — after a gaze hold
+  ],
+  R: [
+    // universal — registers and responds to proximity shift
+    { text: "We started much further apart." },
+    { text: "You moved over here. I noticed." },
+    { text: "I'm not moving. But you can keep going." }, // playful hold of ground
+  ],
+  A: [
+    // universal — names the mirroring/alignment dynamic
+    { text: "You match the pace of whoever you're talking to." },
+    { text: "You adjusted without noticing. That's a tell." },
+    { text: "You just did what I did. That's interesting." },
+  ],
+  C: [
+    // universal — responds to touch initiation without flinching or over-reacting
+    { text: "You did that on purpose." },
+    { text: "That wasn't accidental." },
+    { text: "I noticed that too." },
+  ],
+  E: [
+    // universal — the direct ask; statement, not question
+    { text: "I want to keep talking to you. What's your number." },
+    { text: "We should continue this somewhere else. Come on." },
+    { text: "I'm going to get another drink. You should come." },
+  ],
+},
+```
+
+---
+
+## PEDAGOGICAL EXPLANATION OVERLAY TEXT
+
+*Two-sentence block per skill. Sentence 1: what she's doing and why. Sentence 2: names the skill plainly. Used in Coached Practice interrupt overlays.*
+
+**T — Track gaze:**
+Her eye contact has shifted — it's lasting longer than conversation requires, holding on you during silences and after she finishes speaking. That's a gaze signal: genuine attention has a different duration than polite attention.
+
+**R — Register proximity:**
+She's moved closer than the space requires — not because the room is crowded, but because distance felt like too much. Voluntary proximity reduction is one of the most consistently documented attraction signals in the research.
+
+**A — Attend to alignment:**
+Her posture has started to echo yours — the lean, the angle, the pace — without any deliberate coordination. Behavioral mirroring happens involuntarily toward people we feel drawn to; she isn't doing it consciously.
+
+**C — Catch touch initiation:**
+She just made contact she didn't have to make — a brief touch on your arm or shoulder that released immediately. Deliberate touch initiation is almost never accidental; it's a physical signal that the conversation has crossed into something she wants more of.
+
+**E — Enter once you see the cluster:**
+Three or more of these signals in twenty minutes is a confirmed read, not a guess. This is the moment to act: one direct, unhurried move — ask for the number, suggest somewhere else, include her in what you're doing next. Not a question. Not a preamble. A step.
+
+---
+
+## FULL SCRIPTED SEGMENTS
+
+### SEGMENT 00 — LESSON INTRO (Ryan)
+
+**File:** `ryan_seg00.mp3`
+
+"Lesson 5. If you've done the first four, here's where you are. You can start a conversation — the approach, the opener, the close. You can hold your ground when she tests you — the frame, the reframe, the exit. You can pace yourself when things go well — not rushing what needs time. And you can sustain a conversation for as long as it needs to run, going deeper into what she gives you rather than hunting for new material. That's a complete skill set. And yet — conversations still end without going anywhere. The person you were talking to was interested, and you left. Or you moved before there was anything real there, and she pulled back. The thing you were missing in both cases is the same. You couldn't read the difference between someone who's enjoying talking to you and someone who wants more than the talking. That difference isn't vague. It isn't a gut feeling you either have or don't. It is a specific set of behavioral signals — documented, observed in real settings, catalogued in peer-reviewed research. She has been sending them your entire life. You just weren't taught what they look like. This lesson teaches you what they look like. What you're about to learn is TRACE."
+
+---
+
+### SEGMENT 01 — WHY MEN MISS IT (Ryan)
+
+**File:** `ryan_seg01.mp3`
+
+"Here's the research. Monica Moore spent time watching women in real social settings — bars, cafes, bookstores, libraries — and catalogued fifty-two distinct nonverbal behaviors women emit specifically when they're interested. Not when they're being friendly. When they're interested. Things like eye contact that holds two or three beats past where most people look away. Moving closer than the physical space or the conversation required. Posture that starts to echo the person she's talking to without any apparent reason. A brief touch on the arm that wasn't necessary. Laughter that's slightly more frequent than the jokes deserve. These signals are real. They're documented. And they're not random — they cluster. One of these in twenty minutes means nothing. Three from different categories in twenty minutes means something specific. That's the most important finding in Moore's work: signal frequency and variety, not any single signal, predicted whether an approach would succeed. The second piece of research matters as much. Grammer and his team studied whether men could actually detect these signals in real interactions. The answer was barely above chance. Not because men are inattentive. Because no one ever told them what to pay attention to. The gap between what she's emitting and what he's receiving is exactly the gap this lesson closes."
+
+---
+
+### SEGMENT 02 — WATCH: THE MISSED READ (Exchange)
+
+**Setting:** Alex and Sofia mid-conversation in the bookstore. They've been talking for fifteen minutes. Sofia has been moving gradually closer — she's now beside him, looking at the book in his hands. Throughout the conversation she's held his gaze a beat longer than necessary, her posture has started matching his against the shelf, and she touched his forearm briefly while making a point earlier.
+
+**Files:** `sofia_s02_01.mp3` through `sofia_s02_06.mp3`, `alex_s02_01.mp3` through `alex_s02_05.mp3`
+
+```
+sofia_s02_01: "...I like how he builds silence into the sentences."
+alex_s02_01: "That's a specific thing to notice about a writer."
+sofia_s02_02: "I notice specific things." [holds his gaze past the end of the sentence]
+alex_s02_02: "What kind of work are you in?"
+sofia_s02_03: "...architecture." [she's moved to look at the book in his hands — she's beside him now] "What made you pick that one up?"
+alex_s02_03: "It was next to something I was actually looking for."
+sofia_s02_04: "That's how you find the good ones." [touches his forearm lightly while saying it, drops the contact]
+alex_s02_04: "Yeah, probably." [doesn't register it] "I should make a decision before the shop closes."
+sofia_s02_05: "...right." [stays exactly where she is — close, facing him]
+alex_s02_05: "Good to talk to you."
+sofia_s02_06: "...you too."
+```
+
+*Alex leaves. Sofia watches him go.*
+
+---
+
+### SEGMENT 03 — T AND R EXPLAINED (Ryan)
+
+**File:** `ryan_seg03.mp3`
+
+"Let's go back through that. From the moment they were talking, Sofia was sending him signals. He just wasn't reading them. Track gaze first. When she said 'I notice specific things' — she held eye contact for two or three beats past where most people break it. That's not conversational attention. Conversational eye contact follows speech. It breaks when the sentence ends or when the speaker looks away. What she did held after the sentence ended, into the silence after. That's the first signal. Register proximity next. When she asked about the book, she moved. Not because the aisle was crowded. Because distance felt like too much. She put herself beside him — close enough to look at what he was holding — with no conversational justification for closing that space. He stood exactly where he was and answered the question about the book. He didn't register that she had just voluntarily cut the distance between them by more than half. Two signals in the first few minutes of talking. He didn't see either of them. Watch what changes when he does."
+
+---
+
+### SEGMENT 04 — WATCH: CATCHING T AND R (Exchange)
+
+**Setting:** Same scene, reset to the start of their exchange.
+
+**Files:** `sofia_s04_01.mp3` through `sofia_s04_05.mp3`, `alex_s04_01.mp3` through `alex_s04_04.mp3`
+
+```
+sofia_s04_01: "...I like how he builds silence into the sentences."
+alex_s04_01: "That's a specific thing to notice about a writer."
+sofia_s04_02: "I notice specific things." [holds his gaze]
+alex_s04_02: [holds the eye contact back — doesn't break it when she does, lets it settle] "What kind of work are you in?"
+sofia_s04_03: "...architecture." [moves beside him to look at the book] "What made you pick that one up?"
+alex_s04_03: [doesn't move back — registers that she's closed the distance] "It was next to something I was actually looking for."
+sofia_s04_04: "That's how you find the good ones."
+alex_s04_04: "What are you in here for?"
+sofia_s04_05: "...something I've probably already read." [small smile — still beside him, still close]
+```
+
+*Two signals tracked. Alex continues the conversation with awareness — T logged, R logged. He doesn't act yet. He's building the picture.*
+
+---
+
+### SEGMENT 05 — A AND C EXPLAINED (Ryan)
+
+**File:** `ryan_seg05.mp3`
+
+"Watch what happens over the next few minutes. Sofia's posture starts to change. When Alex leans back against the shelf, her angle shifts — not all the way, not dramatically. She just moves into the same lean. When he shifts his weight, a minute or so later, she shifts hers. She isn't doing this on purpose. Chartrand and Bargh documented this in a study called the chameleon effect — people unconsciously mirror the posture, pace, and gesture of people they feel positively toward. It operates below the level of conscious awareness. She cannot feel herself doing it. The practical test is simple: change your posture slightly, then wait. If she mirrors it within a minute, that's a signal. Align — attend to alignment. The fourth signal is the touch. When she made a point about the book — she put her hand on his forearm for a half second, then released it. She didn't have to make contact there. Nothing in the conversation required it. She chose to, briefly, and let go. That is not an accident. Accidental contact is pulled back from. Deliberate contact settles into, however briefly, before releasing. Gaze. Proximity. Alignment. Touch. In one fifteen-minute conversation. That is not noise. That is a cluster."
+
+---
+
+### SEGMENT 06 — WATCH: READING THE FULL CLUSTER (Exchange)
+
+**Setting:** Continuing from where SEG 04 left off. Several more minutes have passed.
+
+**Files:** `sofia_s06_01.mp3` through `sofia_s06_03.mp3`, `alex_s06_01.mp3` through `alex_s06_03.mp3`
+
+```
+sofia_s06_01: "...it's the kind of decision where if you have to keep asking, you already know the answer." [touches his forearm lightly while making the point, releases]
+alex_s06_01: [doesn't pull back — continues, present] "You always know before you ask."
+sofia_s06_02: "Usually." [her posture mirrors his lean against the shelf — same angle, same ease]
+alex_s06_02: "What made you want to work in architecture in the first place?"
+sofia_s06_03: "...I wanted to make things that didn't apologize for existing." [holds his gaze]
+alex_s06_03: [a beat of quiet — T checked, R checked, A checked, C checked] "That's a good reason."
+```
+
+*He's confirmed the cluster. He continues the conversation — relaxed, unhurried. He doesn't move yet.*
+
+---
+
+### SEGMENT 07 — E EXPLAINED (Ryan)
+
+**File:** `ryan_seg07.mp3`
+
+"That was Enter on the cluster. And notice what it wasn't. It wasn't a setup. It wasn't a speech about how much he'd enjoyed the conversation or how rare it was to meet someone like her. It wasn't a question — 'can I get your number?' — which introduces doubt and transfers the weight of the decision to her. It was one sentence. A statement. Unhurried. Unambiguous. He wasn't nervous because he wasn't guessing. He had tracked the signals, confirmed the cluster, and now he was acting on what was real. The trap most men fall into after reading the signals correctly is continuing to read. They want a sixth signal, or a seventh, or a cleaner moment that will make the move feel more natural than the last one. That moment doesn't arrive. What arrives is her phone buzzing, or someone else joining the conversation, or just the natural end of the scene. The signals don't accumulate forever. There's a window — and it opens when the cluster is confirmed. Once you have three or more signals across different categories inside twenty minutes, that's the window. You enter it. One move. Direct. Unhurried. You don't explain why. You don't apologize for it. You just act on what you know."
+
+---
+
+### SEGMENT 08 — WATCH: THE WINDOW (Exchange)
+
+**Setting:** Continuing from SEG 06 — same conversation, a few exchanges later. The cluster has been confirmed. Now Sofia creates the natural closing moment: she signals she should probably get moving. This is the window. Alex catches it before it closes.
+
+**Files:** `sofia_s08_01.mp3` through `sofia_s08_04.mp3`, `alex_s08_01.mp3` through `alex_s08_03.mp3`
+
+```
+sofia_s08_01: "...I should probably go find what I actually came in for." [she shifts slightly — not leaving yet, but the motion is there]
+alex_s08_01: "I want to keep talking to you. What's your number."
+sofia_s08_02: [stops] "...that was fast."
+alex_s08_02: "It wasn't. I've been deciding for a few minutes."
+sofia_s08_03: "...okay." [takes his phone, enters the number]
+sofia_s08_04: "Done." [hands it back — holds his gaze for a moment]
+alex_s08_03: "Good."
+```
+
+*No additional words. The moment is easy because the groundwork was already there — he wasn't guessing. And the line "I've been deciding for a few minutes" says everything: he was reading, not reacting.*
+
+---
+
+### SEGMENT 09 — RECAP AND SEND-OFF (Ryan)
+
+**File:** `ryan_seg09.mp3`
+
+"That's TRACE. One more time. T — Track gaze. Sustained eye contact that holds past the end of a sentence, past the end of a silence, past where most people look away. That's not conversational attention. That's a signal. R — Register proximity. She moved closer than the space or the conversation required. That move has a reason. Log it. A — Attend to alignment. Her posture echoes yours without any coordination — the lean, the pace, the angle. The chameleon effect only operates toward people she's drawn to. C — Catch touch initiation. Any contact she made that she didn't have to make. Brief. Deliberate. Not a correction, not an accident. A signal. E — Enter once you see the cluster. Three or more of these in a twenty-minute window is not noise. It's a confirmed read. One direct, unhurried move. Statement, not question. You act on what you know. She has been doing this the whole time — every woman who was interested in you, in every conversation you walked away from wondering. She was leaning closer, holding your eye contact a beat longer than she needed to, laughing more than the joke deserved, touching your arm when she didn't have to. And most men never saw it. Not because they weren't paying attention. Because no one told them what to pay attention to. Now you know. That's the whole lesson. Go practice. She's already in there."
+
+---
+
+## EXCHANGE SEQUENCE MANIFEST
+
+*For record_lesson5.js — maps segment ID to file sequence.*
+
+```js
+const EXCHANGE_SEQUENCES = {
+  '02': [
+    { file: 'sofia_s02_01.mp3', voice: 'sofia' },
+    { file: 'alex_s02_01.mp3',  voice: 'alex'  },
+    { file: 'sofia_s02_02.mp3', voice: 'sofia' },
+    { file: 'alex_s02_02.mp3',  voice: 'alex'  },
+    { file: 'sofia_s02_03.mp3', voice: 'sofia' },
+    { file: 'alex_s02_03.mp3',  voice: 'alex'  },
+    { file: 'sofia_s02_04.mp3', voice: 'sofia' },
+    { file: 'alex_s02_04.mp3',  voice: 'alex'  },
+    { file: 'sofia_s02_05.mp3', voice: 'sofia' },
+    { file: 'alex_s02_05.mp3',  voice: 'alex'  },
+    { file: 'sofia_s02_06.mp3', voice: 'sofia' },
+  ],
+  '04': [
+    { file: 'sofia_s04_01.mp3', voice: 'sofia' },
+    { file: 'alex_s04_01.mp3',  voice: 'alex'  },
+    { file: 'sofia_s04_02.mp3', voice: 'sofia' },
+    { file: 'alex_s04_02.mp3',  voice: 'alex'  },
+    { file: 'sofia_s04_03.mp3', voice: 'sofia' },
+    { file: 'alex_s04_03.mp3',  voice: 'alex'  },
+    { file: 'sofia_s04_04.mp3', voice: 'sofia' },
+    { file: 'alex_s04_04.mp3',  voice: 'alex'  },
+    { file: 'sofia_s04_05.mp3', voice: 'sofia' },
+  ],
+  '06': [
+    { file: 'sofia_s06_01.mp3', voice: 'sofia' },
+    { file: 'alex_s06_01.mp3',  voice: 'alex'  },
+    { file: 'sofia_s06_02.mp3', voice: 'sofia' },
+    { file: 'alex_s06_02.mp3',  voice: 'alex'  },
+    { file: 'sofia_s06_03.mp3', voice: 'sofia' },
+    { file: 'alex_s06_03.mp3',  voice: 'alex'  },
+  ],
+  '08': [
+    { file: 'sofia_s08_01.mp3', voice: 'sofia' },
+    { file: 'alex_s08_01.mp3',  voice: 'alex'  },
+    { file: 'sofia_s08_02.mp3', voice: 'sofia' },
+    { file: 'alex_s08_02.mp3',  voice: 'alex'  },
+    { file: 'sofia_s08_03.mp3', voice: 'sofia' },
+    { file: 'sofia_s08_04.mp3', voice: 'sofia' },
+    { file: 'alex_s08_03.mp3',  voice: 'alex'  },
+  ],
+};
+```
+
+*SEG 06: 6 files (3 sofia, 3 alex). SEG 08: 7 files (4 sofia, 3 alex). Total exchange files: 11 + 9 + 6 + 7 = 33. Total with Ryan (10): 43 files.*
+
+---
+
+## SEGMENT TITLE LIST (for lesson-player.js SEGMENTS5)
+
+```js
+const SEGMENTS5 = [
+  { id:'00', title:'Welcome' },
+  { id:'01', title:'Why Men Miss It' },
+  { id:'02', title:'Watch — The Missed Read' },
+  { id:'03', title:'T — Track · R — Register' },
+  { id:'04', title:'Watch — Catching T and R' },
+  { id:'05', title:'A — Align · C — Catch' },
+  { id:'06', title:'Watch — The Full Cluster' },
+  { id:'07', title:'E — Enter' },
+  { id:'08', title:'Watch — The Window' },
+  { id:'09', title:'Your Five Steps' },
+];
+```
+
+---
+
+## DESIGN NOTE: TRACE IN PRACTICE MODE — IMPLEMENTED
+
+T, R, A, and C are observational skills — the student reads signals *from* Sofia rather than producing them. This has been resolved in the practice-mode injection:
+
+- **Sofia's character prompt (character.js `lesson5TestBlock`)**: Sofia emits physical signals as stage-direction parentheticals woven into her responses. Format: `(You realize you've been holding his gaze a beat longer than the sentence required.)` at the start of the turn, roughly one per 2–3 exchanges. Timing schedule: exchange ~3 (gaze), ~4 (proximity), ~5–6 (alignment), ~7+ (touch). Instructions in character.js handle signal spacing and responses to acknowledgment.
+- **Coach-moment (coach-moment.js)**: `lesson5SkillDefs` added. T/R/A/C fire only when the corresponding stage direction appeared in Sofia's most-recent response. E fires on the direct move. Full `lesson5:` BETTER_LINES library added (5 skills × 3 lines = 15 lines).
+- **Post-session coaching (coach.js)**: `lesson5Check` + `lesson5Eval` + `LESSON 5 EVALUATION` criteria added. T/R/A/C are scored on signal acknowledgment; signals Sofia never emitted default to PASS so the user isn't penalized for untested skills.
+
+---
+
+## CONTENT ACCURACY NOTES
+
+- **The 52-behavior count** (Moore 1985): accurate to the paper. The lesson cites it through Ryan's narration in SEG 01. Do not inflate or deflate this number in audio.
+- **"Barely above chance"** (Grammer 1996): accurate directional description of the finding. Acceptable to use in narration without citing exact accuracy percentages, which varied across conditions.
+- **Chameleon effect** (Chartrand & Bargh 1999): the replication record on magnitude is mixed in recent meta-analyses. The directional finding (mirroring reflects and reinforces liking) has held better than specific effect-size claims. Ryan's narration does not make magnitude claims — it describes the mechanism, which is appropriate.
+- **"Three or more signals"**: the cluster-of-three threshold is a pedagogical anchor, not a finding from any single study. Moore's data shows frequency predicts outcome; the "three in twenty minutes" framing is a usable teaching frame, not an empirical threshold. Present it in audio as a practical guide, not a research finding.
+
+---
+
+## RECORDING NOTES (for future use — not current phase)
 
 - Same format as Lessons 1–4: one MP3 per segment
-- File naming: `lesson5_seg00.mp3`, `lesson5_seg01.mp3`, … `lesson5_seg08.mp3`
-- Target runtime: 9-12 minutes total
-- Store in R2 under `/lessons/lesson5/audio/`
+- Ryan: Fish Audio voice `44b996214285427697767cb469793647` (sequential)
+- Sofia: Fish Audio voice `836513f294d64aec8403226e69268b1b` (sequential)
+- Alex: OpenAI tts-1-hd / onyx (parallel)
+- File naming: `lesson5_seg00.mp3` … `lesson5_seg09.mp3` for Ryan; `sofia_s02_01.mp3` etc. for exchanges
+- Total audio files: 6 Ryan + ~14 Alex + ~17 Sofia ≈ 43 files + manifest
+- Store in R2 under `lessons/lesson5/audio/`
+- Cloudflare Worker: add `lesson5/` routing branch to `cloudflare-worker/lesson-audio-worker.js` before serving (same pattern as lesson4/ addition)
+- lesson-player.js: add SEGMENTS5, LESSONS.lesson5 config, renderLesson5Card() — unlock key `eklipses_lesson5_complete`, prerequisite `eklipses_lesson4_complete`

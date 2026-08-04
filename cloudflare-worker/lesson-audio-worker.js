@@ -11,7 +11,9 @@ export default {
     }
 
     let r2Key;
-    if (file.startsWith('lesson4/')) {
+    if (file.startsWith('lesson5/')) {
+      r2Key = 'lessons/lesson5/audio/' + file.slice('lesson5/'.length);
+    } else if (file.startsWith('lesson4/')) {
       r2Key = 'lessons/lesson4/audio/' + file.slice('lesson4/'.length);
     } else if (file.startsWith('lesson3/')) {
       r2Key = 'lessons/lesson3/audio/' + file.slice('lesson3/'.length);

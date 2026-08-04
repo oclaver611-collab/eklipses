@@ -4,12 +4,13 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { conversation, scenarioTitle, scenarioKey, opener, lesson1Complete: _l1 = false, lesson2Complete: _l2 = false, lesson3Complete: _l3 = false, lesson4Complete: _l4 = false, practiceFocus = null, characterId = 'sofia' } = req.body || {};
+  const { conversation, scenarioTitle, scenarioKey, opener, lesson1Complete: _l1 = false, lesson2Complete: _l2 = false, lesson3Complete: _l3 = false, lesson4Complete: _l4 = false, lesson5Complete: _l5 = false, practiceFocus = null, characterId = 'sofia' } = req.body || {};
   // practiceFocus overrides raw lesson flags when present
   const lesson1Complete = practiceFocus ? (practiceFocus === 'lesson1' || practiceFocus === 'both' || practiceFocus === 'all') : _l1;
   const lesson2Complete = practiceFocus ? (practiceFocus === 'lesson2' || practiceFocus === 'both' || practiceFocus === 'all') : _l2;
   const lesson3Complete = practiceFocus ? (practiceFocus === 'lesson3' || practiceFocus === 'all') : _l3;
   const lesson4Complete = practiceFocus ? (practiceFocus === 'lesson4' || practiceFocus === 'all') : _l4;
+  const lesson5Complete = practiceFocus ? (practiceFocus === 'lesson5' || practiceFocus === 'all') : _l5;
 
   if (!conversation?.length) {
     return res.status(400).json({ error: 'No conversation provided' });
@@ -323,6 +324,19 @@ ${lesson4Complete ? `  "lesson4Check": {
     "summary": "<1-2 punchy sentences: 4-5 PASS = CHAIN applied well, 3 = Making progress, 2 or fewer = Review and try again>"
   },
   "lesson4Eval": "<Spoken coaching paragraph — Ryan talking to the user. Start with 'Let me walk you through the Lesson 4 skills — CHAIN.' Then describe each skill result conversationally, matching the PASS/FAIL verdicts in lesson4Check above. For each skill speak it naturally: 'For Catch', 'For Hook', 'For Ask deeper', 'For Inject', 'For Never abandon' — then say what happened and whether it worked. One or two coaching sentences per skill. Spoken out loud — write it to be heard, not read off a form.>",` : ''}
+${lesson5Complete ? `  "lesson5Check": {
+    "skills": {
+      "trackGaze": "<'PASS' or 'FAIL' — apply the LESSON 5 EVALUATION criteria below>",
+      "registerProximity": "<'PASS' or 'FAIL'>",
+      "attendAlignment": "<'PASS' or 'FAIL'>",
+      "catchTouch": "<'PASS' or 'FAIL'>",
+      "enter": "<'PASS' or 'FAIL'>"
+    },
+    "score": "<number 0-5, count of PASS>",
+    "passed": "<true if score >= 4, false otherwise>",
+    "summary": "<1-2 punchy sentences: 4-5 PASS = TRACE applied well, 3 = Making progress, 2 or fewer = Review and try again>"
+  },
+  "lesson5Eval": "<Spoken coaching paragraph — Ryan talking to the user. Start with 'Let me walk you through the Lesson 5 skills — TRACE.' Then describe each skill result conversationally, matching the PASS/FAIL verdicts in lesson5Check above. For each skill speak it naturally: 'For Track gaze', 'For Register proximity', 'For Attend to alignment', 'For Catch touch', 'For Enter' — then say what happened and whether it worked. One or two coaching sentences per skill. Note: T, R, A, C are observational — the user PASSES by naming or responding to signals Sofia emitted. E is the active move. Spoken out loud — write it to be heard, not read off a form.>",` : ''}
   "part1": "<THE OPENER. Minimum 150 characters. Three sentences. ALWAYS begin with a positive: quote ONE specific line the user said anywhere in the conversation that showed curiosity, humor, or confidence, and say in one sentence why it worked. Second sentence: quote their opening line (HIM_1) verbatim inside quotes, name the move in 5 words or fewer, and say how it landed with ${girlName}. Third sentence: the one thing to sharpen next time. Never start part1 with a negative or a critique. The user must hear what to keep doing before hearing what to fix. Example structure: 'When you said [quote from the conversation], that landed — it showed you were paying attention to her, not just running a move. Your opener, [HIM_1 quote], was [name the move] — with ${girlName} that [how it landed]. Next time, [one specific thing to sharpen].'>",
 
   "part2": "<THE MIDDLE. Minimum 150 characters. Two to three sentences. Quote the single most revealing exchange: 'When she said [exact ${girlName} quote], you said [exact HIM quote].' Then one to two sentences on what that exchange cost him or earned him with ${girlName}, specific to who she is. Be surgical — name exactly what she was responding to.>",
@@ -518,7 +532,39 @@ NOT N = the conversation is in early exchanges (3 or fewer) — no established l
 
 IMPORTANT: All CHAIN skills evaluate what the user does with HER words, not whether the user said something interesting or impressive. A clever pivot off-topic fails C. A better question about something she never mentioned fails A. Evaluate strictly on whether the user tracked and deepened what she actually offered.
 
-These fields (lesson4Eval and lesson4Check) are already part of the JSON schema above — fill them based on the criteria and definitions above.` : ''}`;
+These fields (lesson4Eval and lesson4Check) are already part of the JSON schema above — fill them based on the criteria and definitions above.` : ''}${lesson5Complete ? `
+
+LESSON 5 EVALUATION — TRACE: Reading the Signal:
+Evaluate the user on these 5 skills. T, R, A, C are observational — Sofia emits signals through parenthetical stage directions in her responses. The user PASSES these by acknowledging, naming, or responding to the signal; FAILS by ignoring it entirely when it appeared.
+
+T — Track gaze: Did Sofia describe holding eye contact longer than normal, and did the user respond to or acknowledge the gaze dynamic?
+PASS = user named or played with the gaze signal: "don't look away on my account", "I noticed that", any line that holds or engages the eye contact dynamic rather than ignoring it.
+FAIL = the gaze stage direction appeared in Sofia's response and the user made no reference to it — responded only to conversational content.
+NOT T = Sofia emitted no gaze stage direction in the conversation.
+
+R — Register proximity: Did Sofia describe moving closer, and did the user acknowledge the shift?
+PASS = user named it ("we started much further apart", "you moved over here — I noticed") or played with it without pulling back.
+FAIL = proximity stage direction appeared and the user ignored it entirely.
+NOT R = Sofia emitted no proximity stage direction.
+
+A — Attend to alignment: Did Sofia describe mirroring his posture, and did the user notice or name it?
+PASS = user named the mirroring ("you match the pace of whoever you're with"), pointed it out, or acknowledged it in any way.
+FAIL = mirroring stage direction appeared and the user made no acknowledgment.
+NOT A = Sofia emitted no alignment stage direction.
+
+C — Catch touch: Did Sofia describe brief deliberate touch, and did the user respond without ignoring or over-reacting?
+PASS = user acknowledged it directly ("you did that on purpose", "that wasn't accidental") or responded with any line that plays with the touch signal.
+FAIL = touch stage direction appeared and the user completely ignored it in their reply.
+NOT C = Sofia emitted no touch stage direction.
+
+E — Enter on the cluster: Did the user make a direct, unambiguous move — ask for her number, suggest continuing somewhere else, or include her in what they're doing next — after three or more signals had appeared?
+PASS = direct statement or question moving the interaction forward with no hedge language, delivered after Sofia had emitted at least three signal stage directions.
+FAIL = user never made a move; OR used hedge language ("maybe we could..."); OR acted before three signals appeared.
+NOT E = conversation too short for the cluster to have formed.
+
+IMPORTANT: For any NOT-fired skill (Sofia emitted no signal), mark it PASS — do not penalize the user for an opportunity that wasn't created. Score and passed should only reflect skills where a genuine test occurred.
+
+These fields (lesson5Eval and lesson5Check) are already part of the JSON schema above — fill them based on the criteria and definitions above.` : ''}`;
 
   try {
     const finalOutcomeNote = finalCharResponse
