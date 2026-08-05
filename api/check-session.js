@@ -1,13 +1,13 @@
 // api/check-session.js — read session count without incrementing
 const { supabase } = require('./supabase');
-const { isDevBypass, isActiveSubscriber, getClientIP } = require('./ratelimit');
+const { isDevBypass, isActiveSubscriber, getClientIP, isTestAccount } = require('./ratelimit');
 
 const FREE_SESSION_LIMIT = 2;
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
-  if (isDevBypass(req) || await isActiveSubscriber(req)) {
+  if (isDevBypass(req) || isTestAccount(req) || await isActiveSubscriber(req)) {
     return res.status(200).json({ allowed: true, sessionsUsed: 0, sessionsRemaining: 999 });
   }
 

@@ -641,7 +641,8 @@ const DailyLimit = (() => {
   }
 
   // ── Inject auth headers into all API fetch calls via monkey-patch ─────────
-  // Adds x-dev-key (dev bypass) and x-stripe-customer (paid subscriber) headers
+  // Adds x-dev-key (dev bypass), x-stripe-customer (paid subscriber), and
+  // x-user-email (test-account bypass via TEST_EMAILS_BYPASS env var) headers.
   function patchFetch() {
     const _originalFetch = window.fetch;
     window.fetch = function(url, options = {}) {
@@ -651,9 +652,11 @@ const DailyLimit = (() => {
         url.includes('/api/count-session') ||
         url.includes('/api/check-session')
       )) {
-        const devKey = getDevKey();
+        const devKey    = getDevKey();
         const stripeCus = getStripeCustomer();
-        if (devKey || stripeCus) {
+        // x-user-email enables TEST_ACCOUNT_BYPASS on the server for whitelisted test emails
+        const userEmail = window.EkAuth?.getUser()?.email;
+        if (devKey || stripeCus || userEmail) {
           options.headers = options.headers || {};
           const isHeadersObj = options.headers instanceof Headers;
           if (devKey) {
@@ -663,6 +666,10 @@ const DailyLimit = (() => {
           if (stripeCus) {
             if (isHeadersObj) options.headers.set('x-stripe-customer', stripeCus);
             else options.headers['x-stripe-customer'] = stripeCus;
+          }
+          if (userEmail) {
+            if (isHeadersObj) options.headers.set('x-user-email', userEmail);
+            else options.headers['x-user-email'] = userEmail;
           }
         }
       }
