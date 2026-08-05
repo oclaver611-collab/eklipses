@@ -273,8 +273,9 @@ async function run() {
       window.currentCharacterId = 'sofia';
     });
 
-    // Test A: TraceCue.show() creates element with text and opacity:1
-    await tracePage.evaluate(() => TraceCue.show('She holds your gaze a beat too long.'));
+    // Test A: TraceCue.show() creates element with text; after double-RAF opacity is 1
+    await tracePage.evaluate(() => TraceCue.show('She holds your gaze a beat past where it should have ended.'));
+    await tracePage.waitForTimeout(200); // wait for double-RAF entry animation
     const t_shown = await tracePage.evaluate(() => {
       const el = document.getElementById('ek-trace-cue');
       if (!el) return { found: false };
@@ -293,9 +294,9 @@ async function run() {
       t_shown.found ? `opacity=${t_shown.opacity} text=${t_shown.hasText}` : 'element not found'
     );
     report(
-      'TraceCue cue is amber italic (#c9a96e)',
-      t_shown.found && t_shown.innerHTML.includes('#c9a96e') && t_shown.isItalic,
-      t_shown.found ? `hasAmber=${t_shown.innerHTML.includes('#c9a96e')} italic=${t_shown.isItalic}` : 'no span'
+      'TraceCue cue is gold italic (#d4b882)',
+      t_shown.found && t_shown.innerHTML.includes('#d4b882') && t_shown.isItalic,
+      t_shown.found ? `hasGold=${t_shown.innerHTML.includes('#d4b882')} italic=${t_shown.isItalic}` : 'no span'
     );
 
     // Test B: TraceCue.hide() sets opacity to 0
@@ -307,9 +308,9 @@ async function run() {
     });
     report('TraceCue.hide() sets opacity to 0', t_hidden);
 
-    // Test C: streamCharacterAndSpeak() with TRACE parenthetical (lesson5):
-    // — caption shows only the dialogue, not the parenthetical
-    // — TraceCue fires with second-person text when payload.done arrives
+    // Test C: streamCharacterAndSpeak() with server-side cue event (lesson5):
+    // — payload.cue fires TraceCue before the first sentence
+    // — caption shows only the clean dialogue (no parenthetical)
     await tracePage.evaluate(() => {
       localStorage.setItem('eklipses_practice_focus', 'lesson5');
       const el = document.getElementById('ek-trace-cue');
@@ -317,14 +318,11 @@ async function run() {
     });
     await mockTTS(tracePage);
 
-    // Stage direction split across two sentence events (mirrors real sentence splitter behaviour).
-    // Splitter breaks on '.', so the parenthetical becomes:
-    //   event 1: "(You hold his gaze a little past where you meant to."  — no ')', skip
-    //   event 2: "Lifts.) Nice to meet you."                             — ')' at index 6, emit remainder
+    // Server-side format: cue event first, then clean dialogue sentences, then done.
     const TRACE_SSE =
-      'data: {"sentence":"(You hold his gaze a little past where you meant to."}\n\n' +
-      'data: {"sentence":"Lifts.) Nice to meet you."}\n\n' +
-      'data: {"done":true,"full":"(You hold his gaze a little past where you meant to. Lifts.) Nice to meet you."}\n\n';
+      'data: {"cue":"She holds your gaze a beat past where it should have ended."}\n\n' +
+      'data: {"sentence":"Nice to meet you.","done":false}\n\n' +
+      'data: {"done":true,"full":"Nice to meet you."}\n\n';
     await tracePage.route('**/api/character-stream', route =>
       route.fulfill({ status: 200, contentType: 'text/event-stream', body: TRACE_SSE })
     );
@@ -334,7 +332,7 @@ async function run() {
 
     const t_captionText = await waitForCaption(tracePage, 4000);
     report(
-      'TRACE stream: caption shows only dialogue (parenthetical stripped)',
+      'TRACE stream: caption shows clean dialogue only',
       t_captionText === 'Nice to meet you.',
       `caption="${t_captionText}"`
     );
@@ -344,24 +342,24 @@ async function run() {
       `caption="${t_captionText}"`
     );
 
-    // Give payload.done time to fire and TraceCue to render
+    // Give double-RAF time to fire for entry animation
     await tracePage.waitForTimeout(500);
     const t_cue = await tracePage.evaluate(() => {
       const el = document.getElementById('ek-trace-cue');
       return el ? { opacity: el.style.opacity, text: el.textContent.trim() } : null;
     });
     report(
-      'TRACE stream: TraceCue visible after payload.done',
+      'TRACE stream: TraceCue visible after payload.cue',
       t_cue && t_cue.opacity === '1',
       t_cue ? `opacity=${t_cue.opacity}` : 'element not found'
     );
     report(
-      'TRACE stream: TraceCue text uses observer POV (She/her/your)',
+      'TRACE stream: TraceCue text is third-person narrator (She/your)',
       t_cue && t_cue.text.includes('She') && t_cue.text.includes('your'),
       t_cue ? `text="${t_cue.text}"` : 'no element'
     );
 
-    // Test D: No TraceCue when practiceFocus is NOT lesson5
+    // Test D: No TraceCue when practiceFocus is NOT lesson5 (client-side guard)
     await tracePage.evaluate(() => {
       localStorage.setItem('eklipses_practice_focus', 'free');
       const el = document.getElementById('ek-trace-cue');

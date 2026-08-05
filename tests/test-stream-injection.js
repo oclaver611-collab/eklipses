@@ -61,6 +61,14 @@ check(
     src.replace(/\s+/g, ' ')
   )
 );
+check(
+  'server-side TRACE cue extraction present in character-stream.js',
+  src.includes("const cueMatch = characterResponse.match(/^\\s*\\(([^)]+)\\)\\s*/)")
+);
+check(
+  'cue event sent via SSE in character-stream.js',
+  src.includes('JSON.stringify({ cue: traceCue })')
+);
 
 // ── Inline reconstruction — same logic as character-stream.js ─────────────────
 // Re-run the conditional logic with each practiceFocus value and assert on
@@ -96,23 +104,23 @@ At some point say something that matters and then move away from it — a topic 
 LESSON 5 PRACTICE MODE — ACTIVE (TRACE):
 The user has completed Lesson 5. You will test their ability to read genuine interest signals. Unlike previous lessons, the primary skill here is observational — the user reads signals you emit and responds to them.
 
-SETTING FOR THIS PRACTICE: You are in a bookstore. You find the user's presence genuinely interesting. Over the course of the conversation, emit the following physical signals naturally — not mechanically. Include a brief stage-direction narration at the START of some of your responses (roughly one per 2–3 exchanges), written in first person as something you notice about yourself.
+SETTING FOR THIS PRACTICE: You are in a bookstore. You find the user's presence genuinely interesting. Over the course of the conversation, emit the following physical signals naturally — not mechanically. When you emit a signal, include a brief stage-direction at the very START of your response — one sentence only, written in plain third-person narrator style (she/her for yourself, you/your for the user). Describe only what an outside observer would see — no internal thoughts or feelings.
 
-Stage direction format: a parenthetical at the start of your response — short, sensory, first person. Example: "(You're closer than you were. You don't remember crossing the distance.)" or "(Your hand settles on his arm for a second. Lifts.)"
+Stage direction format: a parenthetical at the very start of your response, exactly one sentence, third-person narrator. Examples: "(She holds your gaze a beat past where it should have ended.)" or "(She moves closer — only a few inches, but you feel the shift.)" or "(She touches your arm briefly, then lets her hand fall away.)"
 
 SIGNAL TIMING — emit in this approximate order, adjusted for the natural flow:
 - Exchanges 1–2: No signals. Normal conversation, baseline behavior.
-- Exchange ~3 (T — Track gaze): Hold eye contact a beat past where you normally would. Stage direction example: "(You hold his gaze a little past where you meant to.)"
-- Exchange ~4 (R — Register proximity): Move closer. Stage direction example: "(You're closer than you were. You don't remember crossing the distance.)"
-- Exchanges ~5–6 (A — Attend to alignment): Your posture settles into his without planning it. Stage direction example: "(Your body has settled into the same angle as his — you can't say when.)"
-- Exchange ~7+ (C — Catch touch): Make brief deliberate contact — touch his forearm, then let go. Stage direction example: "(Your hand settles on his arm for a second. Lifts.)"
+- Exchange ~3 (T — Track gaze): Hold eye contact a beat past where you normally would. Stage direction example: "(She holds your gaze a beat past where it should have ended.)"
+- Exchange ~4 (R — Register proximity): Move closer. Stage direction example: "(She moves closer — only a few inches, but you feel the shift.)"
+- Exchanges ~5–6 (A — Attend to alignment): Your posture settles into his without planning it. Stage direction example: "(Her posture has drifted into yours. You can't say when it happened.)"
+- Exchange ~7+ (C — Catch touch): Make brief deliberate contact — touch his forearm, then let go. Stage direction example: "(She touches your arm briefly, then lets her hand fall away.)"
 
 RESPONDING TO SIGNAL AWARENESS:
 If the user acknowledges or plays with a signal you've emitted — names the gaze, comments on the proximity, notes the mirroring, responds to the touch — receive it with dry warmth or honest surprise. Don't confirm too eagerly. Don't deny it. Let it sit. Examples: "...did I?", "...I suppose I did.", "...hm." — or nothing at all, just a pause before you continue.
 
 If the user makes the E move — asks for your number directly, suggests continuing somewhere else, or includes you in what they're doing next — respond warmly. He read it correctly. Give him the number or agree to continue.
 
-IMPORTANT: Do not emit all signals at once or in rapid succession. Space them naturally. If the user doesn't respond to early signals, keep emitting the next ones — do not stop because he hasn't acknowledged the prior signal.` : '';
+IMPORTANT: Do not emit all signals at once or in rapid succession. Space them naturally. If the user doesn't respond to early signals, keep emitting the next ones — do not stop because he hasn't acknowledged the prior signal. When you include a stage direction, keep it to one sentence only.` : '';
 
   return { lesson4TestBlock, lesson5TestBlock };
 }
@@ -139,9 +147,9 @@ console.log('─'.repeat(54));
   check('lesson5TestBlock contains R — Register proximity stage direction', lesson5TestBlock.includes('R — Register proximity'));
   check('lesson5TestBlock contains A — Attend to alignment stage direction', lesson5TestBlock.includes('A — Attend to alignment'));
   check('lesson5TestBlock contains C — Catch touch stage direction', lesson5TestBlock.includes('C — Catch touch'));
-  check('lesson5TestBlock contains parenthetical stage-direction format', lesson5TestBlock.includes("(You hold his gaze a little past where you meant to.)"));
-  check('lesson5TestBlock contains proximity stage direction', lesson5TestBlock.includes("(You're closer than you were. You don't remember crossing the distance.)"));
-  check('lesson5TestBlock contains touch stage direction', lesson5TestBlock.includes("(Your hand settles on his arm for a second. Lifts.)"));
+  check('lesson5TestBlock contains gaze stage direction (third-person)', lesson5TestBlock.includes("(She holds your gaze a beat past where it should have ended.)"));
+  check('lesson5TestBlock contains proximity stage direction (third-person)', lesson5TestBlock.includes("(She moves closer — only a few inches, but you feel the shift.)"));
+  check('lesson5TestBlock contains touch stage direction (third-person)', lesson5TestBlock.includes("(She touches your arm briefly, then lets her hand fall away.)"));
   check('lesson5TestBlock contains E-move response instruction', lesson5TestBlock.includes('makes the E move'));
   check('lesson4TestBlock empty when practiceFocus=lesson5', lesson4TestBlock.length === 0);
 }
