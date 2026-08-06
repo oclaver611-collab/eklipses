@@ -782,7 +782,7 @@ const TraceCue = (() => {
     el.id = 'ek-trace-cue';
     el.style.cssText = [
       'position:absolute',
-      'top:16px',
+      'bottom:80px',
       'left:50%',
       'transform:translateX(-50%) translateY(0)',
       'z-index:11',
@@ -804,16 +804,14 @@ const TraceCue = (() => {
     // Snap to hidden+shifted before setting innerHTML so there's no stale-text flash
     el.style.transition = 'none';
     el.style.opacity = '0';
-    el.style.transform = 'translateX(-50%) translateY(8px)';
+    el.style.transform = 'translateX(-50%) translateY(10px)';
     el.innerHTML = '<span style="' + [
       'display:inline-block',
-      'padding:8px 22px',
-      'background:rgba(0,0,0,0.72)',
-      'border:1px solid rgba(210,180,120,0.30)',
-      'border-radius:40px',
-      'backdrop-filter:blur(4px)',
-      '-webkit-backdrop-filter:blur(4px)',
-      'box-shadow:0 0 18px rgba(210,180,120,0.15),0 2px 12px rgba(0,0,0,0.55),inset 0 1px 0 rgba(255,255,255,0.05)',
+      'padding:10px 28px',
+      'background:rgba(0,0,0,0.95)',
+      'border:1px solid rgba(210,180,120,0.35)',
+      'border-radius:8px',
+      'box-shadow:0 0 20px rgba(210,180,120,0.12),0 4px 16px rgba(0,0,0,0.80)',
       'font-size:13.5px',
       'font-style:italic',
       'font-weight:300',
@@ -831,7 +829,7 @@ const TraceCue = (() => {
       if (overlayEl) {
         overlayEl.style.transition = 'opacity 1.0s ease-in, transform 1.0s ease-in';
         overlayEl.style.opacity = '0';
-        overlayEl.style.transform = 'translateX(-50%) translateY(-4px)';
+        overlayEl.style.transform = 'translateX(-50%) translateY(6px)';
       }
     }, 4500);
   }
@@ -1538,6 +1536,7 @@ async function streamCharacterAndSpeak(userSaid, mySession, onTextReady = null) 
 
   let fullText = '';
   let usedFallback = false;
+  let streamedCue = null;
   const sentenceQueue = [];
   let isPlayingAudio = false;
   let streamDone = false;
@@ -1672,6 +1671,7 @@ async function streamCharacterAndSpeak(userSaid, mySession, onTextReady = null) 
           // in a non-lesson5 context.
           if (payload.cue && localStorage.getItem('eklipses_practice_focus') === 'lesson5') {
             TraceCue.show(payload.cue);
+            streamedCue = payload.cue;
           }
           if (payload.sentence) {
             const s = payload.sentence;
@@ -1708,7 +1708,10 @@ async function streamCharacterAndSpeak(userSaid, mySession, onTextReady = null) 
   if (fullText && !usedFallback && mySession === session) {
     if (!firstUserOpener) firstUserOpener = userSaid;
     conversationHistory.push({ role: 'user', content: userSaid });
-    conversationHistory.push({ role: 'assistant', content: fullText });
+    // Re-prepend the stage direction so coach.js can evaluate TRACE signals.
+    // Server strips the parenthetical before streaming; we restore it here for the record.
+    const historyContent = streamedCue ? `(${streamedCue}) ${fullText}` : fullText;
+    conversationHistory.push({ role: 'assistant', content: historyContent });
     if (conversationHistory.length > 12) conversationHistory = conversationHistory.slice(-12);
     _exchangeCount++;
     updateCoachBtnVisibility();
