@@ -1,174 +1,132 @@
-﻿Loading page and dismissing splash…
-Found 14 scenario cards. Running comprehensive audio checks…
-25s capture + 1.5s gap per scenario. Estimated total: ~7 min
 
-  Beach — She's been sitting alone for 20 minutes … PASS
-  Bookstore — She's reading. Coffee going cold. … PASS
-  House Party — She stepped away from the group … PASS
-  Coffee Shop — Headphones off. Not quite working. … PASS
-  Supermarket — Sunday morning. Unhurried. … PASS
-  Train — Commute home. Window seat. Far away. … PASS
-  Museum — Standing in front of the same painting too long. … PASS
-  Gym — Between sets. Not in a rush to leave. … PASS
-  Rooftop — After dark. She came alone.  … PASS
-  Yoga Studio — Just finished class. Still there. … PASS
-  Airport — 2-hour delay. She hasn't turned a page. … PASS
-  Office Lobby — You've walked past each other for months. … PASS
-  Street — Walking toward you. 4 seconds before she's gone. … PASS
-  Art Gallery — Opening night. She's not looking at the art. … PASS
+=== Beach — She's been sitting alone for 20 minutes (beach) — PASS ===
+  + 2186ms [log] [TEST] AUDIO_START calls=1 text="That’s kind of you to say."
+  + 3300ms [log] [TEST] VIDEO_STATE: speaking gapMs=1119.6
+  + 4762ms [log] [TEST] AUDIO_END gapMs=2581.5
+  + 4763ms [log] [TEST] AUDIO_START calls=2 text="I tend to blend in with the scenery most"
+  + 7831ms [log] [TEST] AUDIO_START calls=3 text="Just trying to find some quiet to work."
+  +10561ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  +10561ms [log] [FC] streamPromise resolved or timed out
 
-════════════════════════════════════════════════════════════════════════════════
-SCENARIO AUDIO VERIFICATION — DETAILED
-════════════════════════════════════════════════════════════════════════════════
+=== Bookstore — She's reading. Coffee going cold. (bookstore) — PASS ===
+  + 1338ms [log] [TEST] AUDIO_START calls=1 text="Presence is a curious thing."
+  + 1967ms [log] [TEST] VIDEO_STATE: speaking gapMs=624.7
+  + 3700ms [log] [TEST] AUDIO_END gapMs=2358.6
+  + 3700ms [log] [TEST] AUDIO_START calls=2 text="It often has little to do with our inten"
+  + 6888ms [log] [TEST] AUDIO_START calls=3 text="More a question of the space we occupy a"
+  +11619ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  +11619ms [log] [FC] streamPromise resolved or timed out
 
-Beach — She's been sitting alone for 20 minutes ✓ PASS
-  1. AUDIO_START:         YES
-  2. VIDEO_STATE:speaking: YES  (3062ms from inject, 907ms TTS decode)
-  3. AUDIO_END in time:   YES  (3140ms playback, limit 30s)
-  4. TTS hard errors:     none
-  5. OVERLAP events:      none
-  6. Console errors:      none
+=== House Party — She stepped away from the group (house_party) — PASS ===
+  + 1122ms [log] [TEST] AUDIO_START calls=1 text="Thank you."
+  + 1436ms [log] [TEST] VIDEO_STATE: speaking gapMs=311.9
+  + 2093ms [log] [TEST] AUDIO_END gapMs=970.3
+  + 2093ms [log] [TEST] AUDIO_START calls=2 text="That's an interesting thing to say."
+  + 4197ms [log] [TEST] AUDIO_START calls=3 text="I think it might just be the quiet momen"
+  + 7193ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  + 7194ms [log] [FC] streamPromise resolved or timed out
 
-Bookstore — She's reading. Coffee going cold. ✓ PASS
-  1. AUDIO_START:         YES
-  2. VIDEO_STATE:speaking: YES  (2545ms from inject, 392ms TTS decode)
-  3. AUDIO_END in time:   YES  (1211ms playback, limit 30s)
-  4. TTS hard errors:     none
-  5. OVERLAP events:      none
-  6. Console errors:      none
+=== Coffee Shop — Headphones off. Not quite working. (coffee_shop) — PASS ===
+  + 1094ms [log] [TEST] AUDIO_START calls=1 text="Thanks."
+  + 1430ms [log] [TEST] VIDEO_STATE: speaking gapMs=335.3
+  + 2166ms [log] [TEST] AUDIO_END gapMs=1070.8
+  + 2166ms [log] [TEST] AUDIO_START calls=2 text="It's really just the caffeine talking."
+  + 4653ms [log] [TEST] AUDIO_START calls=3 text="I'm trying to work on some lyrics that a"
+  + 8210ms [log] [TEST] AUDIO_START calls=4 text="How about you?"
+  + 9431ms [log] [TEST] AUDIO_START calls=5 text="What brings you here?"
+  +11093ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  +11094ms [log] [FC] streamPromise resolved or timed out
 
-House Party — She stepped away from the group ✓ PASS
-  1. AUDIO_START:         YES
-  2. VIDEO_STATE:speaking: YES  (1549ms from inject, 398ms TTS decode)
-  3. AUDIO_END in time:   YES  (1705ms playback, limit 30s)
-  4. TTS hard errors:     none
-  5. OVERLAP events:      none
-  6. Console errors:      none
+=== Supermarket — Sunday morning. Unhurried. (supermarket) — PASS ===
+  + 1243ms [log] [TEST] AUDIO_START calls=1 text="Thanks."
+  + 1527ms [log] [TEST] VIDEO_STATE: speaking gapMs=283.1
+  + 2237ms [log] [TEST] AUDIO_END gapMs=992.8
+  + 2237ms [log] [TEST] AUDIO_START calls=2 text="I appreciate that."
+  + 3818ms [log] [TEST] AUDIO_START calls=3 text="I think it’s just the Sunday energy."
+  + 6321ms [log] [TEST] AUDIO_START calls=4 text="Everyone’s a little more relaxed."
+  + 8507ms [log] [TEST] AUDIO_START calls=5 text="What about you?"
+  + 9887ms [log] [TEST] AUDIO_START calls=6 text="What brings you to this aisle today?"
+  +12194ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  +12194ms [log] [FC] streamPromise resolved or timed out
 
-Coffee Shop — Headphones off. Not quite working. ✓ PASS
-  1. AUDIO_START:         YES
-  2. VIDEO_STATE:speaking: YES  (1250ms from inject, 335ms TTS decode)
-  3. AUDIO_END in time:   YES  (1124ms playback, limit 30s)
-  4. TTS hard errors:     none
-  5. OVERLAP events:      none
-  6. Console errors:      none
+=== Train — Commute home. Window seat. Far away. (train) — PASS ===
+  + 1127ms [log] [TEST] AUDIO_START calls=1 text="Thanks!"
+  + 1448ms [log] [TEST] VIDEO_STATE: speaking gapMs=321.8
+  + 2310ms [log] [TEST] AUDIO_END gapMs=1183.0
+  + 2311ms [log] [TEST] AUDIO_START calls=2 text="That's a nice thing to say."
+  + 4346ms [log] [TEST] AUDIO_START calls=3 text="I've been told I'm pretty good at existi"
+  + 9095ms [log] [TEST] AUDIO_START calls=4 text="Are you usually on this train, or is tod"
+  +13658ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  +13659ms [log] [FC] streamPromise resolved or timed out
 
-Supermarket — Sunday morning. Unhurried. ✓ PASS
-  1. AUDIO_START:         YES
-  2. VIDEO_STATE:speaking: YES  (1597ms from inject, 296ms TTS decode)
-  3. AUDIO_END in time:   YES  (1035ms playback, limit 30s)
-  4. TTS hard errors:     none
-  5. OVERLAP events:      none
-  6. Console errors:      none
+=== Museum — Standing in front of the same painting too long. (museum) — PASS ===
+  +  897ms [log] [TEST] AUDIO_START calls=1 text="Presence."
+  + 1254ms [log] [TEST] VIDEO_STATE: speaking gapMs=357.7
+  + 2153ms [log] [TEST] AUDIO_END gapMs=1256.4
+  + 2166ms [log] [TEST] AUDIO_START calls=2 text="That's an interesting word choice."
+  + 4316ms [log] [TEST] AUDIO_START calls=3 text="It feels more revealing than a complimen"
+  + 7035ms [log] [TEST] AUDIO_START calls=4 text="You’re not asking anything, just stating"
+  +10973ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  +10974ms [log] [FC] streamPromise resolved or timed out
 
-Train — Commute home. Window seat. Far away. ✓ PASS
-  1. AUDIO_START:         YES
-  2. VIDEO_STATE:speaking: YES  (1529ms from inject, 343ms TTS decode)
-  3. AUDIO_END in time:   YES  (1122ms playback, limit 30s)
-  4. TTS hard errors:     none
-  5. OVERLAP events:      none
-  6. Console errors:      none
+=== Gym — Between sets. Not in a rush to leave. (gym) — PASS ===
+  +  565ms [log] [TEST] AUDIO_START calls=1 text="You practiced that."
+  +  928ms [log] [TEST] VIDEO_STATE: speaking gapMs=362.5
+  + 2082ms [log] [TEST] AUDIO_END gapMs=1516.2
+  + 2082ms [log] [TEST] AUDIO_START calls=2 text="What's on your mind?"
+  + 3497ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  + 3497ms [log] [FC] streamPromise resolved or timed out
 
-Museum — Standing in front of the same painting too long. ✓ PASS
-  1. AUDIO_START:         YES
-  2. VIDEO_STATE:speaking: YES  (1675ms from inject, 406ms TTS decode)
-  3. AUDIO_END in time:   YES  (1770ms playback, limit 30s)
-  4. TTS hard errors:     none
-  5. OVERLAP events:      none
-  6. Console errors:      none
+=== Rooftop — After dark. She came alone. (rooftop) — PASS ===
+  +  647ms [log] [TEST] AUDIO_START calls=1 text="That's an interesting observation."
+  + 1152ms [log] [TEST] VIDEO_STATE: speaking gapMs=505.1
+  + 3196ms [log] [TEST] AUDIO_END gapMs=2546.2
+  + 3196ms [log] [TEST] AUDIO_START calls=2 text="What were you expecting when you approac"
+  + 6291ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  + 6292ms [log] [FC] streamPromise resolved or timed out
 
-Gym — Between sets. Not in a rush to leave. ✓ PASS
-  1. AUDIO_START:         YES
-  2. VIDEO_STATE:speaking: YES  (1138ms from inject, 406ms TTS decode)
-  3. AUDIO_END in time:   YES  (1796ms playback, limit 30s)
-  4. TTS hard errors:     none
-  5. OVERLAP events:      none
-  6. Console errors:      none
+=== Yoga Studio — Just finished class. Still there. (yoga_studio) — PASS ===
+  + 1178ms [log] [TEST] AUDIO_START calls=1 text="I appreciate that, but I’m not here to c"
+  + 1875ms [log] [TEST] VIDEO_STATE: speaking gapMs=698.6
+  + 5165ms [log] [TEST] AUDIO_END gapMs=3987.1
+  + 5167ms [log] [TEST] AUDIO_START calls=2 text="Just say what you mean."
+  + 7055ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  + 7056ms [log] [FC] streamPromise resolved or timed out
 
-Rooftop — After dark. She came alone.    ✓ PASS
-  1. AUDIO_START:         YES
-  2. VIDEO_STATE:speaking: YES  (1381ms from inject, 318ms TTS decode)
-  3. AUDIO_END in time:   YES  (1028ms playback, limit 30s)
-  4. TTS hard errors:     none
-  5. OVERLAP events:      none
-  6. Console errors:      none
+=== Airport — 2-hour delay. She hasn't turned a page. (airport) — PASS ===
+  + 1090ms [log] [TEST] AUDIO_START calls=1 text="Thanks."
+  + 1451ms [log] [TEST] VIDEO_STATE: speaking gapMs=360.6
+  + 1951ms [log] [TEST] AUDIO_END gapMs=861.6
+  + 1953ms [log] [TEST] AUDIO_START calls=2 text="I think the fluorescent lighting in airp"
+  + 6560ms [log] [TEST] AUDIO_START calls=3 text="What about you?"
+  + 7622ms [log] [TEST] AUDIO_START calls=4 text="Are you always this charming, or is it j"
+  +13665ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  +13665ms [log] [FC] streamPromise resolved or timed out
 
-Yoga Studio — Just finished class. Still there. ✓ PASS
-  1. AUDIO_START:         YES
-  2. VIDEO_STATE:speaking: YES  (2107ms from inject, 472ms TTS decode)
-  3. AUDIO_END in time:   YES  (2040ms playback, limit 30s)
-  4. TTS hard errors:     none
-  5. OVERLAP events:      none
-  6. Console errors:      none
+=== Office Lobby — You've walked past each other for months. (office_lobby) — PASS ===
+  +  785ms [log] [TEST] AUDIO_START calls=1 text="Thank you."
+  + 1100ms [log] [TEST] VIDEO_STATE: speaking gapMs=314.1
+  + 1854ms [log] [TEST] AUDIO_END gapMs=1068.7
+  + 1855ms [log] [TEST] AUDIO_START calls=2 text="That’s an interesting observation."
+  + 4142ms [log] [TEST] AUDIO_START calls=3 text="I think it’s just the coffee kicking in."
+  + 6590ms [log] [TEST] AUDIO_START calls=4 text="What brings you down to the lobby today?"
+  + 8956ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  + 8956ms [log] [FC] streamPromise resolved or timed out
 
-Airport — 2-hour delay. She hasn't turned a page. ✓ PASS
-  1. AUDIO_START:         YES
-  2. VIDEO_STATE:speaking: YES  (1963ms from inject, 455ms TTS decode)
-  3. AUDIO_END in time:   YES  (1538ms playback, limit 30s)
-  4. TTS hard errors:     none
-  5. OVERLAP events:      none
-  6. Console errors:      none
+=== Street — Walking toward you. 4 seconds before she's gone. (street) — PASS ===
+  +  991ms [log] [TEST] AUDIO_START calls=1 text="Presence is a funny word."
+  + 1449ms [log] [TEST] VIDEO_STATE: speaking gapMs=457.5
+  + 3174ms [log] [TEST] AUDIO_END gapMs=2181.7
+  + 3176ms [log] [TEST] AUDIO_START calls=2 text="It implies something worth noticing."
+  + 6653ms [log] [TEST] AUDIO_START calls=3 text="[beat] What made you stop to say that?"
+  + 8974ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  + 8974ms [log] [FC] streamPromise resolved or timed out
 
-Office Lobby — You've walked past each other for months. ✓ PASS
-  1. AUDIO_START:         YES
-  2. VIDEO_STATE:speaking: YES  (1266ms from inject, 351ms TTS decode)
-  3. AUDIO_END in time:   YES  (1186ms playback, limit 30s)
-  4. TTS hard errors:     none
-  5. OVERLAP events:      none
-  6. Console errors:      none
-
-Street — Walking toward you. 4 seconds before she's gone. ✓ PASS
-  1. AUDIO_START:         YES
-  2. VIDEO_STATE:speaking: YES  (6093ms from inject, 542ms TTS decode)
-  3. AUDIO_END in time:   YES  (2641ms playback, limit 30s)
-  4. TTS hard errors:     none
-  5. OVERLAP events:      none
-  6. Console errors:      none
-
-Art Gallery — Opening night. She's not looking at the art. ✓ PASS
-  1. AUDIO_START:         YES
-  2. VIDEO_STATE:speaking: YES  (1402ms from inject, 336ms TTS decode)
-  3. AUDIO_END in time:   YES  (1138ms playback, limit 30s)
-  4. TTS hard errors:     none
-  5. OVERLAP events:      none
-  6. Console errors:      none
-
-────────────────────────────────────────────────────────────────────────────────
-SCENARIO                            PASS? INJECT→SPEAK  AUDIO_END EL→OAI  ERRORS
-────────────────────────────────────────────────────────────────────────────────
-Beach — She's been sitting alone for 20 minutesPASS  3062ms        3140ms    no      —
-Bookstore — She's reading. Coffee going cold.PASS  2545ms        1211ms    no      —
-House Party — She stepped away from the groupPASS  1549ms        1705ms    no      —
-Coffee Shop — Headphones off. Not quite working.PASS  1250ms        1124ms    no      —
-Supermarket — Sunday morning. Unhurried.PASS  1597ms        1035ms    no      —
-Train — Commute home. Window seat. Far away.PASS  1529ms        1122ms    no      —
-Museum — Standing in front of the same painting too long.PASS  1675ms        1770ms    no      —
-Gym — Between sets. Not in a rush to leave.PASS  1138ms        1796ms    no      —
-Rooftop — After dark. She came alone.PASS  1381ms        1028ms    no      —
-Yoga Studio — Just finished class. Still there.PASS  2107ms        2040ms    no      —
-Airport — 2-hour delay. She hasn't turned a page.PASS  1963ms        1538ms    no      —
-Office Lobby — You've walked past each other for months.PASS  1266ms        1186ms    no      —
-Street — Walking toward you. 4 seconds before she's gone.PASS  6093ms        2641ms    no      —
-Art Gallery — Opening night. She's not looking at the art.PASS  1402ms        1138ms    no      —
-────────────────────────────────────────────────────────────────────────────────
-14/14 scenarios PASS
-node : node:fs:2425
-At line:1 char:350
-+ ... les\love\eklipses\EK7"; node tests/test-all-scenarios.js 2>&1 | Out-F ...
-+                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: (node:fs:2425:String) [], RemoteException
-    + FullyQualifiedErrorId : NativeCommandError
- 
-    return binding.writeFileUtf8(
-                   ^
-
-Error: EBUSY: resource busy or locked, open 'D:\BUSINESS\executables\love\eklipses\EK7\tests\log-all-scenarios.txt'
-    at Object.writeFileSync (node:fs:2425:20)
-    at D:\BUSINESS\executables\love\eklipses\EK7\tests\test-all-scenarios.js:339:6 {
-  errno: -4082,
-  code: 'EBUSY',
-  syscall: 'open',
-  path: 'D:\\BUSINESS\\executables\\love\\eklipses\\EK7\\tests\\log-all-scenarios.txt'
-}
-
-Node.js v22.17.0
+=== Art Gallery — Opening night. She's not looking at the art. (art_gallery) — PASS ===
+  +  805ms [log] [TEST] AUDIO_START calls=1 text="Thank you."
+  + 1104ms [log] [TEST] VIDEO_STATE: speaking gapMs=299.0
+  + 1848ms [log] [TEST] AUDIO_END gapMs=1042.4
+  + 1851ms [log] [TEST] AUDIO_START calls=2 text="There’s something different about being "
+  + 5511ms [log] [TEST] AUDIO_START calls=3 text="It pulls you in."
+  + 6941ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  + 6941ms [log] [FC] streamPromise resolved or timed out
