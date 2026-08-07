@@ -1,6 +1,48 @@
 // api/admin.js — Admin dashboard: login + user management + Stripe subscriber view
 const crypto = require('crypto');
 const { supabase } = require('./supabase');
+const { getClientIP } = require('./ratelimit');
+
+// ── Admin login rate limiter ──────────────────────────────────────────────────
+// In-memory per-instance. Each Vercel warm instance has its own Map, so a
+// determined attacker hitting multiple cold-started instances could exceed the
+// per-instance limit. This is accepted practice for serverless admin pages —
+// the endpoint is low-traffic and the window resets automatically.
+const loginAttempts = new Map();
+const LOGIN_MAX_ATTEMPTS = 5;
+const LOGIN_WINDOW_MS    = 15 * 60 * 1000; // 15-min sliding window
+const LOGIN_LOCKOUT_MS   = 15 * 60 * 1000; // 15-min lockout after max attempts
+
+function checkLoginRateLimit(ip) {
+  const now = Date.now();
+  const rec = loginAttempts.get(ip) || { count: 0, windowStart: now, lockedUntil: 0 };
+
+  if (rec.lockedUntil > now) {
+    return { allowed: false, remaining: Math.ceil((rec.lockedUntil - now) / 1000) };
+  }
+  if (now - rec.windowStart > LOGIN_WINDOW_MS) {
+    loginAttempts.set(ip, { count: 0, windowStart: now, lockedUntil: 0 });
+    return { allowed: true };
+  }
+  if (rec.count >= LOGIN_MAX_ATTEMPTS) {
+    rec.lockedUntil = now + LOGIN_LOCKOUT_MS;
+    loginAttempts.set(ip, rec);
+    return { allowed: false, remaining: Math.ceil(LOGIN_LOCKOUT_MS / 1000) };
+  }
+  return { allowed: true };
+}
+
+function recordLoginFailure(ip) {
+  const now = Date.now();
+  const rec = loginAttempts.get(ip) || { count: 0, windowStart: now, lockedUntil: 0 };
+  rec.count++;
+  if (rec.count >= LOGIN_MAX_ATTEMPTS) rec.lockedUntil = now + LOGIN_LOCKOUT_MS;
+  loginAttempts.set(ip, rec);
+}
+
+function recordLoginSuccess(ip) {
+  loginAttempts.delete(ip);
+}
 
 const COOKIE_NAME    = 'ek_admin';
 const COOKIE_MAX_AGE = 24 * 60 * 60; // 24 h
@@ -422,9 +464,18 @@ module.exports = async function handler(req, res) {
     const body = req.body || {};
 
     if ('password' in body && !body.action) {
+      const ip = getClientIP(req);
+      const rl = checkLoginRateLimit(ip);
+      if (!rl.allowed) {
+        return res.status(429).json({
+          error: `Too many failed login attempts. Try again in ${rl.remaining} seconds.`,
+        });
+      }
       if (body.password !== adminPassword) {
+        recordLoginFailure(ip);
         return res.status(401).json({ error: 'Incorrect password' });
       }
+      recordLoginSuccess(ip);
       const token = signToken(adminPassword);
       res.setHeader('Set-Cookie',
         `${COOKIE_NAME}=${token}; HttpOnly; Secure; SameSite=Lax; Max-Age=${COOKIE_MAX_AGE}; Path=/`);
@@ -491,3 +542,6 @@ module.exports = async function handler(req, res) {
 
   return res.status(405).json({ error: 'Method not allowed' });
 };
+
+// Exported for unit testing only
+module.exports._rateLimit = { checkLoginRateLimit, recordLoginFailure, recordLoginSuccess, loginAttempts, LOGIN_MAX_ATTEMPTS, LOGIN_LOCKOUT_MS, LOGIN_WINDOW_MS };
