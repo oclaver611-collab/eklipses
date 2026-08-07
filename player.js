@@ -641,7 +641,8 @@ const DailyLimit = (() => {
   }
 
   // ── Inject auth headers into all API fetch calls via monkey-patch ─────────
-  // Adds x-dev-key (dev bypass) and x-stripe-customer (paid subscriber) headers
+  // Adds x-dev-key (dev bypass), x-stripe-customer (paid subscriber), and
+  // x-user-email (test-account bypass via TEST_EMAILS_BYPASS env var) headers.
   function patchFetch() {
     const _originalFetch = window.fetch;
     window.fetch = function(url, options = {}) {
@@ -651,9 +652,11 @@ const DailyLimit = (() => {
         url.includes('/api/count-session') ||
         url.includes('/api/check-session')
       )) {
-        const devKey = getDevKey();
+        const devKey    = getDevKey();
         const stripeCus = getStripeCustomer();
-        if (devKey || stripeCus) {
+        // x-user-email enables TEST_ACCOUNT_BYPASS on the server for whitelisted test emails
+        const userEmail = window.EkAuth?.getUser()?.email;
+        if (devKey || stripeCus || userEmail) {
           options.headers = options.headers || {};
           const isHeadersObj = options.headers instanceof Headers;
           if (devKey) {
@@ -663,6 +666,10 @@ const DailyLimit = (() => {
           if (stripeCus) {
             if (isHeadersObj) options.headers.set('x-stripe-customer', stripeCus);
             else options.headers['x-stripe-customer'] = stripeCus;
+          }
+          if (userEmail) {
+            if (isHeadersObj) options.headers.set('x-user-email', userEmail);
+            else options.headers['x-user-email'] = userEmail;
           }
         }
       }
@@ -753,6 +760,86 @@ const Caption = (() => {
     hideTimer = setTimeout(() => {
       if (overlayEl) overlayEl.textContent = '';
     }, 250);
+  }
+
+  return { show, hide };
+})();
+
+
+/* ===== TRACE Signal Cue Overlay ===== */
+// Amber italic pill anchored top-center inside stageFrame.
+// Only shown during lesson5 practice when Sofia emits a parenthetical stage direction.
+// Separate from the caption (bottom) so dialogue and signal never occupy the same visual slot.
+const TraceCue = (() => {
+  let overlayEl = null;
+  let fadeTimer = null;
+
+  function getOrCreateOverlay() {
+    if (overlayEl) return overlayEl;
+    const frame = document.getElementById('stageFrame');
+    if (!frame) return null;
+    const el = document.createElement('div');
+    el.id = 'ek-trace-cue';
+    el.style.cssText = [
+      'position:absolute',
+      'bottom:80px',
+      'left:50%',
+      'transform:translateX(-50%) translateY(0)',
+      'z-index:11',
+      'max-width:calc(100% - 48px)',
+      'text-align:center',
+      'pointer-events:none',
+      'opacity:0',
+    ].join(';');
+    frame.style.position = 'relative';
+    frame.appendChild(el);
+    overlayEl = el;
+    return el;
+  }
+
+  function show(text) {
+    const el = getOrCreateOverlay();
+    if (!el) return;
+    clearTimeout(fadeTimer);
+    // Snap to hidden+shifted before setting innerHTML so there's no stale-text flash
+    el.style.transition = 'none';
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(-50%) translateY(10px)';
+    el.innerHTML = '<span style="' + [
+      'display:inline-block',
+      'padding:10px 28px',
+      'background:rgba(0,0,0,0.95)',
+      'border:1px solid rgba(210,180,120,0.35)',
+      'border-radius:8px',
+      'box-shadow:0 0 20px rgba(210,180,120,0.12),0 4px 16px rgba(0,0,0,0.80)',
+      'font-size:13.5px',
+      'font-style:italic',
+      'font-weight:300',
+      'color:#d4b882',
+      'letter-spacing:0.035em',
+      'line-height:1.55',
+    ].join(';') + '">' + text + '</span>';
+    // Double RAF so transition fires after the browser paints with the new content
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+      el.style.opacity = '1';
+      el.style.transform = 'translateX(-50%) translateY(0)';
+    }));
+    fadeTimer = setTimeout(() => {
+      if (overlayEl) {
+        overlayEl.style.transition = 'opacity 1.0s ease-in, transform 1.0s ease-in';
+        overlayEl.style.opacity = '0';
+        overlayEl.style.transform = 'translateX(-50%) translateY(6px)';
+      }
+    }, 4500);
+  }
+
+  function hide() {
+    clearTimeout(fadeTimer);
+    if (overlayEl) {
+      overlayEl.style.transition = 'opacity 0.3s ease-in';
+      overlayEl.style.opacity = '0';
+    }
   }
 
   return { show, hide };
@@ -1449,6 +1536,7 @@ async function streamCharacterAndSpeak(userSaid, mySession, onTextReady = null) 
 
   let fullText = '';
   let usedFallback = false;
+  let streamedCue = null;
   const sentenceQueue = [];
   let isPlayingAudio = false;
   let streamDone = false;
@@ -1577,16 +1665,23 @@ async function streamCharacterAndSpeak(userSaid, mySession, onTextReady = null) 
         try {
           const payload = JSON.parse(line.slice(6));
           if (payload.error) { console.warn('Stream error:', payload.error); break; }
+          // TRACE cue arrives as a dedicated event before sentence events.
+          // Server extracted it from the leading parenthetical, already third-person.
+          // Client-side check guards against the server accidentally sending a cue
+          // in a non-lesson5 context.
+          if (payload.cue && localStorage.getItem('eklipses_practice_focus') === 'lesson5') {
+            TraceCue.show(payload.cue);
+            streamedCue = payload.cue;
+          }
           if (payload.sentence) {
-            sentenceQueue.push(payload.sentence);
+            const s = payload.sentence;
+            if (s) { sentenceQueue.push(s); }
             if (!isPlayingAudio) processQueue();
           }
           if (payload.done) {
             fullText = payload.full || fullText;
             streamDone = true;
             // Fire the coached-practice moment-check NOW, while TTS is still playing.
-            // By the time all audio finishes and waitIfPaused runs, the API call will
-            // have had the full TTS duration to complete — near-zero overhead.
             if (onTextReady && fullText) { onTextReady(fullText); onTextReady = null; }
           }
         } catch {}
@@ -1613,7 +1708,10 @@ async function streamCharacterAndSpeak(userSaid, mySession, onTextReady = null) 
   if (fullText && !usedFallback && mySession === session) {
     if (!firstUserOpener) firstUserOpener = userSaid;
     conversationHistory.push({ role: 'user', content: userSaid });
-    conversationHistory.push({ role: 'assistant', content: fullText });
+    // Re-prepend the stage direction so coach.js can evaluate TRACE signals.
+    // Server strips the parenthetical before streaming; we restore it here for the record.
+    const historyContent = streamedCue ? `(${streamedCue}) ${fullText}` : fullText;
+    conversationHistory.push({ role: 'assistant', content: historyContent });
     if (conversationHistory.length > 12) conversationHistory = conversationHistory.slice(-12);
     _exchangeCount++;
     updateCoachBtnVisibility();
@@ -2460,7 +2558,7 @@ async function runCoachFeedback(mySession) {
 
   if(mySession!==session) return;
 
-  // Speaking order: [lesson1Eval →] [lesson2Eval →] [lesson3Eval →] [lesson4Eval →] part1 → trans2 → part2 → trans3 → part3 → trans4 → part4 → tryNextTime → score reveal
+  // Speaking order: [lesson1Eval →] [lesson2Eval →] [lesson3Eval →] [lesson4Eval →] [lesson5Eval →] part1 → trans2 → part2 → trans3 → part3 → trans4 → part4 → tryNextTime → score reveal
   if (f.lesson1Eval && mySession === session) {
     const l1url = await KokoroSpeech.prefetch(f.lesson1Eval, 'am_adam');
     await speak(f.lesson1Eval, 'Ryan', () => { els.text.textContent = f.lesson1Eval; }, l1url);
@@ -2482,6 +2580,12 @@ async function runCoachFeedback(mySession) {
   if (f.lesson4Eval && mySession === session) {
     const l4url = await KokoroSpeech.prefetch(f.lesson4Eval, 'am_adam');
     await speak(f.lesson4Eval, 'Ryan', () => { els.text.textContent = f.lesson4Eval; }, l4url);
+    if (mySession !== session) return;
+    await pause(600);
+  }
+  if (f.lesson5Eval && mySession === session) {
+    const l5url = await KokoroSpeech.prefetch(f.lesson5Eval, 'am_adam');
+    await speak(f.lesson5Eval, 'Ryan', () => { els.text.textContent = f.lesson5Eval; }, l5url);
     if (mySession !== session) return;
     await pause(600);
   }
@@ -2781,6 +2885,7 @@ const LESSON_REGISTRY = [
   { id: 'lesson2', label: 'Lesson 2 — Holding Your Ground (FRAME)', lsKey: 'eklipses_lesson2_complete' },
   { id: 'lesson3', label: 'Lesson 3 — The Long Game (PACE)',        lsKey: 'eklipses_lesson3_complete' },
   { id: 'lesson4', label: 'Lesson 4 — The Thread (CHAIN)',          lsKey: 'eklipses_lesson4_complete' },
+  { id: 'lesson5', label: 'Lesson 5 — The Read (TRACE)',           lsKey: 'eklipses_lesson5_complete' },
 ];
 
 // Mnemonic data sourced from lesson-player.js LESSON_DATA.mnemonicMap — keep in sync when lessons change.
@@ -2822,6 +2927,16 @@ const LESSON_MNEMONICS = {
       { letter: 'A', meaning: 'Ask deeper — one layer further on the same thread' },
       { letter: 'I', meaning: 'Inject yourself — share something real and connected' },
       { letter: 'N', meaning: 'Never abandon a live thread — go back to what she lit up about' },
+    ],
+  },
+  lesson5: {
+    label: 'TRACE',
+    items: [
+      { letter: 'T', meaning: 'Track gaze — name it when she holds it too long' },
+      { letter: 'R', meaning: 'Register proximity — notice when she moves closer' },
+      { letter: 'A', meaning: 'Attend to alignment — catch her mirroring your posture' },
+      { letter: 'C', meaning: 'Catch touch — acknowledge brief deliberate contact' },
+      { letter: 'E', meaning: 'Enter — make your move before the window closes' },
     ],
   },
 };
@@ -2929,6 +3044,33 @@ const DRILL_REPS = {
       letter: 'N', cue: 'Never abandon a live thread',
       sofiasLine: "I used to do something completely different before this. But that's — anyway. Do you come here a lot?",
       criteria: "PASS if the user goes back to the dropped thread ('What did you used to do?') instead of accepting her redirect and answering her question. FAIL if the user answers her redirect and lets the disclosure she started drop.",
+    },
+  ],
+  lesson5: [
+    {
+      letter: 'T', cue: 'Track gaze',
+      sofiasLine: "(You hold his gaze a little past where you meant to.) ...so where do you usually end up on a night like this?",
+      criteria: "PASS if the user names or plays with the eye contact — 'don't look away on my account', 'I noticed that', anything that engages the gaze rather than ignoring it. FAIL if the user only answers the conversational question and makes no reference to the stage direction.",
+    },
+    {
+      letter: 'R', cue: 'Register proximity',
+      sofiasLine: "(You're closer than you were. You don't remember crossing the distance.) ...I feel like I've seen you here before.",
+      criteria: "PASS if the user names or plays with the proximity — 'we started much further apart', 'you moved over here', 'I'm not moving'. FAIL if the user only responds to the conversational content and ignores the closeness entirely.",
+    },
+    {
+      letter: 'A', cue: 'Attend to alignment',
+      sofiasLine: "(Your body has settled into the same angle as his — you can't say when.) ...honestly, this place gets better after midnight.",
+      criteria: "PASS if the user names the mirroring — 'you match whoever you're talking to', 'you just did what I did', any acknowledgment of the alignment. FAIL if the user ignores the stage direction and only responds to the surface remark.",
+    },
+    {
+      letter: 'C', cue: 'Catch touch',
+      sofiasLine: "(Your hand settles on his arm for a second. Lifts.) ...sorry. Where were we?",
+      criteria: "PASS if the user names or plays with the touch — 'you did that on purpose', 'that wasn't accidental', any acknowledgment that the contact happened. FAIL if the user ignores it entirely and just resumes conversation.",
+    },
+    {
+      letter: 'E', cue: 'Enter',
+      sofiasLine: "...I should probably go find what I actually came in for. [shifts]",
+      criteria: "PASS if the user makes a direct move with no hedge language — asks for her number, suggests continuing somewhere else, or includes her in what they're doing. FAIL if the user lets the window close, uses hedge language ('maybe we could...'), or asks permission rather than making a statement.",
     },
   ],
 };
