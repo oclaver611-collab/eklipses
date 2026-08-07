@@ -1,6 +1,10 @@
 // api/drill-eval.js — Lightweight per-rep warm-up drill evaluation (single exchange)
+const { checkRateLimit } = require('./ratelimit');
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const rl = await checkRateLimit(req, res);
+  if (!rl.allowed) return;
 
   const { lessonKey, letter, cue, sofiasLine, userResponse, criteria } = req.body || {};
   if (!letter || !sofiasLine || !userResponse) {

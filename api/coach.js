@@ -1,8 +1,12 @@
 // api/coach.js — Ryan's post-session coaching (Groq primary, OpenAI fallback)
+const { checkRateLimit } = require('./ratelimit');
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  const rl = await checkRateLimit(req, res);
+  if (!rl.allowed) return;
 
   const { conversation, scenarioTitle, scenarioKey, opener, lesson1Complete: _l1 = false, lesson2Complete: _l2 = false, lesson3Complete: _l3 = false, lesson4Complete: _l4 = false, lesson5Complete: _l5 = false, practiceFocus = null, characterId = 'sofia' } = req.body || {};
   // practiceFocus overrides raw lesson flags when present

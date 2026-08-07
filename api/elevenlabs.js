@@ -1,7 +1,11 @@
 // api/elevenlabs.js — ElevenLabs TTS for Sofia (Mary speaker)
 // Ryan stays on Kokoro in the browser — only Mary uses this endpoint
+const { checkRateLimit } = require('./ratelimit');
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const rl = await checkRateLimit(req, res);
+  if (!rl.allowed) return;
 
   const { text, speaker } = req.body || {};
   if (!text) return res.status(400).json({ error: 'No text provided' });

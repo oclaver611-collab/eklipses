@@ -1,6 +1,10 @@
 // api/coach-suggest.js — Real-time line suggestions during free conversation
+const { checkRateLimit } = require('./ratelimit');
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const rl = await checkRateLimit(req, res);
+  if (!rl.allowed) return;
 
   if (!process.env.OPENAI_API_KEY && !process.env.GROQ_API_KEY) {
     return res.status(500).json({ error: 'No LLM API key configured' });

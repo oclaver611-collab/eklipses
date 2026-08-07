@@ -1,4 +1,8 @@
-// api/ratelimit.js — subscriber check and dev bypass (no session counting)
+// api/ratelimit.js — subscriber check and server-side session rate limiting
+const { supabase } = require('./supabase');
+
+const FREE_SESSION_LIMIT = 2;
+
 const subscriberCache = new Map();
 const SUBSCRIBER_CACHE_TTL = 5 * 60 * 1000;
 
@@ -53,10 +57,58 @@ function isDevBypass(req) {
 }
 
 async function checkRateLimit(req, res) {
-  if (isDevBypass(req)) return { allowed: true, bypass: true };
+  // Priority 1: dev bypass (DEV_BYPASS_KEY intentionally not set in production)
+  if (isDevBypass(req)) return { allowed: true, bypass: 'dev' };
+
+  // Priority 2: whitelisted test accounts (TEST_EMAILS_BYPASS env var)
+  if (isTestAccount(req)) return { allowed: true, bypass: 'test' };
+
+  // Priority 3: active Stripe subscriber — unlimited
   const paid = await isActiveSubscriber(req);
-  if (paid) return { allowed: true, bypass: true };
-  return { allowed: true, bypass: false };
+  if (paid) return { allowed: true, bypass: 'subscriber' };
+
+  // Priority 4: enforce the free-session limit server-side.
+  // Without this, a caller can bypass the client-side paywall by hitting the API directly.
+  // We read the same counter that count-session.js writes (keyed by ip:${ip}).
+  if (!supabase) {
+    // Supabase not configured (local dev without DB env vars) — fail open.
+    return { allowed: true, bypass: false };
+  }
+
+  const ip = getClientIP(req);
+  const key = `ip:${ip}`;
+
+  try {
+    const { data, error } = await supabase
+      .from('user_sessions')
+      .select('sessions_used, blocked')
+      .eq('email', key)
+      .single();
+
+    // PGRST116 = no row found = new user with 0 sessions
+    if (error && error.code !== 'PGRST116') throw error;
+
+    if (data?.blocked) {
+      res.status(403).json({ error: 'Account blocked.' });
+      return { allowed: false };
+    }
+
+    const sessionsUsed = data?.sessions_used ?? 0;
+    if (sessionsUsed >= FREE_SESSION_LIMIT) {
+      res.status(402).json({
+        error: 'Free session limit reached. Subscribe to continue.',
+        sessionsUsed,
+        limit: FREE_SESSION_LIMIT,
+      });
+      return { allowed: false };
+    }
+
+    return { allowed: true, bypass: false };
+  } catch (err) {
+    // Fail open on DB error — never block a user due to our own infrastructure issue
+    console.warn('[ratelimit] session check error — failing open:', err.message);
+    return { allowed: true, bypass: false };
+  }
 }
 
-module.exports = { checkRateLimit, isDevBypass, isActiveSubscriber, getClientIP, isTestAccount };
+module.exports = { checkRateLimit, isDevBypass, isActiveSubscriber, getClientIP, isTestAccount, FREE_SESSION_LIMIT };
