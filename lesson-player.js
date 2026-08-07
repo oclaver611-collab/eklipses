@@ -628,7 +628,9 @@
         }, 120000);
       });
 
+      let playedSuccessfully = false;
       a.onended = () => {
+        playedSuccessfully = true;
         const playedMs = playStartedAt ? Date.now() - playStartedAt : 0;
         console.log('[lesson] END', filename, '(' + playedMs + 'ms)');
         if (playedMs < 500) {
@@ -639,7 +641,7 @@
         }
       };
 
-      a.onerror = (e) => { console.warn('[lesson] audio error:', filename, e); };
+      a.onerror = (e) => { if (!playedSuccessfully) console.warn('[lesson] audio error:', filename, e); };
       a.play().catch(e => { console.warn('[lesson] play() rejected:', filename, e.message); });
     });
   }

@@ -2558,7 +2558,7 @@ async function runCoachFeedback(mySession) {
 
   if(mySession!==session) return;
 
-  // Speaking order: [lesson1Eval →] [lesson2Eval →] [lesson3Eval →] [lesson4Eval →] part1 → trans2 → part2 → trans3 → part3 → trans4 → part4 → tryNextTime → score reveal
+  // Speaking order: [lesson1Eval →] [lesson2Eval →] [lesson3Eval →] [lesson4Eval →] [lesson5Eval →] part1 → trans2 → part2 → trans3 → part3 → trans4 → part4 → tryNextTime → score reveal
   if (f.lesson1Eval && mySession === session) {
     const l1url = await KokoroSpeech.prefetch(f.lesson1Eval, 'am_adam');
     await speak(f.lesson1Eval, 'Ryan', () => { els.text.textContent = f.lesson1Eval; }, l1url);
@@ -2580,6 +2580,12 @@ async function runCoachFeedback(mySession) {
   if (f.lesson4Eval && mySession === session) {
     const l4url = await KokoroSpeech.prefetch(f.lesson4Eval, 'am_adam');
     await speak(f.lesson4Eval, 'Ryan', () => { els.text.textContent = f.lesson4Eval; }, l4url);
+    if (mySession !== session) return;
+    await pause(600);
+  }
+  if (f.lesson5Eval && mySession === session) {
+    const l5url = await KokoroSpeech.prefetch(f.lesson5Eval, 'am_adam');
+    await speak(f.lesson5Eval, 'Ryan', () => { els.text.textContent = f.lesson5Eval; }, l5url);
     if (mySession !== session) return;
     await pause(600);
   }
