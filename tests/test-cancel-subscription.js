@@ -90,6 +90,9 @@ function makeStripeMock({ customerEmail = null, deleted = false } = {}) {
 }
 
 function injectModules({ userEmail, authError, customerEmail, deleted } = {}) {
+  // Provide a fake key so the handler passes the "Stripe not configured" guard
+  process.env.STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || 'sk_test_fake_for_unit_tests';
+
   // Supabase mock
   const supPath = require.resolve(path.join(API_DIR, 'supabase'));
   delete require.cache[supPath];

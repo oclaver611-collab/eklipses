@@ -39,7 +39,8 @@ async function checkLoginRateLimit(ip) {
       if (lockedUntil > now) {
         return { allowed: false, remaining: Math.ceil((lockedUntil - now) / 1000) };
       }
-      // Lockout expired — allow through (record will be reset on next write)
+      // Lockout expired — allow through; record will be reset on next write
+      return { allowed: true };
     }
 
     // Check window: last_reset stores the window start time
