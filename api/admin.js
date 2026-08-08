@@ -3,45 +3,115 @@ const crypto = require('crypto');
 const { supabase } = require('./supabase');
 const { getClientIP } = require('./ratelimit');
 
-// ── Admin login rate limiter ──────────────────────────────────────────────────
-// In-memory per-instance. Each Vercel warm instance has its own Map, so a
-// determined attacker hitting multiple cold-started instances could exceed the
-// per-instance limit. This is accepted practice for serverless admin pages —
-// the endpoint is low-traffic and the window resets automatically.
-const loginAttempts = new Map();
+// ── Admin login rate limiter (Supabase-backed, globally consistent) ───────────
+// Stored in user_sessions with email key = 'admin_ratelimit:<ip>'.
+// Using the existing table avoids needing DDL access to create a new table.
+// Dashboard query explicitly excludes these rows.
+// Columns repurposed for rate-limit records:
+//   sessions_used  = failure count in current window
+//   last_reset     = window start (TIMESTAMPTZ)
+//   blocked        = true while IP is locked out
+//   updated_at     = lockout expiry time (TIMESTAMPTZ); epoch when not locked
 const LOGIN_MAX_ATTEMPTS = 5;
 const LOGIN_WINDOW_MS    = 15 * 60 * 1000; // 15-min sliding window
 const LOGIN_LOCKOUT_MS   = 15 * 60 * 1000; // 15-min lockout after max attempts
+const RL_PREFIX          = 'admin_ratelimit:';
 
-function checkLoginRateLimit(ip) {
+async function checkLoginRateLimit(ip) {
+  if (!supabase) return { allowed: true }; // fail open if DB unavailable (local dev)
+
   const now = Date.now();
-  const rec = loginAttempts.get(ip) || { count: 0, windowStart: now, lockedUntil: 0 };
+  const key = RL_PREFIX + ip;
 
-  if (rec.lockedUntil > now) {
-    return { allowed: false, remaining: Math.ceil((rec.lockedUntil - now) / 1000) };
-  }
-  if (now - rec.windowStart > LOGIN_WINDOW_MS) {
-    loginAttempts.set(ip, { count: 0, windowStart: now, lockedUntil: 0 });
+  try {
+    const { data, error } = await supabase
+      .from('user_sessions')
+      .select('sessions_used, blocked, last_reset, updated_at')
+      .eq('email', key)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    if (!data) return { allowed: true }; // new IP, no record
+
+    // Check lockout: updated_at stores the lockout expiry
+    if (data.blocked) {
+      const lockedUntil = data.updated_at ? new Date(data.updated_at).getTime() : 0;
+      if (lockedUntil > now) {
+        return { allowed: false, remaining: Math.ceil((lockedUntil - now) / 1000) };
+      }
+      // Lockout expired — allow through (record will be reset on next write)
+    }
+
+    // Check window: last_reset stores the window start time
+    const windowStart = data.last_reset ? new Date(data.last_reset).getTime() : 0;
+    if (now - windowStart > LOGIN_WINDOW_MS) return { allowed: true }; // window expired
+
+    // Count check (defensive: shouldn't reach here if blocked was set correctly)
+    if (data.sessions_used >= LOGIN_MAX_ATTEMPTS) {
+      return { allowed: false, remaining: Math.ceil(LOGIN_LOCKOUT_MS / 1000) };
+    }
+
+    return { allowed: true };
+  } catch (err) {
+    console.warn('[admin] rate limit check failed — failing open:', err.message);
     return { allowed: true };
   }
-  if (rec.count >= LOGIN_MAX_ATTEMPTS) {
-    rec.lockedUntil = now + LOGIN_LOCKOUT_MS;
-    loginAttempts.set(ip, rec);
-    return { allowed: false, remaining: Math.ceil(LOGIN_LOCKOUT_MS / 1000) };
-  }
-  return { allowed: true };
 }
 
-function recordLoginFailure(ip) {
+async function recordLoginFailure(ip) {
+  if (!supabase) return;
+
   const now = Date.now();
-  const rec = loginAttempts.get(ip) || { count: 0, windowStart: now, lockedUntil: 0 };
-  rec.count++;
-  if (rec.count >= LOGIN_MAX_ATTEMPTS) rec.lockedUntil = now + LOGIN_LOCKOUT_MS;
-  loginAttempts.set(ip, rec);
+  const key = RL_PREFIX + ip;
+  const EPOCH = new Date(0).toISOString(); // "not locked" sentinel
+
+  try {
+    const { data } = await supabase
+      .from('user_sessions')
+      .select('sessions_used, blocked, last_reset, updated_at')
+      .eq('email', key)
+      .single();
+
+    const lockoutExpired = data?.blocked &&
+      (!data.updated_at || new Date(data.updated_at).getTime() <= now);
+    const windowExpired  = !data?.last_reset ||
+      (now - new Date(data.last_reset).getTime() > LOGIN_WINDOW_MS);
+    const startFresh     = !data || lockoutExpired || windowExpired;
+
+    let newCount, newWindowStart, newBlocked, newLockedUntil;
+
+    if (startFresh) {
+      newCount       = 1;
+      newWindowStart = new Date(now).toISOString();
+      newBlocked     = false;
+      newLockedUntil = EPOCH;
+    } else {
+      newCount       = (data.sessions_used || 0) + 1;
+      newWindowStart = data.last_reset; // keep existing window start
+      newBlocked     = newCount >= LOGIN_MAX_ATTEMPTS;
+      newLockedUntil = newBlocked ? new Date(now + LOGIN_LOCKOUT_MS).toISOString() : EPOCH;
+    }
+
+    await supabase.from('user_sessions').upsert({
+      email:         key,
+      sessions_used: newCount,
+      sessions_limit: 0,
+      blocked:       newBlocked,
+      last_reset:    newWindowStart,
+      updated_at:    newLockedUntil,
+    }, { onConflict: 'email' });
+  } catch (err) {
+    console.warn('[admin] rate limit write failed:', err.message);
+  }
 }
 
-function recordLoginSuccess(ip) {
-  loginAttempts.delete(ip);
+async function recordLoginSuccess(ip) {
+  if (!supabase) return;
+  try {
+    await supabase.from('user_sessions').delete().eq('email', RL_PREFIX + ip);
+  } catch (err) {
+    console.warn('[admin] rate limit cleanup failed:', err.message);
+  }
 }
 
 const COOKIE_NAME    = 'ek_admin';
@@ -465,17 +535,17 @@ module.exports = async function handler(req, res) {
 
     if ('password' in body && !body.action) {
       const ip = getClientIP(req);
-      const rl = checkLoginRateLimit(ip);
+      const rl = await checkLoginRateLimit(ip);
       if (!rl.allowed) {
         return res.status(429).json({
           error: `Too many failed login attempts. Try again in ${rl.remaining} seconds.`,
         });
       }
       if (body.password !== adminPassword) {
-        recordLoginFailure(ip);
+        await recordLoginFailure(ip);
         return res.status(401).json({ error: 'Incorrect password' });
       }
-      recordLoginSuccess(ip);
+      await recordLoginSuccess(ip);
       const token = signToken(adminPassword);
       res.setHeader('Set-Cookie',
         `${COOKIE_NAME}=${token}; HttpOnly; Secure; SameSite=Lax; Max-Age=${COOKIE_MAX_AGE}; Path=/`);
@@ -519,7 +589,9 @@ module.exports = async function handler(req, res) {
 
     const [supabaseResult, stripeData] = await Promise.all([
       supabase
-        ? supabase.from('user_sessions').select('*').order('sessions_used', { ascending: false })
+        ? supabase.from('user_sessions').select('*')
+            .not('email', 'ilike', 'admin_ratelimit:%')
+            .order('sessions_used', { ascending: false })
         : Promise.resolve({ data: [], error: null }),
       fetchStripeData(),
     ]);
@@ -544,4 +616,4 @@ module.exports = async function handler(req, res) {
 };
 
 // Exported for unit testing only
-module.exports._rateLimit = { checkLoginRateLimit, recordLoginFailure, recordLoginSuccess, loginAttempts, LOGIN_MAX_ATTEMPTS, LOGIN_LOCKOUT_MS, LOGIN_WINDOW_MS };
+module.exports._rateLimit = { checkLoginRateLimit, recordLoginFailure, recordLoginSuccess, LOGIN_MAX_ATTEMPTS, LOGIN_LOCKOUT_MS, LOGIN_WINDOW_MS, RL_PREFIX };

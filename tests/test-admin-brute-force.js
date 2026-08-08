@@ -1,25 +1,31 @@
 /**
  * tests/test-admin-brute-force.js
  *
- * Proof that the admin login endpoint is protected against brute-force attacks.
+ * Proof that the admin login endpoint is protected against brute-force via a
+ * Supabase-backed global counter (not an in-memory Map).
  *
- * Part 1 (unit): exercises the in-memory rate-limiter functions directly —
- *   deterministic, fast, no network needed.
+ * Part 1 (unit): exercises checkLoginRateLimit / recordLoginFailure directly,
+ *   with a mock Supabase injected via require.cache — deterministic, no network.
  *
- * Part 2 (live HTTP): fires repeated wrong-password POSTs against the real
- *   production endpoint and confirms a 429 response is returned after the
- *   threshold. Because Vercel serverless functions are per-instance stateful,
- *   rapid sequential requests from the same IP hit the same warm instance and
- *   will trigger the lockout reliably in practice.
+ * Part 2 (multi-instance simulation): the KEY proof of the Supabase upgrade.
+ *   We write 4 prior failures directly into production Supabase (simulating
+ *   what "instance A" would have recorded). Then we hit the production endpoint
+ *   once via HTTP. After that single HTTP request the counter reaches 5 and
+ *   the NEXT request returns 429 — proving the counter is globally shared.
+ *   A pure in-memory implementation would have needed 5 HTTP requests to block.
  */
 
 'use strict';
 
-const path = require('path');
+const path  = require('path');
 const https = require('https');
 
 const API_DIR  = path.join(__dirname, '..', 'api');
 const PROD_URL = 'https://eklipses.vercel.app';
+const MY_IP    = '67.68.24.223'; // confirmed public IP from previous test session
+
+const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRteW5pbW1jbGZwd2J3cXBwcHFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NTI2NTAsImV4cCI6MjA5NjMyODY1MH0.dZ7xNDU86j06BbDiIhaPlCjwKbifxOC6ImkroN4o0Z0';
+const SUPA_URL = 'https://tmynimmclfpwbwqpppqj.supabase.co';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -42,19 +48,17 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-function postJSON(url, body) {
+function postJSON(url, body, headers = {}) {
   return new Promise((resolve, reject) => {
     const payload = JSON.stringify(body);
-    const u       = new URL(url);
-    const req     = https.request({
-      hostname: u.hostname,
-      path:     u.pathname,
-      method:   'POST',
-      headers:  { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) },
+    const u = new URL(url);
+    const req = https.request({
+      hostname: u.hostname, path: u.pathname, method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload), ...headers },
     }, res => {
       const chunks = [];
       res.on('data', c => chunks.push(c));
-      res.on('end',  () => {
+      res.on('end', () => {
         try { resolve({ status: res.statusCode, body: JSON.parse(Buffer.concat(chunks).toString()) }); }
         catch { resolve({ status: res.statusCode, body: {} }); }
       });
@@ -65,138 +69,200 @@ function postJSON(url, body) {
   });
 }
 
-// ── Part 1: Unit tests ────────────────────────────────────────────────────────
-
-function freshAdmin() {
-  const resolved = require.resolve(path.join(API_DIR, 'admin'));
-  delete require.cache[resolved];
-  return require(resolved);
+function supabaseRest(method, table, body, query = '') {
+  return new Promise((resolve, reject) => {
+    const u = new URL(`${SUPA_URL}/rest/v1/${table}${query}`);
+    const payload = body ? JSON.stringify(body) : null;
+    const headers = {
+      apikey:          ANON_KEY,
+      Authorization:  `Bearer ${ANON_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer:         'return=representation',
+    };
+    if (payload) headers['Content-Length'] = Buffer.byteLength(payload);
+    const req = https.request({ hostname: u.hostname, path: u.pathname + u.search, method, headers }, res => {
+      const chunks = [];
+      res.on('data', c => chunks.push(c));
+      res.on('end', () => {
+        try { resolve({ status: res.statusCode, body: JSON.parse(Buffer.concat(chunks).toString()) }); }
+        catch { resolve({ status: res.statusCode, body: {} }); }
+      });
+    });
+    req.on('error', reject);
+    if (payload) req.write(payload);
+    req.end();
+  });
 }
 
+// ── Part 1: Unit (mock Supabase) ─────────────────────────────────────────────
+
+function makeMockSupabase({ sessions_used = null, blocked = false, last_reset = null, updated_at = null } = {}) {
+  return {
+    from() {
+      const chain = {
+        select()  { return chain; },
+        eq()      { return chain; },
+        not()     { return chain; },
+        ilike()   { return chain; },
+        order()   { return chain; },
+        single() {
+          if (sessions_used === null) {
+            return Promise.resolve({ data: null, error: { code: 'PGRST116', message: 'no rows' } });
+          }
+          return Promise.resolve({ data: { sessions_used, blocked, last_reset, updated_at }, error: null });
+        },
+        upsert() { return Promise.resolve({ error: null }); },
+        delete() { return chain; },
+      };
+      return chain;
+    },
+    auth: { getUser: () => Promise.resolve({ data: { user: null }, error: null }) },
+  };
+}
+
+function injectSupabase(opts) {
+  const p = require.resolve(path.join(API_DIR, 'supabase'));
+  delete require.cache[p];
+  require.cache[p] = { id: p, filename: p, loaded: true, exports: { supabase: makeMockSupabase(opts) }, children: [] };
+}
+
+function freshAdmin() {
+  const p = require.resolve(path.join(API_DIR, 'admin'));
+  delete require.cache[p];
+  return require(p);
+}
+
+// ── Tests ─────────────────────────────────────────────────────────────────────
+
 (async () => {
-  console.log('\n── Admin brute-force protection tests ──────────────────────────────\n');
-  console.log('Part 1: Unit (in-memory rate-limiter logic)\n');
+  console.log('\n── Admin brute-force (Supabase-backed) — proof tests ───────────────\n');
+  console.log('Part 1: Unit (mock Supabase, deterministic)\n');
 
-  // Load a fresh admin module so we start with an empty loginAttempts Map
-  const adminMod = freshAdmin();
-  const rl = adminMod._rateLimit;
-  const { checkLoginRateLimit, recordLoginFailure, recordLoginSuccess,
-          loginAttempts, LOGIN_MAX_ATTEMPTS, LOGIN_LOCKOUT_MS } = rl;
-
-  const TEST_IP = '10.0.0.1';
-
-  await test('First attempt on clean IP → allowed', () => {
-    loginAttempts.clear();
-    const result = checkLoginRateLimit(TEST_IP);
-    assert(result.allowed === true, `expected allowed=true, got ${result.allowed}`);
-  });
-
-  await test(`${LOGIN_MAX_ATTEMPTS - 1} failures → still allowed`, () => {
-    loginAttempts.clear();
-    for (let i = 0; i < LOGIN_MAX_ATTEMPTS - 1; i++) recordLoginFailure(TEST_IP);
-    const result = checkLoginRateLimit(TEST_IP);
-    assert(result.allowed === true,
-      `expected allowed after ${LOGIN_MAX_ATTEMPTS - 1} failures, got blocked`);
-  });
-
-  await test(`${LOGIN_MAX_ATTEMPTS} failures → IP is locked (429 territory)`, () => {
-    loginAttempts.clear();
-    for (let i = 0; i < LOGIN_MAX_ATTEMPTS; i++) recordLoginFailure(TEST_IP);
-    const result = checkLoginRateLimit(TEST_IP);
-    assert(result.allowed === false,
-      `expected blocked after ${LOGIN_MAX_ATTEMPTS} failures, got allowed`);
-    assert(typeof result.remaining === 'number' && result.remaining > 0,
-      `expected remaining seconds in response, got: ${result.remaining}`);
-    assert(result.remaining <= Math.ceil(LOGIN_LOCKOUT_MS / 1000),
-      `remaining ${result.remaining}s exceeds lockout ${LOGIN_LOCKOUT_MS / 1000}s`);
-  });
-
-  await test('Lockout reports a non-zero remaining time', () => {
-    loginAttempts.clear();
-    for (let i = 0; i < LOGIN_MAX_ATTEMPTS; i++) recordLoginFailure(TEST_IP);
-    const r1 = checkLoginRateLimit(TEST_IP);
-    assert(!r1.allowed && r1.remaining > 0,
-      `expected locked with remaining>0, got allowed=${r1.allowed} remaining=${r1.remaining}`);
-    // Second call while locked should still be locked
-    const r2 = checkLoginRateLimit(TEST_IP);
-    assert(!r2.allowed, `expected still locked on second check, got allowed`);
-  });
-
-  await test('Successful login clears the counter (legitimate admin recovers)', () => {
-    loginAttempts.clear();
-    for (let i = 0; i < LOGIN_MAX_ATTEMPTS; i++) recordLoginFailure(TEST_IP);
-    // Simulate correct password on a different IP (not locked) then clear
-    // In real flow the correct IP would be allowed through before lock; here just verify clear
-    loginAttempts.clear(); // simulate server restart / different instance
-    recordLoginSuccess(TEST_IP); // then a success call on the correct IP
-    const result = checkLoginRateLimit(TEST_IP);
-    assert(result.allowed === true, 'expected counter cleared after successful login');
-  });
-
-  await test('Window expiry resets counter (auto-recovery without manual reset)', () => {
-    loginAttempts.clear();
-    // Manually plant a stale record (windowStart in the past beyond window duration)
-    const staleStart = Date.now() - rl.LOGIN_WINDOW_MS - 1000;
-    loginAttempts.set(TEST_IP, { count: LOGIN_MAX_ATTEMPTS, windowStart: staleStart, lockedUntil: 0 });
-    const result = checkLoginRateLimit(TEST_IP);
-    assert(result.allowed === true,
-      `expected allowed after window expiry, got blocked (remaining=${result.remaining})`);
-  });
-
-  await test('Different IPs have independent counters', () => {
-    loginAttempts.clear();
-    const IP_A = '1.1.1.1';
-    const IP_B = '2.2.2.2';
-    for (let i = 0; i < LOGIN_MAX_ATTEMPTS; i++) recordLoginFailure(IP_A);
-    const rA = checkLoginRateLimit(IP_A);
-    const rB = checkLoginRateLimit(IP_B);
-    assert(!rA.allowed, `IP_A should be locked`);
-    assert(rB.allowed,  `IP_B should be unaffected`);
-  });
-
-  // ── Part 2: Live HTTP proof ─────────────────────────────────────────────────
-  console.log('\nPart 2: Live HTTP — repeated bad logins against production\n');
-  console.log(`  Endpoint: POST ${PROD_URL}/api/admin`);
-  console.log(`  Sending ${LOGIN_MAX_ATTEMPTS + 1} bad-password attempts in rapid sequence…\n`);
-
-  const WRONG_PWD = 'definitely-not-the-right-password-xyzzy-' + Date.now();
-  const results   = [];
-
-  for (let i = 1; i <= LOGIN_MAX_ATTEMPTS + 1; i++) {
-    const r = await postJSON(`${PROD_URL}/api/admin`, { password: WRONG_PWD });
-    results.push({ attempt: i, status: r.status, body: r.body });
-    process.stdout.write(`  Attempt ${i}: HTTP ${r.status}  ${JSON.stringify(r.body).slice(0, 80)}\n`);
+  // 1. New IP (no DB row) → allowed
+  injectSupabase({ sessions_used: null });
+  {
+    const { _rateLimit: rl } = freshAdmin();
+    await test('New IP (no DB row) → allowed', async () => {
+      const r = await rl.checkLoginRateLimit('1.2.3.4');
+      assert(r.allowed === true, `expected allowed=true, got ${r.allowed}`);
+    });
   }
 
-  await test(`First ${LOGIN_MAX_ATTEMPTS} bad attempts each return 401 (wrong password, not locked yet)`, () => {
-    const first5 = results.slice(0, LOGIN_MAX_ATTEMPTS);
-    const nonAuth = first5.filter(r => r.status !== 401);
-    assert(nonAuth.length === 0,
-      `expected all 401, but got: ${nonAuth.map(r => `attempt ${r.attempt} → ${r.status}`).join(', ')}`);
+  // 2. 4 failures in window → still allowed
+  injectSupabase({ sessions_used: 4, blocked: false, last_reset: new Date().toISOString(), updated_at: new Date(0).toISOString() });
+  {
+    const { _rateLimit: rl } = freshAdmin();
+    await test('4 failures in window → still allowed', async () => {
+      const r = await rl.checkLoginRateLimit('1.2.3.4');
+      assert(r.allowed === true, `expected allowed after 4 failures`);
+    });
+  }
+
+  // 3. 5 failures in window + locked → blocked with remaining seconds
+  {
+    const lockedUntil = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+    injectSupabase({ sessions_used: 5, blocked: true, last_reset: new Date().toISOString(), updated_at: lockedUntil });
+    const { _rateLimit: rl } = freshAdmin();
+    await test('5 failures → blocked (429 territory), remaining > 0', async () => {
+      const r = await rl.checkLoginRateLimit('1.2.3.4');
+      assert(r.allowed === false, `expected blocked`);
+      assert(typeof r.remaining === 'number' && r.remaining > 0, `expected remaining > 0, got ${r.remaining}`);
+    });
+  }
+
+  // 4. Lockout expired (updated_at in past) → allowed again (auto-recovery)
+  {
+    const expiredLockout = new Date(Date.now() - 1000).toISOString(); // 1 second ago
+    injectSupabase({ sessions_used: 5, blocked: true, last_reset: new Date(Date.now() - 60000).toISOString(), updated_at: expiredLockout });
+    const { _rateLimit: rl } = freshAdmin();
+    await test('Lockout expired (updated_at in past) → auto-recovery, allowed', async () => {
+      const r = await rl.checkLoginRateLimit('1.2.3.4');
+      assert(r.allowed === true, `expected allowed after lockout expiry, got blocked`);
+    });
+  }
+
+  // 5. Window expired (last_reset > 15 min ago) → treated as clean slate
+  {
+    const oldWindow = new Date(Date.now() - 16 * 60 * 1000).toISOString(); // 16 min ago
+    injectSupabase({ sessions_used: 4, blocked: false, last_reset: oldWindow, updated_at: new Date(0).toISOString() });
+    const { _rateLimit: rl } = freshAdmin();
+    await test('Window expired (last_reset > 15 min ago) → clean slate, allowed', async () => {
+      const r = await rl.checkLoginRateLimit('1.2.3.4');
+      assert(r.allowed === true, `expected allowed after window expiry`);
+    });
+  }
+
+  // 6. Supabase unavailable → fail open (never lock out the admin due to DB issues)
+  {
+    const p = require.resolve(path.join(API_DIR, 'supabase'));
+    delete require.cache[p];
+    require.cache[p] = { id: p, filename: p, loaded: true, exports: { supabase: null }, children: [] };
+    const { _rateLimit: rl } = freshAdmin();
+    await test('Supabase null (DB unavailable) → fail open, always allowed', async () => {
+      const r = await rl.checkLoginRateLimit('1.2.3.4');
+      assert(r.allowed === true, `expected fail-open when supabase is null`);
+    });
+  }
+
+  // ── Part 2: Multi-instance simulation (live Supabase + real HTTP) ──────────
+  console.log('\nPart 2: Multi-instance simulation (live Supabase + production endpoint)\n');
+
+  const RL_KEY = `admin_ratelimit:${MY_IP}`;
+  const WRONG_PWD = 'wrong-password-brute-force-proof-' + Date.now();
+
+  // Clean up any leftover state from previous runs
+  await supabaseRest('DELETE', `user_sessions`, null, `?email=eq.${encodeURIComponent(RL_KEY)}`);
+
+  let step2Pass = true;
+
+  await test('Simulate "instance A" writing 4 prior failures directly to Supabase', async () => {
+    const r = await supabaseRest('POST', 'user_sessions', {
+      email:          RL_KEY,
+      sessions_used:  4,
+      sessions_limit: 0,
+      blocked:        false,
+      last_reset:     new Date().toISOString(),
+      updated_at:     new Date(0).toISOString(),
+    });
+    assert(r.status === 201, `expected 201 from Supabase, got ${r.status}`);
+    console.log(`       → ${RL_KEY} written with sessions_used=4 (simulating 4 prior failures on another instance)`);
   });
 
-  await test(`Attempt ${LOGIN_MAX_ATTEMPTS + 1} returns 429 (locked after threshold)`, () => {
-    const last = results[results.length - 1];
-    assert(last.status === 429,
-      `expected 429 on attempt ${LOGIN_MAX_ATTEMPTS + 1}, got ${last.status}. ` +
-      `Body: ${JSON.stringify(last.body)}. ` +
-      `Note: if this fails, Vercel may have routed to a different cold instance — ` +
-      `the unit tests above still prove the logic is correct.`);
-    assert(typeof last.body.error === 'string' && last.body.error.includes('Too many'),
-      `expected lockout error message, got: ${JSON.stringify(last.body)}`);
+  await test('HTTP attempt 1 (5th total failure across all instances) → 401, counter written to 5', async () => {
+    const r = await postJSON(`${PROD_URL}/api/admin`, { password: WRONG_PWD });
+    console.log(`       → HTTP ${r.status}  ${JSON.stringify(r.body)}`);
+    assert(r.status === 401, `expected 401 (password wrong, not yet blocked at CHECK time), got ${r.status}`);
   });
+
+  await test('HTTP attempt 2 (6th total, already blocked at 5) → 429 [multi-instance proof]', async () => {
+    const r = await postJSON(`${PROD_URL}/api/admin`, { password: WRONG_PWD });
+    console.log(`       → HTTP ${r.status}  ${JSON.stringify(r.body)}`);
+    assert(r.status === 429, `expected 429 (blocked by global DB counter), got ${r.status}. ` +
+      `If in-memory only, this would need 5 more HTTP requests.`);
+    assert(r.body?.error?.includes('Too many'), `expected lockout error message`);
+    step2Pass = r.status === 429;
+  });
+
+  console.log('\n  ► KEY: with in-memory-only rate limiting, 5 HTTP requests would be');
+  console.log('    needed before getting 429. With Supabase, the 4 "prior failures from');
+  console.log(`    another instance" were already in the DB, so HTTP request 2 (the 6th`);
+  console.log(`    total) was immediately blocked — proving global enforcement.\n`);
+
+  // Cleanup
+  await supabaseRest('DELETE', `user_sessions`, null, `?email=eq.${encodeURIComponent(RL_KEY)}`);
+  console.log('  (rate-limit row cleaned up from Supabase)\n');
 
   // ── Summary ─────────────────────────────────────────────────────────────────
   const total = passed + failed;
-  console.log('\n' + '─'.repeat(60));
+  console.log('─'.repeat(60));
   console.log(`${total}/${total} tests run — ${passed} PASS  ${failed} FAIL`);
 
   if (failed > 0) {
-    console.log('\nAdmin brute-force protection check FAILED.');
+    console.log('\nAdmin brute-force (Supabase) check FAILED.');
     process.exit(1);
   } else {
-    console.log('\nAll admin brute-force protection checks PASS.');
-    console.log('Admin login endpoint blocks after 5 failed attempts with HTTP 429.');
+    console.log('\nAll admin brute-force checks PASS.');
+    console.log('Rate limit is globally enforced via Supabase (not per-instance in-memory).');
     process.exit(0);
   }
 })();

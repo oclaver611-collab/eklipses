@@ -349,6 +349,7 @@
     signInWithGoogle: ()        => sb?.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } }),
     signOut:        ()          => sb?.auth.signOut(),
     getUser:        ()          => currentUser,
+    getToken:       async ()    => { const { data } = await (sb?.auth.getSession() ?? Promise.resolve({ data: {} })); return data?.session?.access_token || null; },
     showModal:      (tab)       => showAuthModal(tab),
   };
 
