@@ -6,6 +6,10 @@ const FREE_SESSION_LIMIT = 2;
 const subscriberCache = new Map();
 const SUBSCRIBER_CACHE_TTL = 5 * 60 * 1000;
 
+// Exported so webhook.js can do best-effort same-instance cache invalidation.
+// Cross-instance revocations are handled by the DB check inside isActiveSubscriber().
+exports.subscriberCache = subscriberCache;
+
 // TEST_ACCOUNT_BYPASS — permanently free/unlimited accounts for internal testing.
 // Populated via TEST_EMAILS_BYPASS env var (comma-separated emails).
 // Clear this env var (or remove entries) before public launch.
@@ -16,6 +20,21 @@ async function isActiveSubscriber(req) {
   const customerId = req.headers['x-stripe-customer'];
   if (!customerId || !customerId.startsWith('cus_')) return false;
   if (!process.env.STRIPE_SECRET_KEY) return false;
+
+  // Check webhook-written revocation record BEFORE the in-memory cache so that
+  // a subscription cancellation or payment failure revokes access immediately
+  // across all serverless instances (not just the one that received the webhook).
+  if (supabase) {
+    try {
+      const { data } = await supabase
+        .from('user_sessions')
+        .select('blocked')
+        .eq('email', `stripe:${customerId}`)
+        .single();
+      if (data?.blocked === true) return false;
+    } catch { /* fail open — DB error never blocks a paying customer */ }
+  }
+
   const cached = subscriberCache.get(customerId);
   if (cached && cached.expires > Date.now()) return cached.active;
   try {
