@@ -58,13 +58,21 @@ function getClientIP(req) {
   );
 }
 
-// Returns true if the request comes from a whitelisted test account.
-// Relies on x-user-email header injected by patchFetch() in player.js.
-function isTestAccount(req) {
+// Returns true if the request carries a valid Supabase JWT for a whitelisted test email.
+// Verifies the JWT server-side via supabase.auth.getUser() — never trusts a raw header.
+async function isTestAccount(req) {
   if (!TEST_BYPASS_EMAILS.length) return false;
-  const email = req.headers['x-user-email'];
-  if (!email) return false;
-  return TEST_BYPASS_EMAILS.includes(email.trim().toLowerCase());
+  const authHeader = req.headers['authorization'];
+  if (!authHeader?.startsWith('Bearer ')) return false;
+  const jwt = authHeader.slice(7);
+  if (!supabase) return false;
+  try {
+    const { data, error } = await supabase.auth.getUser(jwt);
+    if (error || !data?.user?.email) return false;
+    return TEST_BYPASS_EMAILS.includes(data.user.email.trim().toLowerCase());
+  } catch {
+    return false;
+  }
 }
 
 function isDevBypass(req) {
@@ -80,7 +88,7 @@ async function checkRateLimit(req, res) {
   if (isDevBypass(req)) return { allowed: true, bypass: 'dev' };
 
   // Priority 2: whitelisted test accounts (TEST_EMAILS_BYPASS env var)
-  if (isTestAccount(req)) return { allowed: true, bypass: 'test' };
+  if (await isTestAccount(req)) return { allowed: true, bypass: 'test' };
 
   // Priority 3: active Stripe subscriber — unlimited
   const paid = await isActiveSubscriber(req);

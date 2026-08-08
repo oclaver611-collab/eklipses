@@ -9,7 +9,7 @@ module.exports = async function handler(req, res) {
 
   console.log('[count-session] called, exchangeCount:', req.body?.exchangeCount, 'IP:', req.headers['x-forwarded-for'] || req.socket?.remoteAddress);
 
-  if (isDevBypass(req) || isTestAccount(req) || await isActiveSubscriber(req)) {
+  if (isDevBypass(req) || await isTestAccount(req) || await isActiveSubscriber(req)) {
     return res.status(200).json({ allowed: true, sessionsUsed: 0, sessionsRemaining: 999, counted: false });
   }
 
