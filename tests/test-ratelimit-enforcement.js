@@ -17,7 +17,7 @@ const API_DIR = path.join(__dirname, '..', 'api');
 
 // ── Mock helpers ──────────────────────────────────────────────────────────────
 
-function makeMockSupabase({ sessionsUsed = null, blocked = false } = {}) {
+function makeMockSupabase({ sessionsUsed = null, blocked = false, authEmail = null } = {}) {
   return {
     from() {
       const chain = {
@@ -32,6 +32,12 @@ function makeMockSupabase({ sessionsUsed = null, blocked = false } = {}) {
         },
       };
       return chain;
+    },
+    auth: {
+      async getUser(jwt) {
+        if (authEmail && jwt) return { data: { user: { email: authEmail } }, error: null };
+        return { data: { user: null }, error: new Error('Invalid JWT') };
+      },
     },
   };
 }
@@ -65,7 +71,7 @@ function freshHandler(name) {
   return require(resolved);
 }
 
-function makeReq({ ip = '10.0.0.1', xDevKey = null, xStripeCustomer = null, xUserEmail = null, body = {} } = {}) {
+function makeReq({ ip = '10.0.0.1', xDevKey = null, xStripeCustomer = null, xUserEmail = null, authorization = null, body = {} } = {}) {
   return {
     method: 'POST',
     headers: {
@@ -74,6 +80,7 @@ function makeReq({ ip = '10.0.0.1', xDevKey = null, xStripeCustomer = null, xUse
       ...(xDevKey ? { 'x-dev-key': xDevKey } : {}),
       ...(xStripeCustomer ? { 'x-stripe-customer': xStripeCustomer } : {}),
       ...(xUserEmail ? { 'x-user-email': xUserEmail } : {}),
+      ...(authorization ? { 'authorization': authorization } : {}),
     },
     query: {},
     socket: { remoteAddress: ip },
@@ -191,13 +198,13 @@ function assert(condition, message) {
     delete process.env.DEV_BYPASS_KEY;
   }
 
-  // 6. TEST_EMAILS_BYPASS overrides the limit
-  injectMockSupabase({ sessionsUsed: 2 }); // at limit
+  // 6. TEST_EMAILS_BYPASS overrides the limit (3D fix: requires verified JWT, not just header)
+  injectMockSupabase({ sessionsUsed: 2, authEmail: 'tester@example.com' }); // at limit
   {
     process.env.TEST_EMAILS_BYPASS = 'tester@example.com';
     const { checkRateLimit } = freshRatelimit();
-    await test('TEST_EMAILS_BYPASS account → allowed even with 2 sessions used', async () => {
-      const req = makeReq({ ip: '99.99.99.99', xUserEmail: 'tester@example.com' });
+    await test('TEST_EMAILS_BYPASS account with valid JWT → allowed even with 2 sessions used', async () => {
+      const req = makeReq({ ip: '99.99.99.99', authorization: 'Bearer mock-valid-jwt' });
       const res = makeRes();
       const result = await checkRateLimit(req, res);
       assert(result.allowed === true, `expected allowed=true for test account`);
@@ -268,6 +275,34 @@ function assert(condition, message) {
     });
   }
 
+  // 12. mary.js handler returns 402 for capped user (finding 3F — newly added)
+  injectMockSupabase({ sessionsUsed: 2 });
+  {
+    const handler = freshHandler('mary');
+    await test('/api/mary → 402 when user is past session limit', async () => {
+      const req = makeReq({ ip: '99.99.99.99' });
+      const res = makeRes();
+      await handler(req, res);
+      assert(res._status === 402, `expected 402 from mary, got ${res._status}`);
+      assert(res._body?.error?.includes('limit reached'),
+        `expected limit-reached error in body, got: ${JSON.stringify(res._body)}`);
+    });
+  }
+
+  // 13. coach-moment.js handler returns 402 for capped user (finding 3F — newly added)
+  injectMockSupabase({ sessionsUsed: 2 });
+  {
+    const handler = freshHandler('coach-moment');
+    await test('/api/coach-moment → 402 when user is past session limit', async () => {
+      const req = makeReq({ ip: '99.99.99.99' });
+      const res = makeRes();
+      await handler(req, res);
+      assert(res._status === 402, `expected 402 from coach-moment, got ${res._status}`);
+      assert(res._body?.error?.includes('limit reached'),
+        `expected limit-reached error in body, got: ${JSON.stringify(res._body)}`);
+    });
+  }
+
   // ── Summary ───────────────────────────────────────────────────────────────
   const total = passed + failed;
   console.log('\n' + '─'.repeat(60));
@@ -278,7 +313,7 @@ function assert(condition, message) {
     process.exit(1);
   } else {
     console.log('\nAll rate-limit enforcement checks PASS.');
-    console.log('Direct API exploit path (character-stream/coach/drill-eval/coach-suggest/elevenlabs');
+    console.log('Direct API exploit path (character-stream/coach/drill-eval/coach-suggest/elevenlabs/mary/coach-moment');
     console.log('past the session limit) is confirmed blocked with HTTP 402.');
     process.exit(0);
   }

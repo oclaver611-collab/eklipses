@@ -1,6 +1,7 @@
 // api/coach-moment.js — lightweight mid-conversation teachable-moment check for Coached Practice mode
 // Checks only the active lesson's mnemonic skills. Returns { teachable, skill, skillName, coaching, betterLine }.
 // Conservative by design: only flags unmistakable failures. Fails open on error (no interrupt).
+const { checkRateLimit } = require('./ratelimit');
 
 // Curated example lines per skill — shown as "Try this instead" in the interrupt overlay.
 // Each entry is { text, opener?: true }.
@@ -261,6 +262,9 @@ function earnCannotFire(exchangeCount, userMessage) {
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const rl = await checkRateLimit(req, res);
+  if (!rl.allowed) return;
 
   const {
     userMessage   = '',

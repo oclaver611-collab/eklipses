@@ -1,8 +1,13 @@
 // api/mary.js — Dynamic Mary with per-scenario personality
+const { checkRateLimit } = require('./ratelimit');
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  const rl = await checkRateLimit(req, res);
+  if (!rl.allowed) return;
 
   const { userMessage, scenarioTitle, scenarioKey, history: rawHistory = [] } = req.body || {};
   const history = rawHistory.slice(-16);
