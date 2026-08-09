@@ -554,7 +554,12 @@ const DailyLimit = (() => {
     ].join(';');
 
     overlay.innerHTML = `
-      <div style="font-size:44px;margin-bottom:12px">🔐</div>
+      <svg width="48" height="56" viewBox="0 0 48 56" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:20px;display:block;margin-left:auto;margin-right:auto">
+        <path d="M12 24V17C12 9.268 17.373 3 24 3C30.627 3 36 9.268 36 17V24" stroke="#ffb300" stroke-width="3" stroke-linecap="round"/>
+        <rect x="4" y="24" width="40" height="29" rx="7" fill="rgba(255,179,0,0.1)" stroke="#ffb300" stroke-width="2"/>
+        <circle cx="24" cy="37" r="4" fill="#ffb300"/>
+        <path d="M24 41V47" stroke="#ffb300" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
       <div style="color:#fff;font-size:24px;font-weight:800;margin-bottom:10px;letter-spacing:-0.5px">
         You've used your 2 free sessions
       </div>

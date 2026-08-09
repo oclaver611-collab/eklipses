@@ -836,7 +836,7 @@
       .elp-close:hover { background:rgba(255,255,255,.22); }
 
       .elp-stage { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; max-width:860px; gap:16px; }
-      .elp-avatar-area { width:100%; max-width:540px; height:300px; display:flex; align-items:center; justify-content:center; position:relative; }
+      .elp-avatar-area { width:100%; max-width:600px; flex:1; min-height:260px; max-height:460px; display:flex; align-items:center; justify-content:center; position:relative; }
       .elp-avatar-area video { width:100%; height:100%; object-fit:cover; border-radius:16px; }
 
       /* Ryan orb */
@@ -903,8 +903,8 @@
       .elp-exit-btns { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
 
       /* Shared buttons */
-      .elp-btn-primary { background:#378ADD; color:#fff; border:none; border-radius:8px; padding:11px 24px; font-size:14px; font-weight:700; cursor:pointer; }
-      .elp-btn-primary:hover { background:#4a94e0; }
+      .elp-btn-primary { background:#ffb300; color:#000; border:none; border-radius:8px; padding:11px 24px; font-size:14px; font-weight:700; cursor:pointer; }
+      .elp-btn-primary:hover { background:#e6a300; }
       .elp-btn-ghost { background:transparent; color:#9aa4b2; border:1px solid #2b2e36; border-radius:8px; padding:11px 24px; font-size:14px; cursor:pointer; }
       .elp-btn-ghost:hover { background:#1e2028; }
 
@@ -985,14 +985,14 @@
     area.innerHTML = '';
 
     const row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:40px;width:100%;';
+    row.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:32px;width:100%;height:100%;';
 
     const orbWrap = document.createElement('div');
-    orbWrap.style.cssText = 'display:flex;align-items:center;justify-content:center;width:160px;height:240px;';
+    orbWrap.style.cssText = 'display:flex;align-items:center;justify-content:center;flex-shrink:0;width:160px;';
     orbWrap.appendChild(buildRyanOrb());
 
     const sofiaWrap = document.createElement('div');
-    sofiaWrap.style.cssText = 'width:220px;height:240px;position:relative;';
+    sofiaWrap.style.cssText = 'flex:1;max-width:300px;height:100%;position:relative;border-radius:12px;overflow:hidden;';
     const v = document.createElement('video');
     v.id = 'elp-sofia-video';
     v.src = SOFIA_IDLE;
