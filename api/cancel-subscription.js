@@ -59,16 +59,20 @@ module.exports = async function handler(req, res) {
     }
 
     if (sub.cancel_at_period_end) {
-      const d = new Date(sub.current_period_end * 1000).toLocaleDateString('en-US', {
-        month: 'long', day: 'numeric', year: 'numeric',
-      });
+      const ts = sub.cancel_at || sub.current_period_end;
+      const d = ts
+        ? new Date(ts * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+        : 'end of billing period';
       return res.json({ success: true, alreadyCancelled: true, cancelDate: d });
     }
 
     const updated = await stripe.subscriptions.update(sub.id, { cancel_at_period_end: true });
-    const cancelDate = new Date(updated.current_period_end * 1000).toLocaleDateString('en-US', {
-      month: 'long', day: 'numeric', year: 'numeric',
-    });
+    // cancel_at is set by Stripe (API 2026-05-27+) when cancel_at_period_end=true.
+    // Older API versions used current_period_end; fall back for forward compatibility.
+    const periodEndTs = updated.cancel_at || updated.current_period_end;
+    const cancelDate = periodEndTs
+      ? new Date(periodEndTs * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+      : 'end of billing period';
 
     return res.json({ success: true, cancelDate, subscriptionId: sub.id });
   } catch (err) {
