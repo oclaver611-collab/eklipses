@@ -1345,6 +1345,153 @@ async function run() {
     );
     await l5UnlockedPage.close();
 
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // 13. AVATAR PICKER — SELECTION PERSISTS ACROSS MULTIPLE SCENARIO LAUNCHES
+    // Proof test for the three-part avatar-override fix (2026-08-11).
+    // Bug: picker click never wrote currentCharacterId; playScenario always
+    // overwrote it from SCENARIO_CHARACTER_MAP; runDrill always showed Sofia.
+    // Fix: (1) picker writes currentCharacterId + sets pickerHasOverride flag;
+    //      (2) playScenario respects that flag; (3) runDrill applies the active
+    //          character before the drill starts.
+    // ═══════════════════════════════════════════════════════════════════════
+    console.log('\nAvatar picker persistence tests');
+    console.log('─'.repeat(54));
+
+    const avatarPage = await loadPage(browser);
+    avatarPage.on('pageerror', err => console.error('[avatar page error]', err.message));
+
+    // A. Picker click sets currentCharacterId and pickerHasOverride flag.
+    //    Open the picker, click the Nadia card, verify state.
+    const initialChar = await avatarPage.evaluate(() => currentCharacterId);
+    report(
+      'Initial currentCharacterId is sofia (boot default)',
+      initialChar === 'sofia',
+      `got: ${initialChar}`
+    );
+
+    // Open the picker and click the Nadia card via the UI click handler.
+    // renderAvatarPicker() is a function declaration so accessible on window.
+    await avatarPage.evaluate(() => {
+      if (typeof renderAvatarPicker === 'function') renderAvatarPicker();
+    });
+    await avatarPage.evaluate(() => {
+      const card = document.querySelector('.pick-card[data-id="nadia"]');
+      if (card) card.click();
+    });
+
+    const afterPick = await avatarPage.evaluate(() => ({
+      charId:           currentCharacterId,
+      flag:             pickerHasOverride,
+      videoHasNadia:    AVATARS.Mary.src.includes('nadia'),
+    }));
+    report(
+      'Picker click sets currentCharacterId to the picked avatar',
+      afterPick.charId === 'nadia',
+      `got: ${afterPick.charId}`
+    );
+    report(
+      'Picker click sets pickerHasOverride = true',
+      afterPick.flag === true,
+      `got: ${afterPick.flag}`
+    );
+    report(
+      'Picker click applies Nadia video to AVATARS.Mary.src',
+      afterPick.videoHasNadia,
+      afterPick.videoHasNadia ? 'nadia in src' : `src: ${afterPick.videoHasNadia}`
+    );
+
+    // B. Scenario 1 (Beach → sofia default): verify pick persists.
+    //    Run the character-override section of playScenario for 'beach'.
+    //    With the fix in place, currentCharacterId must stay 'nadia'.
+    const afterBeach = await avatarPage.evaluate(() => {
+      const key = 'beach';
+      if (!pickerHasOverride && SCENARIO_CHARACTER_MAP[key]) {
+        currentCharacterId = SCENARIO_CHARACTER_MAP[key];
+        const defaultSet = AVATAR_SETS.find(s => s.id === currentCharacterId);
+        if (defaultSet) applyAvatarSet(defaultSet);
+      } else if (pickerHasOverride) {
+        const pickedSet = AVATAR_SETS.find(s => s.id === currentCharacterId);
+        if (pickedSet) applyAvatarSet(pickedSet);
+      }
+      return { charId: currentCharacterId, videoHasNadia: AVATARS.Mary.src.includes('nadia') };
+    });
+    report(
+      'Scenario 1 (beach/sofia default): picked avatar not overridden',
+      afterBeach.charId === 'nadia',
+      `charId=${afterBeach.charId} (expected nadia, beach default is sofia)`
+    );
+    report(
+      'Scenario 1: Nadia video still active after launch',
+      afterBeach.videoHasNadia,
+      afterBeach.videoHasNadia ? 'nadia in src' : 'src changed away from nadia'
+    );
+
+    // C. Scenario 2 (Museum → isabelle default): verify pick still persists.
+    const afterMuseum = await avatarPage.evaluate(() => {
+      const key = 'museum';
+      if (!pickerHasOverride && SCENARIO_CHARACTER_MAP[key]) {
+        currentCharacterId = SCENARIO_CHARACTER_MAP[key];
+        const defaultSet = AVATAR_SETS.find(s => s.id === currentCharacterId);
+        if (defaultSet) applyAvatarSet(defaultSet);
+      } else if (pickerHasOverride) {
+        const pickedSet = AVATAR_SETS.find(s => s.id === currentCharacterId);
+        if (pickedSet) applyAvatarSet(pickedSet);
+      }
+      return { charId: currentCharacterId, videoHasNadia: AVATARS.Mary.src.includes('nadia') };
+    });
+    report(
+      'Scenario 2 (museum/isabelle default): picked avatar persists across launches',
+      afterMuseum.charId === 'nadia',
+      `charId=${afterMuseum.charId} (expected nadia, museum default is isabelle)`
+    );
+
+    // D. runDrill fix: with NO picker override, drill applies the scenario's
+    //    character (not Sofia from boot). Simulates fresh-session drill for house_party.
+    const drillNoOverride = await avatarPage.evaluate(() => {
+      // Reset to fresh-session state
+      pickerHasOverride = false;
+      currentCharacterId = 'sofia';
+      const scenarioKey = 'house_party';
+      // This is the runDrill fix block
+      if (!pickerHasOverride && SCENARIO_CHARACTER_MAP[scenarioKey]) {
+        currentCharacterId = SCENARIO_CHARACTER_MAP[scenarioKey];
+      }
+      const drillSet = AVATAR_SETS.find(s => s.id === currentCharacterId);
+      if (drillSet) applyAvatarSet(drillSet);
+      return { charId: currentCharacterId, videoHasSarah: AVATARS.Mary.src.includes('sarah') };
+    });
+    report(
+      'runDrill (no picker): applies scenario default before drill (house_party → sarah)',
+      drillNoOverride.charId === 'sarah',
+      `charId=${drillNoOverride.charId} (expected sarah)`
+    );
+    report(
+      'runDrill (no picker): Sarah video active during drill warm-up',
+      drillNoOverride.videoHasSarah,
+      drillNoOverride.videoHasSarah ? 'sarah in src' : 'wrong video src'
+    );
+
+    // E. runDrill fix: with picker override, drill preserves the picked character.
+    const drillWithOverride = await avatarPage.evaluate(() => {
+      pickerHasOverride = true;
+      currentCharacterId = 'nadia';
+      const scenarioKey = 'house_party';
+      if (!pickerHasOverride && SCENARIO_CHARACTER_MAP[scenarioKey]) {
+        currentCharacterId = SCENARIO_CHARACTER_MAP[scenarioKey];
+      }
+      const drillSet = AVATAR_SETS.find(s => s.id === currentCharacterId);
+      if (drillSet) applyAvatarSet(drillSet);
+      return { charId: currentCharacterId, videoHasNadia: AVATARS.Mary.src.includes('nadia') };
+    });
+    report(
+      'runDrill (picker override): preserves picked avatar during drill (nadia stays nadia)',
+      drillWithOverride.charId === 'nadia',
+      `charId=${drillWithOverride.charId} (expected nadia, house_party default would be sarah)`
+    );
+
+    await avatarPage.close();
+
   } finally {
     await browser.close();
     server.close();

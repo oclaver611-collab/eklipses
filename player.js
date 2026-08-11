@@ -2,6 +2,7 @@
 let currentScenarioKey = null;
 let currentUserStyle = null;
 let currentCharacterId = "sofia"; // active character — changes when user picks avatar
+let pickerHasOverride = false;   // true once user explicitly picks an avatar
 
 // Default character per scenario — overrideable by avatar picker
 const SCENARIO_CHARACTER_MAP = {
@@ -2195,11 +2196,16 @@ async function playScenario(key, practice=false) {
   await pause(800); // increased from 200ms — kills 1s audio bleed on fast clicks
 
   currentScenarioKey=key;
-  // Auto-set default character and avatar for this scenario
-  if (SCENARIO_CHARACTER_MAP[key]) {
+  // Apply character for this scenario. If the user has explicitly picked an avatar,
+  // honour their choice; otherwise use the scenario's built-in default.
+  if (!pickerHasOverride && SCENARIO_CHARACTER_MAP[key]) {
     currentCharacterId = SCENARIO_CHARACTER_MAP[key];
     const defaultSet = AVATAR_SETS.find(s => s.id === currentCharacterId);
     if (defaultSet) applyAvatarSet(defaultSet);
+  } else if (pickerHasOverride) {
+    // Re-apply the picked set (stopEverything clears the active video state)
+    const pickedSet = AVATAR_SETS.find(s => s.id === currentCharacterId);
+    if (pickedSet) applyAvatarSet(pickedSet);
   }
 
   // Fire warmup ping after character is set — primes Groq cold start with correct character
@@ -3144,6 +3150,14 @@ async function runDrill(lessonKey, scenarioKey) {
   stopEverything();
   const mySession = session;
 
+  // Apply the character who will run this scenario before the drill starts.
+  // Without this, the drill warm-up always shows Sofia (the boot default).
+  if (!pickerHasOverride && SCENARIO_CHARACTER_MAP[scenarioKey]) {
+    currentCharacterId = SCENARIO_CHARACTER_MAP[scenarioKey];
+  }
+  const drillSet = AVATAR_SETS.find(s => s.id === currentCharacterId);
+  if (drillSet) applyAvatarSet(drillSet);
+
   resetConversation();
   firstUserOpener = null;
   hideCoachSuggestions();
@@ -3365,6 +3379,8 @@ function renderAvatarPicker() {
     card.onclick=()=>{
       const set=AVATAR_SETS.find(x=>x.id===card.getAttribute('data-id'));
       applyAvatarSet(set);
+      currentCharacterId = set.id;
+      pickerHasOverride = true;
       els.pickerBackdrop.style.display='none';
       renderShelf(); Metrics.refreshUI(currentScenarioKey||Object.keys(SCENARIOS)[0]);
       // Do NOT auto-launch scenario — user picks it manually from the shelf
@@ -3513,6 +3529,7 @@ function initFullscreen() {
 
 /* ===== Boot ===== */
 function bootDefault() {
+  pickerHasOverride = false;
   const set=AVATAR_SETS.find(s=>s.id==='sofia');
   applyAvatarSet(set);
   Metrics.bindLikeButton();
