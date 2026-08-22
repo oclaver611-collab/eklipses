@@ -1,4 +1,4 @@
-// Comprehensive audio verification test — all 14 visible scenario cards.
+﻿// Comprehensive audio verification test — all 14 visible scenario cards.
 // Uses direct state injection (no card click / playScenario) to avoid polluting
 // the capture window with Ryan's TTS calls and warmupCharacterApi() Groq calls,
 // which accumulate across 14 sequential scenarios and cause rate-limit failures.
@@ -75,13 +75,12 @@ const RESET_TRACKING = () => {
 async function setupPage(page) {
   await page.goto(LIVE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.evaluate(() => {
-    localStorage.setItem('ek-onboarding-v1', '1');
     localStorage.setItem('ek-dev-key', 'ek_dev_2026');
   });
   await page.reload({ waitUntil: 'networkidle', timeout: 30000 });
-  await page.waitForSelector('#ek-start-btn', { timeout: 15000 });
-  await page.click('#ek-start-btn');
-  await page.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 20000 });
+  await page.waitForSelector('#ek-h6-start', { timeout: 15000 });
+  await page.click('#ek-h6-start');
+  await page.waitForSelector('#ek-hero-v6', { state: 'detached', timeout: 20000 });
   await page.waitForTimeout(500);
   await page.evaluate(SCENARIO_PATCH);
 }

@@ -1,4 +1,4 @@
-const { chromium } = require('playwright');
+﻿const { chromium } = require('playwright');
 
 (async () => {
   const browser = await chromium.launch({ headless: false });
@@ -33,7 +33,6 @@ const { chromium } = require('playwright');
       JSON.stringify({ date: new Date().toISOString().slice(0, 10), count: 3 })
     );
     // Skip onboarding overlay so it doesn't block card clicks
-    localStorage.setItem('ek-onboarding-v1', '1');
     console.log('[TEST] State set — reloading fresh');
   });
 
@@ -54,15 +53,15 @@ const { chromium } = require('playwright');
   console.log('  ek-daily-v1 =', state.daily,     '(should show count:3)');
   console.log('  cookies     =', state.cookie || '(none)');
 
-  // ── 5. Click #ek-start-btn to dismiss the splash overlay ────────────────
-  console.log('[TEST] Waiting for #ek-start-btn...');
-  await page.waitForSelector('#ek-start-btn', { timeout: 15000 });
-  console.log('[TEST] Clicking #ek-start-btn...');
-  await page.locator('#ek-start-btn').click();
+  // ── 5. Click #ek-h6-start to dismiss the splash overlay ────────────────
+  console.log('[TEST] Waiting for #ek-h6-start...');
+  await page.waitForSelector('#ek-h6-start', { timeout: 15000 });
+  console.log('[TEST] Clicking #ek-h6-start...');
+  await page.locator('#ek-h6-start').click();
 
   // Wait for overlay to be removed (KokoroSpeech preloads then it removes itself)
-  console.log('[TEST] Waiting for #ek-start-overlay to be removed...');
-  await page.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 30000 });
+  console.log('[TEST] Waiting for #ek-hero-v6 to be removed...');
+  await page.waitForSelector('#ek-hero-v6', { state: 'detached', timeout: 30000 });
   console.log('[TEST] Splash overlay gone');
 
   // ── 6. Wait for Ryan's "Pick a scenario" line (or fall back to 4s) ────────

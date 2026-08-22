@@ -1,0 +1,27 @@
+{
+  "name": "video-overlay",
+  "version": "1.0.0",
+  "main": "index.js",
+  "remotion": {
+    "entryPoint": "./src/index.ts"
+  },
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "remotion render EklipsesOverlay"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@remotion/cli": "4.0.513",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "remotion": "4.0.513"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "typescript": "^7.0.2"
+  }
+}

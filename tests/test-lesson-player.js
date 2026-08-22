@@ -1,4 +1,4 @@
-// tests/test-lesson-player.js — Lesson player automated test suite
+﻿// tests/test-lesson-player.js — Lesson player automated test suite
 // Run: node tests/test-lesson-player.js
 const { chromium } = require('playwright');
 
@@ -35,15 +35,14 @@ async function run() {
   // ── Load & dismiss splash (match paywall test pattern) ──────────────────
   await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.evaluate(() => {
-    localStorage.setItem('ek-onboarding-v1', '1');   // skip onboarding overlay
     localStorage.setItem('ek-dev-key', 'ek_dev_2026'); // dev bypass
     localStorage.removeItem('eklipses_lesson1_complete'); // start fresh
     localStorage.removeItem('eklipses_lesson1_progress');
   });
   await page.reload({ waitUntil: 'networkidle', timeout: 30000 });
-  await page.waitForSelector('#ek-start-btn', { timeout: 15000 });
-  await page.locator('#ek-start-btn').click();
-  await page.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 30000 });
+  await page.waitForSelector('#ek-h6-start', { timeout: 15000 });
+  await page.locator('#ek-h6-start').click();
+  await page.waitForSelector('#ek-hero-v6', { state: 'detached', timeout: 30000 });
 
   console.log('\nLesson Player Test Suite');
   console.log('─'.repeat(55));

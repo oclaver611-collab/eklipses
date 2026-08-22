@@ -1,0 +1,58 @@
+﻿[Script Info]
+ScriptType: v4.00+
+PlayResX: 1920
+PlayResY: 1080
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Ryan,Arial Black,44,&H0000D7FF,&H000000FF,&H00000000,&HC0000000,-1,0,0,0,100,100,0,0,3,3,0,2,80,80,50,1
+Style: Serge,Arial Black,44,&H00FFFFFF,&H000000FF,&H00000000,&HC0000000,-1,0,0,0,100,100,0,0,3,3,0,2,80,80,50,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:01:43.00,0:01:49.20,Ryan,,0,0,0,,You're on a beach, late afternoon. She's been sitting there since morning - writing, completely at ease.
+Dialogue: 0,0:01:49.50,0:01:55.29,Ryan,,0,0,0,,You've walked past a woman like this before. You felt it - that pull. And then you kept walking.
+Dialogue: 0,0:01:55.50,0:02:00.90,Ryan,,0,0,0,,You told yourself the timing was wrong. You thought of something perfect to say about three seconds too late.
+Dialogue: 0,0:02:01.20,0:02:05.40,Ryan,,0,0,0,,This time is different. It's late afternoon. The beach is almost empty.
+Dialogue: 0,0:02:05.70,0:02:12.30,Ryan,,0,0,0,,She's been sitting there for twenty minutes, writing something, completely at ease. She already noticed you walk by once.
+Dialogue: 0,0:02:12.59,0:02:20.69,Ryan,,0,0,0,,Your heart is going. Your mind is already making excuses. But she's right there - and this moment has an expiry date of about thirty seconds.
+Dialogue: 0,0:02:21.00,0:02:24.59,Ryan,,0,0,0,,Gather everything you have. Walk toward her. She looks up.
+Dialogue: 0,0:02:24.80,0:02:26.19,Ryan,,0,0,0,,What do you do?
+Dialogue: 0,0:02:30.90,0:02:34.30,Serge,,0,0,0,,hey
+Dialogue: 0,0:02:37.19,0:02:42.40,Serge,,0,0,0,,you so beautiful why did your body
+Dialogue: 0,0:02:52.40,0:02:59.50,Serge,,0,0,0,,all right they just start okay hello now how do you feel
+Dialogue: 0,0:03:11.80,0:03:17.69,Serge,,0,0,0,,all right thank you for answering back
+Dialogue: 0,0:03:27.19,0:03:33.69,Serge,,0,0,0,,I don't know I was on my way and
+Dialogue: 0,0:03:46.80,0:03:55.30,Serge,,0,0,0,,I mean as usual when you wake up you going to beach to go and walk and you know maybe you just want to
+Dialogue: 0,0:04:10.00,0:04:17.30,Serge,,0,0,0,,yeah I mean but I never saw you are you a local and you
+Dialogue: 0,0:04:32.00,0:04:40.69,Serge,,0,0,0,,well... get to know new people like you - by the way what's your name
+Dialogue: 0,0:04:55.50,0:05:07.80,Serge,,0,0,0,,nice to meet you Sophia - my name is James - so what are you up to, what are you doing here on this beach
+Dialogue: 0,0:05:27.60,0:05:37.19,Serge,,0,0,0,,that's pretty weird I mean a young lady riding on the beach - that's unusual
+Dialogue: 0,0:05:55.89,0:06:06.69,Serge,,0,0,0,,no I would have said that I think I found your activity so interesting but I mean you gotta admit that I wasn't expecting that anyways
+Dialogue: 0,0:06:06.69,0:06:18.60,Serge,,0,0,0,,so what kind of is it a job is it part of your work or is it something that you were just doing - my passion - writing - that's it
+Dialogue: 0,0:06:38.60,0:06:41.69,Serge,,0,0,0,,sure
+Dialogue: 0,0:06:48.69,0:06:56.50,Serge,,0,0,0,,well like I said I wanted to keep it for myself if it's not too you know
+Dialogue: 0,0:07:11.19,0:07:22.50,Serge,,0,0,0,,that's absolutely true so apart the writing stuff what else are you doing - like what do you like doing - are you into traveling
+Dialogue: 0,0:07:22.50,0:07:33.69,Serge,,0,0,0,,or do you have activities - do you have a boyfriend, sorry to ask - I mean it's just a question right, just to get to know you better
+Dialogue: 0,0:07:55.30,0:07:57.39,Ryan,,0,0,0,,Two minutes left - make it count.
+Dialogue: 0,0:07:58.80,0:08:09.39,Serge,,0,0,0,,I already don't know I'm just like you know - I saw you and I feel like I get to know that person
+Dialogue: 0,0:08:26.50,0:08:29.39,Serge,,0,0,0,,well
+Dialogue: 0,0:08:32.10,0:08:37.39,Serge,,0,0,0,,I see you are probably right on that
+Dialogue: 0,0:08:53.29,0:08:57.60,Serge,,0,0,0,,like I said - get to know new people like you
+Dialogue: 0,0:09:15.60,0:09:23.20,Serge,,0,0,0,,a little bit curious - try to guess - if you guess it I owe you coffee
+Dialogue: 0,0:09:33.79,0:09:37.29,Ryan,,0,0,0,,That's time. Let me put together your feedback.
+Dialogue: 0,0:09:51.00,0:10:01.00,Ryan,,0,0,0,,Let me walk you through the Lesson 1 skills. For Observe, you didn't reference anything specific about her or the scene in your opening line.
+Dialogue: 0,0:10:01.00,0:10:11.00,Ryan,,0,0,0,,For Tease, you didn't push back when she called you out. For Mystery, you gave a lot of information without leaving her wanting more. For Imply, your curiosity worked.
+Dialogue: 0,0:10:11.00,0:10:21.10,Ryan,,0,0,0,,For Close, the coffee challenge was a solid move. But sharpen your skills to create more real moments.
+Dialogue: 0,0:10:24.00,0:10:36.10,Ryan,,0,0,0,,When you said 'I feel like I get to know that person,' it showed connection. But 'hey' was flat - next time start with something real about her.
+Dialogue: 0,0:10:38.79,0:10:50.00,Ryan,,0,0,0,,When she said 'you seem a little uneasy,' you agreed. You missed a chance to push back and tease her - that would have kept things engaging.
+Dialogue: 0,0:10:52.70,0:11:01.60,Ryan,,0,0,0,,The moment that hurt you most was asking 'do you have a boyfriend?' Instead, say: 'What's your favorite place you've traveled to?'
+Dialogue: 0,0:11:01.60,0:11:10.50,Ryan,,0,0,0,,That works better because it invites her to share something personal and interesting, keeping the focus on her experiences.
+Dialogue: 0,0:11:12.89,0:11:20.79,Ryan,,0,0,0,,Two things to fix: ask more real questions and hold your ground when she challenges you. You got her intrigued with the coffee bet.
+Dialogue: 0,0:11:21.50,0:11:31.00,Ryan,,0,0,0,,Next time try: 'I love the idea of coffee! How about we make it a fun challenge - if I guess right we go for coffee?'
+Dialogue: 0,0:11:31.00,0:11:41.00,Ryan,,0,0,0,,'You seem like someone who enjoys a good story. What's the most memorable encounter you've had while traveling?'
+Dialogue: 0,0:11:41.00,0:11:50.29,Ryan,,0,0,0,,'I appreciate your perspective. What's one thing you wish more people understood about you?'
+Dialogue: 0,0:11:50.89,0:11:53.79,Ryan,,0,0,0,,I give that a... 6 out of 10.
+Dialogue: 0,0:11:54.60,0:12:00.89,Ryan,,0,0,0,,Closer than the score shows. You know what landed. Build on that. Go again.

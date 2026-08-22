@@ -1,4 +1,4 @@
-// tests/test-new-features.js
+﻿// tests/test-new-features.js
 // Explicit test coverage for three features added in July 2026:
 //   1. Bold yellow captions (player.js Caption module + speak() / streamCharacterAndSpeak wiring)
 //   2. Ambient background audio (AmbientAudio module + stopEverything() cleanup)
@@ -113,7 +113,6 @@ async function loadPage(browser) {
 
   // Bypass onboarding and dev-mode flags before any JS runs
   await page.addInitScript(() => {
-    localStorage.setItem('ek-onboarding-v1', '1');
     localStorage.setItem('eklipses_lesson1_complete', 'true'); // avoid drill gate
   });
 
@@ -121,9 +120,9 @@ async function loadPage(browser) {
 
   // Dismiss splash screen
   try {
-    await page.waitForSelector('#ek-start-btn', { timeout: 5000 });
-    await page.click('#ek-start-btn');
-    await page.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 5000 });
+    await page.waitForSelector('#ek-h6-start', { timeout: 5000 });
+    await page.click('#ek-h6-start');
+    await page.waitForSelector('#ek-hero-v6', { state: 'detached', timeout: 5000 });
   } catch { /* overlay already gone or not present */ }
 
   return page;
@@ -770,7 +769,6 @@ async function run() {
     });
 
     await authPage.addInitScript(() => {
-      localStorage.setItem('ek-onboarding-v1', '1'); // skip onboarding → show splash
     });
 
     await authPage.goto(BASE, { waitUntil: 'domcontentloaded' });
@@ -821,7 +819,6 @@ async function run() {
     const l3Page = await browser.newPage();
 
     await l3Page.addInitScript(() => {
-      localStorage.setItem('ek-onboarding-v1', '1');
       localStorage.setItem('eklipses_lesson1_complete', 'true');
       localStorage.setItem('eklipses_lesson2_complete', 'true');
       localStorage.setItem('eklipses_lesson3_complete', 'true');
@@ -832,7 +829,7 @@ async function run() {
 
     // Stub KokoroSpeech BEFORE clicking start — its preload() is called
     // immediately on click and blocks overlay removal if not stubbed.
-    await l3Page.waitForSelector('#ek-start-btn', { timeout: 8000 });
+    await l3Page.waitForSelector('#ek-h6-start', { timeout: 8000 });
     await l3Page.evaluate(() => {
       if (window.KokoroSpeech) {
         window.KokoroSpeech.preload  = async () => {};
@@ -841,8 +838,8 @@ async function run() {
         window.KokoroSpeech.cancel   = () => {};
       }
     });
-    await l3Page.click('#ek-start-btn');
-    await l3Page.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 8000 });
+    await l3Page.click('#ek-h6-start');
+    await l3Page.waitForSelector('#ek-hero-v6', { state: 'detached', timeout: 8000 });
 
     // Switch to Practice tab and wait for the shelf to be rendered.
     // Use JS click (evaluate) to bypass Playwright's visibility pre-check.
@@ -931,7 +928,6 @@ async function run() {
     const l4Page = await browser.newPage();
 
     await l4Page.addInitScript(() => {
-      localStorage.setItem('ek-onboarding-v1', '1');
       localStorage.setItem('eklipses_lesson1_complete', 'true');
       localStorage.setItem('eklipses_lesson2_complete', 'true');
       localStorage.setItem('eklipses_lesson3_complete', 'true');
@@ -941,7 +937,7 @@ async function run() {
 
     await l4Page.goto(BASE, { waitUntil: 'domcontentloaded' });
 
-    await l4Page.waitForSelector('#ek-start-btn', { timeout: 8000 });
+    await l4Page.waitForSelector('#ek-h6-start', { timeout: 8000 });
     await l4Page.evaluate(() => {
       if (window.KokoroSpeech) {
         window.KokoroSpeech.preload  = async () => {};
@@ -950,8 +946,8 @@ async function run() {
         window.KokoroSpeech.cancel   = () => {};
       }
     });
-    await l4Page.click('#ek-start-btn');
-    await l4Page.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 8000 });
+    await l4Page.click('#ek-h6-start');
+    await l4Page.waitForSelector('#ek-hero-v6', { state: 'detached', timeout: 8000 });
 
     await l4Page.evaluate(() => {
       const t = document.getElementById('ek-tab-practice');
@@ -1032,11 +1028,9 @@ async function run() {
 
     const zeroPage = await browser.newPage();
     await zeroPage.addInitScript(() => {
-      localStorage.setItem('ek-onboarding-v1', '1');
-      // All lesson_complete keys intentionally absent — zero-lesson user
     });
     await zeroPage.goto(BASE, { waitUntil: 'domcontentloaded' });
-    await zeroPage.waitForSelector('#ek-start-btn', { timeout: 8000 });
+    await zeroPage.waitForSelector('#ek-h6-start', { timeout: 8000 });
     await zeroPage.evaluate(() => {
       if (window.KokoroSpeech) {
         window.KokoroSpeech.preload  = async () => {};
@@ -1045,8 +1039,8 @@ async function run() {
         window.KokoroSpeech.cancel   = () => {};
       }
     });
-    await zeroPage.click('#ek-start-btn');
-    await zeroPage.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 8000 });
+    await zeroPage.click('#ek-h6-start');
+    await zeroPage.waitForSelector('#ek-hero-v6', { state: 'detached', timeout: 8000 });
     await zeroPage.evaluate(() => {
       const t = document.getElementById('ek-tab-practice');
       if (t) t.click();
@@ -1101,15 +1095,14 @@ async function run() {
     // ── locked state: lesson3_complete absent ─────────────────────────────
     const l4LockedPage = await browser.newPage();
     await l4LockedPage.addInitScript(() => {
-      localStorage.setItem('ek-onboarding-v1', '1');
       localStorage.removeItem('eklipses_lesson3_complete');
       localStorage.removeItem('eklipses_lesson4_complete');
       localStorage.removeItem('eklipses_lesson4_progress');
     });
     await l4LockedPage.goto(BASE, { waitUntil: 'domcontentloaded' });
-    await l4LockedPage.waitForSelector('#ek-start-btn', { timeout: 8000 });
-    await l4LockedPage.click('#ek-start-btn');
-    await l4LockedPage.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 8000 });
+    await l4LockedPage.waitForSelector('#ek-h6-start', { timeout: 8000 });
+    await l4LockedPage.click('#ek-h6-start');
+    await l4LockedPage.waitForSelector('#ek-hero-v6', { state: 'detached', timeout: 8000 });
 
     const lockedState = await l4LockedPage.evaluate(() => {
       const el = document.getElementById('lesson4-card');
@@ -1131,15 +1124,14 @@ async function run() {
     // ── unlocked state: lesson3_complete = true ────────────────────────────
     const l4UnlockedPage = await browser.newPage();
     await l4UnlockedPage.addInitScript(() => {
-      localStorage.setItem('ek-onboarding-v1', '1');
       localStorage.setItem('eklipses_lesson3_complete', 'true');
       localStorage.removeItem('eklipses_lesson4_complete');
       localStorage.removeItem('eklipses_lesson4_progress');
     });
     await l4UnlockedPage.goto(BASE, { waitUntil: 'domcontentloaded' });
-    await l4UnlockedPage.waitForSelector('#ek-start-btn', { timeout: 8000 });
-    await l4UnlockedPage.click('#ek-start-btn');
-    await l4UnlockedPage.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 8000 });
+    await l4UnlockedPage.waitForSelector('#ek-h6-start', { timeout: 8000 });
+    await l4UnlockedPage.click('#ek-h6-start');
+    await l4UnlockedPage.waitForSelector('#ek-hero-v6', { state: 'detached', timeout: 8000 });
 
     const unlockedState = await l4UnlockedPage.evaluate(() => {
       const el = document.getElementById('lesson4-card');
@@ -1174,7 +1166,6 @@ async function run() {
     const l5Page = await browser.newPage();
 
     await l5Page.addInitScript(() => {
-      localStorage.setItem('ek-onboarding-v1', '1');
       localStorage.setItem('eklipses_lesson1_complete', 'true');
       localStorage.setItem('eklipses_lesson2_complete', 'true');
       localStorage.setItem('eklipses_lesson3_complete', 'true');
@@ -1184,7 +1175,7 @@ async function run() {
     });
 
     await l5Page.goto(BASE, { waitUntil: 'domcontentloaded' });
-    await l5Page.waitForSelector('#ek-start-btn', { timeout: 8000 });
+    await l5Page.waitForSelector('#ek-h6-start', { timeout: 8000 });
     await l5Page.evaluate(() => {
       if (window.KokoroSpeech) {
         window.KokoroSpeech.preload  = async () => {};
@@ -1193,8 +1184,8 @@ async function run() {
         window.KokoroSpeech.cancel   = () => {};
       }
     });
-    await l5Page.click('#ek-start-btn');
-    await l5Page.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 8000 });
+    await l5Page.click('#ek-h6-start');
+    await l5Page.waitForSelector('#ek-hero-v6', { state: 'detached', timeout: 8000 });
 
     await l5Page.evaluate(() => {
       const t = document.getElementById('ek-tab-practice');
@@ -1284,15 +1275,14 @@ async function run() {
     // ── locked state: lesson4_complete absent ─────────────────────────────
     const l5LockedPage = await browser.newPage();
     await l5LockedPage.addInitScript(() => {
-      localStorage.setItem('ek-onboarding-v1', '1');
       localStorage.removeItem('eklipses_lesson4_complete');
       localStorage.removeItem('eklipses_lesson5_complete');
       localStorage.removeItem('eklipses_lesson5_progress');
     });
     await l5LockedPage.goto(BASE, { waitUntil: 'domcontentloaded' });
-    await l5LockedPage.waitForSelector('#ek-start-btn', { timeout: 8000 });
-    await l5LockedPage.click('#ek-start-btn');
-    await l5LockedPage.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 8000 });
+    await l5LockedPage.waitForSelector('#ek-h6-start', { timeout: 8000 });
+    await l5LockedPage.click('#ek-h6-start');
+    await l5LockedPage.waitForSelector('#ek-hero-v6', { state: 'detached', timeout: 8000 });
 
     const l5LockedState = await l5LockedPage.evaluate(() => {
       const el = document.getElementById('lesson5-card');
@@ -1314,15 +1304,14 @@ async function run() {
     // ── unlocked state: lesson4_complete = true ────────────────────────────
     const l5UnlockedPage = await browser.newPage();
     await l5UnlockedPage.addInitScript(() => {
-      localStorage.setItem('ek-onboarding-v1', '1');
       localStorage.setItem('eklipses_lesson4_complete', 'true');
       localStorage.removeItem('eklipses_lesson5_complete');
       localStorage.removeItem('eklipses_lesson5_progress');
     });
     await l5UnlockedPage.goto(BASE, { waitUntil: 'domcontentloaded' });
-    await l5UnlockedPage.waitForSelector('#ek-start-btn', { timeout: 8000 });
-    await l5UnlockedPage.click('#ek-start-btn');
-    await l5UnlockedPage.waitForSelector('#ek-start-overlay', { state: 'detached', timeout: 8000 });
+    await l5UnlockedPage.waitForSelector('#ek-h6-start', { timeout: 8000 });
+    await l5UnlockedPage.click('#ek-h6-start');
+    await l5UnlockedPage.waitForSelector('#ek-hero-v6', { state: 'detached', timeout: 8000 });
 
     const l5UnlockedState = await l5UnlockedPage.evaluate(() => {
       const el = document.getElementById('lesson5-card');

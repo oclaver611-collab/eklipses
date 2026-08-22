@@ -1,4 +1,4 @@
-/* ===== Global state ===== */
+﻿/* ===== Global state ===== */
 let currentScenarioKey = null;
 let currentUserStyle = null;
 let currentCharacterId = "sofia"; // active character — changes when user picks avatar
@@ -3410,66 +3410,338 @@ const ONBOARDING_KEY = 'ek-onboarding-v1';
 function hasSeenOnboarding() { try { return !!localStorage.getItem(ONBOARDING_KEY); } catch { return false; } }
 function markOnboardingDone() { try { localStorage.setItem(ONBOARDING_KEY, '1'); } catch {} }
 
-function showOnboarding(onComplete) {
-  const ov = document.createElement('div');
-  ov.id = 'ek-onboarding';
-  ov.style.cssText = 'position:fixed;inset:0;z-index:10001;background:rgba(13,14,18,0.98);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;box-sizing:border-box';
+function launchHeroV6() {
+  const R2 = 'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/';
 
-  const S1 = '<div style="display:flex;flex-direction:column;align-items:center;gap:20px;max-width:340px;text-align:center">'
-    + '<div style="font-size:28px;font-weight:900;color:#fff;letter-spacing:-0.5px;line-height:1.2">Eklipses</div>'
-    + '<div style="font-size:17px;color:#e0e0e0;line-height:1.9;margin-top:4px">'
-    + '&ldquo;You already know what to say.<br>You just need to stop being afraid to say it.<br>'
-    + '<span style="color:#ffb300;font-weight:700">This is where that changes.</span>&rdquo;</div>'
-    + '<button id="ob-btn" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:14px 44px;font-size:16px;font-weight:800;cursor:pointer;margin-top:12px;width:100%;max-width:260px">How does it work? &rarr;</button>'
-    + '<div style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:-8px">Already have an account? <button id="ob-signin" style="background:none;border:none;color:rgba(255,255,255,0.7);font-size:13px;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px">Sign in</button></div>'
-    + '</div>';
-
-  const S2 = '<div style="display:flex;flex-direction:column;align-items:center;gap:18px;max-width:340px;text-align:center">'
-    + '<div style="font-size:22px;font-weight:800;color:#fff">Here&#39;s how it works</div>'
-    + '<div style="display:flex;flex-direction:column;gap:14px;width:100%;text-align:left">'
-    + '<div style="display:flex;align-items:flex-start;gap:14px"><div style="background:#ffb300;color:#000;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0">1</div><div style="color:#cfd6e4;font-size:15px;line-height:1.5"><strong style="color:#fff">Pick a scenario</strong><br>Beach, bar, gym &mdash; real situations where it counts.</div></div>'
-    + '<div style="display:flex;align-items:flex-start;gap:14px"><div style="background:#ffb300;color:#000;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0">2</div><div style="color:#cfd6e4;font-size:15px;line-height:1.5"><strong style="color:#fff">Talk out loud</strong><br>A real AI woman responds to exactly what you say. No scripts.</div></div>'
-    + '<div style="display:flex;align-items:flex-start;gap:14px"><div style="background:#ffb300;color:#000;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0">3</div><div style="color:#cfd6e4;font-size:15px;line-height:1.5"><strong style="color:#fff">Get coached</strong><br>Ryan breaks down exactly what worked and what cost you.</div></div>'
-    + '</div>'
-    + '<button id="ob-btn" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:14px 44px;font-size:16px;font-weight:800;cursor:pointer;margin-top:8px;width:100%;max-width:260px">I&#39;m ready &rarr;</button>'
-    + '</div>';
-
-  const S3 = '<div style="display:flex;flex-direction:column;align-items:center;gap:20px;max-width:340px;text-align:center">'
-    + '<div style="font-size:44px">&#127908;</div>'
-    + '<div style="font-size:22px;font-weight:800;color:#fff">Your first session</div>'
-    + '<div style="font-size:15px;color:#9aa4b2;line-height:1.7">Starting with <strong style="color:#ffb300">Beach &mdash; Cold Open</strong>.<br>No warm-up. No script. Just you and Sofia.<br>Talk out loud. Ryan coaches you after.</div>'
-    + '<div style="background:#1a1c22;border:1px solid #2b2e36;border-radius:12px;padding:14px 20px;font-size:13px;color:#9aa4b2;line-height:1.6">&#128161; <strong style="color:#cfd6e4">Tip:</strong> Use Chrome or Edge. Allow mic access when asked.</div>'
-    + '<button id="ob-btn" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:14px 44px;font-size:16px;font-weight:800;cursor:pointer;width:100%;max-width:260px">Start my first session</button>'
-    + '</div>';
-
-  const screens = [S1, S2, S3];
-
-    let screen = 0;
-
-  function renderScreen(i) {
-    const dots = screens.map((_,idx) =>
-      '<div style="width:8px;height:8px;border-radius:50%;background:' + (idx===i?'#ffb300':'#2b2e36') + '"></div>'
-    ).join('');
-    ov.innerHTML = '<div style="position:absolute;top:20px;right:20px;display:flex;gap:6px">' + dots + '</div>' + screens[i];
-    document.getElementById('ob-btn').onclick = () => {
-      if (i < screens.length - 1) {
-        renderScreen(i + 1);
-      } else {
-        markOnboardingDone();
-        ov.remove();
-        onComplete();
+  // Inject CSS (scoped to ek-h6- prefix to avoid conflicts)
+  if (!document.getElementById('ek-h6-style')) {
+    const s = document.createElement('style');
+    s.id = 'ek-h6-style';
+    s.textContent = `
+      #ek-hero-v6{position:fixed;inset:0;z-index:10000;overflow-y:auto;
+        background:radial-gradient(ellipse 900px 500px at 85% -10%,rgba(217,160,84,.09),transparent 60%),
+          radial-gradient(ellipse 700px 600px at -10% 90%,rgba(94,200,217,.05),transparent 60%),#15171C;
+        font-family:'Inter',system-ui,sans-serif;color:#F2EFE9;}
+      #ek-hero-v6 *,#ek-hero-v6 *::before,#ek-hero-v6 *::after{box-sizing:border-box;}
+      .ek-h6-nav{display:flex;align-items:center;justify-content:space-between;
+        max-width:1180px;margin:0 auto;padding:28px 32px 0;}
+      .ek-h6-brand{font-family:'Fraunces',serif;font-weight:600;font-size:20px;
+        letter-spacing:.01em;color:#F2EFE9;}
+      .ek-h6-navlinks{display:flex;gap:32px;align-items:center;font-size:14px;color:#8A8F98;}
+      .ek-h6-navlinks a{color:#8A8F98;text-decoration:none;}
+      .ek-h6-signin-btn{color:#15171C;background:#F2EFE9;padding:9px 18px;border-radius:100px;
+        font-size:13.5px;font-weight:600;border:none;cursor:pointer;}
+      .ek-h6-signin-btn:focus-visible{outline:2px solid #D9A054;outline-offset:2px;}
+      .ek-h6-hero{max-width:1180px;margin:0 auto;padding:64px 32px 40px;
+        display:grid;grid-template-columns:1.02fr .98fr;gap:60px;align-items:center;}
+      .ek-h6-eyebrow{display:inline-flex;align-items:center;gap:8px;
+        font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.08em;
+        color:#D9A054;text-transform:uppercase;margin-bottom:22px;}
+      .ek-h6-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;
+        background:#D9A054;box-shadow:0 0 0 4px rgba(217,160,84,.14);}
+      .ek-h6-h1{font-family:'Fraunces',serif;font-weight:500;font-size:50px;line-height:1.1;
+        letter-spacing:-.01em;margin:0 0 22px;color:#F2EFE9;}
+      .ek-h6-h1 em{font-style:italic;font-weight:500;color:#D9A054;}
+      .ek-h6-sub{font-size:16.5px;line-height:1.65;color:#8A8F98;max-width:460px;margin:0 0 30px;}
+      .ek-h6-prompt-label{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#8A8F98;
+        text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+      .ek-h6-prompt-box{position:relative;display:flex;align-items:center;gap:10px;
+        background:#20232B;border:1px solid rgba(242,239,233,.08);border-radius:14px;
+        padding:16px 16px 16px 18px;transition:border-color .2s ease;}
+      .ek-h6-prompt-box:focus-within{border-color:rgba(217,160,84,.5);}
+      .ek-h6-input{flex:1;background:transparent;border:none;outline:none;color:#F2EFE9;
+        font-family:'Inter',sans-serif;font-size:15px;position:relative;z-index:2;
+        caret-color:#D9A054;}
+      .ek-h6-ghost{position:absolute;left:18px;top:50%;transform:translateY(-50%);
+        color:#8A8F98;font-size:15px;pointer-events:none;z-index:1;
+        white-space:nowrap;overflow:hidden;}
+      .ek-h6-go-btn{background:#D9A054;color:#1a1508;border:none;border-radius:9px;
+        width:36px;height:36px;flex-shrink:0;cursor:pointer;font-size:16px;
+        display:flex;align-items:center;justify-content:center;}
+      .ek-h6-go-btn:focus-visible{outline:2px solid #D9A054;outline-offset:2px;}
+      .ek-h6-hint{font-size:12px;color:#8A8F98;margin:10px 0 0 2px;}
+      .ek-h6-proof-row{display:flex;gap:26px;font-family:'IBM Plex Mono',monospace;
+        font-size:12px;color:#8A8F98;flex-wrap:wrap;margin-top:30px;}
+      .ek-h6-proof-row b{color:#F2EFE9;font-weight:500;}
+      .ek-h6-prog-wrap{display:none;margin-top:14px;}
+      .ek-h6-prog-bar{background:rgba(255,255,255,.15);border-radius:6px;height:4px;
+        overflow:hidden;margin-bottom:6px;}
+      .ek-h6-prog-fill{background:#D9A054;height:100%;width:0%;border-radius:6px;
+        transition:width .25s ease;}
+      .ek-h6-prog-label{font-size:12px;color:#8A8F98;}
+      .ek-h6-stage{position:relative;background:#20232B;border:1px solid rgba(242,239,233,.08);
+        border-radius:22px;overflow:hidden;height:520px;
+        box-shadow:0 40px 80px -30px rgba(0,0,0,.65);}
+      .ek-h6-slide{position:absolute;inset:0;opacity:0;transition:opacity .7s ease;
+        display:flex;flex-direction:column;}
+      .ek-h6-slide.active{opacity:1;}
+      .ek-h6-portrait{position:relative;flex:1;display:flex;align-items:center;
+        justify-content:center;overflow:hidden;}
+      .ek-h6-portrait-img{position:absolute;inset:0;width:100%;height:100%;
+        object-fit:cover;object-position:top center;filter:brightness(.78);}
+      .ek-h6-live-chip{position:absolute;top:18px;right:18px;display:flex;align-items:center;
+        gap:6px;background:rgba(0,0,0,.35);backdrop-filter:blur(6px);padding:6px 12px;
+        border-radius:100px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#fff;z-index:2;}
+      .ek-h6-live-dot{width:6px;height:6px;border-radius:50%;background:#5EC8D9;
+        box-shadow:0 0 0 3px rgba(94,200,217,.3);animation:ek-h6-pulse 2.4s ease-in-out infinite;}
+      @keyframes ek-h6-pulse{0%,100%{box-shadow:0 0 0 3px rgba(94,200,217,.3);}
+        50%{box-shadow:0 0 0 7px rgba(94,200,217,.07);}}
+      .ek-h6-slide-meta{position:absolute;bottom:18px;left:22px;color:#fff;z-index:2;}
+      .ek-h6-slide-name{font-family:'Fraunces',serif;font-size:19px;font-weight:600;
+        text-shadow:0 2px 8px rgba(0,0,0,.6);}
+      .ek-h6-slide-role{font-family:'IBM Plex Mono',monospace;font-size:11px;
+        color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+      .ek-h6-quote-area{padding:18px 22px 20px;border-top:1px solid rgba(242,239,233,.08);
+        background:#20232B;}
+      .ek-h6-quote-text{margin:0 0 10px;font-size:14.5px;line-height:1.45;color:#F2EFE9;}
+      .ek-h6-coach-line{font-size:12.5px;color:#D9A054;line-height:1.4;}
+      .ek-h6-dots{position:absolute;bottom:134px;left:22px;display:flex;gap:6px;z-index:5;}
+      .ek-h6-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);
+        transition:all .2s ease;border:none;padding:0;cursor:pointer;}
+      .ek-h6-dot.active{background:#fff;width:16px;border-radius:3px;}
+      .ek-h6-dot:focus-visible{outline:2px solid #fff;outline-offset:2px;}
+      .ek-h6-breadth{text-align:center;padding:44px 32px 72px;
+        border-top:1px solid rgba(242,239,233,.08);margin-top:26px;}
+      .ek-h6-breadth-label{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#8A8F98;
+        text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px;}
+      .ek-h6-breadth-h2{font-family:'Fraunces',serif;font-weight:400;font-size:22px;
+        max-width:640px;margin:0 auto;line-height:1.5;color:#F2EFE9;}
+      .ek-h6-breadth-h2 b{color:#D9A054;font-weight:600;}
+      .ek-h6-ticker{margin-top:34px;overflow:hidden;
+        -webkit-mask-image:linear-gradient(90deg,transparent,black 10%,black 90%,transparent);
+        mask-image:linear-gradient(90deg,transparent,black 10%,black 90%,transparent);}
+      .ek-h6-ticker-track{display:flex;gap:14px;width:max-content;
+        animation:ek-h6-scroll 34s linear infinite;}
+      .ek-h6-ticker-chip{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#8A8F98;
+        border:1px solid rgba(242,239,233,.08);border-radius:100px;padding:8px 16px;white-space:nowrap;}
+      @keyframes ek-h6-scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+      @media(max-width:880px){
+        .ek-h6-hero{grid-template-columns:1fr;padding-top:36px;gap:36px;}
+        .ek-h6-h1{font-size:34px;}
+        .ek-h6-navlinks{display:none;}
+        .ek-h6-stage{height:460px;}
+        .ek-h6-dots{bottom:126px;}
       }
-    };
-    const obSignin = document.getElementById('ob-signin');
-    if (obSignin) obSignin.onclick = () => {
-      if (window.EkAuth && typeof window.EkAuth.showModal === 'function') {
-        window.EkAuth.showModal('signin');
+      @media(max-width:430px){
+        .ek-h6-nav{padding:18px 20px 0;}
+        .ek-h6-hero{padding:32px 20px 28px;}
+        .ek-h6-h1{font-size:28px;}
+        .ek-h6-sub{font-size:15px;}
+        .ek-h6-stage{height:400px;}
+        .ek-h6-breadth{padding:32px 20px 56px;}
+        .ek-h6-breadth-h2{font-size:18px;}
+        .ek-h6-proof-row{gap:14px;}
+        .ek-h6-dots{bottom:116px;}
       }
-    };
+    `;
+    document.head.appendChild(s);
   }
 
-  document.body.appendChild(ov);
-  renderScreen(0);
+  const cast = [
+    { name:'Sofia',    role:'Dating \u00b7 Beach Walk', thumb:R2+'sofia_thumb.jpg',
+      quote:'\u201cHonestly? I almost didn\u2019t. But you seemed easy to talk to.\u201d',
+      coach:'<b>Ryan:</b> she just opened a door \u2014 notice it out loud, don\u2019t just answer.' },
+    { name:'Nadia',    role:'Dating \u00b7 Bookstore',  thumb:R2+'Nadia.jpg',
+      quote:'\u201cI wasn\u2019t going to say yes to a stranger\u2019s table, honestly.\u201d',
+      coach:'<b>Ryan:</b> she\u2019s testing you \u2014 hold the tease, don\u2019t over-explain why you asked.' },
+    { name:'Isabelle', role:'Dating \u00b7 Museum',     thumb:R2+'Isabelle_thumb.jpg',
+      quote:'\u201cOkay, that\u2019s actually a good guess. How\u2019d you know that?\u201d',
+      coach:'<b>Ryan:</b> the cold read landed \u2014 build on it, don\u2019t explain the trick.' },
+    { name:'Zoe',      role:'Dating \u00b7 Gym',        thumb:R2+'zoe_thumb.jpg',
+      quote:'\u201cMy friends are gonna ask who you are, you know.\u201d',
+      coach:'<b>Ryan:</b> she\u2019s already thinking past tonight \u2014 match that, don\u2019t downplay it.' },
+    { name:'Julia',    role:'Dating \u00b7 Street',     thumb:R2+'julia_thumb.jpg',
+      quote:'\u201cI don\u2019t usually give my number out this fast.\u201d',
+      coach:'<b>Ryan:</b> good \u2014 you made her feel safe enough to break her own rule.' }
+  ];
+
+  const tickerLines = [
+    '\u201cnotice what she didn\u2019t say\u201d',
+    '\u201chold the pause\u201d',
+    '\u201cname the real objection\u201d',
+    '\u201cdon\u2019t defend, redirect\u201d',
+    '\u201cmake them qualify\u201d',
+    '\u201clet the silence do the work\u201d',
+    '\u201cmirror, then pivot\u201d',
+    '\u201cown it without over-explaining\u201d'
+  ];
+
+  const overlay = document.createElement('div');
+  overlay.id = 'ek-hero-v6';
+
+  const slidesHTML = cast.map((c, i) => `
+    <div class="ek-h6-slide${i===0?' active':''}" role="group" aria-label="${c.name}">
+      <div class="ek-h6-portrait">
+        <img class="ek-h6-portrait-img" src="${c.thumb}" alt="${c.name}" loading="${i===0?'eager':'lazy'}">
+        <div class="ek-h6-live-chip" aria-hidden="true"><span class="ek-h6-live-dot"></span>LIVE</div>
+        <div class="ek-h6-slide-meta">
+          <div class="ek-h6-slide-name">${c.name}</div>
+          <div class="ek-h6-slide-role">${c.role}</div>
+        </div>
+      </div>
+      <div class="ek-h6-quote-area">
+        <p class="ek-h6-quote-text">${c.quote}</p>
+        <div class="ek-h6-coach-line">${c.coach}</div>
+      </div>
+    </div>`).join('');
+
+  const dotsHTML = cast.map((c, i) =>
+    `<button class="ek-h6-dot${i===0?' active':''}" data-idx="${i}" aria-label="${c.name}"></button>`
+  ).join('');
+
+  const tickerChips = [...tickerLines, ...tickerLines]
+    .map(t => `<span class="ek-h6-ticker-chip">${t}</span>`).join('');
+
+  overlay.innerHTML = `
+    <nav class="ek-h6-nav">
+      <div class="ek-h6-brand">Eklipses</div>
+      <div class="ek-h6-navlinks">
+        <a href="#ek-h6-breadth">How it works</a>
+        <button class="ek-h6-signin-btn" id="ek-hero-signin">Sign in</button>
+      </div>
+    </nav>
+    <section class="ek-h6-hero">
+      <div>
+        <div class="ek-h6-eyebrow">Practice, not another video</div>
+        <h1 class="ek-h6-h1">Watching changes nothing.<br><em>Doing</em> changes you.</h1>
+        <p class="ek-h6-sub">You can read every book and watch every video, and still freeze when it’s real. That’s because a skill isn’t something you learn. It’s something you build, by doing it badly, then doing it again, and again, until it’s easy. Eklipses is where you do the real thing, as many times as it takes, until you’re actually good at it.</p>
+        <div>
+          <div class="ek-h6-prompt-label">What do you want to get good at?</div>
+          <div class="ek-h6-prompt-box">
+            <input class="ek-h6-input" id="ek-h6-input" type="text" autocomplete="off" aria-label="What do you want to get good at?">
+            <span class="ek-h6-ghost" id="ek-h6-ghost" aria-hidden="true"></span>
+            <button class="ek-h6-go-btn" id="ek-h6-start" aria-label="Start">&#8594;</button>
+          </div>
+          <div class="ek-h6-hint">Type it. Whatever you’re stuck on, you can practice it here, over and over, until it’s easy.</div>
+        </div>
+        <div class="ek-h6-prog-wrap" id="ek-h6-prog-wrap">
+          <div class="ek-h6-prog-bar"><div class="ek-h6-prog-fill" id="ek-h6-prog-fill"></div></div>
+          <div class="ek-h6-prog-label" id="ek-h6-prog-label">Loading AI model…</div>
+        </div>
+        <div class="ek-h6-proof-row">
+          <span><b>Unlimited</b> reps, not one video</span>
+          <span><b>2</b> free sessions, no card</span>
+          <span><b>7 min</b> avg. session</span>
+        </div>
+      </div>
+      <div>
+        <div class="ek-h6-stage" aria-live="polite">
+          ${slidesHTML}
+          <div class="ek-h6-dots" role="group" aria-label="Slide navigation">${dotsHTML}</div>
+        </div>
+      </div>
+    </section>
+    <div class="ek-h6-breadth" id="ek-h6-breadth">
+      <div class="ek-h6-breadth-label">Not a course. A gym for real conversations.</div>
+      <h2 class="ek-h6-breadth-h2">A book ends. A video ends. Nothing about you has to change once they’re over. Eklipses doesn’t end, you practice the same moment <b>again and again</b>, and Eklipses tells you exactly what to fix, until you can’t get it wrong anymore.</h2>
+      <div class="ek-h6-ticker"><div class="ek-h6-ticker-track">${tickerChips}</div></div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+
+  // Slideshow
+  let slideIdx = 0;
+  const slides = overlay.querySelectorAll('.ek-h6-slide');
+  const dots = overlay.querySelectorAll('.ek-h6-dot');
+
+  function goToSlide(next) {
+    slides[slideIdx].classList.remove('active');
+    dots[slideIdx].classList.remove('active');
+    slideIdx = next;
+    slides[slideIdx].classList.add('active');
+    dots[slideIdx].classList.add('active');
+  }
+
+  const ssTimer = setInterval(() => goToSlide((slideIdx + 1) % cast.length), 4200);
+  dots.forEach(d => d.addEventListener('click', () => goToSlide(parseInt(d.dataset.idx, 10))));
+
+  // Typewriter ghost text
+  const examples = [
+    "the apology I owe my ex",
+    "asking her out without overthinking it",
+    "small talk that doesn’t feel forced",
+    "the first message that doesn’t sound try-hard",
+    "keeping the conversation going past hello",
+    "flirting without sounding cheesy",
+    "what to say when she goes quiet",
+    "the conversation I keep avoiding on dates"
+  ];
+  const ghostEl = overlay.querySelector('#ek-h6-ghost');
+  const inputEl = overlay.querySelector('#ek-h6-input');
+  let exIdx = 0, charIdx = 0, deleting = false, typeTimer = null;
+
+  function typeLoop() {
+    if (document.activeElement === inputEl || inputEl.value.length) {
+      ghostEl.textContent = '';
+      typeTimer = setTimeout(typeLoop, 400);
+      return;
+    }
+    const full = examples[exIdx];
+    if (!deleting) {
+      charIdx++;
+      ghostEl.textContent = full.slice(0, charIdx);
+      if (charIdx === full.length) { deleting = true; typeTimer = setTimeout(typeLoop, 1400); return; }
+    } else {
+      charIdx--;
+      ghostEl.textContent = full.slice(0, charIdx);
+      if (charIdx === 0) { deleting = false; exIdx = (exIdx + 1) % examples.length; }
+    }
+    typeTimer = setTimeout(typeLoop, deleting ? 22 : 38);
+  }
+  typeLoop();
+
+  // Sign in
+  overlay.querySelector('#ek-hero-signin').addEventListener('click', () => {
+    if (window.EkAuth && typeof window.EkAuth.showModal === 'function') window.EkAuth.showModal('signin');
+  });
+
+  // Boot sequence (same as old launchApp's start handler)
+  let _bootStarted = false;
+  async function doStart() {
+    if (_bootStarted) return;
+    _bootStarted = true;
+    clearTimeout(typeTimer);
+    clearInterval(ssTimer);
+    const goBtn = overlay.querySelector('#ek-h6-start');
+    goBtn.disabled = true; goBtn.style.opacity = '.5';
+    overlay.querySelector('#ek-h6-prog-wrap').style.display = 'block';
+    try {
+      await KokoroSpeech.preload(info => {
+        const fill = overlay.querySelector('#ek-h6-prog-fill');
+        const lbl  = overlay.querySelector('#ek-h6-prog-label');
+        if (fill && info.progress != null) fill.style.width = Math.round(info.progress) + '%';
+        if (lbl  && info.file) lbl.textContent = 'Loading ' + info.file.split('/').pop() + '…';
+      });
+    } catch (err) {
+      const lbl = overlay.querySelector('#ek-h6-prog-label');
+      if (lbl) lbl.innerHTML = '<span style="color:#ff6b6b">Failed: ' + err.message + '</span>';
+      goBtn.disabled = false; goBtn.style.opacity = '';
+      _bootStarted = false;
+      return;
+    }
+    overlay.remove();
+    setTimeout(prewarmCharacterVideos, 2000);
+    const firstKey = Object.keys(SCENARIOS)[0];
+    currentScenarioKey = firstKey;
+    setMediaForSpeaker('Ryan');
+    els.name.textContent = 'Ryan';
+    els.text.textContent = '';
+    Metrics.refreshUI(firstKey);
+    if (!document.getElementById('ek-stat-bar')) {
+      const bar = document.createElement('div');
+      bar.id = 'ek-stat-bar';
+      bar.style.cssText = 'display:none;justify-content:center;align-items:center;gap:12px;font-size:11px;color:#9aa4b2;padding:4px 0;flex-wrap:wrap;opacity:0.5';
+      const nameEl = document.getElementById('speakerName');
+      if (nameEl && nameEl.parentNode) nameEl.parentNode.insertBefore(bar, nameEl.nextSibling);
+    }
+    renderShelf();
+    ryanOrbSetState('silent');
+    Progress.refreshStatBar();
+    Progress.refreshStreakBadge();
+  }
+
+  overlay.querySelector('#ek-h6-start').addEventListener('click', doStart);
+  inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') doStart(); });
 }
 
 /* ===== Fullscreen ===== */
@@ -3534,11 +3806,7 @@ function bootDefault() {
   applyAvatarSet(set);
   Metrics.bindLikeButton();
   initFullscreen();
-  if (!hasSeenOnboarding()) {
-    showOnboarding(() => launchApp());
-  } else {
-    launchApp();
-  }
+  launchHeroV6();
 }
 
 function prewarmCharacterVideos() {
@@ -3556,103 +3824,6 @@ function prewarmCharacterVideos() {
   });
 }
 
-function launchApp() {
-  const overlay=document.createElement('div');
-  overlay.id='ek-start-overlay';
-  overlay.style.cssText='position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden';
-
-  // Cinematic slideshow background
-  const slides=['https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/slide5.jpg','https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/slide6.jpg','https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/slide3.jpg','https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev/slide7.jpg'];
-  const bgWrap=document.createElement('div');
-  bgWrap.style.cssText='position:absolute;inset:0;z-index:0';
-  const bg1=document.createElement('div'), bg2=document.createElement('div');
-  [bg1,bg2].forEach(b=>{ b.style.cssText='position:absolute;inset:0;background-size:cover;background-position:center;transition:opacity 1.5s ease'; });
-  bg1.style.backgroundImage=`url(${slides[0]})`; bg1.style.opacity='1'; bg2.style.opacity='0';
-  bgWrap.appendChild(bg1); bgWrap.appendChild(bg2);
-  const darkOv=document.createElement('div');
-  darkOv.style.cssText='position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.5) 0%,rgba(0,0,0,0.78) 100%);z-index:1';
-  bgWrap.appendChild(darkOv);
-  overlay.appendChild(bgWrap);
-  let slide=0,tog=false;
-  const ssTimer=setInterval(()=>{ slide=(slide+1)%slides.length; tog=!tog; const a=tog?bg2:bg1,i=tog?bg1:bg2; a.style.backgroundImage=`url(${slides[slide]})`; a.style.opacity='1'; i.style.opacity='0'; },4000);
-
-  const inner=document.createElement('div');
-  inner.style.cssText='position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:18px;padding:32px 24px;text-align:center;max-width:480px';
-  inner.innerHTML=`
-    <div style="font-size:12px;font-weight:700;letter-spacing:4px;color:#ffb300;text-transform:uppercase;opacity:0.9">AI Conversation Training</div>
-    <div style="font-size:54px;font-weight:900;color:#fff;letter-spacing:-2px;line-height:1;text-shadow:0 4px 24px rgba(0,0,0,0.5)">Eklipses</div>
-    <div style="font-size:16px;color:rgba(255,255,255,0.8);line-height:1.7;font-style:italic;max-width:340px">"You already know what to say.<br>You just need to stop being afraid to say it."</div>
-    <button id="ek-start-btn" style="background:#ffb300;color:#000;border:none;border-radius:999px;padding:16px 56px;font-size:18px;font-weight:900;cursor:pointer;margin-top:8px;box-shadow:0 8px 32px rgba(255,179,0,0.4);letter-spacing:0.3px;transition:transform .1s ease,box-shadow .1s ease" onmouseover="this.style.transform='scale(1.05)';this.style.boxShadow='0 12px 40px rgba(255,179,0,0.6)'" onmouseout="this.style.transform='';this.style.boxShadow='0 8px 32px rgba(255,179,0,0.4)'">Let's go →</button>
-    <div id="ek-prog-wrap" style="display:none;width:280px;text-align:center">
-      <div style="background:rgba(255,255,255,0.15);border-radius:6px;height:6px;overflow:hidden;margin-bottom:8px">
-        <div id="ek-prog-fill" style="background:#ffb300;height:100%;width:0%;border-radius:6px;transition:width 0.25s ease"></div>
-      </div>
-      <div id="ek-prog-label" style="font-size:12px;color:rgba(255,255,255,0.6)">Loading AI model...</div>
-    </div>
-    <div style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:-4px">
-      Already have an account?
-      <button id="ek-splash-signin" style="background:none;border:none;color:rgba(255,255,255,0.7);font-size:13px;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px">Sign in</button>
-    </div>`;
-  overlay.appendChild(inner);
-  document.body.appendChild(overlay);
-
-  document.getElementById('ek-splash-signin').onclick = () => {
-    if (window.EkAuth && typeof window.EkAuth.showModal === 'function') {
-      window.EkAuth.showModal('signin');
-    }
-  };
-
-  let _bootStarted = false;
-  document.getElementById('ek-start-btn').onclick=async()=>{
-    if (_bootStarted) return;
-    _bootStarted = true;
-    document.getElementById('ek-start-btn').style.display='none';
-    document.getElementById('ek-prog-wrap').style.display='block';
-    try {
-      await KokoroSpeech.preload(info=>{
-        const fill=document.getElementById('ek-prog-fill'), label=document.getElementById('ek-prog-label');
-        if(fill&&info.progress!=null) fill.style.width=Math.round(info.progress)+'%';
-        if(label&&info.file) label.textContent='Loading '+info.file.split('/').pop()+'...';
-      });
-    } catch(err) {
-      const lbl=document.getElementById('ek-prog-label');
-      if(lbl) lbl.innerHTML='<span style="color:#ff6b6b">Failed: '+err.message+'</span>';
-      return;
-    }
-    clearInterval(ssTimer);
-    overlay.remove();
-    setTimeout(prewarmCharacterVideos, 2000);
-    const firstKey=Object.keys(SCENARIOS)[0];
-    currentScenarioKey=firstKey;
-    setMediaForSpeaker('Ryan');
-    els.name.textContent='Ryan';
-    els.text.textContent='';
-    Metrics.refreshUI(firstKey);
-    if (!document.getElementById('ek-stat-bar')) {
-      const bar = document.createElement('div');
-      bar.id = 'ek-stat-bar';
-      bar.style.cssText = 'display:none;justify-content:center;align-items:center;gap:12px;font-size:11px;color:#9aa4b2;padding:4px 0;flex-wrap:wrap;opacity:0.5';
-      const nameEl = document.getElementById('speakerName');
-      if (nameEl && nameEl.parentNode) nameEl.parentNode.insertBefore(bar, nameEl.nextSibling);
-    }
-    Progress.refreshStatBar();
-    Progress.refreshStreakBadge();
-    // Render shelf immediately — playScenario calls stopEverything() which increments session
-    renderShelf();
-    ryanOrbSetState('silent');
-    // Inject stat bar below Ryan name
-    const existingBar = document.getElementById('ek-stat-bar');
-    if (!existingBar) {
-      const bar = document.createElement('div');
-      bar.id = 'ek-stat-bar';
-      bar.style.cssText = 'display:none;justify-content:center;align-items:center;gap:12px;font-size:11px;color:#9aa4b2;padding:4px 0;flex-wrap:wrap;opacity:0.5';
-      const nameEl = document.getElementById('speakerName');
-      if (nameEl && nameEl.parentNode) nameEl.parentNode.insertBefore(bar, nameEl.nextSibling);
-    }
-    Progress.refreshStatBar();
-    Progress.refreshStreakBadge();
-  };
-}
 
 /* ===== Coach-me button ===== */
 function initCoachBtn() {
