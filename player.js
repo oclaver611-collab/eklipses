@@ -3471,12 +3471,10 @@ function launchHeroV6() {
       .ek-h6-prog-label{font-size:12px;color:#8A8F98;}
       .ek-h6-stage{position:relative;background:#20232B;border:1px solid rgba(242,239,233,.08);
         border-radius:22px;overflow:hidden;height:520px;
-        box-shadow:0 40px 80px -30px rgba(0,0,0,.65);}
-      .ek-h6-slide{position:absolute;inset:0;opacity:0;transition:opacity .7s ease;
-        display:flex;flex-direction:column;}
+        box-shadow:0 40px 80px -30px rgba(0,0,0,.65);display:flex;flex-direction:column;}
+      .ek-h6-portraits{position:relative;flex:1;overflow:hidden;}
+      .ek-h6-slide{position:absolute;inset:0;opacity:0;transition:opacity .7s ease;}
       .ek-h6-slide.active{opacity:1;}
-      .ek-h6-portrait{position:relative;flex:1;display:flex;align-items:center;
-        justify-content:center;overflow:hidden;}
       .ek-h6-portrait-img{position:absolute;inset:0;width:100%;height:100%;
         object-fit:cover;object-position:top center;filter:brightness(.78);}
       .ek-h6-live-chip{position:absolute;top:18px;right:18px;display:flex;align-items:center;
@@ -3486,7 +3484,7 @@ function launchHeroV6() {
         box-shadow:0 0 0 3px rgba(94,200,217,.3);animation:ek-h6-pulse 2.4s ease-in-out infinite;}
       @keyframes ek-h6-pulse{0%,100%{box-shadow:0 0 0 3px rgba(94,200,217,.3);}
         50%{box-shadow:0 0 0 7px rgba(94,200,217,.07);}}
-      .ek-h6-slide-meta{position:absolute;bottom:18px;left:22px;color:#fff;z-index:2;}
+      .ek-h6-slide-meta{position:absolute;bottom:32px;left:22px;color:#fff;z-index:2;}
       .ek-h6-slide-name{font-family:'Fraunces',serif;font-size:19px;font-weight:600;
         text-shadow:0 2px 8px rgba(0,0,0,.6);}
       .ek-h6-slide-role{font-family:'IBM Plex Mono',monospace;font-size:11px;
@@ -3495,7 +3493,7 @@ function launchHeroV6() {
         background:#20232B;}
       .ek-h6-quote-text{margin:0 0 10px;font-size:14.5px;line-height:1.45;color:#F2EFE9;}
       .ek-h6-coach-line{font-size:12.5px;color:#D9A054;line-height:1.4;}
-      .ek-h6-dots{position:absolute;bottom:134px;left:22px;display:flex;gap:6px;z-index:5;}
+      .ek-h6-dots{position:absolute;bottom:12px;left:22px;display:flex;gap:6px;z-index:5;}
       .ek-h6-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);
         transition:all .2s ease;border:none;padding:0;cursor:pointer;}
       .ek-h6-dot.active{background:#fff;width:16px;border-radius:3px;}
@@ -3520,7 +3518,6 @@ function launchHeroV6() {
         .ek-h6-h1{font-size:34px;}
         .ek-h6-navlinks{display:none;}
         .ek-h6-stage{height:460px;}
-        .ek-h6-dots{bottom:126px;}
       }
       @media(max-width:430px){
         .ek-h6-nav{padding:18px 20px 0;}
@@ -3531,7 +3528,6 @@ function launchHeroV6() {
         .ek-h6-breadth{padding:32px 20px 56px;}
         .ek-h6-breadth-h2{font-size:18px;}
         .ek-h6-proof-row{gap:14px;}
-        .ek-h6-dots{bottom:116px;}
       }
     `;
     document.head.appendChild(s);
@@ -3571,18 +3567,8 @@ function launchHeroV6() {
 
   const slidesHTML = cast.map((c, i) => `
     <div class="ek-h6-slide${i===0?' active':''}" role="group" aria-label="${c.name}">
-      <div class="ek-h6-portrait">
-        <img class="ek-h6-portrait-img" src="${c.thumb}" alt="${c.name}" loading="${i===0?'eager':'lazy'}">
-        <div class="ek-h6-live-chip" aria-hidden="true"><span class="ek-h6-live-dot"></span>LIVE</div>
-        <div class="ek-h6-slide-meta">
-          <div class="ek-h6-slide-name">${c.name}</div>
-          <div class="ek-h6-slide-role">${c.role}</div>
-        </div>
-      </div>
-      <div class="ek-h6-quote-area">
-        <p class="ek-h6-quote-text">${c.quote}</p>
-        <div class="ek-h6-coach-line">${c.coach}</div>
-      </div>
+      <img class="ek-h6-portrait-img" src="${c.thumb}" alt="${c.name}" loading="${i===0?'eager':'lazy'}">
+      <div class="ek-h6-live-chip" aria-hidden="true"><span class="ek-h6-live-dot"></span>LIVE</div>
     </div>`).join('');
 
   const dotsHTML = cast.map((c, i) =>
@@ -3626,8 +3612,18 @@ function launchHeroV6() {
       </div>
       <div>
         <div class="ek-h6-stage" aria-live="polite">
-          ${slidesHTML}
-          <div class="ek-h6-dots" role="group" aria-label="Slide navigation">${dotsHTML}</div>
+          <div class="ek-h6-portraits">
+            ${slidesHTML}
+            <div class="ek-h6-slide-meta">
+              <div class="ek-h6-slide-name" id="ek-h6-slide-name">${cast[0].name}</div>
+              <div class="ek-h6-slide-role" id="ek-h6-slide-role">${cast[0].role}</div>
+            </div>
+            <div class="ek-h6-dots" role="group" aria-label="Slide navigation">${dotsHTML}</div>
+          </div>
+          <div class="ek-h6-quote-area">
+            <p class="ek-h6-quote-text" id="ek-h6-quote-text">${cast[0].quote}</p>
+            <div class="ek-h6-coach-line" id="ek-h6-coach-line">${cast[0].coach}</div>
+          </div>
         </div>
       </div>
     </section>
@@ -3650,6 +3646,10 @@ function launchHeroV6() {
     slideIdx = next;
     slides[slideIdx].classList.add('active');
     dots[slideIdx].classList.add('active');
+    overlay.querySelector('#ek-h6-slide-name').textContent = cast[next].name;
+    overlay.querySelector('#ek-h6-slide-role').textContent = cast[next].role;
+    overlay.querySelector('#ek-h6-quote-text').innerHTML = cast[next].quote;
+    overlay.querySelector('#ek-h6-coach-line').innerHTML = cast[next].coach;
   }
 
   const ssTimer = setInterval(() => goToSlide((slideIdx + 1) % cast.length), 4200);
