@@ -313,10 +313,14 @@
         await pushProgressToDb(currentUser.id);
         await fetchAndMergeProgress(currentUser.id);
         hideAuthModal();
+        const _hero = document.getElementById('ek-hero-v6');
+        if (_hero) _hero.remove();
       } else if (event === 'INITIAL_SESSION' && currentUser) {
         // Returning signed-in user on page load: only pull from DB (don't overwrite
         // DB with potentially stale local state).
         await fetchAndMergeProgress(currentUser.id);
+        const _hero = document.getElementById('ek-hero-v6');
+        if (_hero) _hero.remove();
       }
     });
 

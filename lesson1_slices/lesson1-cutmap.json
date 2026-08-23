@@ -1,0 +1,75 @@
+{
+  "lesson": "lesson1",
+  "totalSlices": 8,
+  "testBatch": [1, 2, 3],
+  "note": "Slices 4-6 run 108-113s (each step explanation + its live demo). Flag for Serge to review before scaling — may want to trim or split.",
+  "slices": [
+    {
+      "num": 1,
+      "title": "Why Approaches Fail (And What Actually Works)",
+      "segments": ["01"],
+      "audioDurationSec": 85.7,
+      "totalWithOutroSec": 89.7,
+      "intent": "Hook: exposes why men freeze or say the wrong thing — sets up the whole system"
+    },
+    {
+      "num": 2,
+      "title": "The Moment Before You Open Your Mouth",
+      "segments": ["02", "03"],
+      "audioDurationSec": 77.6,
+      "totalWithOutroSec": 81.6,
+      "intent": "Mindset reset + the actual approach live — positions Ryan as having seen it"
+    },
+    {
+      "num": 3,
+      "title": "Step 1 — The Observation Opener",
+      "segments": ["04", "05"],
+      "audioDurationSec": 94.9,
+      "totalWithOutroSec": 98.9,
+      "intent": "The core first-move technique + live tease exchange to show it working"
+    },
+    {
+      "num": 4,
+      "title": "Step 2 — The Playful Challenge",
+      "segments": ["06", "07"],
+      "audioDurationSec": 112.7,
+      "totalWithOutroSec": 116.7,
+      "intent": "How to create tension without being a jerk + live sensitive-topic demo",
+      "flagged": "113s — over 90s target. Consider: seg06 alone (93s) or segment trim."
+    },
+    {
+      "num": 5,
+      "title": "Step 3 — Owning Your Mystery",
+      "segments": ["08", "09"],
+      "audioDurationSec": 109.9,
+      "totalWithOutroSec": 113.9,
+      "intent": "Why giving everything away kills attraction + live verbal-spike demo",
+      "flagged": "110s — over 90s target."
+    },
+    {
+      "num": 6,
+      "title": "Step 4 — The Verbal Spike",
+      "segments": ["10", "11"],
+      "audioDurationSec": 108.1,
+      "totalWithOutroSec": 112.1,
+      "intent": "Communicating intent through implication, not statement + live close demo",
+      "flagged": "108s — over 90s target."
+    },
+    {
+      "num": 7,
+      "title": "Step 5 — The Natural Close",
+      "segments": ["12"],
+      "audioDurationSec": 84.8,
+      "totalWithOutroSec": 88.8,
+      "intent": "Why the close is the easiest part if you've done the rest — how to lead it"
+    },
+    {
+      "num": 8,
+      "title": "The Full System: What You Now Know",
+      "segments": ["13"],
+      "audioDurationSec": 93.8,
+      "totalWithOutroSec": 97.8,
+      "intent": "Summary recap of all 5 steps — ideal standalone pinned post or series closer"
+    }
+  ]
+}
