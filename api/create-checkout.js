@@ -11,9 +11,13 @@ module.exports = async function handler(req, res) {
   const stripe = require('stripe')(key);
   const { email, plan } = req.body || {};
 
+  // In test mode, prefer _TEST-suffixed price IDs so Preview deployments can use
+  // test-mode Stripe prices without overwriting the Production (live-mode) values.
+  const isTestMode = key.startsWith('sk_test_');
+
   const priceId = plan === 'elite'
-    ? process.env.STRIPE_ELITE_PRICE_ID
-    : process.env.STRIPE_PRO_PRICE_ID;
+    ? (isTestMode && process.env.STRIPE_ELITE_PRICE_ID_TEST) || process.env.STRIPE_ELITE_PRICE_ID
+    : (isTestMode && process.env.STRIPE_PRO_PRICE_ID_TEST) || process.env.STRIPE_PRO_PRICE_ID;
 
   if (!priceId) return res.status(500).json({ error: `Price ID not configured for plan: ${plan || 'pro'}` });
 
