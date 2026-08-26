@@ -1,127 +1,127 @@
 
 === Beach — She's been sitting alone for 20 minutes (beach) — PASS ===
-  + 1985ms [log] [TEST] AUDIO_START calls=1 text="That's quite the observation."
-  + 2919ms [log] [TEST] VIDEO_STATE: speaking gapMs=927.0
-  + 4723ms [log] [TEST] AUDIO_END gapMs=2736.2
-  + 4723ms [log] [TEST] AUDIO_START calls=2 text="It's not every day someone notices a per"
-  +10005ms [log] [TEST] AUDIO_START calls=3 text="What brings you to this quiet corner of "
-  +13185ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
-  +13185ms [log] [FC] streamPromise resolved or timed out
+  + 1686ms [log] [TEST] AUDIO_START calls=1 text="Thanks, I guess."
+  + 2261ms [log] [TEST] VIDEO_STATE: speaking gapMs=574.6
+  + 3510ms [log] [TEST] AUDIO_END gapMs=1823.4
+  + 3510ms [log] [TEST] AUDIO_START calls=2 text="You know, I was just trying to stay focu"
+  + 7600ms [log] [TEST] AUDIO_START calls=3 text="It’s funny how a compliment can feel lik"
+  +11335ms [log] [TEST] AUDIO_START calls=4 text="But I appreciate it — it’s nice to be se"
+  +15775ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  +15776ms [log] [FC] streamPromise resolved or timed out
 
 === Bookstore — She's reading. Coffee going cold. (bookstore) — PASS ===
-  + 1177ms [log] [TEST] AUDIO_START calls=1 text="Thank you."
-  + 1575ms [log] [TEST] VIDEO_STATE: speaking gapMs=398.1
-  + 2374ms [log] [TEST] AUDIO_END gapMs=1197.4
-  + 2375ms [log] [TEST] AUDIO_START calls=2 text="There’s something about being surrounded"
-  + 7300ms [log] [TEST] AUDIO_START calls=3 text="Something cozy, I suppose."
-  + 9635ms [log] [TEST] AUDIO_START calls=4 text="How do you feel about places like this?"
-  +12396ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
-  +12396ms [log] [FC] streamPromise resolved or timed out
+  +  926ms [log] [TEST] AUDIO_START calls=1 text="That's quite the compliment."
+  + 1405ms [log] [TEST] VIDEO_STATE: speaking gapMs=479.7
+  + 2838ms [log] [TEST] AUDIO_END gapMs=1912.3
+  + 2838ms [log] [TEST] AUDIO_START calls=2 text="Presence can be a strange thing, isn't i"
+  + 5505ms [log] [TEST] AUDIO_START calls=3 text="Like a well-stacked shelf — it draws you"
+  +11835ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  +11836ms [log] [FC] streamPromise resolved or timed out
 
 === House Party — She stepped away from the group (house_party) — PASS ===
-  + 1102ms [log] [TEST] AUDIO_START calls=1 text="Thank you."
-  + 1458ms [log] [TEST] VIDEO_STATE: speaking gapMs=353.1
-  + 2143ms [log] [TEST] AUDIO_END gapMs=1037.4
-  + 2143ms [log] [TEST] AUDIO_START calls=2 text="That’s not something I hear often."
-  + 4400ms [log] [TEST] AUDIO_START calls=3 text="It’s nice to feel noticed, especially in"
-  + 8411ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
-  + 8411ms [log] [FC] streamPromise resolved or timed out
+  + 1365ms [log] [TEST] AUDIO_START calls=1 text="Thank you."
+  + 2359ms [log] [TEST] VIDEO_STATE: speaking gapMs=993.6
+  + 3151ms [log] [TEST] AUDIO_END gapMs=1785.0
+  + 3164ms [log] [TEST] AUDIO_START calls=2 text="That’s kind of you to say."
+  + 4931ms [log] [TEST] AUDIO_START calls=3 text="I’ve been out here thinking about how sp"
+  +13376ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  +13376ms [log] [FC] streamPromise resolved or timed out
 
 === Coffee Shop — Headphones off. Not quite working. (coffee_shop) — PASS ===
-  +  849ms [log] [TEST] AUDIO_START calls=1 text="Thanks."
-  + 1171ms [log] [TEST] VIDEO_STATE: speaking gapMs=322.9
-  + 1950ms [log] [TEST] AUDIO_END gapMs=1101.7
-  + 1951ms [log] [TEST] AUDIO_START calls=2 text="I'm just trying to get some writing done"
-  + 6133ms [log] [TEST] AUDIO_START calls=3 text="Presence isn't really a skill you practi"
-  +12092ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
-  +12092ms [log] [FC] streamPromise resolved or timed out
+  + 1248ms [log] [TEST] AUDIO_START calls=1 text="Thanks."
+  + 1570ms [log] [TEST] VIDEO_STATE: speaking gapMs=321.7
+  + 2305ms [log] [TEST] AUDIO_END gapMs=1055.6
+  + 2305ms [log] [TEST] AUDIO_START calls=2 text="I don’t know about that."
+  + 3878ms [log] [TEST] AUDIO_START calls=3 text="I’m just trying to write a song that doe"
+  + 7019ms [log] [TEST] AUDIO_START calls=4 text="Hopefully, it’ll show up eventually."
+  + 9952ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  + 9952ms [log] [FC] streamPromise resolved or timed out
 
 === Supermarket — Sunday morning. Unhurried. (supermarket) — PASS ===
-  +  881ms [log] [TEST] AUDIO_START calls=1 text="Thank you."
-  + 1264ms [log] [TEST] VIDEO_STATE: speaking gapMs=379.1
-  + 2186ms [log] [TEST] AUDIO_END gapMs=1304.2
-  + 2186ms [log] [TEST] AUDIO_START calls=2 text="That's an interesting thing to notice in"
-  + 5395ms [log] [TEST] AUDIO_START calls=3 text="Most people are just focusing on their l"
-  +10009ms [log] [TEST] AUDIO_START calls=4 text="What brought you to say that?"
-  +11696ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
-  +11696ms [log] [FC] streamPromise resolved or timed out
+  + 1231ms [log] [TEST] AUDIO_START calls=1 text="Thank you."
+  + 1959ms [log] [TEST] VIDEO_STATE: speaking gapMs=727.6
+  + 2739ms [log] [TEST] AUDIO_END gapMs=1506.9
+  + 2739ms [log] [TEST] AUDIO_START calls=2 text="That’s not something I hear every day, b"
+  + 6960ms [log] [TEST] AUDIO_START calls=3 text="It’s nice to be noticed while navigating"
+  +10617ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  +10617ms [log] [FC] streamPromise resolved or timed out
 
 === Train — Commute home. Window seat. Far away. (train) — PASS ===
-  + 1499ms [log] [TEST] AUDIO_START calls=1 text="Thanks."
-  + 1798ms [log] [TEST] VIDEO_STATE: speaking gapMs=298.8
-  + 2451ms [log] [TEST] AUDIO_END gapMs=952.4
-  + 2451ms [log] [TEST] AUDIO_START calls=2 text="I try to bring something to the chaos of"
-  + 5653ms [log] [TEST] AUDIO_START calls=3 text="It's like a tiny performance art piece, "
-  + 8635ms [log] [TEST] AUDIO_START calls=4 text="The train's moving, the lights flicker, "
-  +15274ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
-  +15274ms [log] [FC] streamPromise resolved or timed out
+  +  952ms [log] [TEST] AUDIO_START calls=1 text="That’s a nice thing to say."
+  + 1408ms [log] [TEST] VIDEO_STATE: speaking gapMs=456.0
+  + 2896ms [log] [TEST] AUDIO_END gapMs=1943.0
+  + 2896ms [log] [TEST] AUDIO_START calls=2 text="I think it might just be the train’s cal"
+  + 5806ms [log] [TEST] AUDIO_START calls=3 text="Or maybe the absurdity of being in a met"
+  +10459ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  +10459ms [log] [FC] streamPromise resolved or timed out
 
 === Museum — Standing in front of the same painting too long. (museum) — PASS ===
-  + 1088ms [log] [TEST] AUDIO_START calls=1 text="You don't have to do that."
-  + 1522ms [log] [TEST] VIDEO_STATE: speaking gapMs=430.7
-  + 2799ms [log] [TEST] AUDIO_END gapMs=1688.3
-  + 2799ms [log] [TEST] AUDIO_START calls=2 text="It's just the quiet of the gallery."
-  + 5152ms [log] [TEST] AUDIO_START calls=3 text="It makes it easier to notice what and wh"
-  + 8948ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
-  + 8948ms [log] [FC] streamPromise resolved or timed out
+  +  885ms [log] [TEST] AUDIO_START calls=1 text="You don't have to do that."
+  + 1322ms [log] [TEST] VIDEO_STATE: speaking gapMs=437.1
+  + 2620ms [log] [TEST] AUDIO_END gapMs=1734.1
+  + 2620ms [log] [TEST] AUDIO_START calls=2 text="An observation like that feels more valu"
+  + 7776ms [log] [TEST] AUDIO_START calls=3 text="What are you really noticing?"
+  +10677ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  +10677ms [log] [FC] streamPromise resolved or timed out
 
 === Gym — Between sets. Not in a rush to leave. (gym) — PASS ===
-  +  610ms [log] [TEST] AUDIO_START calls=1 text="You don't have to start there."
-  + 1306ms [log] [TEST] VIDEO_STATE: speaking gapMs=696.9
-  + 2814ms [log] [TEST] AUDIO_END gapMs=2204.0
-  + 2814ms [log] [TEST] AUDIO_START calls=2 text="Just say what you really want."
-  + 4845ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
-  + 4846ms [log] [FC] streamPromise resolved or timed out
+  +  630ms [log] [TEST] AUDIO_START calls=1 text="You don't have to start there."
+  + 1099ms [log] [TEST] VIDEO_STATE: speaking gapMs=465.6
+  + 2493ms [log] [TEST] AUDIO_END gapMs=1850.3
+  + 2493ms [log] [TEST] AUDIO_START calls=2 text="Just say what you want."
+  + 4307ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  + 4307ms [log] [FC] streamPromise resolved or timed out
 
 === Rooftop — After dark. She came alone. (rooftop) — PASS ===
-  +  998ms [log] [TEST] AUDIO_START calls=1 text="That’s a well-crafted line."
-  + 1703ms [log] [TEST] VIDEO_STATE: speaking gapMs=704.4
-  + 3511ms [log] [TEST] AUDIO_END gapMs=2510.8
-  + 3511ms [log] [TEST] AUDIO_START calls=2 text="I assume it was an opening strategy."
-  + 6449ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
-  + 6449ms [log] [FC] streamPromise resolved or timed out
+  +  802ms [log] [TEST] AUDIO_START calls=1 text="Thank you."
+  + 1190ms [log] [TEST] VIDEO_STATE: speaking gapMs=388.1
+  + 2100ms [log] [TEST] AUDIO_END gapMs=1297.5
+  + 2100ms [log] [TEST] AUDIO_START calls=2 text="Though it sounds like you might be tryin"
+  + 6777ms [log] [TEST] AUDIO_START calls=3 text="That tactic usually has a predictable rh"
+  +10339ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  +10339ms [log] [FC] streamPromise resolved or timed out
 
 === Yoga Studio — Just finished class. Still there. (yoga_studio) — PASS ===
-  +  607ms [log] [TEST] AUDIO_START calls=1 text="Thanks."
-  + 1182ms [log] [TEST] VIDEO_STATE: speaking gapMs=574.5
-  + 1680ms [log] [TEST] AUDIO_END gapMs=1072.2
-  + 1680ms [log] [TEST] AUDIO_START calls=2 text="You’ve got a good view from there, I gue"
-  + 4671ms [log] [TEST] AUDIO_START calls=3 text="What brings you over here?"
-  + 7061ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
-  + 7061ms [log] [FC] streamPromise resolved or timed out
+  +  753ms [log] [TEST] AUDIO_START calls=1 text="I appreciate that."
+  + 1118ms [log] [TEST] VIDEO_STATE: speaking gapMs=365.1
+  + 2084ms [log] [TEST] AUDIO_END gapMs=1331.3
+  + 2085ms [log] [TEST] AUDIO_START calls=2 text="You didn’t come over here to talk about "
+  + 5075ms [log] [TEST] AUDIO_START calls=3 text="What is it?"
+  + 6316ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  + 6316ms [log] [FC] streamPromise resolved or timed out
 
 === Airport — 2-hour delay. She hasn't turned a page. (airport) — PASS ===
-  +  791ms [log] [TEST] AUDIO_START calls=1 text="That's either a compliment or a really c"
-  + 1663ms [log] [TEST] VIDEO_STATE: speaking gapMs=873.2
-  + 5838ms [log] [TEST] AUDIO_END gapMs=5046.3
-  + 5838ms [log] [TEST] AUDIO_START calls=2 text="Either way, I appreciate it."
-  + 7396ms [log] [TEST] AUDIO_START calls=3 text="It’s nice to be noticed — especially her"
-  +15448ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
-  +15448ms [log] [FC] streamPromise resolved or timed out
+  + 1388ms [log] [TEST] AUDIO_START calls=1 text="Thanks, I guess that makes one of us."
+  + 2272ms [log] [TEST] VIDEO_STATE: speaking gapMs=883.4
+  + 4488ms [log] [TEST] AUDIO_END gapMs=3099.2
+  + 4488ms [log] [TEST] AUDIO_START calls=2 text="Airports usually do their best to make e"
+  +11158ms [log] [TEST] AUDIO_START calls=3 text="What brings you to gate C14?"
+  +13972ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  +13972ms [log] [FC] streamPromise resolved or timed out
 
 === Office Lobby — You've walked past each other for months. (office_lobby) — PASS ===
-  +  638ms [log] [TEST] AUDIO_START calls=1 text="Thank you."
-  +  984ms [log] [TEST] VIDEO_STATE: speaking gapMs=345.2
-  + 1761ms [log] [TEST] AUDIO_END gapMs=1122.5
-  + 1765ms [log] [TEST] AUDIO_START calls=2 text="I’m just trying to get through the week "
-  + 4951ms [log] [TEST] AUDIO_START calls=3 text="What about you?"
-  + 6288ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
-  + 6289ms [log] [FC] streamPromise resolved or timed out
+  +  825ms [log] [TEST] AUDIO_START calls=1 text="Thank you."
+  + 1151ms [log] [TEST] VIDEO_STATE: speaking gapMs=326.0
+  + 1890ms [log] [TEST] AUDIO_END gapMs=1065.0
+  + 1890ms [log] [TEST] AUDIO_START calls=2 text="The lobby does have a way of bringing pe"
+  + 5875ms [log] [TEST] AUDIO_START calls=3 text="Feels like everyone's on a mission."
+  + 8437ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  + 8438ms [log] [FC] streamPromise resolved or timed out
 
 === Street — Walking toward you. 4 seconds before she's gone. (street) — PASS ===
-  +  831ms [log] [TEST] AUDIO_START calls=1 text="Presence is an interesting word."
-  + 1371ms [log] [TEST] VIDEO_STATE: speaking gapMs=541.2
-  + 3534ms [log] [TEST] AUDIO_END gapMs=2703.9
-  + 3534ms [log] [TEST] AUDIO_START calls=2 text="It suggests more than just being here."
-  + 6578ms [log] [TEST] AUDIO_START calls=3 text="What do you think you saw?"
-  + 8553ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
-  + 8553ms [log] [FC] streamPromise resolved or timed out
+  + 2822ms [log] [TEST] AUDIO_START calls=1 text="Presence is an interesting word."
+  + 4004ms [log] [TEST] VIDEO_STATE: speaking gapMs=1183.0
+  + 6142ms [log] [TEST] AUDIO_END gapMs=3319.8
+  + 6142ms [log] [TEST] AUDIO_START calls=2 text="It often says more about the observer th"
+  +10209ms [log] [TEST] AUDIO_START calls=3 text="You seem to have a way of finding what y"
+  +13700ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  +13700ms [log] [FC] streamPromise resolved or timed out
 
 === Art Gallery — Opening night. She's not looking at the art. (art_gallery) — PASS ===
-  +  601ms [log] [TEST] AUDIO_START calls=1 text="Thank you."
-  +  936ms [log] [TEST] VIDEO_STATE: speaking gapMs=335.1
-  + 1746ms [log] [TEST] AUDIO_END gapMs=1143.1
-  + 1746ms [log] [TEST] AUDIO_START calls=2 text="I’ve spent a lot of time with this work."
-  + 4039ms [log] [TEST] AUDIO_START calls=3 text="It tends to create a certain atmosphere."
-  + 6569ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
-  + 6569ms [log] [FC] streamPromise resolved or timed out
+  +  867ms [log] [TEST] AUDIO_START calls=1 text="Thank you."
+  + 1260ms [log] [TEST] VIDEO_STATE: speaking gapMs=393.9
+  + 2095ms [log] [TEST] AUDIO_END gapMs=1227.1
+  + 2097ms [log] [TEST] AUDIO_START calls=2 text="I’ve been standing with this piece for a"
+  + 4799ms [log] [TEST] AUDIO_START calls=3 text="It feels different with the crowd moving"
+  + 7652ms [log] [FC] processQueue calling resolveStream, queue length: 0 streamDone: true
+  + 7652ms [log] [FC] streamPromise resolved or timed out
