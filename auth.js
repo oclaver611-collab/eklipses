@@ -314,13 +314,23 @@
         await fetchAndMergeProgress(currentUser.id);
         hideAuthModal();
         const _hero = document.getElementById('ek-hero-v6');
-        if (_hero) _hero.remove();
+        if (_hero) {
+          // Trigger doStart() so Ryan orb, shelf, and Kokoro preload all initialize.
+          // Bare .remove() skips that setup and leaves <img id="media"> broken.
+          const _startBtn = _hero.querySelector('#ek-h6-start');
+          if (_startBtn && !_startBtn.disabled) _startBtn.click();
+          else _hero.remove();
+        }
       } else if (event === 'INITIAL_SESSION' && currentUser) {
         // Returning signed-in user on page load: only pull from DB (don't overwrite
         // DB with potentially stale local state).
         await fetchAndMergeProgress(currentUser.id);
         const _hero = document.getElementById('ek-hero-v6');
-        if (_hero) _hero.remove();
+        if (_hero) {
+          const _startBtn = _hero.querySelector('#ek-h6-start');
+          if (_startBtn && !_startBtn.disabled) _startBtn.click();
+          else _hero.remove();
+        }
       }
     });
 
