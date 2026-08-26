@@ -14,6 +14,11 @@ module.exports = async function handler(req, res) {
   // In test mode, prefer _TEST-suffixed price IDs so Preview deployments can use
   // test-mode Stripe prices without overwriting the Production (live-mode) values.
   const isTestMode = key.startsWith('sk_test_');
+
+  // DEBUG — remove once confirmed clean
+  const _rawPro = process.env.STRIPE_PRO_PRICE_ID_TEST || '';
+  console.log('[create-checkout] DEBUG STRIPE_PRO_PRICE_ID_TEST:', JSON.stringify(_rawPro), 'charCode[0]:', _rawPro.charCodeAt(0));
+
   const priceId = plan === 'elite'
     ? (isTestMode && process.env.STRIPE_ELITE_PRICE_ID_TEST) || process.env.STRIPE_ELITE_PRICE_ID
     : (isTestMode && process.env.STRIPE_PRO_PRICE_ID_TEST) || process.env.STRIPE_PRO_PRICE_ID;
