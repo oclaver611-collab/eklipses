@@ -488,6 +488,9 @@
   <!-- FingerprintJS — device fingerprint for session rate limiting -->
   <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
 
+  <!-- Guard for Supabase's navigator.storage.persisted() call (missing in some WebKit/Safari environments) -->
+  <script>if(typeof navigator!=='undefined'&&!navigator.storage){Object.defineProperty(navigator,'storage',{value:{persisted:()=>Promise.resolve(false),persist:()=>Promise.resolve(false),estimate:()=>Promise.resolve({})},configurable:true});}</script>
+
   <!-- Supabase browser client (UMD — exposes window.supabase) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 

@@ -64,4 +64,17 @@ Fill in the `[ ]` that applies, or write your own answer in the blank.
 
 ---
 
+### PA-006 — G3.6 iOS/WebKit surprises (logged 2026-08-27)
+**Found during G3.5 WebKit Playwright test against Preview URL:**
+
+1. **`navigator.storage.persisted` crash** — Supabase's client library calls `navigator.storage.persisted()` on startup. In Playwright's WebKit emulation (and potentially older iOS Safari 13), `navigator.storage` is undefined, causing a `TypeError`. **Fixed:** added a polyfill guard in `index.html` before the Supabase script tag. This is a defensive guard that's a no-op in browsers that already have `navigator.storage`.
+
+2. **MediaRecorder unavailable in Playwright WebKit** — `typeof MediaRecorder` is undefined in Playwright's WebKit emulation. However, MediaRecorder IS available in real Safari 14.5+ on iOS/macOS. This is a test environment limitation. The `listenForUserWhisper()` code path will work on real iOS devices running Safari 14.5+. Playwright WebKit emulation cannot test this path — **real device test recommended** (BrowserStack or physical iPhone).
+
+3. **hasSpeechRecognition() correctly returns false** in WebKit ✓ — the dispatch to `listenForUserWhisper()` will trigger correctly on real iOS Safari.
+
+**No blocking issues.** Real-device test on iPhone (Safari 14.5+) is the definitive check for MediaRecorder + mic permissions. Add to launch QA checklist (G6.4).
+
+---
+
 _Runner appends new items here automatically. Answer them and re-run: `node scripts/dating-mvp-runner.js --loop`_
