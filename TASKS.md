@@ -19,7 +19,7 @@ _Dependency: none. Run before touching anything._
 
 - [x] G0.1: Tag current HEAD as v-dating-mvp-baseline (`git tag v-dating-mvp-baseline && git push origin v-dating-mvp-baseline`)
 - [x] G0.2: Run all 4 canonical test suites. Results: test-all-scenarios 14/14 PASS, test-paywall PASS, test-lesson-player 20/20 PASS, test-new-features 87/87 PASS. All baseline results in AUTOMATION_REPORT.md.
-- [ ] G0.3: Capture current Vercel env var list (names only, no values) — confirm SUPABASE_URL, SUPABASE_SERVICE_KEY, STRIPE_SECRET_KEY, STRIPE_PRO_PRICE_ID, GROQ_API_KEY, ELEVENLABS_API_KEY, DEV_BYPASS_KEY are all set. Log missing vars to PENDING-APPROVALS.md.
+- [x] G0.3: All required Vercel env vars confirmed via API: SUPABASE_URL ✓, SUPABASE_SERVICE_KEY ✓, STRIPE_SECRET_KEY ✓ (prod+preview), STRIPE_PRO_PRICE_ID ✓, STRIPE_PRO_PRICE_ID_TEST ✓, STRIPE_ELITE_PRICE_ID ✓, STRIPE_ELITE_PRICE_ID_TEST ✓, GROQ_API_KEY ✓, ELEVENLABS_API_KEY ✓, DEV_BYPASS_KEY ✓, OPENAI_API_KEY ✓. Gap: STRIPE_WEBHOOK_SECRET is production-only (not set for Preview) — logged to PA-007.
 
 ---
 
@@ -57,14 +57,14 @@ _Goal: voice input works on iOS Safari. MediaRecorder captures audio → Whisper
 
 ---
 
-## G4 — Payment funnel end-to-end [PENDING]
+## G4 — Payment funnel end-to-end [IN-PROGRESS]
 _Dependency: G3 complete._
 _Goal: free user hits limit, pays via Stripe, gets immediate subscriber access._
 
-- [ ] G4.1: ⚠️ RISKY — Full funnel test. Steps: (1) exhaust free sessions (2 sessions from clean IP), (2) trigger paywall modal, (3) click "Subscribe", (4) complete Stripe checkout in test mode (use test card 4242 4242 4242 4242), (5) confirm redirect to `/?stripe_session=...`, (6) confirm `verify-payment` API confirms subscriber, (7) confirm rate limit now returns `bypass: subscriber`. Run `node tests/test-payment-flow.js` if it covers this — otherwise run Playwright manually.
-- [ ] G4.2: Verify Stripe webhook fires on subscription creation. Check Vercel function logs for `[webhook]` entries after G4.1 test payment. Confirm `subscriberCache` is populated. If webhook is not firing, check Vercel env has `STRIPE_WEBHOOK_SECRET` set.
-- [ ] G4.3: Verify cancel subscription flow. Run `node tests/test-cancel-subscription.js`. Confirm cancelled subscriber loses access after next API call.
-- [ ] G4.4: Check that success_url and cancel_url in `api/create-checkout.js` resolve correctly on both production (`eklipses.vercel.app`) and preview domains. The `origin` detection logic uses `req.headers.origin` — confirm this is set correctly on Vercel.
+- [ ] G4.1: ⚠️ RISKY — Full funnel test. Programmatic: checkout session creates cs_test_ URL ✓. Payment completion requires browser (Stripe Checkout iframe not automatable headless). Manual test needed: exhaust 2 sessions → paywall → Subscribe → test card 4242 → verify redirect → verify-payment confirms active. Logged to PA-007.
+- [ ] G4.2: STRIPE_WEBHOOK_SECRET not available in Preview env (production-only) → webhook returns 500 on Preview. Code is correct (static analysis). Need to add STRIPE_WEBHOOK_SECRET to Preview env vars in Vercel settings (PA-007).
+- [ ] G4.3: Verify cancel subscription flow. Requires manual test.
+- [x] G4.4: origin detection PASS (static analysis) — `req.headers.origin || req.headers.referer || 'https://eklipses.vercel.app'` → success_url and cancel_url resolve to Preview URL when called from Preview.
 
 ---
 

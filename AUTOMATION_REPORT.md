@@ -86,16 +86,68 @@ This is a test-hygiene fix, not a feature regression. The lesson player itself s
 
 ---
 
+## G1 Core Conversation — 2026-08-27
+
+| Task | Result | Notes |
+|---|---|---|
+| G1.1 SSE pipeline verify | **PASS** | Preview URL → 200 `text/event-stream` → `{"sentence":"Hi.","done":false}` confirmed |
+| G1.2 processQueue mismatch | Deferred | Static analysis shows session guard in place at line 1557. Requires live interactive session debugging to reproduce — not blocking |
+| G1.3 Ryan coach API | **PASS** | `/api/coach` returns score:7 + part1 text on production. API pipeline working |
+
+---
+
+## G2 Session Persistence — 2026-08-27
+
+| Task | Result | Notes |
+|---|---|---|
+| G2.1 Supabase rows | **PASS** | Direct API test: IP-based SELECT returns `sessionsUsed:2, allowed:false` correctly. INSERT/UPDATE verbose logging added to count-session.js. No DB write errors. |
+| G2.2 Rate limit at 2 sessions | **PASS** | `test-paywall.js` passes — paywall appears after simulated session limit exhaustion |
+| G2.3 localStorage persistence | Pending | |
+| G2.4 Dev bypass key | PASS (via test-paywall.js which uses `ek-dev-key`) | |
+
+---
+
+## G3 iOS Voice (continued) — 2026-08-27
+
+| Check | Result | Notes |
+|---|---|---|
+| G3.5 WebKit hasSpeechRecognition()=false | **PASS** | WebKit correctly returns false; Whisper path would activate |
+| G3.5 navigator.storage polyfill | **FIXED** | Polyfill moved to top of `<head>`, runs before PostHog/Supabase. After page load, `navigator.storage.persisted` is callable. Real iOS 14.5+ has native storage. |
+| G3.5 MediaRecorder in Playwright WebKit | Not available | Playwright WebKit emulation doesn't include MediaRecorder. Real Safari 14.5+ supports it. Real device test needed (logged PA-006). |
+| G3.6 iOS surprises | Logged | PA-006: navigator.storage timing, MediaRecorder real-device requirement, hasSpeechRecognition correctly false |
+
+---
+
+## G5 Dating Polish (continued) — 2026-08-27
+
+| Task | Result | Notes |
+|---|---|---|
+| G5.4 Mobile smoke (375×812) | **4/4 PASS** | Hero visible, PRACTICE tab visible, no horizontal overflow (scrollWidth=375), scenario cards present |
+
+---
+
+## test-lesson-player.js test #2 fix — 2026-08-27
+
+- Old assertion: "LEARN tab visible and default" (was passing before G5.2)
+- New assertion: "PRACTICE tab is default; LEARN tab hidden for new users"
+- Added `?lessons=1` navigation before lesson-specific tests so `#ek-start-lesson1` remains clickable
+- Syntax check: pass
+
+---
+
+## Preview URL info
+
+- Preview URL (current): `https://eklipses-hb2jxp6h7-oclaver611-collabs-projects.vercel.app`
+- Branch: `dating-mvp-build`
+- Bypass header: `x-vercel-protection-bypass: 4rAqwnc2ZfF6Yyuz4pKAbITVOCMpLIyA`
+
+---
+
 ## Pending / not yet run
 
 | Group | Status | Blocker |
 |---|---|---|
-| G1.1 SSE pipeline verify | Not started | Need Preview URL |
 | G1.2 processQueue mismatch fix | Deferred | Requires live session debugging; static analysis inconclusive |
-| G1.3 Ryan coach verify | Not started | Need Preview URL |
-| G2.1-G2.4 Session persistence | Not started | Need deployed URL + Vercel logs |
-| G3.5 WebKit voice test | Not started | Need Preview URL |
-| G4.1-G4.4 Payment funnel | Not started | Need Preview URL + Stripe test mode |
-| G5.3 Three scenarios confirmed | Pending | test-all-scenarios.js shows all 14 pass on production |
-| G5.4 Mobile smoke test | Not started | Need Preview URL + Playwright viewport test |
+| G2.3 localStorage persistence | Pending | |
+| G4.1-G4.4 Payment funnel | Not started | Need Stripe test mode Playwright automation |
 | G6.1-G6.4 Pre-launch QA | Not started | Depends on all groups |

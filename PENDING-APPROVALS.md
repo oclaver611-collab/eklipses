@@ -64,6 +64,26 @@ Fill in the `[ ]` that applies, or write your own answer in the blank.
 
 ---
 
+### PA-007 — G4 Payment funnel findings (logged 2026-08-27)
+
+**Verified programmatically:**
+1. `POST /api/create-checkout` creates a valid `cs_test_` Stripe Checkout URL on Preview ✓ (test-mode key active)
+2. `STRIPE_WEBHOOK_SECRET` is in Vercel env but **Production-only** — Preview returns 500 "Webhook secret not configured" on all webhook calls. Before launch: configure STRIPE_WEBHOOK_SECRET for Preview environment too, or accept that webhook testing only happens on production.
+3. All required env vars present in Vercel: STRIPE_PRO_PRICE_ID, STRIPE_ELITE_PRICE_ID, STRIPE_PRO_PRICE_ID_TEST, STRIPE_ELITE_PRICE_ID_TEST, STRIPE_SECRET_KEY (prod+preview), STRIPE_WEBHOOK_SECRET (prod only), SUPABASE_URL/SERVICE_KEY/ANON_KEY, GROQ_API_KEY, ELEVENLABS_API_KEY, OPENAI_API_KEY, DEV_BYPASS_KEY ✓
+
+**Requires manual browser verification (Stripe Checkout iframe — not automatable headless):**
+- Full payment flow: exhaust 2 free sessions → paywall modal → click Subscribe → Stripe Checkout with test card 4242 → redirect to `/?stripe_session=cs_test_...` → verify-payment confirms active
+- Recommended: Use Stripe test card `4242 4242 4242 4242`, exp `12/30`, CVC `123` in a real browser at Preview URL
+
+**G4.4 (origin detection) — PASS via static analysis:**
+- `create-checkout.js` uses `req.headers.origin || req.headers.referer || 'https://eklipses.vercel.app'`
+- When called from Preview URL, origin header is set to Preview URL → success_url and cancel_url correctly point to Preview
+- No code change needed
+
+**Action needed before launch:** Set `STRIPE_WEBHOOK_SECRET` in Vercel for Preview environment (Vercel project settings → Environment Variables → add Preview target for the existing secret).
+
+---
+
 ### PA-006 — G3.6 iOS/WebKit surprises (logged 2026-08-27)
 **Found during G3.5 WebKit Playwright test against Preview URL:**
 
