@@ -1,96 +1,139 @@
-# Eklipses — Task Queue
-
-## How to use this file
-Start every session by reading this file. Work top to bottom. Move completed tasks to Done. Add new tasks at the bottom of the relevant priority section.
-
----
-
-## 🔴 P1 — Critical (do these first)
-- [x] Test caption sync fix live — confirm text appears with audio not before (v-stable-june3-caption-sync)
-- [x] Investigate score always showing 3/10 in real sessions despite +1 correction — consistent 6/10, +1 correction working, low scores = genuinely weak convos
-- [ ] Fix processQueue session mismatch breaking Ava/all non-sofia characters mid-stream — debug logging deployed (commit 80508a3), need to run test and check [FC] processQueue session mismatch log in DevTools
-- [ ] Test Ryan prefetch + cancel fix live — confirm no double voice, reduced dead air
-- [ ] Verify Supabase rows appearing after user sessions (table was empty after deploy)
-- [ ] Test admin endpoint: https://eklipses.vercel.app/api/admin?key=ADMIN_KEY
-
-## 🟡 P2 — Important
-- [ ] Fix Remi character — BLOCKED: no R2 assets yet. Prompt is malformed + duplicate, not in AVATAR_SETS or charNames. Resume when assets are uploaded.
-- [x] Re-apply rate limit increase (DAILY_SESSION_LIMIT=40 for dev, 1 for prod)
-- [x] Re-apply dev key capture fix in index.html
-- [x] Fix Ryan dead air gaps between lines — prefetch next part while current plays (v-stable-june6-ryan-prefetch-v2)
-
-## 🟢 P3 — Nice to have
-- [ ] Switch Sofia TTS to Fish Audio or Chatterbox — cheaper than ElevenLabs at scale
-- [ ] Add more scenario variety — new characters or locations
-- [ ] Ryan feedback: investigate why part2/part3 sometimes references wrong exchanges
-
-## 🔵 Future / Research
-- [ ] Chatterbox Turbo — emotion tags [laugh] [sigh] for more natural character responses
-- [ ] Fish Audio as ElevenLabs backup
-- [ ] Kokoro on paid Render tier — keep warm, no cold starts
+# Eklipses — Dating Niche MVP Tasks
+# Target: paid-ready MVP in 7 days (deadline: 2026-09-03)
+# Runner: node scripts/dating-mvp-runner.js
+# Blocked decisions: see PENDING-APPROVALS.md
 
 ---
 
-## Automated Tests
-
-### End-to-end character + TTS check:
-node test-frontend.js https://eklipses.vercel.app
-
-Run before every deploy that touches character or TTS code.
-14/14 passing as of v-stable-june6-all-passing.
-
----
-
-## Fast Test Commands
-
-### Test coach API (no full session needed):
-node -e "fetch('https://eklipses.vercel.app/api/coach', {method:'POST',headers:{'Content-Type':'application/json','x-dev-key':'ek_dev_2026'},body:JSON.stringify({scenarioTitle:'Beach — Cold Open',scenarioKey:'beach',conversation:[{role:'user',content:'hey never saw you here'},{role:'assistant',content:'I come here to think. What about you?'},{role:'user',content:'same actually. what are you writing?'},{role:'assistant',content:'Something I probably won t finish.'},{role:'user',content:'the unfinished ones are usually the most honest'},{role:'assistant',content:'That s... actually true.'}]})}).then(r=>r.json()).then(d=>console.log('SCORE:',d.score,'PART1:',d.part1?.slice(0,150))).catch(console.error)"
-
-### Deploy:
-deploy.bat "your message"
-
-### Manual deploy:
-git push origin HEAD
-curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_l6CBJ6apO3R4vIkcoaXzZO89zXFH/dzoXAksvJp?buildCache=false"
+## HOW THE RUNNER USES THIS FILE
+Each group header must end with `[COMPLETE]`, `[IN-PROGRESS]`, or `[PENDING]`.
+Each task line starts with `- [ ]` (todo) or `- [x]` (done).
+The runner finds the first `[PENDING]` or `[IN-PROGRESS]` group and works top-to-bottom.
+Tasks marked `(DECISION POINT)` are logged to PENDING-APPROVALS.md and skipped.
+Tasks marked `⚠️ RISKY` get extra test passes before being marked done.
 
 ---
 
-## ✅ Done
+## G0 — Baseline snapshot [PENDING]
+_Dependency: none. Run before touching anything._
 
-### June 6, 2026
-- [x] SSH auth fix — remote switched to git@github.com, no more GitHub credential popups
-- [x] Automated test suite — test-frontend.js, 14/14 characters passing SSE + TTS checks
-- [x] Ava hidden — hidden: true in AVATAR_SETS, filtered from picker (browser audio bug)
-- [x] Bar scenario hidden — hidden: true in scenarios.js, same issue as Ava
-- [x] Ryan prefetch — pre-downloads next feedback part while current plays, reduces dead air (v-stable-june6-ryan-prefetch-v2)
-- [x] cancel() fix — moved cancel() to after URL resolved, prevents double voice on prefetched audio (v-stable-june6-cancel-fix)
-- [x] Supabase-backed rate limiting — api/supabase.js + api/ratelimit.js wired to user_sessions table (v-stable-june6-supabase)
-- [x] Admin API — api/admin.js, block/unblock/reset users via x-admin-key header
-- [x] Playwright browser test suite — 5/6 scenarios passing, test-browser.js (v-stable-june6-playwright)
+- [ ] G0.1: Tag current HEAD as v-dating-mvp-baseline (`git tag v-dating-mvp-baseline && git push origin v-dating-mvp-baseline`)
+- [ ] G0.2: Run all 4 canonical test suites (`node tests/test-all-scenarios.js`, `node tests/test-paywall.js`, `node tests/test-lesson-player.js`, `node tests/test-new-features.js`). Record pass/fail counts in AUTOMATION_REPORT.md under "G0 Baseline".
+- [ ] G0.3: Capture current Vercel env var list (names only, no values) — confirm SUPABASE_URL, SUPABASE_SERVICE_KEY, STRIPE_SECRET_KEY, STRIPE_PRO_PRICE_ID, GROQ_API_KEY, ELEVENLABS_API_KEY, DEV_BYPASS_KEY are all set. Log missing vars to PENDING-APPROVALS.md.
 
-### June 4, 2026
-- [x] Display name fix — maya_office now shows as "Maya" (getCharacterDisplayName via AVATAR_SETS)
-- [x] Stream timeout 10s→25s — character-stream fetch abort timeout increased
-- [x] 500ms mic pause — gap added after avatar speaks before mic reopens
-- [x] processQueue race condition fix (partial) — restarts if exits before stream finishes; session mismatch debug logging deployed
+---
 
-### June 3, 2026
-- [x] Upgraded Vercel to Pro
-- [x] ElevenLabs now primary TTS (Kokoro disabled)
-- [x] Fixed Sofia audio (frontend timeout, audio.play errors)
-- [x] Ryan opener nuclear fix — always HIM_1
-- [x] Score +1 correction for gpt-4o-mini
-- [x] Removed broken Practice Mode and Mic buttons
-- [x] Removed duplicate Ryan intro in train scenario
-- [x] Ryan encouragement — more emotional
+## G1 — Core conversation: one scenario works end-to-end [PENDING]
+_Dependency: G0 complete._
+_Goal: Sofia/beach scenario produces a real AI response with character audio, no crashes._
+
+- [ ] G1.1: Verify character-stream SSE pipeline works on the deployed preview URL. Use `node -e` fetch test from TASKS.md (old Fast Test Commands section) against latest Vercel preview URL. Log result to AUTOMATION_REPORT.md.
+- [ ] G1.2: ⚠️ RISKY — Fix processQueue session mismatch for non-Sofia characters. Root cause: `api/character-stream.js` or `player.js` is associating a stream with the wrong session ID when a new scenario starts mid-playback. Steps: (1) reproduce by switching characters rapidly in a Playwright test, (2) add session guard: only apply SSE data if `response.session === session` at the time of the callback, (3) run `node tests/test-all-scenarios.js` and confirm all 14 pass.
+- [ ] G1.3: Verify Ryan coach voice plays after a completed scenario. Ryan uses Fish Audio / OpenAI TTS onyx. Run `node -e` coach API call (from TASKS.md Fast Test Commands) and confirm score + part1 text returns. If TTS for Ryan is broken, log to PENDING-APPROVALS.md.
+
+---
+
+## G2 — Session persistence + rate limiting [PENDING]
+_Dependency: G1 complete._
+_Goal: sessions are counted, rate limit enforced, no phantom "unlimited free" bug._
+
+- [ ] G2.1: ⚠️ RISKY — Debug Supabase rows not appearing. In `api/count-session.js`, add `console.log('[count-session] upsert result:', JSON.stringify({data, error}))` after each DB call. Deploy to preview. Run a full scenario (5+ exchanges) from a fresh IP. Check Vercel function logs for `[count-session]` output. Fix any DB write error found.
+- [ ] G2.2: Verify rate limit enforces at 2 free sessions. After G2.1 fix: simulate 2 sessions from same IP using Playwright test (`node tests/test-paywall.js`). Confirm third attempt returns 402 with paywall modal. Confirm `sessions_used` row appears in Supabase `user_sessions` table.
+- [ ] G2.3: Verify localStorage session history persists between page reloads. Open browser, complete a scenario, reload, check that history UI shows the session. Fix if missing.
+- [ ] G2.4: Confirm dev bypass key still works (DEV_BYPASS_KEY header). Confirm test accounts in TEST_EMAILS_BYPASS bypass rate limit. Both are needed for QA without burning sessions.
+
+---
+
+## G3 — iOS voice: Whisper STT for Safari and non-Chrome browsers [PENDING]
+_Dependency: G2 complete._
+_Goal: voice input works on iOS Safari. MediaRecorder captures audio → Whisper transcribes → same downstream flow as Web Speech API. Estimated cost: ~$0.006/min, already approved._
+
+- [ ] G3.1: Create `api/stt.js` — serverless endpoint that accepts `multipart/form-data` with a single `audio` file field, forwards it to OpenAI Whisper (`whisper-1` model, `OPENAI_API_KEY`), and returns `{ transcript: string }`. Max duration 30s (fits Vercel default). Add `node --check api/stt.js` before finishing.
+- [ ] G3.2: Add `vercel.json` route so `/api/stt` resolves to `api/stt.js`. Confirm the route doesn't conflict with existing entries.
+- [ ] G3.3: ⚠️ RISKY — Extend `listenForUser()` in `player.js` with a MediaRecorder path. Logic: (1) on init, detect `const hasWebSpeech = typeof (window.SpeechRecognition || window.webkitSpeechRecognition) !== 'undefined'`; (2) if `!hasWebSpeech`, show a press-and-hold mic button instead of the auto-listen mode; (3) on button press, start `MediaRecorder` on `getUserMedia({audio:true})` stream; (4) on button release (or silence timeout of 4s), stop recording, assemble the Blob, POST it to `/api/stt` as `multipart/form-data`; (5) resolve the `listenForUser()` promise with the returned transcript — the same string the Web Speech API path produces. The existing `correctSTT()` post-processing and downstream `playLoop()` flow must remain unchanged.
+- [ ] G3.4: Keep Web Speech API untouched for Chrome/Android — the new MediaRecorder path is only activated when `!hasWebSpeech`. Add a `data-stt-mode` attribute to the mic button so tests can assert which path is active.
+- [ ] G3.5: ⚠️ RISKY — Test with Playwright WebKit (iOS Safari emulation). Run `npx playwright test --project=webkit tests/test-all-scenarios.js` if a webkit project is configured; otherwise add a minimal webkit smoke test that: (a) sets user-agent to iOS Safari, (b) injects a transcript via the existing `window.dispatchEvent(new CustomEvent('test:speech', ...))` hook, (c) confirms the character responds and audio plays. Save results to `tests/test-screenshots/webkit-voice-smoke.png`. If the `test:speech` hook bypasses the STT path entirely (it injects at the conversation level, not the audio level), note that in AUTOMATION_REPORT.md and confirm the MediaRecorder code path compiles and loads without errors as the test signal.
+- [ ] G3.6: Log any iOS-specific surprises to PENDING-APPROVALS.md rather than blocking — specifically: AudioContext unlock requirement (iOS requires a user gesture before audio plays), microphone permission prompt flow differences, and autoplay policy. Document any workarounds applied.
+
+---
+
+## G4 — Payment funnel end-to-end [PENDING]
+_Dependency: G3 complete._
+_Goal: free user hits limit, pays via Stripe, gets immediate subscriber access._
+
+- [ ] G4.1: ⚠️ RISKY — Full funnel test. Steps: (1) exhaust free sessions (2 sessions from clean IP), (2) trigger paywall modal, (3) click "Subscribe", (4) complete Stripe checkout in test mode (use test card 4242 4242 4242 4242), (5) confirm redirect to `/?stripe_session=...`, (6) confirm `verify-payment` API confirms subscriber, (7) confirm rate limit now returns `bypass: subscriber`. Run `node tests/test-payment-flow.js` if it covers this — otherwise run Playwright manually.
+- [ ] G4.2: Verify Stripe webhook fires on subscription creation. Check Vercel function logs for `[webhook]` entries after G4.1 test payment. Confirm `subscriberCache` is populated. If webhook is not firing, check Vercel env has `STRIPE_WEBHOOK_SECRET` set.
+- [ ] G4.3: Verify cancel subscription flow. Run `node tests/test-cancel-subscription.js`. Confirm cancelled subscriber loses access after next API call.
+- [ ] G4.4: Check that success_url and cancel_url in `api/create-checkout.js` resolve correctly on both production (`eklipses.vercel.app`) and preview domains. The `origin` detection logic uses `req.headers.origin` — confirm this is set correctly on Vercel.
+
+---
+
+## G5 — Dating niche product polish [PENDING]
+_Dependency: G1 complete. G4 can run in parallel._
+_Goal: a new visitor understands the product and can start in < 30 seconds._
+
+- [ ] G5.1: (DECISION POINT) Landing page / hero clarity. The current index.html opens directly into the scenario picker (Netflix-style card grid). Is that good enough for the dating niche, or do we need a hero/splash that explains the product to a cold visitor? Log to PENDING-APPROVALS.md with recommendation: add a 3-line hero above the card grid ("Practice real conversations. Get feedback. Get better.") — takes < 1 hour and improves conversion. Proceed with the hero change immediately unless Serge vetoes.
+- [ ] G5.2: Hide lesson-player content from the main dating entry point. The lesson player (lesson-player.js, lesson1–5 audio) is currently part of the same page. For the dating MVP, lessons should be a secondary/pro feature, not a first-screen distraction. Add `hidden` flag or conditional render so the lesson tab doesn't appear unless `?lessons=1` is in the URL or user is a subscriber. Log the approach to AUTOMATION_REPORT.md.
+- [ ] G5.3: Confirm at least 3 dating scenarios work end-to-end (Sofia/beach, Isabelle/museum, + 1 more). Run `node tests/test-all-scenarios.js` and pick the 3 with highest pass rate. If a scenario is broken, mark it `hidden: true` in scenarios.js rather than showing a broken experience.
+- [ ] G5.4: Mobile layout smoke test. Use Playwright `page.setViewportSize({ width: 375, height: 812 })` on the main page. Take a screenshot. Check: (a) scenario cards are tappable, (b) chat input is above keyboard, (c) avatar video plays. Save screenshot to `tests/test-screenshots/mobile-smoke.png`. Flag any critical breakages to PENDING-APPROVALS.md.
+- [ ] G5.5: Terms of service linked before payment. Verify `terms.html` exists and is linked in the paywall modal ("By subscribing you agree to our Terms of Service"). If missing, add a one-line link. The /terms rewrite already exists in vercel.json.
+
+---
+
+## G6 — Pre-launch QA and deploy [PENDING]
+_Dependency: G3, G4, G5 complete._
+
+- [ ] G6.1: Run all 4 canonical test suites on the latest preview URL. All must pass. Record results in AUTOMATION_REPORT.md under "G6 Pre-launch".
+- [ ] G6.2: `node --check` all modified files (api/stt.js, character-stream.js, player.js, any API files touched in G1–G5). Zero syntax errors.
+- [ ] G6.3: Tag `v-dating-mvp-launch` and deploy via `deploy.bat "dating niche MVP launch"`. Confirm Vercel deployment completes (check deployment status via Vercel API, not just that the hook fired).
+- [ ] G6.4: Post-deploy smoke test on production URL: (1) open eklipses.vercel.app, (2) start Sofia/beach scenario, (3) send one message via text, (4) confirm AI response with audio, (5) confirm paywall triggers after free limit, (6) if on Chrome: confirm voice input auto-listens; if on iOS Safari (use BrowserStack or real device): confirm press-to-talk mic button appears and records.
+
+---
+
+## ⚠️ RISKY / UNCERTAIN ITEMS (flagged separately)
+
+| Item | Risk | Mitigation |
+|------|------|-----------|
+| G1.2 processQueue mismatch | Root cause unknown — could be in SSE parsing, session variable scope, or audio queue | Add session guard early, test with character switching |
+| G2.1 Supabase rows not appearing | Could be env var missing, RLS policy, or table schema mismatch | Add verbose logging first, don't assume code is wrong |
+| G3.3 MediaRecorder path in player.js | listenForUser() is complex; wrong branch activation could break Chrome too | Feature-detect strictly; gate on `!hasWebSpeech`; run full test-all-scenarios.js after change |
+| G3.5 WebKit/iOS voice test | Playwright WebKit emulation may not fully replicate iOS Safari mic permissions | Document gap; treat test:speech hook injection as functional signal; flag real-device test to PENDING-APPROVALS |
+| G4.1 Full payment funnel | Stripe webhook in Vercel serverless has cold-start timing issues | Use Stripe dashboard to verify event delivery |
+| Non-Sofia characters (G1.2) | Only Sofia is reliably tested. Others may have R2 asset 404s | Hide broken ones rather than ship broken |
+
+---
+
+## ✅ Done (from pre-MVP work)
+
+- [x] Stripe live mode configured ($14.99/month, 3 free sessions originally, now 2)
+- [x] ElevenLabs TTS primary for character voices
+- [x] Supabase rate limiting wired (count-session + ratelimit)
+- [x] Admin API for blocking/resetting users
+- [x] Ryan prefetch — pre-downloads next feedback part to reduce dead air
 - [x] Caption sync — text shows with audio not before
-- [x] Created TECHNICAL_ISSUES_LOG.md
+- [x] Playwright browser test suite (14 scenarios)
+- [x] Descriptive scenario card titles
+- [x] 5 rotating Ryan boot intros
+- [x] Ava and Bar hidden (R2 asset issues)
 
-## Current Stack
-- Live: https://eklipses.vercel.app
-- Dev: https://eklipses.vercel.app?dev=ek_dev_2026
-- TTS: ElevenLabs primary → OpenAI fallback
-- Ryan: OpenAI onyx via KokoroSpeech
-- LLM: gpt-4o-mini
-- Vercel: Pro, 30s timeout
-- Latest stable: v-stable-june6-playwright (commit 3516343)
+---
+
+## Fast reference
+
+### Test commands
+```
+node tests/test-all-scenarios.js      # 14/14 scenarios audio pipeline
+node tests/test-paywall.js            # paywall gate
+node tests/test-lesson-player.js      # lesson player
+node tests/test-new-features.js       # captions, ambient audio, certification
+```
+
+### Coach API test
+```
+node -e "fetch('https://eklipses.vercel.app/api/coach', {method:'POST',headers:{'Content-Type':'application/json','x-dev-key':'ek_dev_2026'},body:JSON.stringify({scenarioTitle:'Beach — Cold Open',scenarioKey:'beach',conversation:[{role:'user',content:'hey never saw you here'},{role:'assistant',content:'I come here to think. What about you?'},{role:'user',content:'same actually. what are you writing?'},{role:'assistant',content:'Something I probably won t finish.'},{role:'user',content:'the unfinished ones are usually the most honest'},{role:'assistant',content:'That s... actually true.'}]})}).then(r=>r.json()).then(d=>console.log('SCORE:',d.score,'PART1:',d.part1?.slice(0,150))).catch(console.error)"
+```
+
+### Deploy
+```
+deploy.bat "your message"
+```
