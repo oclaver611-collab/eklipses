@@ -62,7 +62,7 @@ _Dependency: G3 complete._
 _Goal: free user hits limit, pays via Stripe, gets immediate subscriber access._
 
 - [ ] G4.1: ⚠️ RISKY — Full funnel test. Programmatic: checkout session creates cs_test_ URL ✓. Payment completion requires browser (Stripe Checkout iframe not automatable headless). Manual test needed: exhaust 2 sessions → paywall → Subscribe → test card 4242 → verify redirect → verify-payment confirms active. Logged to PA-007.
-- [ ] G4.2: STRIPE_WEBHOOK_SECRET not available in Preview env (production-only) → webhook returns 500 on Preview. Code is correct (static analysis). Need to add STRIPE_WEBHOOK_SECRET to Preview env vars in Vercel settings (PA-007).
+- [x] G4.2: STRIPE_WEBHOOK_SECRET added to Preview env via Vercel API (PATCH env var gLGIFs4RVf4KwjDF target → production+preview). New Preview deployment required to pick up env var — triggered by this commit. Webhook should no longer return 500 on Preview.
 - [ ] G4.3: Verify cancel subscription flow. Requires manual test.
 - [x] G4.4: origin detection PASS (static analysis) — `req.headers.origin || req.headers.referer || 'https://eklipses.vercel.app'` → success_url and cancel_url resolve to Preview URL when called from Preview.
 

@@ -143,11 +143,22 @@ This is a test-hygiene fix, not a feature regression. The lesson player itself s
 
 ---
 
+## G4 Payment — STRIPE_WEBHOOK_SECRET fix — 2026-08-27
+
+| Item | Result | Notes |
+|---|---|---|
+| G4.2 STRIPE_WEBHOOK_SECRET to Preview | **DONE** | Vercel env var `gLGIFs4RVf4KwjDF` PATCH: target changed from `[production]` to `[production,preview]`. No value change needed — Vercel copies same encrypted value. This commit triggers a new Preview build. |
+
+After new build: `GET /api/webhook` on Preview should no longer return 500 "Webhook secret not configured".
+
+---
+
 ## Pending / not yet run
 
 | Group | Status | Blocker |
 |---|---|---|
 | G1.2 processQueue mismatch fix | Deferred | Requires live session debugging; static analysis inconclusive |
 | G2.3 localStorage persistence | Pending | |
-| G4.1-G4.4 Payment funnel | Not started | Need Stripe test mode Playwright automation |
+| G4.1 Full payment funnel | Pending | Stripe Checkout iframe not automatable headless — manual browser test needed (PA-007) |
+| G4.3 Cancel subscription | Pending | Manual test needed |
 | G6.1-G6.4 Pre-launch QA | Not started | Depends on all groups |
