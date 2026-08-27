@@ -1,0 +1,8 @@
+file 'D:\BUSINESS\executables\love\eklipses\EK7\scripts\heygen-output\sofia_chunks\chunk_00_clean.mp4'
+file 'D:\BUSINESS\executables\love\eklipses\EK7\scripts\heygen-output\sofia_chunks\chunk_01_clean.mp4'
+file 'D:\BUSINESS\executables\love\eklipses\EK7\scripts\heygen-output\sofia_chunks\chunk_02_clean.mp4'
+file 'D:\BUSINESS\executables\love\eklipses\EK7\scripts\heygen-output\sofia_chunks\chunk_03_clean.mp4'
+file 'D:\BUSINESS\executables\love\eklipses\EK7\scripts\heygen-output\sofia_chunks\chunk_04_clean.mp4'
+file 'D:\BUSINESS\executables\love\eklipses\EK7\scripts\heygen-output\sofia_chunks\chunk_05_clean.mp4'
+file 'D:\BUSINESS\executables\love\eklipses\EK7\scripts\heygen-output\sofia_chunks\chunk_06_clean.mp4'
+file 'D:\BUSINESS\executables\love\eklipses\EK7\scripts\heygen-output\sofia_chunks\chunk_07_clean.mp4'
