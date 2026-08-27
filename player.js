@@ -590,7 +590,8 @@ const DailyLimit = (() => {
           </button>
         </div>
       </div>
-      <div style="color:#555;font-size:12px;margin-bottom:20px">No contract · Cancel anytime</div>
+      <div style="color:#555;font-size:12px;margin-bottom:8px">No contract · Cancel anytime</div>
+      <div style="color:#444;font-size:11px;margin-bottom:12px">By subscribing you agree to our <a href="/terms" style="color:#6b7685;text-decoration:underline" target="_blank">Terms of Service</a></div>
       <div style="color:#666;font-size:13px;cursor:pointer;text-decoration:underline"
            onclick="document.getElementById('ek-paywall').remove()">
         Come back tomorrow
@@ -1812,8 +1813,118 @@ function showListening(on=true) {
   }
 }
 
-/* ===== listenForUser — Chrome Web Speech API or type input ===== */
-// Dynamic silence detection:
+// Returns true only in Chrome/Edge/Android Chrome where the free Web Speech API works.
+// iOS Safari, Firefox, and most other browsers return false → Whisper path is used instead.
+function hasSpeechRecognition() {
+  return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+}
+
+/* ===== Whisper STT — for iOS Safari and browsers without Web Speech API ===== */
+// Records audio via MediaRecorder (works in iOS Safari 14.5+), sends blob to /api/stt,
+// resolves with the transcript string — same shape as the Web Speech API path output.
+// UI: press-and-hold "Hold to speak" button. Auto-stops after 30s.
+function listenForUserWhisper(mySession, maxTotalMs) {
+  return new Promise(resolve => {
+    const MAX_RECORD_MS = Math.min(maxTotalMs || 30000, 30000);
+    let resolved = false;
+    let mediaRecorder = null;
+    let chunks = [];
+    let autoStopTimer = null;
+    let holdBtn = null;
+    let sessionPoll = null;
+
+    function done(transcript) {
+      if (resolved) return;
+      resolved = true;
+      if (sessionPoll) { clearInterval(sessionPoll); sessionPoll = null; }
+      if (autoStopTimer) { clearTimeout(autoStopTimer); autoStopTimer = null; }
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        try { mediaRecorder.stop(); } catch {}
+      }
+      if (holdBtn) { holdBtn.remove(); holdBtn = null; }
+      showListening(false);
+      resolve(correctSTT(transcript || '') || null);
+    }
+
+    async function sendAudio(blob) {
+      const form = new FormData();
+      const ext = blob.type.includes('mp4') ? 'mp4' : blob.type.includes('ogg') ? 'ogg' : 'webm';
+      form.append('audio', blob, `speech.${ext}`);
+      if (holdBtn) { holdBtn.textContent = '⏳'; holdBtn.disabled = true; }
+      try {
+        const r = await fetch('/api/stt', { method: 'POST', body: form });
+        if (!r.ok) { console.warn('[Whisper] STT error', r.status); done(null); return; }
+        const data = await r.json();
+        done(data.transcript || null);
+      } catch (e) {
+        console.warn('[Whisper] fetch error:', e.message);
+        done(null);
+      }
+    }
+
+    async function startRecording() {
+      if (resolved || (mediaRecorder && mediaRecorder.state === 'recording')) return;
+      chunks = [];
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus'
+                       : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm'
+                       : MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4'
+                       : 'audio/ogg';
+        mediaRecorder = new MediaRecorder(stream, { mimeType });
+        mediaRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
+        mediaRecorder.onstop = () => {
+          stream.getTracks().forEach(t => t.stop());
+          if (!resolved && chunks.length > 0) {
+            sendAudio(new Blob(chunks, { type: mimeType }));
+          } else if (!resolved) {
+            done(null);
+          }
+        };
+        mediaRecorder.start();
+        showListening(true);
+        if (holdBtn) { holdBtn.textContent = '🔴 Release to send'; holdBtn.setAttribute('data-stt-mode', 'whisper-recording'); }
+        autoStopTimer = setTimeout(() => {
+          if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop();
+        }, MAX_RECORD_MS);
+      } catch (e) {
+        // Mic permission denied or MediaRecorder not supported — resolve null so caller falls through
+        console.warn('[Whisper] getUserMedia error:', e.name, e.message);
+        done(null);
+      }
+    }
+
+    function stopRecording() {
+      if (autoStopTimer) { clearTimeout(autoStopTimer); autoStopTimer = null; }
+      if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop();
+    }
+
+    // Session guard (matches the pattern in listenForUserType)
+    sessionPoll = setInterval(() => {
+      if (resolved || mySession !== session) { clearInterval(sessionPoll); sessionPoll = null; if (!resolved) done(null); }
+    }, 300);
+
+    // Build the press-and-hold button
+    holdBtn = document.createElement('button');
+    holdBtn.id = 'whisper-hold-btn';
+    holdBtn.setAttribute('data-stt-mode', 'whisper');
+    holdBtn.textContent = '🎙 Hold to speak';
+    holdBtn.style.cssText = 'position:fixed;bottom:120px;left:50%;transform:translateX(-50%);' +
+      'background:#ffb300;color:#000;border:none;border-radius:999px;' +
+      'padding:14px 32px;font-size:16px;font-weight:700;cursor:pointer;' +
+      'z-index:10000;touch-action:none;box-shadow:0 4px 20px rgba(255,179,0,.4);' +
+      'user-select:none;-webkit-user-select:none;';
+
+    holdBtn.addEventListener('pointerdown', e => { e.preventDefault(); startRecording(); });
+    holdBtn.addEventListener('pointerup',   e => { e.preventDefault(); stopRecording(); });
+    holdBtn.addEventListener('pointercancel', e => { e.preventDefault(); stopRecording(); });
+
+    document.body.appendChild(holdBtn);
+  });
+}
+
+/* ===== listenForUser — Chrome Web Speech API, Whisper (iOS), or type input ===== */
+// Dynamic silence detection (Web Speech path):
 //   SILENCE_SHORT = 900ms  — fires when last word ends with . ! ? or common sentence-enders
 //   SILENCE_LONG  = 1800ms — fires otherwise (mid-thought, comma pause, etc.)
 function listenForUser(mySession, maxTotalMs) {
@@ -1828,6 +1939,8 @@ function listenForUser(mySession, maxTotalMs) {
     });
   }
   if (typeof window !== 'undefined' && window._testMode) return Promise.resolve(null);
+  // iOS Safari, Firefox, and other browsers lack Web Speech API — use Whisper via MediaRecorder instead.
+  if (!hasSpeechRecognition()) return listenForUserWhisper(mySession, maxTotalMs);
   return new Promise(resolve=>{
     maxTotalMs=maxTotalMs||30000;
     let accumulated='', interim='', silenceTimer=null, hardTimer=null, currentRec=null;

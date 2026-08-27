@@ -306,7 +306,18 @@
     const disBtn = document.getElementById('ek-banner-dismiss');
     if (goL1)   goL1.onclick  = () => switchTab('learn');
     if (disBtn) disBtn.onclick = () => { sessionStorage.setItem('ek-lesson-banner-dismissed','1'); if (banner) banner.style.display='none'; };
-    switchTab('learn');
+    // Dating MVP: default to PRACTICE tab. LEARN tab is accessible via ?lessons=1 or by clicking the tab.
+    const showLessons = new URLSearchParams(window.location.search).has('lessons');
+    if (showLessons) {
+      switchTab('learn');
+    } else {
+      // Hide the LEARN tab button for the dating-niche entry point; show it via ?lessons=1 or
+      // if the user has previously started a lesson (respects their existing progress).
+      const hasLessonProgress = ['eklipses_lesson1_progress','eklipses_lesson2_progress',
+        'eklipses_lesson1_complete','eklipses_lesson2_complete'].some(k => localStorage.getItem(k));
+      if (btnLearn) btnLearn.style.display = hasLessonProgress ? '' : 'none';
+      switchTab('practice');
+    }
   }
 
   // ── Learn tab rendering ───────────────────────────────────────────
