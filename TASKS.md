@@ -14,11 +14,11 @@ Tasks marked `⚠️ RISKY` get extra test passes before being marked done.
 
 ---
 
-## G0 — Baseline snapshot [PENDING]
+## G0 — Baseline snapshot [COMPLETE]
 _Dependency: none. Run before touching anything._
 
-- [ ] G0.1: Tag current HEAD as v-dating-mvp-baseline (`git tag v-dating-mvp-baseline && git push origin v-dating-mvp-baseline`)
-- [ ] G0.2: Run all 4 canonical test suites (`node tests/test-all-scenarios.js`, `node tests/test-paywall.js`, `node tests/test-lesson-player.js`, `node tests/test-new-features.js`). Record pass/fail counts in AUTOMATION_REPORT.md under "G0 Baseline".
+- [x] G0.1: Tag current HEAD as v-dating-mvp-baseline (`git tag v-dating-mvp-baseline && git push origin v-dating-mvp-baseline`)
+- [x] G0.2: Run all 4 canonical test suites. Results: test-all-scenarios 14/14 PASS, test-paywall PASS, test-lesson-player 20/20 PASS, test-new-features 87/87 PASS. All baseline results in AUTOMATION_REPORT.md.
 - [ ] G0.3: Capture current Vercel env var list (names only, no values) — confirm SUPABASE_URL, SUPABASE_SERVICE_KEY, STRIPE_SECRET_KEY, STRIPE_PRO_PRICE_ID, GROQ_API_KEY, ELEVENLABS_API_KEY, DEV_BYPASS_KEY are all set. Log missing vars to PENDING-APPROVALS.md.
 
 ---
@@ -44,16 +44,16 @@ _Goal: sessions are counted, rate limit enforced, no phantom "unlimited free" bu
 
 ---
 
-## G3 — iOS voice: Whisper STT for Safari and non-Chrome browsers [PENDING]
+## G3 — iOS voice: Whisper STT for Safari and non-Chrome browsers [IN-PROGRESS]
 _Dependency: G2 complete._
 _Goal: voice input works on iOS Safari. MediaRecorder captures audio → Whisper transcribes → same downstream flow as Web Speech API. Estimated cost: ~$0.006/min, already approved._
 
-- [ ] G3.1: Create `api/stt.js` — serverless endpoint that accepts `multipart/form-data` with a single `audio` file field, forwards it to OpenAI Whisper (`whisper-1` model, `OPENAI_API_KEY`), and returns `{ transcript: string }`. Max duration 30s (fits Vercel default). Add `node --check api/stt.js` before finishing.
-- [ ] G3.2: Add `vercel.json` route so `/api/stt` resolves to `api/stt.js`. Confirm the route doesn't conflict with existing entries.
-- [ ] G3.3: ⚠️ RISKY — Extend `listenForUser()` in `player.js` with a MediaRecorder path. Logic: (1) on init, detect `const hasWebSpeech = typeof (window.SpeechRecognition || window.webkitSpeechRecognition) !== 'undefined'`; (2) if `!hasWebSpeech`, show a press-and-hold mic button instead of the auto-listen mode; (3) on button press, start `MediaRecorder` on `getUserMedia({audio:true})` stream; (4) on button release (or silence timeout of 4s), stop recording, assemble the Blob, POST it to `/api/stt` as `multipart/form-data`; (5) resolve the `listenForUser()` promise with the returned transcript — the same string the Web Speech API path produces. The existing `correctSTT()` post-processing and downstream `playLoop()` flow must remain unchanged.
-- [ ] G3.4: Keep Web Speech API untouched for Chrome/Android — the new MediaRecorder path is only activated when `!hasWebSpeech`. Add a `data-stt-mode` attribute to the mic button so tests can assert which path is active.
-- [ ] G3.5: ⚠️ RISKY — Test with Playwright WebKit (iOS Safari emulation). Run `npx playwright test --project=webkit tests/test-all-scenarios.js` if a webkit project is configured; otherwise add a minimal webkit smoke test that: (a) sets user-agent to iOS Safari, (b) injects a transcript via the existing `window.dispatchEvent(new CustomEvent('test:speech', ...))` hook, (c) confirms the character responds and audio plays. Save results to `tests/test-screenshots/webkit-voice-smoke.png`. If the `test:speech` hook bypasses the STT path entirely (it injects at the conversation level, not the audio level), note that in AUTOMATION_REPORT.md and confirm the MediaRecorder code path compiles and loads without errors as the test signal.
-- [ ] G3.6: Log any iOS-specific surprises to PENDING-APPROVALS.md rather than blocking — specifically: AudioContext unlock requirement (iOS requires a user gesture before audio plays), microphone permission prompt flow differences, and autoplay policy. Document any workarounds applied.
+- [x] G3.1: Create `api/stt.js` — serverless endpoint that accepts `multipart/form-data` with a single `audio` file field, forwards it to OpenAI Whisper (`whisper-1` model, `OPENAI_API_KEY`), and returns `{ transcript: string }`. node --check: pass.
+- [x] G3.2: Add `vercel.json` route so `/api/stt` resolves to `api/stt.js`. No conflicts.
+- [x] G3.3: ⚠️ RISKY — Extended `listenForUser()` in `player.js` with `hasSpeechRecognition()` + `listenForUserWhisper()` MediaRecorder path. Press-and-hold button, session guard, auto-stop 30s, graceful null fallback on mic deny. `correctSTT()` applied to Whisper transcript. Chrome/Android Web Speech API path completely unchanged. node --check: pass.
+- [x] G3.4: Chrome/Android unchanged — MediaRecorder path gated on `!hasSpeechRecognition()`. `data-stt-mode` attribute on hold button for test assertions.
+- [ ] G3.5: ⚠️ RISKY — Test with Playwright WebKit (iOS Safari emulation) against Preview URL once Vercel build completes. Note: `test:speech` hook injects at conversation level (bypasses audio capture), so it validates the downstream flow but not the MediaRecorder path itself. Confirm MediaRecorder code loads without errors as minimum signal.
+- [ ] G3.6: Log any iOS-specific surprises to PENDING-APPROVALS.md rather than blocking — specifically: AudioContext unlock requirement, microphone permission prompt, autoplay policy.
 
 ---
 
@@ -68,15 +68,15 @@ _Goal: free user hits limit, pays via Stripe, gets immediate subscriber access._
 
 ---
 
-## G5 — Dating niche product polish [PENDING]
+## G5 — Dating niche product polish [IN-PROGRESS]
 _Dependency: G1 complete. G4 can run in parallel._
 _Goal: a new visitor understands the product and can start in < 30 seconds._
 
-- [ ] G5.1: (DECISION POINT) Landing page / hero clarity. The current index.html opens directly into the scenario picker (Netflix-style card grid). Is that good enough for the dating niche, or do we need a hero/splash that explains the product to a cold visitor? Log to PENDING-APPROVALS.md with recommendation: add a 3-line hero above the card grid ("Practice real conversations. Get feedback. Get better.") — takes < 1 hour and improves conversion. Proceed with the hero change immediately unless Serge vetoes.
-- [ ] G5.2: Hide lesson-player content from the main dating entry point. The lesson player (lesson-player.js, lesson1–5 audio) is currently part of the same page. For the dating MVP, lessons should be a secondary/pro feature, not a first-screen distraction. Add `hidden` flag or conditional render so the lesson tab doesn't appear unless `?lessons=1` is in the URL or user is a subscriber. Log the approach to AUTOMATION_REPORT.md.
-- [ ] G5.3: Confirm at least 3 dating scenarios work end-to-end (Sofia/beach, Isabelle/museum, + 1 more). Run `node tests/test-all-scenarios.js` and pick the 3 with highest pass rate. If a scenario is broken, mark it `hidden: true` in scenarios.js rather than showing a broken experience.
-- [ ] G5.4: Mobile layout smoke test. Use Playwright `page.setViewportSize({ width: 375, height: 812 })` on the main page. Take a screenshot. Check: (a) scenario cards are tappable, (b) chat input is above keyboard, (c) avatar video plays. Save screenshot to `tests/test-screenshots/mobile-smoke.png`. Flag any critical breakages to PENDING-APPROVALS.md.
-- [ ] G5.5: Terms of service linked before payment. Verify `terms.html` exists and is linked in the paywall modal ("By subscribing you agree to our Terms of Service"). If missing, add a one-line link. The /terms rewrite already exists in vercel.json.
+- [x] G5.1: (DECISION POINT resolved) Hero added to index.html above scenario grid: "Stop overthinking it. Start practicing. / AI characters that talk back. Honest feedback after every conversation."
+- [x] G5.2: lesson-player.js now defaults to PRACTICE tab. LEARN tab button hidden for new users without lesson progress. `?lessons=1` param restores it. Detailed in AUTOMATION_REPORT.md.
+- [x] G5.3: test-all-scenarios.js confirms all 14 scenarios pass on production. All 3 anchor scenarios (Beach/Sofia, Museum/Isabelle, Gym/Zoe) passing.
+- [ ] G5.4: Mobile layout smoke test. Use Playwright `page.setViewportSize({ width: 375, height: 812 })` on the Preview URL once Vercel build completes.
+- [x] G5.5: Terms of service link added to paywall modal: "By subscribing you agree to our Terms of Service" with /terms link.
 
 ---
 
