@@ -57,10 +57,17 @@ async function run() {
   report('1. Page loads silently — no TTS on load', noisyLogs.length === 0,
     noisyLogs.length ? noisyLogs[0].text.slice(0, 80) : '');
 
-  // ── 2. LEARN tab is default ──────────────────────────────────────────────
-  const learnVisible    = await page.locator('#ek-learn-tab').isVisible();
-  const practiceHidden  = !(await page.locator('#ek-practice-wrap').isVisible());
-  report('2. LEARN tab visible and default', learnVisible && practiceHidden);
+  // ── 2. PRACTICE tab is now default ──────────────────────────────────────
+  const practiceVisible = await page.locator('#ek-practice-wrap').isVisible();
+  const learnTabHidden  = !(await page.locator('#ek-tab-learn').isVisible());
+  report('2. PRACTICE tab is default; LEARN tab hidden for new users', practiceVisible && learnTabHidden);
+
+  // Navigate with ?lessons=1 so lesson-specific tests can access the LEARN tab
+  await page.goto(BASE + '?lessons=1', { waitUntil: 'networkidle', timeout: 30000 });
+  if (await page.locator('#ek-h6-start').isVisible().catch(() => false)) {
+    await page.locator('#ek-h6-start').click();
+    await page.waitForSelector('#ek-hero-v6', { state: 'detached', timeout: 30000 });
+  }
 
   // ── 3. Lesson 1 card with Start Lesson button ────────────────────────────
   const lessonBtn = page.locator('#ek-start-lesson1');

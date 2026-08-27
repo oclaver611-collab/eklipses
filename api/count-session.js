@@ -32,12 +32,13 @@ module.exports = async function handler(req, res) {
     console.log('[count-session] result:', JSON.stringify(data));
 
     if (!data) {
-      await supabase.from('user_sessions').insert({
+      const { data: insertData, error: insertErr } = await supabase.from('user_sessions').insert({
         email,
         sessions_used: 1,
         sessions_limit: FREE_SESSION_LIMIT,
         blocked: false,
       });
+      console.log('[count-session] insert result:', JSON.stringify({ data: insertData, error: insertErr }));
       return res.status(200).json({
         allowed: true,
         sessionsUsed: 1,
@@ -56,10 +57,11 @@ module.exports = async function handler(req, res) {
     }
 
     const newCount = data.sessions_used + 1;
-    await supabase
+    const { data: updateData, error: updateErr } = await supabase
       .from('user_sessions')
       .update({ sessions_used: newCount, updated_at: new Date().toISOString() })
       .eq('email', email);
+    console.log('[count-session] update result:', JSON.stringify({ data: updateData, error: updateErr }));
 
     return res.status(200).json({
       allowed: newCount < FREE_SESSION_LIMIT,

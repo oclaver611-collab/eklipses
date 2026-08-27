@@ -57,17 +57,10 @@ Fill in the `[ ]` that applies, or write your own answer in the blank.
 
 ---
 
-### PA-005 — Paywall price mismatch (found during dating-mvp-build run, 2026-08-27)
-**Problem:** The paywall modal in `player.js` shows **Pro $19.99/month (60 sessions)** and **Elite $39.99/month (200 sessions)**. But memory says Stripe is configured for **$14.99/month** with unlimited practice. These don't match — either the UI is stale or the Stripe config changed.
+### PA-005 — Paywall price mismatch ✅ RESOLVED (2026-08-27)
+**Finding:** Both `STRIPE_PRO_PRICE_ID` (`price_1TlwfIFSGWeDPq8xtbRCZA0s`) and `STRIPE_ELITE_PRICE_ID` (`price_1TlwjLFSGWeDPq8xbSp4Begn`) return "No such price" when queried with the test-mode key in `.env.local` — this is expected because the prices were created in **live mode** and test keys cannot see live-mode resources.
 
-**Risk:** Real users see the wrong price before checkout. Stripe charges whatever the price ID says, not what the overlay shows.
-
-**Options:**
-- [ ] A) Update the UI to match the live Stripe price ($14.99, unlimited). Remove the Elite tier from the paywall if it's not configured in Stripe.
-- [ ] B) Keep two tiers — update Stripe to have both Pro ($19.99) and Elite ($39.99) price IDs before launch.
-- [ ] C) Something else: _____________
-
-**To answer:** check `STRIPE_PRO_PRICE_ID` and `STRIPE_ELITE_PRICE_ID` in Vercel env and compare to what the price IDs charge on the Stripe dashboard.
+**Conclusion:** The $14.99 figure was from an old TASKS.md note (pre-dated the price update). The user confirmed via a live checkout test that Stripe is already at **$19.99 / $39.99**, matching the UI exactly. No code change needed. UI and Stripe config are in sync.
 
 ---
 
