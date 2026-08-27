@@ -68,7 +68,7 @@ Fill in the `[ ]` that applies, or write your own answer in the blank.
 
 **Verified programmatically:**
 1. `POST /api/create-checkout` creates a valid `cs_test_` Stripe Checkout URL on Preview ✓ (test-mode key active)
-2. `STRIPE_WEBHOOK_SECRET` is in Vercel env but **Production-only** — Preview returns 500 "Webhook secret not configured" on all webhook calls. Before launch: configure STRIPE_WEBHOOK_SECRET for Preview environment too, or accept that webhook testing only happens on production.
+2. `STRIPE_WEBHOOK_SECRET` — **FIXED 2026-08-27**: Vercel env var patched to include `preview` target via REST API. New Preview build `eklipses-2ojlcy7y6-oclaver611-collabs-projects.vercel.app` confirmed: webhook now returns 400 (bad signature) not 500 (no secret) ✓
 3. All required env vars present in Vercel: STRIPE_PRO_PRICE_ID, STRIPE_ELITE_PRICE_ID, STRIPE_PRO_PRICE_ID_TEST, STRIPE_ELITE_PRICE_ID_TEST, STRIPE_SECRET_KEY (prod+preview), STRIPE_WEBHOOK_SECRET (prod only), SUPABASE_URL/SERVICE_KEY/ANON_KEY, GROQ_API_KEY, ELEVENLABS_API_KEY, OPENAI_API_KEY, DEV_BYPASS_KEY ✓
 
 **Requires manual browser verification (Stripe Checkout iframe — not automatable headless):**
@@ -80,7 +80,7 @@ Fill in the `[ ]` that applies, or write your own answer in the blank.
 - When called from Preview URL, origin header is set to Preview URL → success_url and cancel_url correctly point to Preview
 - No code change needed
 
-**Action needed before launch:** Set `STRIPE_WEBHOOK_SECRET` in Vercel for Preview environment (Vercel project settings → Environment Variables → add Preview target for the existing secret).
+**Action needed before launch:** ~~Set `STRIPE_WEBHOOK_SECRET` in Vercel for Preview~~ ✅ DONE — see item 2 above.
 
 ---
 
