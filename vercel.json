@@ -11,6 +11,7 @@
     { "source": "/admin", "destination": "/api/admin" },
     { "source": "/admin/", "destination": "/api/admin" },
     { "source": "/terms", "destination": "/terms.html" },
-    { "source": "/terms/", "destination": "/terms.html" }
+    { "source": "/terms/", "destination": "/terms.html" },
+    { "source": "/api/stt", "destination": "/api/stt" }
   ]
 }

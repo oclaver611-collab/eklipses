@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	
-	
-	
-	
+	<!-- Polyfill navigator.storage for older Safari/WebKit — must run before PostHog and Supabase -->
+	<script>if(typeof navigator!="undefined"&&(!navigator.storage||typeof navigator.storage.persisted!="function")){var _s=navigator.storage||{};if(typeof _s.persisted!="function")_s.persisted=function(){return Promise.resolve(false)};if(typeof _s.persist!="function")_s.persist=function(){return Promise.resolve(false)};if(typeof _s.estimate!="function")_s.estimate=function(){return Promise.resolve({quota:0,usage:0})};try{Object.defineProperty(navigator,"storage",{value:_s,configurable:true,writable:true})}catch(e){try{navigator.storage=_s}catch(e2){}}}</script>
+
 	<script>
     !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="Mi Ri init Vi Gi Rr Wi Ji Bi capture calculateEventProperties tn register register_once register_for_session unregister unregister_for_session an getFeatureFlag getFeatureFlagPayload getFeatureFlagResult isFeatureEnabled reloadFeatureFlags updateFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync un identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset setIdentity clearIdentity get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException addExceptionStep captureLog startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty nn Xi createPersonProfile setInternalOrTestUser sn Hi cn opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Ki debug Lr rn getPageViewId captureTraceFeedback captureTraceMetric Di".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
     posthog.init('phc_rRbQmeiNiijJw4XBY6RmVNFSxpiAPejiz6z9kJRgiE6u', {
@@ -316,6 +315,18 @@
 
   <!-- PRACTICE tab content -->
   <div id="ek-practice-wrap" style="display:none;">
+  <!-- Dating MVP hero — shown to first-time visitors only (hidden once they've started) -->
+  <div id="ek-hero" style="text-align:center;padding:36px 24px 20px;max-width:600px;margin:0 auto">
+    <div style="font-size:26px;font-weight:800;color:#e9ecf1;letter-spacing:-0.5px;line-height:1.25">
+      Stop overthinking it.<br>Start practicing.
+    </div>
+    <div style="font-size:15px;color:#8a93a8;margin-top:10px;line-height:1.6">
+      AI characters that talk back. Honest feedback after every conversation.
+    </div>
+    <div style="font-size:13px;color:#ffb300;margin-top:8px;font-weight:600">
+      ↓ Pick a scenario and go
+    </div>
+  </div>
   <!-- Warning banner -->
   <div id="ek-practice-banner">
     <span class="ek-banner-text">Recommended: Complete Lesson 1 before your first practice session — you'll perform significantly better.</span>
@@ -432,11 +443,17 @@
       }
       try {
         const token = await window.EkAuth?.getToken?.();
+        if (!token) {
+          document.getElementById('ek-cancel-body').innerHTML =
+            '<p style="color:#aaa;font-size:14px;margin-bottom:16px">To cancel, email us at <a href="mailto:support@eklipses.com?subject=Cancel+subscription&body=Please+cancel+my+subscription.+My+account+email+is%3A+" style="color:#6b9fff">support@eklipses.com</a> with "Cancel subscription" in the subject line. We\'ll process it within 24 hours.</p>' +
+            '<button onclick="document.getElementById(\'ek-cancel-modal\').style.display=\'none\'" style="padding:8px 24px;background:#333;color:#fff;border:none;border-radius:6px;cursor:pointer">Close</button>';
+          return;
+        }
         const res = await fetch('/api/cancel-subscription', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(token ? { 'Authorization': 'Bearer ' + token } : {}),
+            'Authorization': 'Bearer ' + token,
           },
           body: JSON.stringify({ customerId }),
         });
