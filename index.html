@@ -443,11 +443,17 @@
       }
       try {
         const token = await window.EkAuth?.getToken?.();
+        if (!token) {
+          document.getElementById('ek-cancel-body').innerHTML =
+            '<p style="color:#aaa;font-size:14px;margin-bottom:16px">To cancel, email us at <a href="mailto:support@eklipses.com?subject=Cancel+subscription&body=Please+cancel+my+subscription.+My+account+email+is%3A+" style="color:#6b9fff">support@eklipses.com</a> with "Cancel subscription" in the subject line. We\'ll process it within 24 hours.</p>' +
+            '<button onclick="document.getElementById(\'ek-cancel-modal\').style.display=\'none\'" style="padding:8px 24px;background:#333;color:#fff;border:none;border-radius:6px;cursor:pointer">Close</button>';
+          return;
+        }
         const res = await fetch('/api/cancel-subscription', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(token ? { 'Authorization': 'Bearer ' + token } : {}),
+            'Authorization': 'Bearer ' + token,
           },
           body: JSON.stringify({ customerId }),
         });
