@@ -1,0 +1,64 @@
+=== Eklipses Marketing Demo — AI vs Sofia ===
+Date: 2026-08-28T22:55:56.775Z
+URL: https://eklipses.com
+TTS: Fish Audio (real production voices, no stubs)
+
+[T1] USER: Your notebook looks like it's documenting the beach's slow vanishing act. What first tipped you off that the sand was receding?
+
+[T2] SOFIA: Well, it’s like a mystery novel here but with less suspense. The erosion markers along the shore tell a pretty clear story. And I've been coming to this beach for years, so I noticed when my favorite towel spot started overlapping with the waves. It's all shifting.
+[T2] USER: When the tide started reaching the old pier’s footings, I knew the sand was slipping away. Did you notice any particular spots where the change was most dramatic?
+
+[T3] SOFIA: Definitely. There’s a small cove where the dunes used to rise like little castles, and now it’s just... sad. It used to be my escape. Now it’s like it’s been on a slow diet. I imagine it wondering why it lost all that weight. Have you found any spots that hit you harder?
+[T3] USER: That cove used to be my go‑to for sunrise sketches; the loss feels like the whole horizon is shrinking. Have you ever tried to photograph the dune line before it vanished?
+
+[T4] SOFIA: I haven’t, but I can imagine the photos would be hauntingly beautiful. The light changes so dramatically here; it’s like capturing a fading memory. I’d probably end up with more blurred shots than anything else. I think that’s part of the erasure process, isn’t it? You can try to document it, but ultimately, it keeps moving on. Do your sketches hold up against that?
+[T4] USER: My sketches get fuzzier the more the sand disappears, but I try to capture the edge before it slips. Maybe we could grab a coffee and walk the remaining dunes to see what’s left?
+
+[T5] SOFIA: That sounds like a plan. We could document our own little version of the shoreline’s farewell tour. But just to be clear, you might need to call it a “last-minute field trip” rather than a coffee date. Not sure if that turns into an art critique I’m ready for.
+[T5] USER: Coffee and a dune walk sounds good. I’ll bring a notebook and we can see what the tide left behind.
+
+[T6] SOFIA: Perfect. I’ll be the one with the inevitable sand in my shoes and a curious look. Just promise me you won't critique my choice of coffee — I can be a bit picky about it. Who knows what treasures we might uncover?
+[T6] USER: Deal, I’ll leave the coffee critique to the tide. Let’s see what the dunes have saved for us.
+
+[T7] SOFIA: Looking forward to it. The dunes are always full of surprises, even if they’re just the echoes of what used to be. I’ll see you then, ready for whatever the tide has to offer. Just keep an eye on those sketch pads — they might want to float away!
+[T7] USER: I’ll bring a spare bag for any stray shells we might find. The tide always leaves little surprises behind.
+
+[T8] SOFIA: A spare bag for shells? Now that’s an ambitious endeavor. We might end up with a mini museum exhibit by the end of our walk. Just don’t blame me if I take forever to choose the “perfect” one to take home. The tide has an eye for beauty, you know.
+[T8] USER: Sounds like a good plan, I’ll bring a camera in case any of those shells tell a story.
+
+[T9] SOFIA: Now we’re talking. A camera, a notebook, and an eye for stories. Sounds like a perfect recipe for an afternoon of wondering if we’re capturing memories or just fragments of sand. Let’s see what those shells have to say. Maybe they’ll spill the secrets of the shoreline.
+[T9] USER: If a shell does whisper, I’ll make sure we both hear it. We’ll see if the tide’s secrets are louder than our own chatter.
+
+[T10] SOFIA: I like that idea; we’ll let the shells set the agenda. They might have some interesting tales to tell while we stand there, becoming beach philosophers. Just don’t be too surprised if I get distracted by the waves — they have a way of pulling focus.
+[T10] USER: How about we meet at the little café by the dunes tomorrow at nine?
+
+[T11] SOFIA: Nine it is. Just make sure they have something decent for my coffee standards, or I might be taking up shell whispering instead. I’ll try to be on time, but you know how the tide can influence plans. See you then!
+[T11] USER: Sounds good, the café at nine works for me. Could you text me the details?
+
+[T12] SOFIA: Texting? You’re moving fast! We haven’t even exchanged names yet. Let's get that sorted out first. I promise my handwriting is more legible than my thoughts right now.
+[T12] USER: Sure, just need your number first.
+
+[T13] SOFIA: You’ve known me for, what, a whole conversation? That's not quite enough for my number. Let’s see how our shell-finding adventure goes first. Then we can talk about phones.
+[T13] USER: That's really interesting.
+
+[T14] SOFIA: Interesting, huh? That's the kind of compliment you reserve for an art exhibit, not a beach conversation. I’ll take it, though. It suggests you’re actually paying attention, which is refreshing.
+[T14] USER: Here’s my number: 555‑0198; text me the details and I’ll confirm.
+
+[T15] SOFIA: Clever move, but that’s not how this works. You still haven’t asked my name. Let’s start there, and then we can talk numbers. It’s only fair, don’t you think?
+[T15] USER: That's really interesting.
+
+[T16] SOFIA: You’re really leaning into that word, aren’t you? I might need to add "interesting" to the list of things I collect — right next to shells and tide charts. What’s your real opinion then?
+[T16] USER: Got it, here’s mine: 555‑0123. I’ll text the café address and lock in nine.
+
+[T17] SOFIA: You’re persistent, I’ll give you that. But you didn’t quite catch my point. I still need to know who I’m texting. Let’s break the ice a bit. What’s your name?
+[T17] USER: Alex, by the way—nice to finally put a name to the voice.
+
+[T18] SOFIA: Alex. Well, that’s easy to remember. If we were to swap nicknames, I’d ask you to call me "The Beach Whisperer." It has a nice ring to it. But for now, let’s focus on you. What’s your story, aside from pursuing numbers?
+[T18] USER: Alex, finally—nice to have a name that fits the tide. How's the sand loss story shaping up?
+
+[T19] SOFIA: I appreciate the ocean-themed compliment, but I'll keep my sand loss story in the gritty realm, thank you. It's not exactly light reading, but it has depth—in both the data and my own nostalgia. The beach used to be wider, more generous with space. Makes you wonder what other changes we've overlooked, doesn’t it?
+[T19] USER: If the sand can tell a story, I’m curious whether the café can keep a coffee warm long enough for us to hear it.
+
+=== SESSION END ===
+Duration: 8.3 minutes
+Turns: 19

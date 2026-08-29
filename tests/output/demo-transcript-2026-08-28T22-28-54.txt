@@ -1,0 +1,58 @@
+=== Eklipses Marketing Demo — AI vs Sofia ===
+Date: 2026-08-28T22:29:55.378Z
+URL: https://eklipses.vercel.app
+TTS: Fish Audio (real production voices, no stubs)
+
+[T1] USER: That notebook looks like it’s tracking more than just words—what’s the biggest change you’ve seen on this beach?
+
+[T2] SOFIA: It's tracking a lot of grief, actually. But if we're talking about the beach, the biggest change? The sand has retreated almost eight meters in twenty years. It was a nice stretch for sunbathing, now it’s more of an obstacle course to the water. What about you? You a regular here?
+[T2] USER: Usually I show up at sunrise, when the receded sand still reveals the old dune line. Do you ever find any surprising critters in those exposed patches?
+
+[T3] SOFIA: Sunrise? That's bold. I mean, I'm more of a late-afternoon thinker. As for critters, it's amazing what pops up—crabs haunting the tide pools, ghostly jellyfish dodging the sunlight. You sound like you've got a favorite critter in mind. Anything in particular you’ve stumbled upon?
+[T3] USER: Caught a tiny sand flea once, barely visible until it leapt onto my shoe. Do you ever see the moonlit sand crabs that only come out when the tide's low?
+
+[T4] SOFIA: Ah, the stealthy sand fleas. They have a way of making you jump without warning. As for those moonlit sand crabs, they’re like little ninjas scuttling around. I’ve seen them once or twice. They’re a bit shy, though. What do you think? Are they just avoiding us, or are we too slow to keep up?
+[T4] USER: Probably both— they sense our footsteps and slip away before we can catch them.
+
+[T5] SOFIA: Clever little critters, huh? It’s like they have a sixth sense for our clumsiness. I can’t help but feel there’s a lesson in that, you know? Maybe something about observation and patience in all of this. You seem to have a knack for noticing details. What else catches your eye out here?
+[T5] USER: Sounds like the beach is teaching us patience; any pattern in the erosion data that surprised you?
+
+[T6] SOFIA: You could say that. The patterns in the erosion data are more revealing than I expected. It's not just numbers; storms are becoming more intense, and some areas are losing sand faster than others. It's like a slow-motion drama playing out. Did you know some communities are actually trying to fight back with artificial reefs? What do you think about that approach?
+[T6] USER: Artificial reefs could help, but they have to be placed just right to protect existing habitats. Have you seen any projects where they actually slowed the shoreline loss?
+
+[T7] SOFIA: Absolutely, it’s a delicate balance. Some projects have shown promise in slowing erosion, especially when the reefs integrate well with natural habitats. There’s a few spots I’ve visited where they’ve managed to create both a barrier and a thriving ecosystem. It’s a fascinating mix of science and artistry. Have you had a chance to witness any of those projects in action?
+[T7] USER: Sure, the reefs I've seen actually trap sand and let the dunes rebuild. Want to check out one of those sites sometime?
+
+[T8] SOFIA: That sounds like a worthwhile trip. Watching nature reclaim its space is always captivating. Although, I have to say, I’m curious about your enthusiasm for the early mornings. Is it the sunrise or the excitement of critter-hunting that gets you out of bed?
+[T8] USER: Morning light does have its pull, but chasing the tiny sand fleas is the real reward.
+
+[T9] SOFIA: A true connoisseur of sand fleas, huh? I admire your dedication to the small things. There’s something poetic about pursuing those elusive little guys. Makes the early mornings sound almost... adventurous. So, what’s your strategy for catching them? Do you have a secret technique, or is it all instinct?
+[T9] USER: Usually I just let the tide bring them close, then scoop them up with a soft brush. It’s more about patience than any fancy trick.
+
+[T10] SOFIA: Ah, the art of patience strikes again. A soft brush? Very elegant. It's like trying to catch whispers instead of raindrops. I wonder what other small wonders you've encountered with that technique. Any surprising finds beyond the sand fleas?
+[T10] USER: Found a tiny ghost crab that was practically invisible until it scuttled across the brush—makes the hunt worth it. Coffee tomorrow to compare notes?
+
+[T11] SOFIA: A ghost crab, huh? Now that's an impressive find. I can almost picture it zipping away, blending seamlessly with the sand. As for coffee tomorrow, that’s tempting. But let's see if this conversation can hold my attention a little longer first. What else do you usually seek out on your adventures?
+[T11] USER: Sounds perfect, meet me at the pier café at nine and text me your number.
+
+[T12] SOFIA: You’re moving fast. I appreciate the boldness. But I’m still weighing this conversation. Let’s see if you can keep it interesting until then. Share something unexpected about yourself. I’ll decide if it’s worth my number.
+[T12] USER: Turns out I spent a summer cataloguing tide‑pool critters for a marine biology class, keeping a notebook of every odd shell I found. That habit of logging even the tiniest details is why I never miss a ghost crab.
+
+[T13] SOFIA: That does explain your meticulous approach. A summer of tide-pooling sounds like a dream—so many tiny stories to uncover. You must have some fascinating entries in that notebook. What's the most memorable critter you logged? Give me a taste of your detective work.
+[T13] USER: A tide‑pool notebook sounds like a treasure—what’s the weirdest find you recorded?
+
+[T14] SOFIA: I’ve stumbled upon some pretty odd shells, but I’d say the most bizarre was a piece of a sea creature that looked like it came straight out of a sci-fi movie. I dubbed it "alien shell." It was so unusual, I almost expected it to start glowing. Your turn—what’s your favorite tide pool specimen?
+[T14] USER: That sea cucumber you logged really shows how much life hides in the sand; coffee tomorrow at nine?
+
+[T15] SOFIA: A sea cucumber? Those things are the undercover agents of the tide pools. Discreet but essential. You really want to push the coffee invitation, don’t you? I’m still contemplating the merits of your critter knowledge. Let’s see if you can impress me with one last quirky detail about your sea adventures.
+[T15] USER: Found a hermit crab that’d taken up residence in a bottle cap—kept it as a souvenir. Nine works.
+
+[T16] SOFIA: A hermit crab in a bottle cap? That’s a perfect housing choice for a minimalist. I can see the charm—tiny eco-friendly living at its finest. Alright, you’ve piqued my interest enough for coffee. Just be ready to share how you keep track of all these finds. I’ll see you at nine.
+[T16] USER: A hermit crab in a bottle cap—nice find. See you at nine at the pier café.
+
+[T17] SOFIA: Nine it is, then. I'll be there, possibly scribbling notes and judging your coffee choices. Just a heads-up—be prepared for some interesting questions. It's not just a social event for me.
+[T17] USER: Great, I'll text you my number so we can lock in the spot.
+
+=== SESSION END ===
+Duration: 8.6 minutes
+Turns: 17

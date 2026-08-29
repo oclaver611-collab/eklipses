@@ -2299,6 +2299,11 @@ async function playScenario(key, practice=false) {
     : null;
   if (_firstIntroRyan) console.log('[prefetch] intro warm-up:', _firstIntroRyan.text.slice(0, 60));
 
+  // Declutter: hide marketing hero + lesson-recommendation banner while in session
+  ['ek-hero', 'ek-practice-banner'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+
   stopEverything();
   const mySession=session; // capture BEFORE pause — rapid re-clicks each get a unique session id
   setMediaForSpeaker('Ryan'); // clear stale character video immediately — orb shows during setup
@@ -2970,6 +2975,16 @@ function startListeningYesNo(mySession) {
 
 /* ===== UI ===== */
 function renderShelf() {
+  // Restore hero + banner when user returns to the shelf from a session
+  const _heroEl = document.getElementById('ek-hero');
+  if (_heroEl) _heroEl.style.display = '';
+  const _bannerEl = document.getElementById('ek-practice-banner');
+  if (_bannerEl) {
+    const alreadyComplete = typeof LessonPlayer !== 'undefined' && LessonPlayer.isComplete();
+    const dismissed = sessionStorage.getItem('ek-lesson-banner-dismissed');
+    _bannerEl.style.display = (!alreadyComplete && !dismissed) ? 'flex' : 'none';
+  }
+
   const keys=Object.keys(SCENARIOS).filter(k=>!SCENARIOS[k].hidden);
   // #scenarioSelect was removed from index.html (a1ae651) — guard against null
   if (els.select) {
