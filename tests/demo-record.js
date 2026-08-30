@@ -258,29 +258,44 @@ async function fishAudioTTS(text, voiceId = RYAN_VOICE_ID) {
   return Buffer.from(await res.arrayBuffer());
 }
 
-// ── Play audio into VB-CABLE Input → browser STT hears it ─────────────────────
-// Saves TTS buffer to temp files, converts MP3→WAV, plays to CABLE Input device.
-// Blocks until playback is fully complete (WinMM WHDR_DONE).
+// ── Play audio into VB-CABLE Input AND default speakers ───────────────────────
+// Two parallel streams for the same WAV:
+//   1. WinMM WaveOut → CABLE Input → VB-CABLE → CABLE Output → Chrome STT
+//   2. ffplay → default speakers → audible in room + OBS desktop-audio track
+// Both start simultaneously; WinMM blocks until done, ffplay finishes on its own.
 function playToCableInput(audioBuffer) {
   const id      = Date.now();
   const mp3File = path.join(SCRATCH_DIR, `ek-tts-${id}.mp3`);
   const wavFile = path.join(SCRATCH_DIR, `ek-tts-${id}.wav`);
+
+  fs.writeFileSync(mp3File, audioBuffer);
+  // Convert MP3 → PCM WAV that WinMM can play directly
+  execSync(
+    `ffmpeg -y -i "${mp3File}" -ar 44100 -ac 1 -acodec pcm_s16le "${wavFile}"`,
+    { stdio: 'pipe', timeout: 30000 },
+  );
+  try { fs.unlinkSync(mp3File); } catch {}
+
+  // Stream 2: ffplay to default speakers (async, non-blocking)
+  // windowsHide suppresses the console window flash on Windows
+  const { spawn } = require('child_process');
+  const ffp = spawn('ffplay', ['-nodisp', '-autoexit', '-i', wavFile],
+    { stdio: 'pipe', windowsHide: true });
+  ffp.on('exit', () => { try { fs.unlinkSync(wavFile); } catch {} });
+  ffp.on('error', () => {});
+
+  // Stream 1: WinMM → CABLE Input (blocks until WinMM WHDR_DONE)
   try {
-    fs.writeFileSync(mp3File, audioBuffer);
-    // Convert MP3 → PCM WAV that WinMM can play directly
-    execSync(
-      `ffmpeg -y -i "${mp3File}" -ar 44100 -ac 1 -acodec pcm_s16le "${wavFile}"`,
-      { stdio: 'pipe', timeout: 30000 },
-    );
-    // Play the WAV to CABLE Input via WinMM (blocks until done)
     execSync(
       `powershell.exe -NonInteractive -File "${PLAY_SCRIPT}" "${wavFile}" "CABLE Input"`,
       { stdio: 'pipe', timeout: 60000 },
     );
-  } finally {
-    try { fs.unlinkSync(mp3File); } catch {}
+  } catch (err) {
+    ffp.kill();
     try { fs.unlinkSync(wavFile); } catch {}
+    throw err;
   }
+  // wav file stays alive for ffplay's exit handler to clean up
 }
 
 // ── Pre-flight: verify VB-CABLE Output is present as a recording device ────────
