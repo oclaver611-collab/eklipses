@@ -16,6 +16,11 @@ module.exports = async function handler(req, res) {
   const recentHistory = history.slice(-8);
   const lastCharMessage = [...recentHistory].reverse().find(m => m.role === 'assistant')?.content?.trim() || '';
 
+  // Diagnostic: log received history shape and resolved anchor so stale-history bugs are traceable in Vercel logs
+  console.log('[coach-suggest] history len:', history.length,
+    '| last role:', history.length ? history[history.length - 1].role : 'none',
+    '| anchor (first 100):', lastCharMessage.slice(0, 100));
+
   const lastCharAnchor = lastCharMessage
     ? `\n\nHer last message (the one you are responding to): "${lastCharMessage}"\n\nSTEP 1: Identify the single most specific word, phrase, or thing she revealed — not the general topic, but the exact detail.\nSTEP 2: Build each suggestion around THAT specific detail. The line should only make sense as a reply to HER exact message — not as a generic reply to any woman.`
     : '';
@@ -115,6 +120,7 @@ Return ONLY valid JSON, no other text:
       return res.status(502).json({ error: 'Invalid suggestions format' });
     }
 
+    console.log('[coach-suggest] suggestions:', parsed.suggestions.map(s => s.style + ': ' + s.text).join(' | '));
     return res.json(parsed);
   } catch (err) {
     console.error('[coach-suggest] error:', err.message);
