@@ -655,6 +655,8 @@ const DailyLimit = (() => {
     window.fetch = async function(url, options = {}) {
       if (typeof url === 'string' && (
         url.includes('/api/character') ||
+        url.includes('/api/coach') ||
+        url.includes('/api/drill-eval') ||
         url.includes('/api/tts') ||
         url.includes('/api/count-session') ||
         url.includes('/api/check-session')
@@ -4050,9 +4052,13 @@ async function handleCoachBtn() {
     showCoachSuggestions(data.suggestions);
   } catch (err) {
     console.warn('[coach-btn] error:', err.message);
+    // Show brief inline error so the button doesn't just silently reset
+    btn.textContent = 'Try again';
+    setTimeout(() => { if (btn) btn.textContent = '🎯 Coach me'; }, 2500);
+    return;
   } finally {
     btn.disabled = false;
-    btn.textContent = '🎯 Coach me';
+    if (btn.textContent === '...') btn.textContent = '🎯 Coach me';
   }
 }
 
