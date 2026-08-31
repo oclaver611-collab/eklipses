@@ -46,8 +46,13 @@ module.exports = async function handler(req, res) {
     `Content-Type: ${mime}\r\n\r\n`,
   ];
   const bodyHeader = Buffer.from(bodyParts.join(''));
+  // language=en reduces hallucination on low-SNR audio; verbose_json exposes no_speech_prob per segment
   const bodyFooter = Buffer.from(`\r\n--${whisperBoundary}\r\n` +
     `Content-Disposition: form-data; name="model"\r\n\r\nwhisper-1\r\n` +
+    `--${whisperBoundary}\r\n` +
+    `Content-Disposition: form-data; name="language"\r\n\r\nen\r\n` +
+    `--${whisperBoundary}\r\n` +
+    `Content-Disposition: form-data; name="response_format"\r\n\r\nverbose_json\r\n` +
     `--${whisperBoundary}--\r\n`);
   const body = Buffer.concat([bodyHeader, audioBuffer, bodyFooter]);
 
@@ -68,6 +73,19 @@ module.exports = async function handler(req, res) {
     }
 
     const data = await whisperRes.json();
+
+    // Reject likely hallucinations — verbose_json segments include no_speech_prob per chunk.
+    // Whisper generates plausible-sounding garbage (food words, place names) when audio has
+    // no real speech; no_speech_prob > 0.7 on any segment is a reliable hallucination signal.
+    const segments = data.segments || [];
+    if (segments.length > 0) {
+      const maxNoSpeech = Math.max(...segments.map(s => s.no_speech_prob || 0));
+      if (maxNoSpeech > 0.7) {
+        console.log('[stt] rejected hallucination: no_speech_prob', maxNoSpeech.toFixed(2));
+        return res.json({ transcript: '' });
+      }
+    }
+
     const transcript = (data.text || '').trim();
     console.log('[stt] transcript:', transcript.slice(0, 120));
     return res.json({ transcript });

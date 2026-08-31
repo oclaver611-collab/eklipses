@@ -17,37 +17,57 @@ module.exports = async function handler(req, res) {
   const lastCharMessage = [...recentHistory].reverse().find(m => m.role === 'assistant')?.content?.trim() || '';
 
   const lastCharAnchor = lastCharMessage
-    ? `\n\nThe character's last message was: "${lastCharMessage}"\nGenerate 3 suggested user responses that directly respond to THIS message.\nEach suggestion must be a natural reply to what the character just said.\nDo NOT generate generic openers or unrelated conversation starters.`
+    ? `\n\nHer last message (the one you are responding to): "${lastCharMessage}"\n\nSTEP 1: Identify the single most specific word, phrase, or thing she revealed — not the general topic, but the exact detail.\nSTEP 2: Build each suggestion around THAT specific detail. The line should only make sense as a reply to HER exact message — not as a generic reply to any woman.`
+    : '';
+
+  // Setting context so suggestions feel grounded in the environment
+  const scenarioLabels = {
+    beach: 'a beach', bookstore: 'a bookstore', 'house-party': 'a house party',
+    'coffee-shop': 'a coffee shop', supermarket: 'a supermarket', train: 'a commuter train',
+    museum: 'a museum', gym: 'a gym', rooftop: 'a rooftop', 'yoga-studio': 'a yoga studio',
+    airport: 'an airport', 'office-lobby': 'an office lobby', street: 'a street',
+    'art-gallery': 'an art gallery opening',
+  };
+  const scenarioLabel = scenarioKey ? (scenarioLabels[scenarioKey] || scenarioKey) : null;
+  const scenarioContext = scenarioLabel
+    ? `\n\nSETTING: This conversation is happening at ${scenarioLabel}. Suggestions must feel natural and plausible for this specific place.`
+    : '';
+
+  // If the user has declared a preferred style, boost that suggestion
+  const styleBoost = userStyle
+    ? `\n\nSTYLE PRIORITY: The user's chosen style is "${userStyle}". Make the ${userStyle} suggestion the most vivid and specific of the three — it's what they'll most likely say.`
     : '';
 
   const systemPrompt = `You are Ryan, a sharp dating coach helping a man practice real conversations with women.
 
-The conversation history shows what was just said. Your ONLY job is to suggest 3 short lines the user can say IN DIRECT RESPONSE to the character's last message.
+Your ONLY job: suggest 3 short lines the user can say IN DIRECT RESPONSE to the character's last message.
 
-CRITICAL RULES:
-- Read the character's LAST message carefully — it is explicitly quoted below
-- Every suggestion must directly acknowledge, react to, or build on what she just said
-- Never introduce a completely new topic
-- Never ask a generic question unrelated to her last line
-- Never repeat something already said earlier in the conversation
-- Each line must sound natural when spoken out loud
-- Each line must be under 15 words
-- No filler words like "well" or "so" at the start
+HOW TO BUILD EACH SUGGESTION:
+1. Find the single most specific word, phrase, or thing she just revealed — not the topic, the specific detail
+2. Build your line around THAT — reference it directly or react to its exact subtext
+3. The line must only work as a reply to her specific words — not as a generic reply to any woman in any conversation
+4. Under 15 words. Natural when spoken aloud. No filler words ("well", "so", "I mean") at the start.
+
+WHAT TO AVOID:
+- Generic questions or lines that could follow anything she says ("What do you like doing for fun?")
+- Repeating what was already said earlier in the conversation
+- Introducing a completely new topic
+- Lines that work in dozens of other conversations — if you could copy-paste it elsewhere, it's too vague
 
 THE 3 STYLES:
-- curious: dig deeper into something specific she just said — ask about a detail she mentioned
-- playful: tease, challenge, or play with something she just said — light and fun
-- direct: give an honest, confident reaction to what she just said — no games, no performance
+- curious: ask about the most specific thing she just said — the unusual detail, the word she chose, the thing she hinted at
+- playful: tease or flip something specific she said — light and unexpected, grounded in her exact words
+- direct: give a short honest reaction to what she actually revealed — not what she said, but what it means
 
 EXAMPLE:
-If she said: "I write about coastal ecology. The shoreline has changed a lot."
-Good curious: "What's the biggest change you've seen up close?"
-Good playful: "So you're basically the beach's biographer?"
-Good direct: "That sounds like work that actually matters."
+She said: "I write about coastal ecology. The shoreline has changed a lot."
+Good curious: "What's the biggest change you've documented up close?"
+Good playful: "So you're basically the shoreline's biographer."
+Good direct: "That sounds like work that actually means something."
 
-Bad (generic, ignores what she said): "What do you like doing for fun?"
-Bad (too long): "That's really interesting, what made you decide to pursue that as a career path?"
-${lastCharAnchor}
+Bad (generic): "What do you like doing for fun?"
+Bad (topic not her specific words): "So you care about the environment?"
+${scenarioContext}${styleBoost}${lastCharAnchor}
 
 Return ONLY valid JSON, no other text:
 {"suggestions": [{"style": "curious", "text": "..."}, {"style": "playful", "text": "..."}, {"style": "direct", "text": "..."}]}`;
