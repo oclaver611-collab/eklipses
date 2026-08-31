@@ -74,14 +74,24 @@ module.exports = async function handler(req, res) {
 
     const data = await whisperRes.json();
 
-    // Reject likely hallucinations — verbose_json segments include no_speech_prob per chunk.
-    // Whisper generates plausible-sounding garbage (food words, place names) when audio has
-    // no real speech; no_speech_prob > 0.7 on any segment is a reliable hallucination signal.
+    // Confidence filters — verbose_json exposes per-segment metrics.
     const segments = data.segments || [];
     if (segments.length > 0) {
+      // no_speech_prob > 0.7: Whisper thinks there is no real speech — rejects hallucinated
+      // food/place words generated on silence or near-silence.
       const maxNoSpeech = Math.max(...segments.map(s => s.no_speech_prob || 0));
       if (maxNoSpeech > 0.7) {
         console.log('[stt] rejected hallucination: no_speech_prob', maxNoSpeech.toFixed(2));
+        return res.json({ transcript: '' });
+      }
+
+      // avg_logprob < -1.2: Whisper is very uncertain about the transcription — typical of
+      // background echo, cross-talk, or mic distortion producing garbled word sequences.
+      // Only applies when the transcript is short (garbled = few confident tokens).
+      const avgLogprob = segments.reduce((sum, s) => sum + (s.avg_logprob || 0), 0) / segments.length;
+      const wordCount = (data.text || '').trim().split(/\s+/).length;
+      if (avgLogprob < -1.2 && wordCount <= 8) {
+        console.log('[stt] rejected low-confidence: avg_logprob', avgLogprob.toFixed(2), 'words', wordCount);
         return res.json({ transcript: '' });
       }
     }

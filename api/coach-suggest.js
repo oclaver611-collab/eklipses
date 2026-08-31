@@ -12,13 +12,38 @@ module.exports = async function handler(req, res) {
 
   const { history = [], scenarioKey, userStyle } = req.body || {};
 
-  // Extract the character's last message explicitly for anchor injection
+  // Filler detection — when the character's last line is a clarification request or short filler
+  // (caused by garbled STT feeding nonsense to the character), the LLM has nothing to echo and
+  // silently ignores the anchor, pulling topic from earlier history instead. Skip fillers and use
+  // the previous substantive assistant message as the anchor.
+  const FILLER_PATTERNS = [
+    /could you say that again/i,
+    /say that again/i,
+    /what was that/i,
+    /didn't (quite )?catch/i,
+    /didn't hear/i,
+    /sorry.{0,15}(what|repeat|again)/i,
+    /could you repeat/i,
+    /^hmm\??\.?$/i,
+    /^pardon\??\.?$/i,
+    /^what\??\.?$/i,
+    /i('m| am) not sure (what|if) (you|i heard)/i,
+    /seems? (like )?you('re| are) (asking|saying)/i,
+    /could(n't)? (quite )?make (that|it) out/i,
+  ];
+  const isFiller = msg => msg.length < 80 && FILLER_PATTERNS.some(p => p.test(msg));
+
   const recentHistory = history.slice(-8);
-  const lastCharMessage = [...recentHistory].reverse().find(m => m.role === 'assistant')?.content?.trim() || '';
+  const lastCharMessage = [...recentHistory].reverse().find(
+    m => m.role === 'assistant' && !isFiller(m.content?.trim() || '')
+  )?.content?.trim() || '';
 
   // Diagnostic: log received history shape and resolved anchor so stale-history bugs are traceable in Vercel logs
+  const rawLast = [...recentHistory].reverse().find(m => m.role === 'assistant')?.content?.trim() || '';
+  const fillerSkipped = rawLast !== lastCharMessage;
   console.log('[coach-suggest] history len:', history.length,
     '| last role:', history.length ? history[history.length - 1].role : 'none',
+    fillerSkipped ? '| FILLER SKIPPED: ' + rawLast.slice(0, 60) : '',
     '| anchor (first 100):', lastCharMessage.slice(0, 100));
 
   const lastCharAnchor = lastCharMessage
