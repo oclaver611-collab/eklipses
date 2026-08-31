@@ -1,0 +1,17 @@
+=== Eklipses Marketing Demo — AI vs Sofia (voice-to-voice) ===
+Date: 2026-08-30T05:28:13.985Z
+URL: https://www.eklipses.com
+AI user TTS: Fish Audio Ryan (44b996214285427697767cb469793647)
+Sofia TTS: Fish Audio (production voices)
+
+[T1] USER: Hi. That notebook is getting absolutely destroyed by the wind, is it, or are you just ignoring it?
+
+[T2] SOFIA: Hey. It's definitely making a run for it. You'd think I'd have a better grip after all these years of writing here. What about you? Do you always find yourself saving notebooks from the wind?
+[T2] USER: Guess I’m the backup safety net for now. How many times has it actually flown away?
+
+[T3] SOFIA: A few times, actually. I like to think of it as the notebook's rebellious phase. It's always trying to break free. Do you consider yourself a safety net in other areas, or just here?
+[T3] USER: Probably just here, unless you're looking for one in your life that also protects them from the wind, in which case, I'm definitely not your safety net.
+
+=== SESSION END ===
+Duration: 1.5 minutes
+Turns: 3

@@ -1,0 +1,17 @@
+=== Eklipses Marketing Demo — AI vs Sofia (voice-to-voice) ===
+Date: 2026-08-30T16:50:01.165Z
+URL: https://www.eklipses.com
+AI user TTS: Fish Audio Slax (c5f56a6cc2ec4fa8920cb4c5889a3fb7)
+Sofia TTS: Fish Audio (production voices)
+
+[T1] USER: Paper looks pretty wet out here. Mind if I just stand here and listen to the sound a collapsing coastline makes?
+
+[T2] SOFIA: I’m here. What’s on your mind?
+[T2] USER: Eight meters is basically a two-story building. That’s a lot of sand to lose just to the waves.
+
+[T3] SOFIA: I’m here. What’s on your mind?
+[T3] USER: It’s not just waves, though. The roots holding it all together are gone.
+
+=== SESSION END ===
+Duration: 1.2 minutes
+Turns: 3

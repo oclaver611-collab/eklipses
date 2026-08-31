@@ -1,0 +1,65 @@
+=== Eklipses Marketing Demo — AI vs Sofia (voice-to-voice) ===
+Date: 2026-08-30T19:36:30.486Z
+URL: https://www.eklipses.com
+AI user TTS: OpenAI tts-1-hd / echo (sentence-split)
+Sofia TTS: Fish Audio (production voices)
+
+[T1] USER: That map you’re holding looks old. Eight meters gone in twenty years?
+
+[T2] SOFIA: It's been through a few adventures, that's for sure. Shows all the changes around here over the last couple of decades. You wouldn't believe some of the spots that have disappeared.
+[T2] USER: Gone means gone. No coming back.
+
+[T3] SOFIA: Sorry, what was that?
+[T3] USER: Nothing. Just staring at the map.
+
+[T4] SOFIA: Staring's a good start. What do you see? I hope it’s not just lines and symbols. There's a story hidden in there somewhere.
+[T4] USER: A line moving inland. The land losing ground.
+
+[T5] SOFIA: Aligning with the lines, I get it. There's a whole universe of movement and change beneath the surface. Makes you wonder what all these spots were like once, doesn’t it?
+[T5] USER: Not much. Just more sand.
+
+[T6] SOFIA: Sorry, what was that?
+[T6] USER: I said the sand.
+
+[T7] SOFIA: Ah, the sand. It’s true—this beach has gotten a lot less generous over the years. Reminds me of how everything’s in constant flux. Kind of poetic, really.
+[T7] USER: Poetry doesn't stop the waves.
+
+[T8] SOFIA: True, poetry can’t hold back the waves. But it does offer a way to capture the feeling of it all. Sometimes words just… linger while the ocean keeps moving. Do you find yourself drawn to that?
+[T8] USER: I'm here for the data.
+
+[T9] SOFIA: Data, huh? Quite the opposite of poetry, then. Numbers can tell their own stories, though. What type of data are you trying to wrangle from these shores?
+[T9] USER: Eight meters of sand, gone.
+
+[T10] SOFIA: That's right. Eight meters of sand lost over two decades. It’s a staggering number but also just a slice of the bigger picture. What do you think that means for the future of this place?
+[T10] USER: It means we're losing the shoreline.
+
+[T11] SOFIA: Exactly. We're witnessing more than just erosion; it’s about what the loss signifies—for wildlife, for the community, for everything we rely on. Kind of makes you rethink how we interact with the coast, doesn’t it?
+[T11] USER: It makes me want to leave.
+
+[T12] SOFIA: Wanting to leave isn’t surprising. Change can be overwhelming. But there’s something about understanding what’s happening that can also make you feel more rooted. What do you think you’d find elsewhere that’s missing here?
+[T12] USER: Coffee, maybe.
+
+[T13] SOFIA: Ah, the coffee dilemma. It can be surprisingly tough to find a good cup outside of your usual spots. What’s your go-to order when you’re trying to find that perfect brew?
+[T13] USER: A flat white.
+
+[T14] SOFIA: Sorry, what was that?
+[T14] USER: A flat white.
+
+[T15] SOFIA: Could you say that again?
+[T15] USER: I said, a flat white.
+
+[T16] SOFIA: A flat white, nice choice. It’s all about that creamy texture with just the right kick of espresso. Just don’t ever ask for it in a takeaway cup—it's an art form best enjoyed sit-down style. You know that, right?
+[T16] USER: Yeah, I know that.
+
+[T17] SOFIA: Good. Glad we’re on the same page here. It sounds like you have your coffee game sorted. Do you have a favorite cafe around here, or is it all about venturing out?
+[T17] USER: The one on High Street.
+
+[T18] SOFIA: High Street has some solid options. That place with the cozy vibe? It’s packed during weekends, though. Ever thought about writing a piece on local cafes? I can see it now—“Coffee Chronicles: The Brews of High Street.”
+[T18] USER: Number?
+
+[T19] SOFIA: I didn't quite catch that.
+[T19] USER: Give me your number
+
+=== SESSION END ===
+Duration: 8.4 minutes
+Turns: 19
