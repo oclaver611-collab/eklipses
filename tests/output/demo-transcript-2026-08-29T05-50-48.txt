@@ -1,0 +1,17 @@
+=== Eklipses Marketing Demo — AI vs Sofia (voice-to-voice) ===
+Date: 2026-08-29T05:51:49.141Z
+URL: https://www.eklipses.com
+AI user TTS: Fish Audio Ryan (44b996214285427697767cb469793647)
+Sofia TTS: Fish Audio (production voices)
+
+[T1] USER: Eight meters sounds like a landslide disguised as erosion. Is that what you’re chasing down in that notebook?
+
+[T2] SOFIA: You’ve got a point there. It’s more like a slow-motion landslide, really. The shoreline is shifting. Changes like that don’t just happen overnight. They tell a much bigger story. What about you? Are you just here for the sandy drama or did you have something more interesting in mind?
+[T2] USER: It’s less about the numbers and more about why the sand is disappearing.
+
+[T3] SOFIA: Exactly. The numbers are just a starting point. It's the reasons behind it that get interesting. Climate change, human impact—those layers reveal connections most people don’t even think about. But what drew you to this beach? Just a fan of disappearing sand?
+[T3] USER: I’m probably the opposite type of fan. I just want the sand to stay there.
+
+=== SESSION END ===
+Duration: 1.7 minutes
+Turns: 3

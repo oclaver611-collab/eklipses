@@ -1,0 +1,17 @@
+=== Eklipses Marketing Demo — AI vs Sofia (voice-to-voice) ===
+Date: 2026-08-30T16:37:55.380Z
+URL: https://www.eklipses.com
+AI user TTS: Fish Audio Ryan (44b996214285427697767cb469793647)
+Sofia TTS: Fish Audio (production voices)
+
+[T1] USER: You’ve been staring at that one patch of sand for forty-five minutes. I have a feeling you’re not just waiting for it to talk, so I’d rather get out of the way than interrupt the process.
+
+[T2] SOFIA: It's true, the sand is pretty tight-lipped. But I promise my writing isn’t as thrilling as watching it dry. You can stay a little longer—unless you're worried about interrupting some deep philosophical breakthrough.
+[T2] USER: Eight metres. The numbers in your head must be heavier than the ones on the beach.
+
+[T3] SOFIA: You caught me. Trying to carry all that erosion data around is a workout in itself. Makes for a nice contrast with the lightness of the waves. What’s your excuse for hanging around?
+[T3] USER: Honestly, I was just trying to figure out if you were writing a novel or an obituary for the coastline.
+
+=== SESSION END ===
+Duration: 1.5 minutes
+Turns: 3

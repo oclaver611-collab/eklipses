@@ -3400,25 +3400,56 @@ function showPracticeFocusModal(scenarioKey) {
     };
   }
 
-  const S    = 'display:block;width:100%;background:#252836;border:1px solid #2f3344;border-radius:10px;padding:14px 16px;color:#e4e8f1;font-size:14px;font-weight:600;cursor:pointer;text-align:left;transition:background .15s,border-color .15s';
-  const SD   = 'display:block;width:100%;background:#1c1e2a;border:1px solid #212333;border-radius:10px;padding:14px 16px;color:#3d4460;font-size:14px;font-weight:600;cursor:default;text-align:left';
-  const SUB  = 'font-size:12px;color:#6b7495;margin-top:3px';
-  const SUBD = 'font-size:12px;color:#2a2e40;margin-top:3px';
-  const HV   = `onmouseover="this.style.background='#2e3245';this.style.borderColor='#4a5070'" onmouseout="this.style.background='#252836';this.style.borderColor='#2f3344'"`;
-  const hasAny = completed.length > 0;
+  const S   = 'display:block;width:100%;background:#252836;border:1px solid #2f3344;border-radius:10px;padding:14px 16px;color:#e4e8f1;font-size:14px;font-weight:600;cursor:pointer;text-align:left;transition:background .15s,border-color .15s';
+  const SUB = 'font-size:12px;color:#6b7495;margin-top:3px';
+  const HV  = `onmouseover="this.style.background='#2e3245';this.style.borderColor='#4a5070'" onmouseout="this.style.background='#252836';this.style.borderColor='#2f3344'"`;
+  const hasAny      = completed.length > 0;
+  const completedIds = new Set(completed.map(l => l.id));
 
-  body.innerHTML = `
-<p style="font-size:18px;font-weight:700;color:#f0f2f6;margin:0 0 6px">What do you want to practice?</p>
-<p style="font-size:13px;color:#8a93a8;margin:0 0 18px;line-height:1.5">${getCharacterDisplayName(currentCharacterId)||'Your character'} will adapt her behavior to your choice.</p>
-<div style="display:flex;flex-direction:column;gap:8px">
+  // ── Lesson list (shared, searchable — scales to 100+ lessons) ─────────────
+  const lessonListHTML = `
+  <div id="pfm-list" style="display:none;margin-top:6px;background:#141620;border:1px solid #252836;border-radius:10px;overflow:hidden">
+    <div style="padding:8px 10px;border-bottom:1px solid #1e2132">
+      <input id="pfm-search" type="text" placeholder="Search lessons…" autocomplete="off"
+        style="width:100%;box-sizing:border-box;padding:7px 10px;background:#0e1018;border:1px solid #252836;border-radius:6px;color:#e4e8f1;font-size:13px;outline:none">
+    </div>
+    <div id="pfm-list-items" style="max-height:200px;overflow-y:auto">
+      ${LESSON_REGISTRY.map(l =>
+        `<button data-lessonid="${l.id}" data-label="${l.label.toLowerCase()}"
+          style="display:block;width:100%;padding:11px 16px;color:#c9d0e8;font-size:13px;font-weight:600;cursor:pointer;text-align:left;background:transparent;border:none;border-bottom:1px solid #1e2132;transition:background .12s"
+          onmouseover="this.style.background='#1e2132'" onmouseout="this.style.background='transparent'">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span>${l.label}</span>
+            ${completedIds.has(l.id) ? '<span style="font-size:11px;color:#5db870;font-weight:700">✓</span>' : ''}
+          </div>
+        </button>`
+      ).join('')}
+    </div>
+  </div>`;
 
-${hasAny
-  ? `<button id="pfm-latest" style="${S}" ${HV}>
-      <div>Latest Lesson</div>
-      <div style="${SUB}">${latest.label.replace(/^Lesson \d+ — /, '')} — your most recently completed lesson</div>
-     </button>`
-  : ''
-}
+  if (!hasAny) {
+    // ── New / zero-lesson user: minimal first-decision UI ──────────────────
+    // Primary: Start Practicing (Free Practice). Secondary: choose a lesson.
+    body.innerHTML = `
+<p style="font-size:18px;font-weight:700;color:#f0f2f6;margin:0 0 4px">Ready to practice?</p>
+<p style="font-size:13px;color:#8a93a8;margin:0 0 18px;line-height:1.5">${getCharacterDisplayName(currentCharacterId)||'Your character'} is ready when you are.</p>
+<div style="display:flex;flex-direction:column;gap:10px">
+
+<button id="pfm-free"
+  style="display:block;width:100%;background:#1c2a1e;border:1px solid #2a4a2f;border-radius:10px;padding:16px;color:#e4e8f1;font-size:15px;font-weight:700;cursor:pointer;text-align:left;transition:background .15s,border-color .15s"
+  onmouseover="this.style.background='#243524';this.style.borderColor='#3a6040'" onmouseout="this.style.background='#1c2a1e';this.style.borderColor='#2a4a2f'">
+  <div style="display:flex;align-items:center;justify-content:space-between">
+    <span>Start Practicing →</span>
+    <span style="font-size:11px;color:#5db870;font-weight:600;background:#1a3320;padding:2px 8px;border-radius:4px">Recommended</span>
+  </div>
+  <div style="${SUB}">Free conversation — no pressure, just practice</div>
+</button>
+
+<div style="display:flex;align-items:center;gap:10px;margin:2px 0">
+  <div style="flex:1;height:1px;background:#252836"></div>
+  <span style="font-size:12px;color:#4a5070">or focus on a lesson</span>
+  <div style="flex:1;height:1px;background:#252836"></div>
+</div>
 
 <div id="pfm-choose-wrap">
   <button id="pfm-choose-btn" style="${S}" ${HV}>
@@ -3426,47 +3457,69 @@ ${hasAny
       <span>Choose a Lesson</span>
       <span id="pfm-arrow" style="font-size:16px;transition:transform .2s;display:inline-block">›</span>
     </div>
-    <div style="${SUB}">Pick which lesson's skills to test</div>
+    <div style="${SUB}">Practice a specific lesson's skills</div>
   </button>
-  <div id="pfm-list" style="display:none;margin-top:6px;background:#141620;border:1px solid #252836;border-radius:10px;overflow:hidden;max-height:224px;overflow-y:auto">
-    ${LESSON_REGISTRY.map(l =>
-      `<button data-lessonid="${l.id}" style="display:block;width:100%;padding:13px 16px;color:#c9d0e8;font-size:13px;font-weight:600;cursor:pointer;text-align:left;background:transparent;border:none;border-bottom:1px solid #1e2132;transition:background .12s" onmouseover="this.style.background='#1e2132'" onmouseout="this.style.background='transparent'">${l.label}</button>`
-    ).join('')}
-  </div>
+  ${lessonListHTML}
 </div>
 
-${hasAny
-  ? `<button id="pfm-all" style="${S}" ${HV}>
-      <div>All Lessons</div>
-      <div style="${SUB}">Test every completed lesson's skills in one session</div>
-     </button>`
-  : ''
-}
+</div>`;
+  } else {
+    // ── Returning user: primary actions prominent, secondary options below ──
+    body.innerHTML = `
+<p style="font-size:18px;font-weight:700;color:#f0f2f6;margin:0 0 4px">What do you want to practice?</p>
+<p style="font-size:13px;color:#8a93a8;margin:0 0 16px;line-height:1.5">${getCharacterDisplayName(currentCharacterId)||'Your character'} adapts to your choice.</p>
+<div style="display:flex;flex-direction:column;gap:8px">
 
-${hasAny
-  ? `<button id="pfm-coached" style="${S.replace('#252836','#1e2030').replace('#2f3344','#3d3060')}" onmouseover="this.style.background='#28204a';this.style.borderColor='#6a4fbf'" onmouseout="this.style.background='#1e2030';this.style.borderColor='#3d3060'">
-      <div style="display:flex;align-items:center;gap:8px"><span style="font-size:13px">⚡</span><span>Coached Practice</span></div>
-      <div style="${SUB}">Ryan interrupts with real-time coaching on ${latest ? latest.label.replace(/^Lesson \d+ — /, '') : 'lesson'} skills — rewind and retry on the spot</div>
-     </button>`
-  : `<button style="${SD}" disabled>
-      <div style="display:flex;align-items:center;gap:8px"><span style="font-size:13px">⚡</span><span>Coached Practice</span></div>
-      <div style="${SUBD}">Complete a lesson to unlock</div>
-     </button>`
-}
-
-<button id="pfm-free" style="${!hasAny ? S.replace('#252836','#1c2a1e').replace('#2f3344','#2a4a2f') : S}" data-focus="free" ${!hasAny ? `onmouseover="this.style.background='#243524';this.style.borderColor='#3a6040'" onmouseout="this.style.background='#1c2a1e';this.style.borderColor='#2a4a2f'"` : HV}>
+<button id="pfm-latest"
+  style="display:block;width:100%;background:#1e2a3a;border:1px solid #2a4a6a;border-radius:10px;padding:14px 16px;color:#e4e8f1;font-size:14px;font-weight:700;cursor:pointer;text-align:left;transition:background .15s,border-color .15s"
+  onmouseover="this.style.background='#253344';this.style.borderColor='#3a6080'" onmouseout="this.style.background='#1e2a3a';this.style.borderColor='#2a4a6a'">
   <div style="display:flex;align-items:center;gap:8px">
-    Free Practice
-    ${!hasAny ? '<span style="font-size:11px;color:#5db870;font-weight:600;background:#1a3320;padding:2px 6px;border-radius:4px">Recommended</span>' : ''}
+    <span>▶</span>
+    <span>${latest.label.replace(/^Lesson \d+ — /, '')}</span>
+    <span style="font-size:11px;color:#6a9abf;font-weight:600;background:#152030;padding:2px 6px;border-radius:4px">Latest</span>
   </div>
+  <div style="${SUB}">Continue with your most recently completed lesson</div>
+</button>
+
+<button id="pfm-coached"
+  style="display:block;width:100%;background:#1e2030;border:1px solid #3d3060;border-radius:10px;padding:14px 16px;color:#e4e8f1;font-size:14px;font-weight:600;cursor:pointer;text-align:left;transition:background .15s,border-color .15s"
+  onmouseover="this.style.background='#28204a';this.style.borderColor='#6a4fbf'" onmouseout="this.style.background='#1e2030';this.style.borderColor='#3d3060'">
+  <div style="display:flex;align-items:center;gap:8px"><span>⚡</span><span>Coached Practice</span></div>
+  <div style="${SUB}">Ryan interrupts with real-time coaching — rewind and retry on the spot</div>
+</button>
+
+<div style="display:flex;align-items:center;gap:10px;margin:4px 0">
+  <div style="flex:1;height:1px;background:#252836"></div>
+  <span style="font-size:12px;color:#4a5070">or explore</span>
+  <div style="flex:1;height:1px;background:#252836"></div>
+</div>
+
+<div id="pfm-choose-wrap">
+  <button id="pfm-choose-btn" style="${S}" ${HV}>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span>Choose a Lesson</span>
+      <span id="pfm-arrow" style="font-size:16px;transition:transform .2s;display:inline-block">›</span>
+    </div>
+    <div style="${SUB}">Pick any lesson to focus on</div>
+  </button>
+  ${lessonListHTML}
+</div>
+
+<button id="pfm-free" style="${S}" ${HV}>
+  <div>Free Practice</div>
   <div style="${SUB}">Open conversation — no skill testing or evaluation</div>
 </button>
 
-</div>`;
+<button id="pfm-all" style="${S}" ${HV}>
+  <div>All Lessons</div>
+  <div style="${SUB}">Test every completed lesson's skills in one session</div>
+</button>
 
-  if (hasAny) {
-    document.getElementById('pfm-latest').addEventListener('click', () => start(latest.id));
+</div>`;
   }
+
+  // ── Event listeners ──────────────────────────────────────────────────────
+  document.getElementById('pfm-free').addEventListener('click', () => start('free'));
 
   const chooseBtn = document.getElementById('pfm-choose-btn');
   const list      = document.getElementById('pfm-list');
@@ -3476,17 +3529,26 @@ ${hasAny
     open = !open;
     list.style.display    = open ? 'block' : 'none';
     arrow.style.transform = open ? 'rotate(90deg)' : 'rotate(0deg)';
+    if (open) { const s = document.getElementById('pfm-search'); if (s) setTimeout(() => s.focus(), 40); }
   });
+  const searchInput = document.getElementById('pfm-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', e => {
+      const q = e.target.value.toLowerCase();
+      document.querySelectorAll('#pfm-list-items [data-lessonid]').forEach(btn => {
+        btn.style.display = btn.dataset.label.includes(q) ? 'block' : 'none';
+      });
+    });
+  }
   list.querySelectorAll('[data-lessonid]').forEach(btn => {
     btn.addEventListener('click', () => start(btn.getAttribute('data-lessonid')));
   });
 
   if (hasAny) {
-    document.getElementById('pfm-all').addEventListener('click', () => start('all'));
+    document.getElementById('pfm-latest').addEventListener('click', () => start(latest.id));
     document.getElementById('pfm-coached').addEventListener('click', () => start(latest.id, true));
+    document.getElementById('pfm-all').addEventListener('click', () => start('all'));
   }
-
-  document.getElementById('pfm-free').addEventListener('click', () => start('free'));
 
   modal.style.display = 'flex';
 }

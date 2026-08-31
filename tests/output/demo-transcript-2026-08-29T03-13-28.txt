@@ -1,0 +1,61 @@
+=== Eklipses Marketing Demo — AI vs Sofia ===
+Date: 2026-08-29T03:14:28.335Z
+URL: https://www.eklipses.com
+TTS: Fish Audio (real production voices, no stubs)
+
+[T1] USER: Looks like the sand's just slipping away under our feet, right where you were writing. Do you think the next high tide will carve out even more?
+
+[T2] SOFIA: Definitely. It feels like a slow-motion heist every time I come here. Just when you think a spot is safe… a few storms later, and it's gone. Makes you wonder about the real estate values around here. You ever thought of investing in sand?
+[T2] USER: Sounds like the ocean's got a bigger agenda than my notebook. Which stretch are you zeroing in on for the article?
+
+[T3] SOFIA: I'm looking at the south end mainly. It has the most dramatic changes. Every time I check, it feels like a landscape artist came through with an eraser. What about you? Any hidden gems you’ve found along the coast?
+[T3] USER: The section between the pier and the old lighthouse has lost the most sand, almost like the shoreline is being redrawn. Have you seen any changes in the bird colonies that nest there?
+
+[T4] SOFIA: Yeah, I noticed they’ve shifted a bit over the years. Less space means they’re rethinking their real estate too. Last summer, there were fewer chicks than before. It’s all tied together, isn’t it? Loss of sand equals loss of habitat. Ever try birdwatching there?
+[T4] USER: Caught a glimpse once, but the crowds keep me from staying long. Maybe we could walk the dunes together sometime and see the changes up close?
+
+[T5] SOFIA: Walking the dunes sounds intriguing. I could use a partner in crime for my research. Plus, a little adventure might make up for the crowds. Just so you know, I’m not responsible for any wayward kites making an appearance. You up for dodging some flying objects?
+[T5] USER: Sounds like a plan, and I’ll bring a spare hat for any rogue kites.
+
+[T6] SOFIA: Perfect. A backup hat feels like a solid strategy, especially if the wind gets ambitious. I mean, this beach has a flair for surprise. Who knew our stroll would double as a scene from a slapstick comedy? You ready for some unpredictable beach fun?
+[T6] USER: How about meeting at the old pier around three, then we can see if the wind decides to join us?
+
+[T7] SOFIA: Three it is, then. I’ll bring my notebook for serious research... and a backup plan for any kite-related emergencies. It’s going to be quite the adventure, especially if Mother Nature decides to show off. Should we prepare for inspiration or chaos?
+[T7] USER: Inspiration sounds ideal, but a little chaos keeps things interesting. I'll bring the notebook and a spare kite‑tether just in case.
+
+[T8] SOFIA: That’s the spirit! A little chaos keeps the beach lively. Plus, with both of us taking notes, we might just uncover the next great sand conspiracy. I’m intrigued to see what emerges from our beach expedition. See you there, kite-tether ready?
+[T8] USER: Sounds good, the kite‑tether will be handy. See you at the pier at three.
+
+[T9] SOFIA: I'll be there. A little wind might just add the perfect touch to our research. I’ll be the one dodging flying objects and taking notes. Until then, enjoy whatever mischief the beach dishes out.
+[T9] USER: Looking forward to it, and the notebook will be ready for any unexpected data. See you at three.
+
+[T10] SOFIA: Definitely. I’ll be ready to capture the essence of our beach adventure, whatever that may turn out to be. Until then, may the beach gods be in our favor.
+[T10] USER: Sounds good, I’ll have coffee ready for a quick debrief after the dunes. Meet me by the old lighthouse?
+
+[T11] SOFIA: Coffee and a debrief by the lighthouse? You clearly know how to sweeten the deal. I’ll bring the notes, and you can provide the caffeine boost. It’s a plan. Let’s see which changes are worth writing about over some strong coffee.
+[T11] USER: Sounds perfect, the lighthouse will be a good backdrop for the debrief. I’ll have the notebook ready and the coffee will be the best part of the day.
+
+[T12] SOFIA: The lighthouse will definitely add some character to our meeting. And I agree, coffee has a way of elevating any conversation—or maybe it’s just the caffeine magic. Either way, let’s make this debrief memorable. Looking forward to seeing what we uncover.
+[T12] USER: Coffee at the lighthouse sounds like the perfect ending to a day of sand and data. See you there at three.
+
+[T13] SOFIA: It does sound perfect. A little coffee, some interesting data, and the lighthouse looming in the background—how poetic. I’ll be there, ready to discuss the great mysteries of the beach. Until then, may the tide bring us good insights!
+[T13] USER: Sounds like a plan. I’ll bring the notebook and we can swap notes over coffee.
+
+[T14] SOFIA: Absolutely, I’m looking forward to the note-swapping part. Who knows, we might even end up with some unexpected insights. Coffee in one hand, notebook in the other—perfect balance for a beach day. See you at three!
+[T14] USER: Great, I’ll bring the coffee and we can see what the sand’s trying to tell us.
+
+[T15] SOFIA: I love that idea. The sand has secrets; we just have to listen. I’ll bring my best questions, and we can play detective with the shoreline. Can't wait to see what we uncover.
+[T15] USER: The sand’s stories will be waiting. See you at three by the lighthouse.
+
+[T16] SOFIA: The sand is always ready to share. I'll see you at three, ready to dive into those stories. Who knows what treasures we’ll find in those grains? Until then!
+[T16] USER: Sounds good, I’ll bring the recorder and we can see what the dunes reveal.
+
+[T17] SOFIA: A recorder—now that’s a smart move. We might capture some hidden gems from the dunes. Let’s see what they’ve got to say—could be more interesting than expected. Looking forward to it!
+[T17] USER: Recorder in hand, ready to catch the dunes’ whispers.
+
+[T18] SOFIA: Perfect! The whispers of the dunes might surprise us. I can already tell this is going to be an enlightening afternoon. See you at three—let the storytelling begin!
+[T18] USER: That's really interesting.
+
+=== SESSION END ===
+Duration: 8.6 minutes
+Turns: 18

@@ -1,0 +1,17 @@
+=== Eklipses Marketing Demo — AI vs Sofia (voice-to-voice) ===
+Date: 2026-08-30T17:44:09.097Z
+URL: https://www.eklipses.com
+AI user TTS: OpenAI tts-1-hd / echo (Alex)
+Sofia TTS: Fish Audio (production voices)
+
+[T1] USER: You look like you’re trying to catch a whale in that notebook. Mind if I stand here for a sec, or am I getting in the way of your research?
+
+[T2] SOFIA: Catching whales would require a much larger notebook. This one is just for the sand erosion data. Though, I guess you never know what might jump out at you. Are you hoping for a big catch today?
+[T2] USER: More like checking if the tide’s taking the place by the rocks, honestly. The sand loss they keep mentioning sounds pretty drastic when you’re actually standing there.
+
+[T3] SOFIA: Ah, a tide watcher then. That has a nice ring to it. Are you clocking when the water will reclaim its territory, or are you just killing time?
+[T3] USER: Not exactly killing time, just seeing how bad it is. Eight meters in twenty years sounds insane, did you walk the whole coastline?
+
+=== SESSION END ===
+Duration: 1.2 minutes
+Turns: 3

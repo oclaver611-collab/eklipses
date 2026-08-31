@@ -1,0 +1,21 @@
+=== Eklipses Marketing Demo — AI vs Sofia (voice-to-voice) ===
+Date: 2026-08-30T17:20:36.060Z
+URL: https://www.eklipses.com
+AI user TTS: OpenAI tts-1-hd / echo (Alex)
+Sofia TTS: Fish Audio (production voices)
+
+[T1] USER: You’ve been circling the same two lines in your notebook for ten minutes. Is it just me, or is that shoreline actually disappearing?
+
+[T2] SOFIA: Good observation. It's definitely been shrinking over the years. You know, I wrote a piece about that—its rise and fall. The shoreline, I mean. Not my struggles with a blank page. 
+
+But hey, you're reading my thoughts. What's your excuse for loitering around here?
+[T2] USER: The sand keeps slipping, but I’m stuck on the rest.
+
+[T3] SOFIA: Stuck, huh? Seems fitting for a beach conversation. What, are you waiting for the words to wash up on the shore like seashells? 
+
+Trust me, if you stare too long, they might just disappear completely.
+[T3] USER: The eight meters don't wait for the perfect word to fall out of the sky. It’s just gone.
+
+=== SESSION END ===
+Duration: 1.6 minutes
+Turns: 3

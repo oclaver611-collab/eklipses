@@ -1,0 +1,37 @@
+=== Eklipses Marketing Demo — AI vs Sofia ===
+Date: 2026-08-29T04:33:35.972Z
+URL: https://www.eklipses.com
+TTS: Fish Audio (real production voices, no stubs)
+
+[T1] USER: Looks like the tide's pulling back more than usual today—does that line up with the erosion you’ve been tracking?
+
+[T2] SOFIA: You noticed that, huh? You're right. The tide line is shifting. It's almost like a visible diary of the shoreline's history. Erosion is a slow dance, but sometimes it moves faster than you expect. Do you spend much time down here?
+[T2] USER: That's really interesting.
+
+[T3] SOFIA: You sound surprised again. I promise, I don't bite. Shoreline changes don’t always make for the most thrilling conversation, but there’s a story behind every grain of sand. Got any secret beach stories to share?
+[T3] USER: That's really interesting.
+
+[T4] SOFIA: You're really leaning into the surprise, aren't you? I should probably let you in on the big secret—sand doesn't tell stories without a little digging. What was the last interesting thing you saw on the beach?
+[T4] USER: That's really interesting.
+
+[T5] SOFIA: Okay, are you on a loop? You could just say "mmm" and save us both some time. There’s more to this beach than just "interesting." What really caught your eye?
+[T5] USER: That's really interesting.
+
+[T6] SOFIA: You're committed to that line, I’ll give you that. Should I start writing it down? Can’t say I’m not intrigued to hear what you find so riveting. Is there a secret code to unlock more than "interesting"?
+[T6] USER: That's really interesting.
+
+[T7] SOFIA: Okay, now I’m starting to think you might be messing with me. I get it. You’d win this round of intrigue. But really, what about this beach makes you stick to that phrase?
+[T7] USER: That's really interesting.
+
+[T8] SOFIA: Alright, you win. I officially concede. If "interesting" is your mantra, I’ll have to step up my game. But I’m curious—what else do you do for fun aside from repeating “interesting”?
+[T8] USER: That's really interesting.
+
+[T9] SOFIA: Wow, you really are dedicated to that word. I respect the consistency. But perhaps I should start taking notes? Or is there an even deeper level of "interesting" hiding in there somewhere?
+[T9] USER: That's really interesting.
+
+[T10] SOFIA: I see we’ve hit peak "interesting" here. Should I start a support group for us? I mean, if we keep this up, we'll have a whole novel by the end of the day. What’s your plan for the next chapter?
+[T10] USER: That's really interesting.
+
+=== SESSION END ===
+Duration: 8.9 minutes
+Turns: 10

@@ -1,0 +1,17 @@
+=== Eklipses Marketing Demo — AI vs Sofia (voice-to-voice) ===
+Date: 2026-08-30T19:17:50.644Z
+URL: https://www.eklipses.com
+AI user TTS: OpenAI tts-1-hd / echo (sentence-split)
+Sofia TTS: Fish Audio (production voices)
+
+[T1] USER: That shoreline data is brutal. Eight meters gone in two decades.
+
+[T2] SOFIA: Yep. It's wild how much the shoreline has shifted. Eight meters, and that’s just the average. Some areas have seen even more. How long have you been coming here?
+[T2] USER: Three, four years now. Mostly summer weekends.
+
+[T3] SOFIA: So you’ve watched some change, then. It can be surprising how quickly things shift. Do you remember the last time you noticed something different?
+[T3] USER: Last spring, the dunes were just gone.
+
+=== SESSION END ===
+Duration: 1.3 minutes
+Turns: 3

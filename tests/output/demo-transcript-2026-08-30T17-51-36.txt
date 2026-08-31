@@ -1,0 +1,17 @@
+=== Eklipses Marketing Demo — AI vs Sofia (voice-to-voice) ===
+Date: 2026-08-30T17:52:38.147Z
+URL: https://www.eklipses.com
+AI user TTS: OpenAI tts-1-hd / echo (Alex)
+Sofia TTS: Fish Audio (production voices)
+
+[T1] USER: Is that coastline bleeding out in real time? I’d hate to walk out here and lose my whole sandbar before lunch.
+
+[T2] SOFIA: It really is, isn't it? The shoreline keeps retreating like it's trying to escape from us. Pretty dramatic if you're into that sort of thing. What made you notice?
+[T2] USER: I was looking for the old lighthouse base, but it’s buried now. Just felt weird seeing the water so close.
+
+[T3] SOFIA: Buried under the sand, along with a lot of memories. It's strange to think how much has been lost here. Do you remember how it used to look?
+[T3] USER: I was mostly a kid when I last came. Just remember the cliffs being way back and the hotel right on the edge.
+
+=== SESSION END ===
+Duration: 1.2 minutes
+Turns: 3

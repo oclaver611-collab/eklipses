@@ -1,0 +1,17 @@
+=== Eklipses Marketing Demo — AI vs Sofia (voice-to-voice) ===
+Date: 2026-08-30T19:12:03.422Z
+URL: https://www.eklipses.com
+AI user TTS: Fish Audio Verity-v2 (906b8b47c30d4ba2a7f1287773e8a3ed)
+Sofia TTS: Fish Audio (production voices)
+
+[T1] USER: Bit blustery for field notes, isn't it? I saw you highlighting the eroding dunes on that page earlier.
+
+[T2] SOFIA: Could you say that again?
+[T2] USER: Sorry, was the wind too loud? I was just asking about the dune markers you were checking.
+
+[T3] SOFIA: Could you say that again?
+[T3] USER: I'm sorry, is the wind too loud to hear me? I was asking which specific erosion marker you were looking at just now.
+
+=== SESSION END ===
+Duration: 1.6 minutes
+Turns: 3

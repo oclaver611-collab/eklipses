@@ -1,0 +1,17 @@
+=== Eklipses Marketing Demo — AI vs Sofia (voice-to-voice) ===
+Date: 2026-08-30T17:35:02.616Z
+URL: https://www.eklipses.com
+AI user TTS: OpenAI tts-1-hd / echo (Alex)
+Sofia TTS: Fish Audio (production voices)
+
+[T1] USER: You mind if I stand here for a bit? The wind is nearly sweeping that notebook off your knee.
+
+[T2] SOFIA: Sounds like the wind has plans for your notebook. Maybe it wants to share your secrets with the sea. Do you think it would make a good co-author?
+[T2] USER: It’s more about me trying to keep it from becoming a seagull snack. I’m Sofia, by the way.
+
+[T3] SOFIA: Ah, a noble battle against nature. Maybe if you offer it coffee, it will behave. Or at least it will know better than to mess with your notes.
+[T3] USER: Seagulls don’t do coffee, I think. But eight meters of sand is a lot to lose. Is that mostly erosion or was there a storm involved?
+
+=== SESSION END ===
+Duration: 1.6 minutes
+Turns: 3
