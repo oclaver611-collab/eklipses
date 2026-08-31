@@ -996,6 +996,19 @@ function applyAvatarSet(set) {
     preload.oncanplaythrough = () => { try { preload.remove(); } catch {} };
     document.body.appendChild(preload);
   }
+  // Preload idle video — prevents 1-2s black screen on first speaking→idle transition
+  // for avatars that have a separate maryIdleVideo (different from speaking video).
+  const idleUrl = set.maryIdleVideo || set.danielVideo || null;
+  if (idleUrl && idleUrl !== set.maryVideo) {
+    const preloadIdle = document.createElement('video');
+    preloadIdle.src = idleUrl;
+    preloadIdle.preload = 'auto';
+    preloadIdle.muted = true;
+    preloadIdle.style.display = 'none';
+    preloadIdle.load();
+    preloadIdle.oncanplaythrough = () => { try { preloadIdle.remove(); } catch {} };
+    document.body.appendChild(preloadIdle);
+  }
 }
 
 /* ===== Stop everything ===== */

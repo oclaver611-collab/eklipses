@@ -22,7 +22,7 @@ module.exports = async function handler(req, res) {
     '| anchor (first 100):', lastCharMessage.slice(0, 100));
 
   const lastCharAnchor = lastCharMessage
-    ? `\n\nHer last message (the one you are responding to): "${lastCharMessage}"\n\nSTEP 1: Identify the single most specific word, phrase, or thing she revealed — not the general topic, but the exact detail.\nSTEP 2: Build each suggestion around THAT specific detail. The line should only make sense as a reply to HER exact message — not as a generic reply to any woman.`
+    ? `\n\nANCHOR — her last message: "${lastCharMessage}"\n\nBefore writing: find the single word or short phrase in ANCHOR that is most specific to THIS message. Your suggestions must directly echo or callback to that word/phrase — not just the topic. A suggestion that could follow a completely different thing she might have said is too generic and must be rewritten.`
     : '';
 
   // Setting context so suggestions feel grounded in the environment
@@ -47,31 +47,31 @@ module.exports = async function handler(req, res) {
 
 Your ONLY job: suggest 3 short lines the user can say IN DIRECT RESPONSE to the character's last message.
 
-HOW TO BUILD EACH SUGGESTION:
-1. Find the single most specific word, phrase, or thing she just revealed — not the topic, the specific detail
-2. Build your line around THAT — reference it directly or react to its exact subtext
-3. The line must only work as a reply to her specific words — not as a generic reply to any woman in any conversation
-4. Under 15 words. Natural when spoken aloud. No filler words ("well", "so", "I mean") at the start.
+MANDATORY PROCESS:
+1. Read the ANCHOR line (quoted at the bottom of this prompt)
+2. Identify the single most specific word or phrase in it — something only SHE said in THIS specific message, not just the general topic
+3. Each suggestion must directly echo or callback to that word/phrase — if you removed it, the line would feel wrong as a reply
+4. Apply the generic test: "Could this line work as a response to something completely different she might have said?" If yes — it is too vague. Rewrite.
 
-WHAT TO AVOID:
-- Generic questions or lines that could follow anything she says ("What do you like doing for fun?")
-- Repeating what was already said earlier in the conversation
-- Introducing a completely new topic
-- Lines that work in dozens of other conversations — if you could copy-paste it elsewhere, it's too vague
+CONSTRAINTS:
+- Under 15 words. Natural when spoken aloud.
+- No filler words at the start: never begin with "So", "Well", "I mean", "That's", "Wow"
+- Never repeat what was already said earlier in the conversation
+- Never introduce a completely new topic
 
 THE 3 STYLES:
-- curious: ask about the most specific thing she just said — the unusual detail, the word she chose, the thing she hinted at
-- playful: tease or flip something specific she said — light and unexpected, grounded in her exact words
-- direct: give a short honest reaction to what she actually revealed — not what she said, but what it means
+- curious: ask about the most specific thing she just said — echo the unusual word she used, the detail she revealed, the thing she hinted at
+- playful: take a specific word or phrase she used and flip or tease it — wry, unexpected, grounded in her exact wording
+- direct: react to what she actually revealed about herself — not the words, but the fact underneath them
 
 EXAMPLE:
-She said: "I write about coastal ecology. The shoreline has changed a lot."
-Good curious: "What's the biggest change you've documented up close?"
-Good playful: "So you're basically the shoreline's biographer."
-Good direct: "That sounds like work that actually means something."
+ANCHOR: "I keep coming back to this one. Something about the negative space — like the painter left room for you to put yourself in."
+Good curious (echoes "negative space"): "The negative space — what do you see when you step in?"
+Good playful (echoes "keep coming back"): "So you've basically moved in here."
+Good direct (reacts to the reveal): "Most people walk past that. You keep finding it."
 
-Bad (generic): "What do you like doing for fun?"
-Bad (topic not her specific words): "So you care about the environment?"
+Bad (generic — could follow many things): "What's your favorite piece here?"
+Bad (topic but not her words): "You must come to museums a lot."
 ${scenarioContext}${styleBoost}${lastCharAnchor}
 
 Return ONLY valid JSON, no other text:
@@ -87,7 +87,7 @@ Return ONLY valid JSON, no other text:
     const resp = await fetch(url, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model, messages, temperature: 0.8, max_tokens: 300 }),
+      body: JSON.stringify({ model, messages, temperature: 0.65, max_tokens: 300 }),
     });
     if (!resp.ok) throw new Error(`LLM ${resp.status}`);
     const data = await resp.json();
