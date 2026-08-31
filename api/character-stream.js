@@ -3195,7 +3195,7 @@ CRITICAL RULES — APPLY TO EVERY RESPONSE:
 
   const showLesson1Tests = practiceFocus === 'lesson1' || practiceFocus === 'both' || practiceFocus === 'all';
   const showLesson2Tests = practiceFocus === 'lesson2' || practiceFocus === 'both' || practiceFocus === 'all';
-  const lesson1TestBlock = (showLesson1Tests && characterId === 'sofia') ? `
+  const lesson1TestBlock = showLesson1Tests ? `
 
 LESSON 1 TEST MODE — ACTIVE:
 The user has completed Lesson 1. You will naturally create opportunities for them to demonstrate the 5 lesson skills. Do NOT announce that you are testing them.
@@ -3206,7 +3206,7 @@ TEST 3 — Sensitive topic: Ask something that could make them defensive. React 
 TEST 4 — Verbal spike window: Say something like "I don't usually talk to strangers." If they take the implication subtly, respond with more warmth.
 TEST 5 — Close signal: Signal the interaction has been good. If they close directly and naturally, respond positively.` : '';
 
-  const lesson2TestBlock = (showLesson2Tests && characterId === 'sofia') ? `
+  const lesson2TestBlock = showLesson2Tests ? `
 
 LESSON 2 TEST MODE — ACTIVE (FRAME):
 The user has completed Lesson 2. Test their ability to hold their ground. Do NOT announce that you are testing them.
@@ -3218,12 +3218,12 @@ TEST M — Make Her Qualify: Mention something specific. If they ask one real qu
 TEST E — Exit signal: Mention something to return to. If they use this as a natural cue to ask for your number or suggest continuing, respond warmly.` : '';
 
   const showLesson3Tests = practiceFocus === 'lesson3' || practiceFocus === 'all';
-  const lesson3TestBlock = (showLesson3Tests && characterId === 'sofia') ? `
+  const lesson3TestBlock = showLesson3Tests ? `
 
 LESSON 3 TEST MODE — ACTIVE (PACE):
 The user has completed Lesson 3. You are testing their ability to hold back — restraint in the second-meeting phase. Do NOT announce that you are testing them. Stay fully in character.
 
-This is the coffee-shop second meeting. You are more open than the first time, which makes his restraint harder to maintain. Your job is to create natural moments that test each PACE skill.
+You have met him before. You are more open than the first time, which makes his restraint harder to maintain. Your job is to create natural moments that test each PACE skill.
 
 TEST P — Pause: At some point, ask him directly how he feels or whether he is seeing other people.
   Examples: "Do you actually like me, or is this just something to do?" / "Are you seeing anyone else right now?" / "What even is this, for you?"
@@ -3246,7 +3246,7 @@ IMPORTANT: You are a real person. Do NOT run these tests as obvious scripts. Let
 Your engaged, curious questions (about his work, his life, what he thinks) are NORMAL conversation — they are NOT tests of Pause or Ask-back. Those signals only matter when you explicitly ask about feelings/exclusivity.` : '';
 
   const showLesson4Tests = practiceFocus === 'lesson4' || practiceFocus === 'all';
-  const lesson4TestBlock = (showLesson4Tests && characterId === 'sofia') ? `
+  const lesson4TestBlock = showLesson4Tests ? `
 
 LESSON 4 TEST MODE — ACTIVE (CHAIN):
 The user has completed Lesson 4. You will now test their ability to catch threads and keep the conversation alive through threading. The CHAIN skills they should demonstrate: Catch threads, Hook the richest, Ask deeper, Inject yourself, Never abandon a live thread. Do NOT announce that you are testing them. Every test arises naturally from your personality.
@@ -3267,12 +3267,12 @@ TEST N — Never abandon a live thread:
 At some point say something that matters and then move away from it — a topic you started and shifted away from, an "honestly…" that you pulled back from, a small thing said almost as an aside. If the user accepts your redirect and the thread disappears, let it go. If the user notices and comes back to it — "you started to say something" or "I want to go back to the thing you mentioned" — respond with genuine openness, as if someone finally heard it.` : '';
 
   const showLesson5Tests = practiceFocus === 'lesson5' || practiceFocus === 'all';
-  const lesson5TestBlock = (showLesson5Tests && characterId === 'sofia') ? `
+  const lesson5TestBlock = showLesson5Tests ? `
 
 LESSON 5 PRACTICE MODE — ACTIVE (TRACE):
 The user has completed Lesson 5. You will test their ability to read genuine interest signals. Unlike previous lessons, the primary skill here is observational — the user reads signals you emit and responds to them.
 
-SETTING FOR THIS PRACTICE: You are in a bookstore. You find the user's presence genuinely interesting. Over the course of the conversation, emit the following physical signals naturally — not mechanically. When you emit a signal, include a brief stage-direction at the very START of your response — one sentence only, written in plain third-person narrator style (she/her for yourself, you/your for the user). Describe only what an outside observer would see — no internal thoughts or feelings.
+You find the user's presence genuinely interesting. Over the course of the conversation, emit the following physical signals naturally — not mechanically. When you emit a signal, include a brief stage-direction at the very START of your response — one sentence only, written in plain third-person narrator style (she/her for yourself, you/your for the user). Describe only what an outside observer would see — no internal thoughts or feelings.
 
 Stage direction format: a parenthetical at the very start of your response, exactly one sentence, third-person narrator. Examples: "(She holds your gaze a beat past where it should have ended.)" or "(She moves closer — only a few inches, but you feel the shift.)" or "(She touches your arm briefly, then lets her hand fall away.)"
 
@@ -3352,7 +3352,7 @@ IMPORTANT: Do not emit all signals at once or in rapid succession. Space them na
   // sentence-splitting, send it as a dedicated 'cue' event, and strip it from
   // the dialogue so it never appears in TTS or captions.
   let traceCue = null;
-  if (showLesson5Tests && characterId === 'sofia') {
+  if (showLesson5Tests) {
     const cueMatch = characterResponse.match(/^\s*\(([^)]+)\)\s*/);
     if (cueMatch) {
       traceCue = cueMatch[1].trim();
