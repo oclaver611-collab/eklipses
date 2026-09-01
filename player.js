@@ -655,6 +655,8 @@ const DailyLimit = (() => {
     window.fetch = async function(url, options = {}) {
       if (typeof url === 'string' && (
         url.includes('/api/character') ||
+        url.includes('/api/coach') ||
+        url.includes('/api/drill-eval') ||
         url.includes('/api/tts') ||
         url.includes('/api/count-session') ||
         url.includes('/api/check-session')
@@ -993,6 +995,19 @@ function applyAvatarSet(set) {
     // Remove after preload to avoid memory leak
     preload.oncanplaythrough = () => { try { preload.remove(); } catch {} };
     document.body.appendChild(preload);
+  }
+  // Preload idle video — prevents 1-2s black screen on first speaking→idle transition
+  // for avatars that have a separate maryIdleVideo (different from speaking video).
+  const idleUrl = set.maryIdleVideo || set.danielVideo || null;
+  if (idleUrl && idleUrl !== set.maryVideo) {
+    const preloadIdle = document.createElement('video');
+    preloadIdle.src = idleUrl;
+    preloadIdle.preload = 'auto';
+    preloadIdle.muted = true;
+    preloadIdle.style.display = 'none';
+    preloadIdle.load();
+    preloadIdle.oncanplaythrough = () => { try { preloadIdle.remove(); } catch {} };
+    document.body.appendChild(preloadIdle);
   }
 }
 
@@ -1529,10 +1544,15 @@ function getKokoroVoice(speaker) {
 /* ===== Dynamic Mary ===== */
 let conversationHistory=[];
 let _exchangeCount = 0;
+let _streaming = false; // true from turn start until history push completes — blocks Coach me
 let firstUserOpener=null;
-function resetConversation() { conversationHistory=[]; _exchangeCount = 0; }
+function resetConversation() { conversationHistory=[]; _exchangeCount = 0; _streaming = false; }
 
 async function streamCharacterAndSpeak(userSaid, mySession, onTextReady = null) {
+  // Block Coach me for the full duration of this turn — until history is pushed.
+  _streaming = true;
+  updateCoachBtnVisibility();
+
   // Show thinking state immediately
   els.name.textContent = getCharacterDisplayName(currentCharacterId);
   els.text.textContent = '...';
@@ -1720,8 +1740,10 @@ async function streamCharacterAndSpeak(userSaid, mySession, onTextReady = null) 
     conversationHistory.push({ role: 'assistant', content: historyContent });
     if (conversationHistory.length > 12) conversationHistory = conversationHistory.slice(-12);
     _exchangeCount++;
-    updateCoachBtnVisibility();
   }
+  // Always clear streaming flag so Coach me re-enables, even if this turn produced no text
+  _streaming = false;
+  updateCoachBtnVisibility();
 
   return fullText || null;
 }
@@ -1756,10 +1778,13 @@ async function getCharacterResponseFallback(userSaid) {
     conversationHistory.push({ role: 'assistant', content: maryText });
     if (conversationHistory.length > 12) conversationHistory = conversationHistory.slice(-12);
     _exchangeCount++;
+    _streaming = false;
     updateCoachBtnVisibility();
     return maryText;
   } catch (err) {
     clearTimeout(timeout);
+    _streaming = false;
+    updateCoachBtnVisibility();
     return null;
   }
 }
@@ -4035,6 +4060,11 @@ async function handleCoachBtn() {
   if (!btn || btn.disabled) return;
   btn.disabled = true;
   btn.textContent = '...';
+
+  // Diagnostic: log what history is being sent so stale-anchor bugs are traceable
+  console.log('[coach-btn] history at fire time (' + conversationHistory.length + ' msgs):',
+    conversationHistory.map((m, i) => i + ':' + m.role + ' ' + m.content.slice(0, 60)));
+
   try {
     const res = await fetch('/api/coach-suggest', {
       method: 'POST',
@@ -4048,11 +4078,25 @@ async function handleCoachBtn() {
     if (!res.ok) throw new Error('suggest failed');
     const data = await res.json();
     showCoachSuggestions(data.suggestions);
+    // Log to session transcript so every coach-suggest call is captured alongside conversation turns
+    if (typeof window.EkTranscript?.logCoachSuggest === 'function') {
+      window.EkTranscript.logCoachSuggest({
+        anchor: data.anchor || '',
+        fillerSkipped: data.fillerSkipped || false,
+        fillerText: data.fillerText || '',
+        suggestions: data.suggestions,
+        historyContext: conversationHistory.slice(-6),
+      });
+    }
   } catch (err) {
     console.warn('[coach-btn] error:', err.message);
+    // Show brief inline error so the button doesn't just silently reset
+    btn.textContent = 'Try again';
+    setTimeout(() => { if (btn) btn.textContent = '🎯 Coach me'; }, 2500);
+    return;
   } finally {
     btn.disabled = false;
-    btn.textContent = '🎯 Coach me';
+    if (btn.textContent === '...') btn.textContent = '🎯 Coach me';
   }
 }
 
@@ -4082,7 +4126,12 @@ function hideCoachSuggestions() {
 
 function updateCoachBtnVisibility() {
   const btn = document.getElementById('ek-coach-btn');
-  if (btn) btn.style.display = _exchangeCount >= 1 ? 'block' : 'none';
+  if (!btn) return;
+  btn.style.display = _exchangeCount >= 1 ? 'block' : 'none';
+  // Disable (but keep visible) while a turn is in flight — prevents stale-history suggestions
+  btn.disabled = _streaming;
+  btn.style.opacity = _streaming ? '0.4' : '1';
+  btn.style.cursor = _streaming ? 'default' : 'pointer';
 }
 
 bootDefault();

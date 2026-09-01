@@ -26,6 +26,23 @@ module.exports = async function handler(req, res) {
 
   async function callLLM(messages, maxTokens) {
     const bodyBase = { max_tokens: maxTokens, temperature: 0.1, messages, response_format: { type: 'json_object' } };
+    // OpenAI primary — gpt-4o-mini is reliable and fast for structured JSON coaching output
+    if (process.env.OPENAI_API_KEY) {
+      try {
+        const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...bodyBase, model: 'gpt-4o-mini' }),
+        });
+        if (resp.ok) {
+          const d = await resp.json();
+          const content = d.choices?.[0]?.message?.content;
+          if (content) return content;
+        }
+        console.warn('[coach] OpenAI non-OK:', resp.status);
+      } catch (err) { console.warn('[coach] OpenAI error:', err.message); }
+    }
+    // Groq fallback
     if (process.env.GROQ_API_KEY) {
       try {
         const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -41,15 +58,7 @@ module.exports = async function handler(req, res) {
         console.warn('[coach] Groq non-OK:', resp.status);
       } catch (err) { console.warn('[coach] Groq error:', err.message); }
     }
-    if (!process.env.OPENAI_API_KEY) throw new Error('No LLM provider available');
-    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...bodyBase, model: 'gpt-4o-mini' }),
-    });
-    if (!resp.ok) throw new Error('OpenAI error: ' + await resp.text());
-    const d = await resp.json();
-    return d.choices?.[0]?.message?.content;
+    throw new Error('No LLM provider available');
   }
 
   // Character name map for transcript labels

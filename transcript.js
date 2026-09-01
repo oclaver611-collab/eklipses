@@ -91,6 +91,32 @@
     logEntry('DIAG', text, { isdiag: true });
   }
 
+  // Called from player.js handleCoachBtn after a successful coach-suggest response.
+  // Captures the anchor, history context, and suggestions as a single transcript event.
+  function logCoachSuggest({ anchor, fillerSkipped, fillerText, suggestions, historyContext }) {
+    const now = Date.now();
+    const entry = {
+      speaker: 'COACH-SUGGEST',
+      text: anchor || '(no anchor)',
+      timestamp: now,
+      elapsed: sessionStartTime ? now - sessionStartTime : 0,
+      scenarioId: currentScenarioId,
+      scenarioTitle: (window.SCENARIOS && currentScenarioId && window.SCENARIOS[currentScenarioId])
+        ? window.SCENARIOS[currentScenarioId].title
+        : 'Unknown',
+      mode: window.isPractice ? 'practice' : 'demo',
+      iscoach: true,
+      anchor: anchor || '',
+      fillerSkipped: !!fillerSkipped,
+      fillerText: fillerText || '',
+      suggestions: suggestions || [],
+      historyContext: (historyContext || []).map(m => ({ role: m.role, text: (m.content || '').slice(0, 120) })),
+    };
+    transcriptLog.push(entry);
+    saveToStorage();
+    updateBadge();
+  }
+
   function formatTranscriptForCopy() {
     if (transcriptLog.length === 0) {
       return '(empty transcript — no session recorded yet)';
@@ -111,6 +137,31 @@
       // Diagnostic entries: indented, ms-precision timestamp
       if (entry.isdiag) {
         lines.push(`  [${formatTimestampMs(entry.elapsed)}] >> ${entry.text}`);
+        return;
+      }
+
+      // Coach-suggest entries: structured block
+      if (entry.iscoach) {
+        const prevNonSystem = transcriptLog.slice(0, i).filter(e => !e.isdiag && !e.iscoach).pop();
+        const gap = prevNonSystem ? ((entry.elapsed - prevNonSystem.elapsed) / 1000).toFixed(1) : '0.0';
+        lines.push('');
+        lines.push(`[${formatTimestamp(entry.elapsed)}] [+${gap}s] [COACH-SUGGEST]`);
+        if (entry.fillerSkipped) {
+          lines.push(`  Filler skipped: "${entry.fillerText}"`);
+        }
+        lines.push(`  Anchor: "${entry.anchor}"`);
+        if (entry.historyContext && entry.historyContext.length > 0) {
+          lines.push(`  History context (last ${entry.historyContext.length} msgs):`);
+          entry.historyContext.forEach(m => {
+            const label = m.role === 'user' ? '    You' : '    Her';
+            lines.push(`${label}: "${m.text}"`);
+          });
+        }
+        lines.push(`  Suggestions:`);
+        (entry.suggestions || []).forEach(s => {
+          lines.push(`    [${s.style}]  "${s.text}"`);
+        });
+        lines.push('');
         return;
       }
 
@@ -311,6 +362,59 @@
       .ek-gap.slow { color: #ff9a8b; }
       .ek-gap.fast { color: #94f1b6; }
 
+      /* Coach-suggest entries */
+      .ek-turn-coach {
+        background: #0e1420;
+        border-bottom-color: #1a2a3a;
+        border-left: 3px solid #3b82f6;
+        padding-left: 10px;
+        margin: 6px 0;
+        border-radius: 0 8px 8px 0;
+      }
+      .ek-turn-speaker.coachsuggest { color: #60a5fa; }
+      .ek-coach-anchor {
+        color: #e3eaf4;
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+      .ek-coach-anchor strong { color: #93c5fd; }
+      .ek-coach-filler {
+        color: #f87171;
+        font-size: 11px;
+        font-style: italic;
+        margin-bottom: 4px;
+      }
+      .ek-coach-history {
+        color: #6b7280;
+        font-size: 11px;
+        font-family: ui-monospace, 'SF Mono', Monaco, Consolas, monospace;
+        margin-bottom: 6px;
+        line-height: 1.6;
+      }
+      .ek-coach-history .ch-user { color: #7aa8ff; }
+      .ek-coach-history .ch-her  { color: #ff9ec7; }
+      .ek-coach-suggestions { display: flex; flex-direction: column; gap: 4px; }
+      .ek-coach-suggestion {
+        font-size: 13px;
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+      }
+      .ek-coach-style {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        min-width: 52px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        text-align: center;
+      }
+      .ek-coach-style.curious { background: #1e3a5f; color: #93c5fd; }
+      .ek-coach-style.playful { background: #3b1f5e; color: #c4b5fd; }
+      .ek-coach-style.direct  { background: #1c3a2a; color: #6ee7b7; }
+      .ek-coach-suggestion-text { color: #e3eaf4; }
+
       @media (max-width: 720px) {
         #ek-transcript-panel { inset: 10px; }
         #ek-transcript-btn {
@@ -395,6 +499,41 @@
             <div class="ek-turn-time" style="font-size:10px">${formatTimestampMs(entry.elapsed)}</div>
             <div class="ek-turn-speaker diag">diag</div>
             <div class="ek-turn-text-diag">${escapeHtml(entry.text)}</div>
+          </div>
+        `);
+        return;
+      }
+
+      // Coach-suggest events: anchor + history context + suggestions card
+      if (entry.iscoach) {
+        const fillerHtml = entry.fillerSkipped
+          ? `<div class="ek-coach-filler">⚠ Filler skipped: "${escapeHtml(entry.fillerText)}"</div>`
+          : '';
+        const historyHtml = (entry.historyContext || []).map(m => {
+          const cls = m.role === 'user' ? 'ch-user' : 'ch-her';
+          const label = m.role === 'user' ? 'You' : 'Her';
+          return `<span class="${cls}">${label}:</span> ${escapeHtml(m.text)}`;
+        }).join('<br>');
+        const suggestionsHtml = (entry.suggestions || []).map(s => `
+          <div class="ek-coach-suggestion">
+            <span class="ek-coach-style ${escapeHtml(s.style)}">${escapeHtml(s.style)}</span>
+            <span class="ek-coach-suggestion-text">"${escapeHtml(s.text)}"</span>
+          </div>`).join('');
+
+        const prevNonSystem = transcriptLog.slice(0, i).filter(e => !e.isdiag && !e.iscoach).pop();
+        const gap = prevNonSystem ? entry.elapsed - prevNonSystem.elapsed : 0;
+        const gapStr = prevNonSystem ? `<span class="ek-gap">+${(gap/1000).toFixed(1)}s</span>` : '';
+
+        html.push(`
+          <div class="ek-turn ek-turn-coach">
+            <div class="ek-turn-time">${formatTimestamp(entry.elapsed)}<br>${gapStr}</div>
+            <div class="ek-turn-speaker coachsuggest">🎯 COACH</div>
+            <div>
+              ${fillerHtml}
+              <div class="ek-coach-anchor"><strong>Anchor:</strong> "${escapeHtml(entry.anchor)}"</div>
+              <div class="ek-coach-history">${historyHtml}</div>
+              <div class="ek-coach-suggestions">${suggestionsHtml}</div>
+            </div>
           </div>
         `);
         return;
@@ -641,6 +780,9 @@
     buildUI();
     installHooks();
     updateBadge();
+
+    // Expose coach-suggest hook so player.js can log into the transcript
+    window.EkTranscript = { logCoachSuggest };
 
     console.log('[Transcript] Tool loaded. Press 📋 button to view session.');
   }
