@@ -4078,6 +4078,16 @@ async function handleCoachBtn() {
     if (!res.ok) throw new Error('suggest failed');
     const data = await res.json();
     showCoachSuggestions(data.suggestions);
+    // Log to session transcript so every coach-suggest call is captured alongside conversation turns
+    if (typeof window.EkTranscript?.logCoachSuggest === 'function') {
+      window.EkTranscript.logCoachSuggest({
+        anchor: data.anchor || '',
+        fillerSkipped: data.fillerSkipped || false,
+        fillerText: data.fillerText || '',
+        suggestions: data.suggestions,
+        historyContext: conversationHistory.slice(-6),
+      });
+    }
   } catch (err) {
     console.warn('[coach-btn] error:', err.message);
     // Show brief inline error so the button doesn't just silently reset

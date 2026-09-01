@@ -146,7 +146,13 @@ Return ONLY valid JSON, no other text:
     }
 
     console.log('[coach-suggest] suggestions:', parsed.suggestions.map(s => s.style + ': ' + s.text).join(' | '));
-    return res.json(parsed);
+    // Include anchor metadata so the client can log exactly what the model worked from
+    return res.json({
+      suggestions: parsed.suggestions,
+      anchor: lastCharMessage,
+      fillerSkipped,
+      fillerText: fillerSkipped ? rawLast : null,
+    });
   } catch (err) {
     console.error('[coach-suggest] error:', err.message);
     return res.status(500).json({ error: 'Failed to generate suggestions' });
