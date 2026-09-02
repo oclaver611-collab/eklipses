@@ -3492,7 +3492,7 @@ function showPracticeFocusModal(scenarioKey) {
     // ── Returning user: primary actions prominent, secondary options below ──
     body.innerHTML = `
 <p style="font-size:18px;font-weight:700;color:#f0f2f6;margin:0 0 4px">What do you want to practice?</p>
-<p style="font-size:13px;color:#8a93a8;margin:0 0 16px;line-height:1.5">${getCharacterDisplayName(currentCharacterId)||'Your character'} adapts to your choice.</p>
+<p style="font-size:13px;color:#8a93a8;margin:0 0 16px;line-height:1.5">She adapts to your choice.</p>
 <div style="display:flex;flex-direction:column;gap:8px">
 
 <button id="pfm-latest"
