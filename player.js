@@ -3457,7 +3457,7 @@ function showPracticeFocusModal(scenarioKey) {
     // Primary: Start Practicing (Free Practice). Secondary: choose a lesson.
     body.innerHTML = `
 <p style="font-size:18px;font-weight:700;color:#f0f2f6;margin:0 0 4px">Ready to practice?</p>
-<p style="font-size:13px;color:#8a93a8;margin:0 0 18px;line-height:1.5">${getCharacterDisplayName(currentCharacterId)||'Your character'} is ready when you are.</p>
+<p style="font-size:13px;color:#8a93a8;margin:0 0 18px;line-height:1.5">She's ready when you are.</p>
 <div style="display:flex;flex-direction:column;gap:10px">
 
 <button id="pfm-free"

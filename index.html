@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<!-- Polyfill navigator.storage for older Safari/WebKit â€” must run before PostHog and Supabase -->
+	<!-- Polyfill navigator.storage for older Safari/WebKit Ã¢â‚¬â€ must run before PostHog and Supabase -->
 	<script>if(typeof navigator!="undefined"&&(!navigator.storage||typeof navigator.storage.persisted!="function")){var _s=navigator.storage||{};if(typeof _s.persisted!="function")_s.persisted=function(){return Promise.resolve(false)};if(typeof _s.persist!="function")_s.persist=function(){return Promise.resolve(false)};if(typeof _s.estimate!="function")_s.estimate=function(){return Promise.resolve({quota:0,usage:0})};try{Object.defineProperty(navigator,"storage",{value:_s,configurable:true,writable:true})}catch(e){try{navigator.storage=_s}catch(e2){}}}</script>
 
 	<script>
@@ -30,7 +30,7 @@
     --text:#e9ecf1; --shadow: 0 10px 30px rgba(0,0,0,.35);
   }
   html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
-  /* top bar â€” hidden in card-first flow */
+  /* top bar Ã¢â‚¬â€ hidden in card-first flow */
   .topbar{display:none}
   .topbar label{font-size:14px;color:#cfd6e4;margin-right:6px}
   select,button{border:1px solid var(--stroke);background:#1d2026;color:var(--text);border-radius:8px;padding:8px 10px}
@@ -103,7 +103,7 @@
     height:260px !important;
   }
 
-  /* listening pill â€” position:absolute inside #stageFrame so it renders in fullscreen */
+  /* listening pill Ã¢â‚¬â€ position:absolute inside #stageFrame so it renders in fullscreen */
   .pill{position:absolute;top:10px;right:10px;background:var(--accent);color:#000;padding:8px 12px;border-radius:20px;font-weight:700;display:none;z-index:999}
 
   /* ===== Avatar Picker Overlay ===== */
@@ -170,7 +170,7 @@
   .ek-cert-chip.certified { background:rgba(76,175,80,.2); color:#4caf50; }
   .ek-cert-chip.practiced { background:rgba(154,164,178,.12); color:#9aa4b2; }
 
-  /* ===== Input Mode Toggle â€” position:absolute inside #stageFrame so it renders in fullscreen ===== */
+  /* ===== Input Mode Toggle Ã¢â‚¬â€ position:absolute inside #stageFrame so it renders in fullscreen ===== */
   #input-mode-toggle {
     position: absolute; bottom: 60px; right: 12px; z-index: 999;
     width: 44px; height: 44px; border-radius: 50%;
@@ -285,24 +285,24 @@
   .mn-meaning { font-size:12px;color:#8a93a8;line-height:1.3 }</style>
 </head>
 <body>
-  <!-- Streak badge â€” populated by Progress.refreshStreakBadge() -->
+  <!-- Streak badge Ã¢â‚¬â€ populated by Progress.refreshStreakBadge() -->
   <span id="ek-streak-badge" style="display:none;position:fixed;top:10px;right:10px;z-index:9990;align-items:center;gap:5px;background:#1e1a0e;border:1px solid #7a5500;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700;color:#ffb300;cursor:pointer" title="View progress"></span>
 
-  <!-- LEARN / PRACTICE Tabs (auth UI lives here as right-side flex child â€” avoids fixed-position overlap) -->
+  <!-- LEARN / PRACTICE Tabs (auth UI lives here as right-side flex child Ã¢â‚¬â€ avoids fixed-position overlap) -->
   <div class="ek-tabs">
     <button class="ek-tab" id="ek-tab-learn">LEARN</button>
     <button class="ek-tab" id="ek-tab-practice">PRACTICE</button>
     <div style="margin-left:auto;display:flex;align-items:center;padding-bottom:4px;gap:8px">
       <button id="ek-auth-btn" style="display:none;background:transparent;border:1px solid #2b2e3b;border-radius:999px;color:#9aa4b2;font-size:13px;font-weight:600;padding:5px 14px;cursor:pointer;transition:color .15s,border-color .15s" onmouseover="this.style.color='#e9ecf1';this.style.borderColor='#3a3f4b'" onmouseout="this.style.color='#9aa4b2';this.style.borderColor='#2b2e3b'">Sign in</button>
       <div id="ek-auth-indicator" style="display:none;align-items:center;gap:8px;background:#1a1d26;border:1px solid #2b2e3b;border-radius:999px;padding:5px 14px;font-size:12px;color:#9aa4b2">
-        <span>ðŸ‘¤</span>
+        <span>Ã°Å¸â€˜Â¤</span>
         <span id="ek-auth-email" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
         <button id="ek-auth-logout" style="background:none;border:none;color:#6b7685;font-size:12px;cursor:pointer;padding:0;text-decoration:underline">Log out</button>
       </div>
     </div>
   </div>
 
-  <!-- LEARN tab content â€” lesson cards filled dynamically by lesson-player.js -->
+  <!-- LEARN tab content Ã¢â‚¬â€ lesson cards filled dynamically by lesson-player.js -->
   <div id="ek-learn-tab" style="display:none;">
     <div class="ek-learn-inner">
       <div id="lesson1-card"></div>
@@ -315,7 +315,7 @@
 
   <!-- PRACTICE tab content -->
   <div id="ek-practice-wrap" style="display:none;">
-  <!-- Dating MVP hero â€” shown to first-time visitors only (hidden once they've started) -->
+  <!-- Dating MVP hero Ã¢â‚¬â€ shown to first-time visitors only (hidden once they've started) -->
   <div id="ek-hero" style="text-align:center;padding:36px 24px 20px;max-width:600px;margin:0 auto">
     <div style="font-size:26px;font-weight:800;color:#e9ecf1;letter-spacing:-0.5px;line-height:1.25">
       Stop overthinking it.<br>Start practicing.
@@ -324,12 +324,12 @@
       AI characters that talk back. Honest feedback after every conversation.
     </div>
     <div style="font-size:13px;color:#ffb300;margin-top:8px;font-weight:600">
-      â†“ Pick a scenario and go
+      Ã¢â€ â€œ Pick a scenario and go
     </div>
   </div>
   <!-- Warning banner -->
   <div id="ek-practice-banner">
-    <span class="ek-banner-text">Recommended: Complete Lesson 1 before your first practice session â€” you'll perform significantly better.</span>
+    <span class="ek-banner-text">Recommended: Complete Lesson 1 before your first practice session Ã¢â‚¬â€ you'll perform significantly better.</span>
     <div class="ek-banner-btns">
       <button id="ek-banner-go-lesson">Go to Lesson 1</button>
       <button id="ek-banner-dismiss">Dismiss</button>
@@ -346,8 +346,8 @@
         <!-- Listening indicator and input-mode toggle live inside stageFrame so they
              remain visible when stageFrame enters fullscreen (Fullscreen API only
              renders children of the fullscreen element). -->
-        <div id="listenPill" class="pill">ðŸŽ¤ Listeningâ€¦</div>
-        <button id="input-mode-toggle" title="Switch to keyboard input">ðŸŽ¤</button>
+        <div id="listenPill" class="pill">Ã°Å¸Å½Â¤ ListeningÃ¢â‚¬Â¦</div>
+        <button id="input-mode-toggle" title="Switch to keyboard input">Ã°Å¸Å½Â¤</button>
       </div>
       <div id="speakerName" class="name">Ryan</div>
       <div id="lineText" class="line"></div>
@@ -356,7 +356,7 @@
     <aside class="shelf">
       <div style="display:flex;justify-content:space-between;align-items:center;margin:4px 8px 10px">
         <span style="font-size:16px;font-weight:600;color:#cfd6e4">Scenarios</span>
-        <button id="chooseAvatarBtn" style="font-size:11px;font-weight:600;background:transparent;border:1px solid #2b2e36;border-radius:999px;color:#9aa4b2;padding:4px 10px;cursor:pointer;transition:color .15s,border-color .15s" onmouseover="this.style.color='#cfd6e4';this.style.borderColor='#3a3f4b'" onmouseout="this.style.color='#9aa4b2';this.style.borderColor='#2b2e36'">ðŸ‘¤ Change</button>
+        <button id="chooseAvatarBtn" style="font-size:11px;font-weight:600;background:transparent;border:1px solid #2b2e36;border-radius:999px;color:#9aa4b2;padding:4px 10px;cursor:pointer;transition:color .15s,border-color .15s" onmouseover="this.style.color='#cfd6e4';this.style.borderColor='#3a3f4b'" onmouseout="this.style.color='#9aa4b2';this.style.borderColor='#2b2e36'">Ã°Å¸â€˜Â¤ Change</button>
       </div>
       <div id="shelfList" class="sc-list"></div>
       <div id="showMore" class="showmore" style="display:none;"></div>
@@ -367,30 +367,30 @@
 
   <footer class="site-footer">
     Questions? <a href="mailto:support@eklipses.com" style="color:#6b7685;text-decoration:none;">support@eklipses.com</a>
-    &nbsp;Â·&nbsp;
+    &nbsp;Ã‚Â·&nbsp;
     <a href="/terms" style="color:#6b7685;text-decoration:none;">Terms of Service</a>
     <span id="ek-cancel-wrap" style="display:none">
-      &nbsp;Â·&nbsp;
+      &nbsp;Ã‚Â·&nbsp;
       <a href="#" id="ek-cancel-btn" style="color:#6b7685;text-decoration:none;" onclick="ekCancelSubscription(event)">Cancel subscription</a>
     </span>
   </footer>
 
-  <!-- Type mode input bar â€” shown when input mode is 'type' and listenForUser is active -->
+  <!-- Type mode input bar Ã¢â‚¬â€ shown when input mode is 'type' and listenForUser is active -->
   <div id="type-input-wrap">
-    <textarea id="type-input-field" placeholder="Type your response and press Enterâ€¦" rows="1"></textarea>
+    <textarea id="type-input-field" placeholder="Type your response and press EnterÃ¢â‚¬Â¦" rows="1"></textarea>
     <button id="type-send-btn">Send</button>
   </div>
 
-  <!-- Mnemonic reminder pill â€” shown during lesson-specific practice sessions -->
+  <!-- Mnemonic reminder pill Ã¢â‚¬â€ shown during lesson-specific practice sessions -->
   <div id="mnemonic-pill" style="display:none">
     <div id="mnemonic-pill-collapsed">
-      <button id="mnemonic-pill-label">FRAME â–¸</button>
-      <button id="mnemonic-pill-off" title="Hide this reminder">Ã—</button>
+      <button id="mnemonic-pill-label">FRAME Ã¢â€“Â¸</button>
+      <button id="mnemonic-pill-off" title="Hide this reminder">Ãƒâ€”</button>
     </div>
     <div id="mnemonic-pill-card" style="display:none">
       <div id="mnemonic-card-head">
         <span id="mnemonic-card-name">FRAME</span>
-        <button id="mnemonic-card-collapse" title="Collapse">âˆ’</button>
+        <button id="mnemonic-card-collapse" title="Collapse">Ã¢Ë†â€™</button>
       </div>
       <ul id="mnemonic-items"></ul>
     </div>
@@ -433,7 +433,7 @@
     btn.textContent = 'Yes, cancel my subscription';
     btn.disabled = false;
     btn.onclick = async function() {
-      btn.textContent = 'Cancellingâ€¦';
+      btn.textContent = 'CancellingÃ¢â‚¬Â¦';
       btn.disabled = true;
       const customerId = localStorage.getItem('ek-stripe-cus');
       if (!customerId) {
@@ -468,12 +468,12 @@
             '<button onclick="document.getElementById(\'ek-cancel-modal\').style.display=\'none\'" style="padding:8px 24px;background:#333;color:#fff;border:none;border-radius:6px;cursor:pointer">Close</button>';
         } else {
           document.getElementById('ek-cancel-body').innerHTML =
-            '<p style="color:#e05252;font-size:14px">Something went wrong â€” email <a href="mailto:support@eklipses.com" style="color:#6b9fff">support@eklipses.com</a></p>' +
+            '<p style="color:#e05252;font-size:14px">Something went wrong Ã¢â‚¬â€ email <a href="mailto:support@eklipses.com" style="color:#6b9fff">support@eklipses.com</a></p>' +
             '<button onclick="document.getElementById(\'ek-cancel-modal\').style.display=\'none\'" style="margin-top:16px;padding:8px 24px;background:#333;color:#fff;border:none;border-radius:6px;cursor:pointer">Close</button>';
         }
       } catch {
         document.getElementById('ek-cancel-body').innerHTML =
-          '<p style="color:#e05252;font-size:14px">Something went wrong â€” email <a href="mailto:support@eklipses.com" style="color:#6b9fff">support@eklipses.com</a></p>' +
+          '<p style="color:#e05252;font-size:14px">Something went wrong Ã¢â‚¬â€ email <a href="mailto:support@eklipses.com" style="color:#6b9fff">support@eklipses.com</a></p>' +
           '<button onclick="document.getElementById(\'ek-cancel-modal\').style.display=\'none\'" style="margin-top:16px;padding:8px 24px;background:#333;color:#fff;border:none;border-radius:6px;cursor:pointer">Close</button>';
       }
     };
@@ -490,19 +490,19 @@
 
   <script src="scenarios.js"></script>
 
-  <!-- FingerprintJS â€” device fingerprint for session rate limiting -->
+  <!-- FingerprintJS Ã¢â‚¬â€ device fingerprint for session rate limiting -->
   <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
 
-  <!-- Supabase browser client (UMD â€” exposes window.supabase) -->
+  <!-- Supabase browser client (UMD Ã¢â‚¬â€ exposes window.supabase) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
-  <!-- Auth + progress sync â€” must load before lesson-player.js -->
-  <script src="auth.js?v=925a1f6"></script>
+  <!-- Auth + progress sync Ã¢â‚¬â€ must load before lesson-player.js -->
+  <script src="auth.js?v=ee3fa36"></script>
 
-  <script src="kokoro-speech.js?v=925a1f6"></script>
-  <script src="player.js?v=925a1f6"></script>
-  <script src="netflix-rows.js?v=925a1f6"></script>
-  <script src="transcript.js?v=925a1f6"></script>
-  <script src="lesson-player.js?v=925a1f6"></script>
+  <script src="kokoro-speech.js?v=ee3fa36"></script>
+  <script src="player.js?v=ee3fa36"></script>
+  <script src="netflix-rows.js?v=ee3fa36"></script>
+  <script src="transcript.js?v=ee3fa36"></script>
+  <script src="lesson-player.js?v=ee3fa36"></script>
 </body>
 </html>
