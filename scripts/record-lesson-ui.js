@@ -18,7 +18,7 @@ const os              = require('os');
 
 // ── Paths ──────────────────────────────────────────────────────────────────────
 const ROOT       = path.resolve(__dirname, '..');
-const SLICE_DIR  = path.join(ROOT, 'lesson1_slices');
+const SLICE_DIR  = path.join(ROOT, 'content', 'lesson1', 'slices');
 const PUBLIC_DIR = path.join(ROOT, 'tools', 'video-overlay', 'public');
 const TS_DATA    = path.join(ROOT, 'tools', 'video-overlay', 'src', 'LessonSliceData.ts');
 const TMP        = path.join(os.tmpdir(), `ek-ui-record-${Date.now()}`);

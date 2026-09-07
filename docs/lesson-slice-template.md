@@ -28,7 +28,7 @@ module.exports = {
   obsFile:    'C:/Users/serge/Videos/EKtest.mp4', // raw OBS recording
   lessonNum:  1,          // lesson number (used in output filenames and badges)
   totalSlices: 8,         // total slices in this lesson
-  outputDir:  'D:/BUSINESS/executables/love/eklipses/EK7/lesson1_slices',
+  outputDir:  'D:/BUSINESS/executables/love/eklipses/EK7/content/lesson1/slices',
 
   slices: [
     {
@@ -115,7 +115,7 @@ All in ASS BGR hex (note: ASS uses BBGGRR byte order, opposite of CSS RGB):
 |------|----------|-------|
 | Hook | 2s | Dark card at start of each slice. Text is white, centered, Alignment=5. Hook line uses `\\N` for line breaks in ASS. Badge appears in top-right corner (Alignment=9). |
 | Cliffhanger | ~5–7s (measured from actual TTS audio) | Dark card between lesson and outro. Ryan gold captions, Alignment=5 (centered). Text split by `chunkSegment` using proportional word timing. |
-| Outro | 4s | Dark card at end. Fixed layout: "Want to try this yourself?" / "eklipses.com" / "2 free sessions · no card required". |
+| Outro | 4s | Dark card at end. Four elements (top to bottom): "Follow for Part [N+1]" (white, 60pt, y=700) · "Want to try this yourself?" (muted pink, 46pt, y=830) · "eklipses.com" (Ryan gold, 70pt, y=960) · "2 free sessions · no card required" (gray, 38pt, y=1090). The follow line is omitted on the final slice (no next part). Each slice gets its own `outro{N}.ass` file (not a shared one) so the part number can vary. |
 
 ### Badge style
 
@@ -186,6 +186,25 @@ tmp/  (auto-created in OS temp, e.g. %TEMP%/ek-lesson1/)
 
 CRF 18 gives near-lossless quality at reasonable file size (~15–30 MB per slice at these dimensions). `faststart` places the MP4 moov atom at the front for streaming.
 
+### Audio normalization
+
+The lesson audio is normalized to EBU R128 / -14 LUFS before encoding using the ffmpeg `loudnorm` filter:
+
+```
+loudnorm=I=-14:LRA=11:TP=-1.5
+```
+
+- **I=-14 LUFS**: target integrated loudness — standard for Instagram/TikTok/YouTube Shorts
+- **LRA=11**: allows up to 11 LU of loudness range (preserves dynamic narration)
+- **TP=-1.5 dBTP**: true peak ceiling giving 1.5 dB headroom before the AAC encode
+
+Applied only to the lesson audio track `[lsn_a]`; cliffhanger TTS and silence segments are left unchanged (TTS is already consistent; silence has no energy). Single-pass mode — no pre-analysis step needed.
+
+To verify loudness of a rendered file:
+```
+ffprobe -f lavfi -i "amovie=lesson1-slice01-of08.mp4,ebur128" -show_entries frame_tags=lavfi.r128.I -of csv=p=0
+```
+
 ---
 
 ## Known issues / lessons learned (Lesson 1)
@@ -194,3 +213,5 @@ CRF 18 gives near-lossless quality at reasonable file size (~15–30 MB per slic
 - **Slice 3 contamination:** Alex/Sofia voices bled into Ryan's lesson audio at t≈33–39.8s because they were recorded simultaneously. The contamination window was measured by listening and confirmed by checking Whisper's spurious word timestamps. If a future slice has the same symptom (captions show dialogue words during narration), add a `contamZone` to the manifest.
 - **Sofia name tag:** The Eklipses UI places Sofia's name tag at the very bottom of her photo card. The drawbox y must stay at or above the UI chrome elements but below the name tag bottom. Current value (y=1125) was pixel-measured from the raw OBS source. If the app layout changes (e.g. name tag moves), re-measure by extracting a raw OBS frame without drawbox and scanning for white pixel clusters in y=1090–1150.
 - **chunkSegment drift:** `chunkSegment` (proportional splitting) is still used for exchange dialogue since we have known text but no word-level timestamps. It's accurate enough for scripted exchanges with relatively even pacing. For long monologue segments, always use Whisper word-level timestamps instead.
+- **Two render scripts for Lesson 1:** The canonical template (`lesson-slice-template.js`) requires a manifest file and uses Fish Audio cliffhangers (4-segment concat). Lesson 1 was originally rendered by `scripts/process-obs-recording.js`, which has caption data hardcoded (no cliffhangers, 3-segment concat). Both scripts have been updated with the same outro follow text and audio normalization changes. To re-render Lesson 1, run `node scripts/process-obs-recording.js`; output goes to `content/lesson1/slices/`. Future lessons should use `lesson-slice-template.js` with a manifest.
+- **Follow text on last slice:** The `buildOutroASS(sliceNum, totalSlices)` function automatically omits the "Follow for Part X" line when `sliceNum >= totalSlices`. No special handling needed in the manifest.

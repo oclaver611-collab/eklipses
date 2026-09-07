@@ -13,7 +13,7 @@ const fs   = require('fs');
 const path = require('path');
 
 const OBS = 'C:/Users/serge/Videos/EKtest.mp4';
-const OUT = path.resolve(__dirname, '../lesson1_slices');
+const OUT = path.resolve(__dirname, '../content/lesson1/slices');
 const TMP = 'C:/Users/serge/AppData/Local/Temp/ek-obs-slice';
 fs.mkdirSync(TMP, { recursive: true });
 
@@ -401,6 +401,7 @@ Style: HookText,Arial Black,86,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,
 Style: OutroTag,Arial,46,&H00C8A0A0,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,0,5,80,80,0,1
 Style: OutroUrl,Arial Black,70,&H0054A0D9,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,3,1,5,80,80,0,1
 Style: OutroSub,Arial,38,&H00888888,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,0,5,80,80,0,1
+Style: OutroFollow,Arial Black,60,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,3,1,5,80,80,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text`;
@@ -427,8 +428,12 @@ function buildHookASS(hookLine, badge) {
     `Dialogue: 0,${assTime(0.25)},${assTime(1.75)},HookText,,0,0,0,,${hookLine}`;
 }
 
-function buildOutroASS() {
+function buildOutroASS(sliceNum, totalSlices) {
+  const followLine = (sliceNum < totalSlices)
+    ? `Dialogue: 0,0:00:00.20,0:00:04.00,OutroFollow,,0,0,0,,{\\pos(540,700)}Follow for Part ${sliceNum + 1}\n`
+    : '';
   return ASS_HEADER + '\n' +
+    followLine +
     'Dialogue: 0,0:00:00.20,0:00:04.00,OutroTag,,0,0,0,,{\\pos(540,830)}Want to try this yourself?\n' +
     'Dialogue: 0,0:00:00.50,0:00:04.00,OutroUrl,,0,0,0,,{\\pos(540,960)}eklipses.com\n' +
     'Dialogue: 0,0:00:01.00,0:00:04.00,OutroSub,,0,0,0,,{\\pos(540,1090)}2 free sessions \u00B7 no card required';
@@ -460,25 +465,26 @@ function ffmpeg(args, label) {
   });
 
   console.log('\nWriting ASS files...');
-  fs.writeFileSync(path.join(TMP, 'outro.ass'), buildOutroASS(), 'utf8');
-
   for (let i = 0; i < SLICES.length; i++) {
     const slice = SLICES[i];
-    const badge = `LESSON 1 \u00B7 PART ${i+1}/8`;
-    fs.writeFileSync(path.join(TMP, `slice${i+1}.ass`), buildCaptionASS(captionSets[i], badge, slice.dur), 'utf8');
-    fs.writeFileSync(path.join(TMP, `hook${i+1}.ass`),  buildHookASS(slice.hook, badge), 'utf8');
-    console.log(`  \u2713 slice${i+1}.ass + hook${i+1}.ass  badge="${badge}"`);
+    const n     = i + 1;
+    const badge = `LESSON 1 \u00B7 PART ${n}/8`;
+    fs.writeFileSync(path.join(TMP, `outro${n}.ass`),  buildOutroASS(n, 8), 'utf8');
+    fs.writeFileSync(path.join(TMP, `slice${n}.ass`), buildCaptionASS(captionSets[i], badge, slice.dur), 'utf8');
+    fs.writeFileSync(path.join(TMP, `hook${n}.ass`),  buildHookASS(slice.hook, badge), 'utf8');
+    console.log(`  \u2713 outro${n}.ass + slice${n}.ass + hook${n}.ass  badge="${badge}"`);
   }
 
   console.log('\nRendering slices...');
   console.log('  Frame layout: crop 390\xD7693 at x=445,y=18 \u2192 scale 1080\xD71920');
   console.log('  drawbox masks UI chrome at output y=1110-1920  (below Sofia photo)\n');
 
-  for (const slice of SLICES.filter(s => s.num <= 3)) {
+  for (const slice of SLICES) {
     const { num, label, obsStart, dur, hook } = slice;
     const tag        = String(num).padStart(2, '0');
     const captionAss = `slice${num}.ass`;
     const hookAss    = `hook${num}.ass`;
+    const outroAss   = `outro${num}.ass`;
     const outFile    = path.join(OUT, `lesson1-slice${tag}-of08.mp4`).replace(/\\/g, '/');
 
     console.log(`\nSlice ${num}: ${label}`);
@@ -506,12 +512,12 @@ function ffmpeg(args, label) {
 
     const d   = dur.toFixed(3);
     const FC  = [
-      `[0:v]trim=duration=${d},setpts=PTS-STARTPTS,crop=390:693:445:18,scale=1080:1920:flags=lanczos,setsar=1,fps=30,drawbox=x=0:y=1110:w=1080:h=810:c=0x15171C@1:t=fill,ass='${captionAss}'[lesson]`,
+      `[0:v]trim=duration=${d},setpts=PTS-STARTPTS,crop=390:693:445:18,scale=1080:1920:flags=lanczos,setsar=1,fps=30,drawbox=x=0:y=1125:w=1080:h=795:c=0x15171C@1:t=fill,ass='${captionAss}'[lesson]`,
       `[2:v]fps=30,ass='${hookAss}'[hook]`,
-      `[1:v]fps=30,ass='outro.ass'[outro]`,
+      `[1:v]fps=30,ass='${outroAss}'[outro]`,
       `[hook][lesson][outro]concat=n=3:v=1:a=0[outv]`,
       `aevalsrc=0:d=2[hook_sil]`,
-      `[0:a]atrim=duration=${d},asetpts=PTS-STARTPTS[lsn_a]`,
+      `[0:a]atrim=duration=${d},asetpts=PTS-STARTPTS,loudnorm=I=-14:LRA=11:TP=-1.5[lsn_a]`,
       `aevalsrc=0:d=4[outro_sil]`,
       `[hook_sil][lsn_a][outro_sil]concat=n=3:v=0:a=1[outa]`,
     ].join(';');

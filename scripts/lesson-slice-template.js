@@ -124,6 +124,7 @@ Style: OutroTag,Arial,46,&H00C8A0A0,&H000000FF,&H00000000,&H00000000,0,0,0,0,100
 Style: OutroUrl,Arial Black,70,${COLOR_RYAN},&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,3,1,5,80,80,0,1
 Style: OutroSub,Arial,38,&H00888888,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,0,5,80,80,0,1
 Style: CliffCaption,Arial Black,72,${COLOR_RYAN},&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,3,1,5,80,80,0,1
+Style: OutroFollow,Arial Black,60,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,3,1,5,80,80,0,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text`;
@@ -151,8 +152,12 @@ function buildHookASS(hookLine, badge) {
     `Dialogue: 0,${assTime(0.25)},${assTime(HOOK_DUR - 0.25)},HookText,,0,0,0,,${hookLine}`;
 }
 
-function buildOutroASS() {
+function buildOutroASS(sliceNum, totalSlices) {
+  const followLine = (sliceNum < totalSlices)
+    ? `Dialogue: 0,0:00:00.20,0:00:04.00,OutroFollow,,0,0,0,,{\\pos(540,700)}Follow for Part ${sliceNum + 1}\n`
+    : '';
   return ASS_HEADER + '\n' +
+    followLine +
     `Dialogue: 0,0:00:00.20,0:00:04.00,OutroTag,,0,0,0,,{\\pos(540,830)}Want to try this yourself?\n` +
     `Dialogue: 0,0:00:00.50,0:00:04.00,OutroUrl,,0,0,0,,{\\pos(540,960)}eklipses.com\n` +
     `Dialogue: 0,0:00:01.00,0:00:04.00,OutroSub,,0,0,0,,{\\pos(540,1090)}2 free sessions · no card required`;
@@ -334,10 +339,10 @@ function renderSlice({ obsFile, obsStart, lessonDur, clifDur, outFile, tmp, slic
       `ass='slice${sliceNum}.ass'[lesson]`,
     `[2:v]fps=30,ass='hook${sliceNum}.ass'[hook]`,
     `[3:v]fps=30,ass='cliff${sliceNum}.ass'[cliff_v]`,
-    `[1:v]fps=30,ass='outro.ass'[outro]`,
+    `[1:v]fps=30,ass='outro${sliceNum}.ass'[outro]`,
     `[hook][lesson][cliff_v][outro]concat=n=4:v=1:a=0[outv]`,
     `aevalsrc=0:d=${HOOK_DUR}[hook_sil]`,
-    `[0:a]atrim=duration=${d},asetpts=PTS-STARTPTS[lsn_a]`,
+    `[0:a]atrim=duration=${d},asetpts=PTS-STARTPTS,loudnorm=I=-14:LRA=11:TP=-1.5[lsn_a]`,
     `[4:a]asetpts=PTS-STARTPTS[cliff_a]`,
     `aevalsrc=0:d=${OUTRO_DUR}[outro_sil]`,
     `[hook_sil][lsn_a][cliff_a][outro_sil]concat=n=4:v=0:a=1[outa]`,
@@ -438,11 +443,12 @@ function main() {
 
   // ── Step 5: Write ASS files ───────────────────────────────────────────────
   console.log('\n── Step 5: Writing ASS files');
-  fs.writeFileSync(path.join(tmp, 'outro.ass'), buildOutroASS(), 'utf8');
-
   for (const s of slices) {
     const n = s.num;
     const clifDur = clifDurMap[n];
+
+    fs.writeFileSync(path.join(tmp, `outro${n}.ass`),
+      buildOutroASS(n, totalSlices), 'utf8');
 
     fs.writeFileSync(path.join(tmp, `slice${n}.ass`),
       buildCaptionASS(captionMap[n], s.badge, s.dur), 'utf8');
@@ -454,7 +460,7 @@ function main() {
     fs.writeFileSync(path.join(tmp, `cliff${n}.ass`),
       buildCliffASS(cliffCaps), 'utf8');
 
-    console.log(`  ✓ slice${n}.ass + hook${n}.ass + cliff${n}.ass`);
+    console.log(`  ✓ outro${n}.ass + slice${n}.ass + hook${n}.ass + cliff${n}.ass`);
   }
 
   // ── Step 6: Render ────────────────────────────────────────────────────────
