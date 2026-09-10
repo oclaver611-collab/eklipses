@@ -26,7 +26,7 @@ echo.
 rem Stamp current HEAD hash into ?v=... on all local script tags in index.html
 for /f %%H in ('git rev-parse --short HEAD') do set VHASH=%%H
 echo Stamping JS cache version: %VHASH%
-powershell -Command "$v='%VHASH%'; $f='index.html'; $c=(Get-Content $f -Raw) -replace '\.js\?v=[a-f0-9]+', \".js?v=$v\"; [System.IO.File]::WriteAllText((Resolve-Path $f).Path, $c)"
+powershell -Command "$v='%VHASH%'; $f='index.html'; $c=[System.IO.File]::ReadAllText((Resolve-Path $f).Path, [System.Text.Encoding]::UTF8) -replace '\.js\?v=[a-f0-9]+', \".js?v=$v\"; [System.IO.File]::WriteAllText((Resolve-Path $f).Path, $c, [System.Text.Encoding]::UTF8)"
 if errorlevel 1 ( echo ERROR: version stamp update failed & exit /b 1 )
 
 git add -A
