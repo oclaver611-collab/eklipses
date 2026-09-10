@@ -1,7 +1,7 @@
 {
-  "name": "eklipses",
+  "name": "ozmeva",
   "version": "1.0.0",
-  "description": "Eklipses — AI dating practice app",
+  "description": "Ozmeva — AI dating practice app",
   "scripts": {
     "test": "node tests/test-all-scenarios.js && node tests/test-paywall.js && node tests/test-lesson-player.js && node tests/test-new-features.js",
     "test:scenarios": "node tests/test-all-scenarios.js",

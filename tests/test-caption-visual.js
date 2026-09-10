@@ -79,11 +79,11 @@ async function run() {
     // Skip onboarding + set dev-bypass key so the paywall doesn't block
     await page.addInitScript(() => {
       localStorage.setItem('ek-onboarding-v1', '1');
-      localStorage.setItem('eklipses_lesson1_complete', 'true');
-      localStorage.setItem('eklipses_practice_focus', 'lesson1');
+      localStorage.setItem('ozmeva_lesson1_complete', 'true');
+      localStorage.setItem('ozmeva_practice_focus', 'lesson1');
       localStorage.setItem('ek-dev-key', 'ek_dev_2026');
-      localStorage.removeItem('eklipses_mnemonic_off');
-      localStorage.removeItem('eklipses_mnemonic_expanded');
+      localStorage.removeItem('ozmeva_mnemonic_off');
+      localStorage.removeItem('ozmeva_mnemonic_expanded');
     });
 
     await page.goto(BASE, { waitUntil: 'domcontentloaded' });

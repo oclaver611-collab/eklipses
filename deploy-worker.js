@@ -1,4 +1,4 @@
-// deploy-worker.js — Deploy eklipses-lesson-audio Cloudflare Worker via API
+// deploy-worker.js — Deploy ozmeva-lesson-audio Cloudflare Worker via API
 const fs   = require('fs');
 const path = require('path');
 
@@ -20,7 +20,7 @@ const env = { ...loadEnv('.env'), ...loadEnv('.env.local') };
 
 const ACCOUNT_ID = env.CLOUDFLARE_ACCOUNT_ID || env.R2_ACCOUNT_ID;
 const API_TOKEN  = env.CLOUDFLARE_API_TOKEN;
-const SCRIPT     = 'eklipses-lesson-audio';
+const SCRIPT     = 'ozmeva-lesson-audio';
 
 if (!API_TOKEN) {
   console.error('');
@@ -49,7 +49,7 @@ const boundary = '----FormBoundary' + Math.random().toString(36).slice(2);
 const metadata = JSON.stringify({
   main_module: 'worker.js',
   bindings: [
-    { type: 'r2_bucket', name: 'EKLIPSES_VIDEOS', bucket_name: 'eklipses-videos' }
+    { type: 'r2_bucket', name: 'OZMEVA_VIDEOS', bucket_name: 'eklipses-videos' }
   ],
   compatibility_date: '2024-01-01',
 });

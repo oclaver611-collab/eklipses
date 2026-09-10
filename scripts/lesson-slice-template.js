@@ -33,12 +33,12 @@ const CROP = { x: 445, y: 18, w: 390, h: 693 };
 const OUTPUT_W = 1080;
 const OUTPUT_H = 1920;
 
-// Background/card fill color (matches the Eklipses dark UI palette).
+// Background/card fill color (matches the Ozmeva dark UI palette).
 const BG_HEX   = '0x15171C'; // ffmpeg color string
 const BG_COLOR  = '#15171C'; // CSS-style for reference
 
 // Dark caption box: covers everything below y=1125 with the background color,
-// hiding the Eklipses app's bottom chrome (paywall button, scroll indicators).
+// hiding the Ozmeva app's bottom chrome (paywall button, scroll indicators).
 // y=1125 was chosen after pixel-scanning the raw OBS source: Sofia's "Sofia"
 // name tag text ends at y=1111, so y=1125 gives a 14px margin before the dark
 // box begins. Earlier value of y=1110 clipped the bottom 2 rows of her name.
@@ -159,7 +159,7 @@ function buildOutroASS(sliceNum, totalSlices) {
   return ASS_HEADER + '\n' +
     followLine +
     `Dialogue: 0,0:00:00.20,0:00:04.00,OutroTag,,0,0,0,,{\\pos(540,830)}Want to try this yourself?\n` +
-    `Dialogue: 0,0:00:00.50,0:00:04.00,OutroUrl,,0,0,0,,{\\pos(540,960)}eklipses.com\n` +
+    `Dialogue: 0,0:00:00.50,0:00:04.00,OutroUrl,,0,0,0,,{\\pos(540,960)}ozmeva.com\n` +
     `Dialogue: 0,0:00:01.00,0:00:04.00,OutroSub,,0,0,0,,{\\pos(540,1090)}2 free sessions · no card required`;
 }
 

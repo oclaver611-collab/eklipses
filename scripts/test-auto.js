@@ -6,7 +6,7 @@
 const { execSync } = require('child_process');
 
 console.log('\n╔══════════════════════════════════════════════════════════╗');
-console.log('║         EKLIPSES — AUTOMATED TEST SUITE                 ║');
+console.log('║         OZMEVA — AUTOMATED TEST SUITE                   ║');
 console.log('║         No human needed. Run when AI prompts change.    ║');
 console.log('╚══════════════════════════════════════════════════════════╝\n');
 

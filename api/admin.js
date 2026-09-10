@@ -248,7 +248,7 @@ function loginPage(error) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Eklipses Admin</title>
+<title>Ozmeva Admin</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0a0a0a;color:#e5e5e5;font-family:system-ui,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center}
@@ -265,7 +265,7 @@ button:disabled{opacity:.5;cursor:default}
 </head>
 <body>
 <div class="card">
-  <h1>Eklipses Admin</h1>
+  <h1>Ozmeva Admin</h1>
   <label for="pw">Password</label>
   <input type="password" id="pw" autofocus>
   <button id="btn" onclick="login()">Sign in</button>
@@ -403,7 +403,7 @@ function dashboardPage(users, stats, stripeData) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Eklipses Admin</title>
+<title>Ozmeva Admin</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0a0a0a;color:#e5e5e5;font-family:system-ui,sans-serif;padding:32px 40px}
@@ -440,7 +440,7 @@ tr[data-expandable].open td{background:#111}
 </style>
 </head>
 <body>
-<h1>Eklipses Admin</h1>
+<h1>Ozmeva Admin</h1>
 <p class="sub">Internal dashboard &middot; ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
 
 ${statsHtml}

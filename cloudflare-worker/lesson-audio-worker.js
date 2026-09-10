@@ -23,7 +23,7 @@ export default {
       r2Key = 'lessons/lesson1/audio_v2/' + file;
     }
 
-    const object = await env.EKLIPSES_VIDEOS.get(r2Key);
+    const object = await env.OZMEVA_VIDEOS.get(r2Key);
 
     if (!object) {
       return new Response('Not found', { status: 404 });

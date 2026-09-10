@@ -19,7 +19,7 @@ exit /b 1
 
 :deploy
 echo.
-echo === EKLIPSES DEPLOY ===
+echo === OZMEVA DEPLOY ===
 echo Committing: %MSG%
 echo.
 

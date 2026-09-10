@@ -1,5 +1,5 @@
 // ===================================================================
-// Eklipses — Lesson Player Module  (v3 — multi-lesson)
+// Ozmeva — Lesson Player Module  (v3 — multi-lesson)
 // Handles LEARN tab, Lesson 1 + Lesson 2 players, completion
 // ===================================================================
 (function () {
@@ -95,9 +95,9 @@
     lesson1: {
       id:           'lesson1',
       workerPrefix: '',               // backwards compat: no prefix → lesson1/audio_v2
-      lsProgress:   'eklipses_lesson1_progress',
-      lsComplete:   'eklipses_lesson1_complete',
-      lsCert:       'eklipses_lesson1_certification',
+      lsProgress:   'ozmeva_lesson1_progress',
+      lsComplete:   'ozmeva_lesson1_complete',
+      lsCert:       'ozmeva_lesson1_certification',
       segments:     SEGMENTS1,
       title:        'The Approach',
       completionSub: '"The Approach" — 5 principles mastered.',
@@ -121,8 +121,8 @@
     lesson2: {
       id:           'lesson2',
       workerPrefix: 'lesson2/',       // file=lesson2/ryan_seg00.mp3 → R2: lessons/lesson2/audio/
-      lsProgress:   'eklipses_lesson2_progress',
-      lsComplete:   'eklipses_lesson2_complete',
+      lsProgress:   'ozmeva_lesson2_progress',
+      lsComplete:   'ozmeva_lesson2_complete',
       lsCert:       null,
       segments:     SEGMENTS2,
       title:        'Holding Your Ground',
@@ -147,8 +147,8 @@
     lesson3: {
       id:           'lesson3',
       workerPrefix: 'lesson3/',       // file=lesson3/ryan_seg00.mp3 → R2: lessons/lesson3/audio/
-      lsProgress:   'eklipses_lesson3_progress',
-      lsComplete:   'eklipses_lesson3_complete',
+      lsProgress:   'ozmeva_lesson3_progress',
+      lsComplete:   'ozmeva_lesson3_complete',
       lsCert:       null,
       segments:     SEGMENTS3,
       title:        'The Long Game',
@@ -171,8 +171,8 @@
     lesson4: {
       id:           'lesson4',
       workerPrefix: 'lesson4/',       // file=lesson4/ryan_seg00.mp3 → R2: lessons/lesson4/audio/
-      lsProgress:   'eklipses_lesson4_progress',
-      lsComplete:   'eklipses_lesson4_complete',
+      lsProgress:   'ozmeva_lesson4_progress',
+      lsComplete:   'ozmeva_lesson4_complete',
       lsCert:       null,
       segments:     SEGMENTS4,
       title:        'The Thread',
@@ -197,8 +197,8 @@
     lesson5: {
       id:           'lesson5',
       workerPrefix: 'lesson5/',       // file=lesson5/ryan_seg00.mp3 → R2: lessons/lesson5/audio/
-      lsProgress:   'eklipses_lesson5_progress',
-      lsComplete:   'eklipses_lesson5_complete',
+      lsProgress:   'ozmeva_lesson5_progress',
+      lsComplete:   'ozmeva_lesson5_complete',
       lsCert:       null,
       segments:     SEGMENTS5,
       title:        'The Read',
@@ -223,9 +223,9 @@
   };
 
   // Backwards-compat alias so existing callers work
-  const LS_PROGRESS = 'eklipses_lesson1_progress';
-  const LS_COMPLETE = 'eklipses_lesson1_complete';
-  const LS_CERT     = 'eklipses_lesson1_certification';
+  const LS_PROGRESS = 'ozmeva_lesson1_progress';
+  const LS_COMPLETE = 'ozmeva_lesson1_complete';
+  const LS_CERT     = 'ozmeva_lesson1_certification';
   const SEGMENTS    = SEGMENTS1; // used by public API callers
 
   // ── localStorage helpers ──────────────────────────────────────────
@@ -251,7 +251,7 @@
   // ── Public API ────────────────────────────────────────────────────
   window.LessonPlayer = {
     isComplete:           () => localStorage.getItem(LS_COMPLETE) === 'true',
-    isLesson2Complete:    () => localStorage.getItem('eklipses_lesson2_complete') === 'true',
+    isLesson2Complete:    () => localStorage.getItem('ozmeva_lesson2_complete') === 'true',
     getProgress:          () => lsGet(LS_PROGRESS, null),
     getCertForCharacter:  (charId) => { const c = getCert(); return c[charId] || { attempts:0, passed:0, certified:false }; },
     recordCoachResult:    (charId, passed) => {
@@ -313,8 +313,8 @@
     } else {
       // Hide the LEARN tab button for the dating-niche entry point; show it via ?lessons=1 or
       // if the user has previously started a lesson (respects their existing progress).
-      const hasLessonProgress = ['eklipses_lesson1_progress','eklipses_lesson2_progress',
-        'eklipses_lesson1_complete','eklipses_lesson2_complete'].some(k => localStorage.getItem(k));
+      const hasLessonProgress = ['ozmeva_lesson1_progress','ozmeva_lesson2_progress',
+        'ozmeva_lesson1_complete','ozmeva_lesson2_complete'].some(k => localStorage.getItem(k));
       if (btnLearn) btnLearn.style.display = hasLessonProgress ? '' : 'none';
       switchTab('practice');
     }
@@ -322,14 +322,14 @@
 
   // ── Learn tab rendering ───────────────────────────────────────────
   function getLesson1Status() {
-    if (localStorage.getItem('eklipses_lesson1_complete') === 'true') return 'completed';
-    const prog = localStorage.getItem('eklipses_lesson1_progress');
+    if (localStorage.getItem('ozmeva_lesson1_complete') === 'true') return 'completed';
+    const prog = localStorage.getItem('ozmeva_lesson1_progress');
     if (prog && prog !== '01') return 'in_progress';
     return 'not_started';
   }
   function getLesson2Status() {
-    if (localStorage.getItem('eklipses_lesson2_complete') === 'true') return 'completed';
-    const prog = localStorage.getItem('eklipses_lesson2_progress');
+    if (localStorage.getItem('ozmeva_lesson2_complete') === 'true') return 'completed';
+    const prog = localStorage.getItem('ozmeva_lesson2_progress');
     if (prog && prog !== '00') return 'in_progress';
     return 'not_started';
   }
@@ -388,9 +388,9 @@
     const el = document.getElementById('lesson2-card');
     if (!el) return;
 
-    const lesson1Done    = localStorage.getItem('eklipses_lesson1_complete') === 'true';
-    const lesson2Done    = localStorage.getItem('eklipses_lesson2_complete') === 'true';
-    const lesson2Progress = localStorage.getItem('eklipses_lesson2_progress');
+    const lesson1Done    = localStorage.getItem('ozmeva_lesson1_complete') === 'true';
+    const lesson2Done    = localStorage.getItem('ozmeva_lesson2_complete') === 'true';
+    const lesson2Progress = localStorage.getItem('ozmeva_lesson2_progress');
 
     if (!lesson1Done) {
       el.innerHTML = `
@@ -427,9 +427,9 @@
     const el = document.getElementById('lesson3-card');
     if (!el) return;
 
-    const lesson2Done     = localStorage.getItem('eklipses_lesson2_complete') === 'true';
-    const lesson3Done     = localStorage.getItem('eklipses_lesson3_complete') === 'true';
-    const lesson3Progress = localStorage.getItem('eklipses_lesson3_progress');
+    const lesson2Done     = localStorage.getItem('ozmeva_lesson2_complete') === 'true';
+    const lesson3Done     = localStorage.getItem('ozmeva_lesson3_complete') === 'true';
+    const lesson3Progress = localStorage.getItem('ozmeva_lesson3_progress');
 
     if (!lesson2Done) {
       el.innerHTML = `
@@ -466,9 +466,9 @@
     const el = document.getElementById('lesson4-card');
     if (!el) return;
 
-    const lesson3Done     = localStorage.getItem('eklipses_lesson3_complete') === 'true';
-    const lesson4Done     = localStorage.getItem('eklipses_lesson4_complete') === 'true';
-    const lesson4Progress = localStorage.getItem('eklipses_lesson4_progress');
+    const lesson3Done     = localStorage.getItem('ozmeva_lesson3_complete') === 'true';
+    const lesson4Done     = localStorage.getItem('ozmeva_lesson4_complete') === 'true';
+    const lesson4Progress = localStorage.getItem('ozmeva_lesson4_progress');
 
     if (!lesson3Done) {
       el.innerHTML = `
@@ -505,9 +505,9 @@
     const el = document.getElementById('lesson5-card');
     if (!el) return;
 
-    const lesson4Done     = localStorage.getItem('eklipses_lesson4_complete') === 'true';
-    const lesson5Done     = localStorage.getItem('eklipses_lesson5_complete') === 'true';
-    const lesson5Progress = localStorage.getItem('eklipses_lesson5_progress');
+    const lesson4Done     = localStorage.getItem('ozmeva_lesson4_complete') === 'true';
+    const lesson5Done     = localStorage.getItem('ozmeva_lesson5_complete') === 'true';
+    const lesson5Progress = localStorage.getItem('ozmeva_lesson5_progress');
 
     if (!lesson4Done) {
       el.innerHTML = `

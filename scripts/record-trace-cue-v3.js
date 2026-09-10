@@ -16,7 +16,7 @@
  *    offset from the moment Playwright started recording. File mtime is never
  *    used for timing.
  *
- * Deliverable: C:\Users\serge\OneDrive\Desktop\eklipses-trace-touch.mp4
+ * Deliverable: C:\Users\serge\OneDrive\Desktop\ozmeva-trace-touch.mp4
  *   1080×1920 9:16  ~20 seconds  Contains the TRACE "C — Catch touch" moment.
  */
 
@@ -38,7 +38,7 @@ const VIDEO_DIR  = path.join(SCRATCHPAD, 'trace-rec');
 const AUDIO_DIR  = path.join(SCRATCHPAD, 'trace-audio');
 const EVENTS_LOG = path.join(SCRATCHPAD, 'trace-events.json');
 const DESKTOP    = path.join(USERPROFILE, 'OneDrive', 'Desktop');
-const FINAL_OUT  = path.join(DESKTOP, 'eklipses-trace-touch.mp4');
+const FINAL_OUT  = path.join(DESKTOP, 'ozmeva-trace-touch.mp4');
 
 for (const d of [VIDEO_DIR, AUDIO_DIR, DESKTOP]) {
   if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
@@ -263,16 +263,16 @@ function ffmpeg(args, label) {
 
   await page.evaluate(() => {
     localStorage.setItem('ek-onboarding-v1',          '1');
-    localStorage.setItem('eklipses_practice_focus',   'lesson5');
-    localStorage.setItem('eklipses_input_mode',       'type');
-    localStorage.setItem('eklipses_lesson1_complete', 'true');
-    localStorage.setItem('eklipses_lesson2_complete', 'true');
-    localStorage.setItem('eklipses_lesson3_complete', 'true');
-    localStorage.setItem('eklipses_lesson4_complete', 'true');
-    localStorage.setItem('eklipses_lesson5_complete', 'true');
+    localStorage.setItem('ozmeva_practice_focus',   'lesson5');
+    localStorage.setItem('ozmeva_input_mode',       'type');
+    localStorage.setItem('ozmeva_lesson1_complete', 'true');
+    localStorage.setItem('ozmeva_lesson2_complete', 'true');
+    localStorage.setItem('ozmeva_lesson3_complete', 'true');
+    localStorage.setItem('ozmeva_lesson4_complete', 'true');
+    localStorage.setItem('ozmeva_lesson5_complete', 'true');
     localStorage.removeItem('ek-dev-key');           // no dev bypass — rate-limit mocked above
     localStorage.removeItem('ekDevKey');
-    localStorage.removeItem('eklipses_coached_mode'); // prevent coach interrupts
+    localStorage.removeItem('ozmeva_coached_mode'); // prevent coach interrupts
   });
 
   await page.reload({ waitUntil: 'networkidle', timeout: 45000 });

@@ -1,5 +1,5 @@
 // ============================================================
-// Eklipses — Session Transcript Tool
+// Ozmeva — Session Transcript Tool
 // Logs every turn (Ryan, Mary, user) with timestamps
 // for debugging pacing, cutoffs, and AI response quality.
 // ============================================================
@@ -124,7 +124,7 @@
 
     const lines = [];
     lines.push('='.repeat(60));
-    lines.push('EKLIPSES SESSION TRANSCRIPT');
+    lines.push('OZMEVA SESSION TRANSCRIPT');
     lines.push('Recorded: ' + new Date(sessionStartTime).toLocaleString());
     lines.push('Turns: ' + transcriptLog.filter(e => !e.isdiag).length);
     lines.push('='.repeat(60));

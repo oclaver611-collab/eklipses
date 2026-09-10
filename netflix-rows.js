@@ -1,5 +1,5 @@
 // ============================================================
-// Eklipses — Netflix-style row renderer
+// Ozmeva — Netflix-style row renderer
 // Reads window.SCENARIOS, groups by category, builds rows.
 // Loads AFTER scenarios.js, scenarios_extended.js, and player.js
 // ============================================================

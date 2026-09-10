@@ -31,13 +31,13 @@ const CUES = [
   await context.addInitScript(() => {
     localStorage.setItem('ek-onboarding-v1', '1');
     localStorage.setItem('ek-dev-key', 'ek_dev_2026');
-    localStorage.setItem('eklipses_practice_focus', 'lesson5');
-    localStorage.setItem('eklipses_input_mode', 'type');
-    localStorage.setItem('eklipses_lesson1_complete', 'true');
-    localStorage.setItem('eklipses_lesson2_complete', 'true');
-    localStorage.setItem('eklipses_lesson3_complete', 'true');
-    localStorage.setItem('eklipses_lesson4_complete', 'true');
-    localStorage.setItem('eklipses_lesson5_complete', 'true');
+    localStorage.setItem('ozmeva_practice_focus', 'lesson5');
+    localStorage.setItem('ozmeva_input_mode', 'type');
+    localStorage.setItem('ozmeva_lesson1_complete', 'true');
+    localStorage.setItem('ozmeva_lesson2_complete', 'true');
+    localStorage.setItem('ozmeva_lesson3_complete', 'true');
+    localStorage.setItem('ozmeva_lesson4_complete', 'true');
+    localStorage.setItem('ozmeva_lesson5_complete', 'true');
     window._testMode = true;
   });
 

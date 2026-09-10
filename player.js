@@ -476,7 +476,7 @@ const DailyLimit = (() => {
           console.log('[DailyLimit] Pro subscription activated:', data.customerId);
           const banner = document.createElement('div');
           banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ffb300;color:#000;text-align:center;padding:12px;font-weight:700;font-size:15px;z-index:99999;cursor:pointer';
-          banner.textContent = 'Welcome to Eklipses Pro! Unlimited sessions activated.';
+          banner.textContent = 'Welcome to Ozmeva Pro! Unlimited sessions activated.';
           banner.onclick = () => banner.remove();
           document.body.prepend(banner);
           setTimeout(() => banner.remove(), 5000);
@@ -1039,7 +1039,7 @@ function stopEverything() {
 /* ===== Coached Practice helpers ===== */
 
 function isCoachMode() {
-  return localStorage.getItem('eklipses_coached_mode') === '1';
+  return localStorage.getItem('ozmeva_coached_mode') === '1';
 }
 
 // Waits for any in-flight moment check (already running during TTS), then blocks if an interrupt
@@ -1078,7 +1078,7 @@ async function waitIfPaused(mySession) {
 // Fails open on any error so the conversation always continues.
 async function checkMoment(userSaid, charResponse, mySession) {
   const myGen = _momentCheckGen; // snapshot — checked again before firing interrupt
-  const practiceFocus = localStorage.getItem('eklipses_practice_focus') || 'free';
+  const practiceFocus = localStorage.getItem('ozmeva_practice_focus') || 'free';
   try {
     const controller = new AbortController();
     const t = setTimeout(() => controller.abort(), 7000);
@@ -1449,7 +1449,7 @@ async function speakElevenLabs(text, onStart) {
 async function speak(text, speaker, onAudioReady, prefetchedUrl = null) {
   const mySession=session;
   // Test mode — skip audio, resolve immediately
-  if (window.__EKLIPSES_TEST_MODE) {
+  if (window.__OZMEVA_TEST_MODE) {
     if (els.text.dataset.pendingText) {
       els.text.textContent = els.text.dataset.pendingText;
       delete els.text.dataset.pendingText;
@@ -1653,11 +1653,11 @@ async function streamCharacterAndSpeak(userSaid, mySession, onTextReady = null) 
         characterId: currentCharacterId,
         history: conversationHistory,
         userStyle: currentUserStyle,
-        lesson1Complete: localStorage.getItem('eklipses_lesson1_complete') === 'true',
-        lesson2Complete: localStorage.getItem('eklipses_lesson2_complete') === 'true',
-        lesson3Complete: localStorage.getItem('eklipses_lesson3_complete') === 'true',
-        lesson4Complete: localStorage.getItem('eklipses_lesson4_complete') === 'true',
-        practiceFocus: localStorage.getItem('eklipses_practice_focus') || 'free',
+        lesson1Complete: localStorage.getItem('ozmeva_lesson1_complete') === 'true',
+        lesson2Complete: localStorage.getItem('ozmeva_lesson2_complete') === 'true',
+        lesson3Complete: localStorage.getItem('ozmeva_lesson3_complete') === 'true',
+        lesson4Complete: localStorage.getItem('ozmeva_lesson4_complete') === 'true',
+        practiceFocus: localStorage.getItem('ozmeva_practice_focus') || 'free',
         voiceInput: _lastInputMode === 'voice',
       }),
       signal: controller.signal,
@@ -1695,7 +1695,7 @@ async function streamCharacterAndSpeak(userSaid, mySession, onTextReady = null) 
           // Server extracted it from the leading parenthetical, already third-person.
           // Client-side check guards against the server accidentally sending a cue
           // in a non-lesson5 context.
-          if (payload.cue && localStorage.getItem('eklipses_practice_focus') === 'lesson5') {
+          if (payload.cue && localStorage.getItem('ozmeva_practice_focus') === 'lesson5') {
             TraceCue.show(payload.cue);
             streamedCue = payload.cue;
           }
@@ -1760,11 +1760,11 @@ async function getCharacterResponseFallback(userSaid) {
         scenarioKey: currentScenarioKey,
         characterId: currentCharacterId,
         history: conversationHistory,
-        lesson1Complete: localStorage.getItem('eklipses_lesson1_complete') === 'true',
-        lesson2Complete: localStorage.getItem('eklipses_lesson2_complete') === 'true',
-        lesson3Complete: localStorage.getItem('eklipses_lesson3_complete') === 'true',
-        lesson4Complete: localStorage.getItem('eklipses_lesson4_complete') === 'true',
-        practiceFocus: localStorage.getItem('eklipses_practice_focus') || 'free',
+        lesson1Complete: localStorage.getItem('ozmeva_lesson1_complete') === 'true',
+        lesson2Complete: localStorage.getItem('ozmeva_lesson2_complete') === 'true',
+        lesson3Complete: localStorage.getItem('ozmeva_lesson3_complete') === 'true',
+        lesson4Complete: localStorage.getItem('ozmeva_lesson4_complete') === 'true',
+        practiceFocus: localStorage.getItem('ozmeva_practice_focus') || 'free',
         voiceInput: _lastInputMode === 'voice',
       }),
       signal: controller.signal,
@@ -1798,7 +1798,7 @@ function createRecognition() {
 }
 
 function getInputMode() {
-  return localStorage.getItem('eklipses_input_mode') || 'voice';
+  return localStorage.getItem('ozmeva_input_mode') || 'voice';
 }
 
 function correctSTT(text) {
@@ -2129,7 +2129,7 @@ function listenForUserType(mySession) {
       field.removeEventListener('keydown', onKey);
       field.removeEventListener('input', onInput);
       clearInterval(sessionPoll);
-      window.removeEventListener('eklipses-abort-type-listen', onAbort);
+      window.removeEventListener('ozmeva-abort-type-listen', onAbort);
     }
 
     // Fired when the mic toggle switches back to voice mid-listen — lets playLoop
@@ -2154,7 +2154,7 @@ function listenForUserType(mySession) {
     sendBtn.addEventListener('click', onSend);
     field.addEventListener('keydown', onKey);
     field.addEventListener('input', onInput);
-    window.addEventListener('eklipses-abort-type-listen', onAbort, { once: true });
+    window.addEventListener('ozmeva-abort-type-listen', onAbort, { once: true });
 
     const sessionPoll = setInterval(() => {
       if (mySession !== session) { done(null); }
@@ -2361,7 +2361,7 @@ async function playScenario(key, practice=false) {
   isPractice=practice;
   currentScript=practice?sc.practice:sc.demo;
   stepIndex=0;
-  if (practice) showMnemonicPill(localStorage.getItem('eklipses_practice_focus') || 'free');
+  if (practice) showMnemonicPill(localStorage.getItem('ozmeva_practice_focus') || 'free');
   else hideMnemonicPill();
   if(els.select && els.select.value!==key) els.select.value=key;
   if (window.showFullscreenBtn) window.showFullscreenBtn();
@@ -2654,11 +2654,11 @@ async function runCoachFeedback(mySession) {
     scenarioTitle: sc.title || 'Dating scenario',
     scenarioKey: currentScenarioKey || '',
     opener: firstUserOpener || '',
-    lesson1Complete: localStorage.getItem('eklipses_lesson1_complete') === 'true',
-    lesson2Complete: localStorage.getItem('eklipses_lesson2_complete') === 'true',
-    lesson3Complete: localStorage.getItem('eklipses_lesson3_complete') === 'true',
-    lesson4Complete: localStorage.getItem('eklipses_lesson4_complete') === 'true',
-    practiceFocus: localStorage.getItem('eklipses_practice_focus') || null,
+    lesson1Complete: localStorage.getItem('ozmeva_lesson1_complete') === 'true',
+    lesson2Complete: localStorage.getItem('ozmeva_lesson2_complete') === 'true',
+    lesson3Complete: localStorage.getItem('ozmeva_lesson3_complete') === 'true',
+    lesson4Complete: localStorage.getItem('ozmeva_lesson4_complete') === 'true',
+    practiceFocus: localStorage.getItem('ozmeva_practice_focus') || null,
     characterId: currentCharacterId || 'sofia',
   });
 
@@ -3044,11 +3044,11 @@ function makeCard(key) {
 // Central registry of all lessons — add new entries here as lessons ship.
 // id must match the practiceFocus value sent to the APIs ('lesson1', 'lesson2', …).
 const LESSON_REGISTRY = [
-  { id: 'lesson1', label: 'Lesson 1 — The Approach (OTIMC)',        lsKey: 'eklipses_lesson1_complete' },
-  { id: 'lesson2', label: 'Lesson 2 — Holding Your Ground (FRAME)', lsKey: 'eklipses_lesson2_complete' },
-  { id: 'lesson3', label: 'Lesson 3 — The Long Game (PACE)',        lsKey: 'eklipses_lesson3_complete' },
-  { id: 'lesson4', label: 'Lesson 4 — The Thread (CHAIN)',          lsKey: 'eklipses_lesson4_complete' },
-  { id: 'lesson5', label: 'Lesson 5 — The Read (TRACE)',           lsKey: 'eklipses_lesson5_complete' },
+  { id: 'lesson1', label: 'Lesson 1 — The Approach (OTIMC)',        lsKey: 'ozmeva_lesson1_complete' },
+  { id: 'lesson2', label: 'Lesson 2 — Holding Your Ground (FRAME)', lsKey: 'ozmeva_lesson2_complete' },
+  { id: 'lesson3', label: 'Lesson 3 — The Long Game (PACE)',        lsKey: 'ozmeva_lesson3_complete' },
+  { id: 'lesson4', label: 'Lesson 4 — The Thread (CHAIN)',          lsKey: 'ozmeva_lesson4_complete' },
+  { id: 'lesson5', label: 'Lesson 5 — The Read (TRACE)',           lsKey: 'ozmeva_lesson5_complete' },
 ];
 
 // Mnemonic data sourced from lesson-player.js LESSON_DATA.mnemonicMap — keep in sync when lessons change.
@@ -3242,13 +3242,13 @@ function showMnemonicPill(practiceFocus) {
   const pill = document.getElementById('mnemonic-pill');
   if (!pill) return;
   const data = LESSON_MNEMONICS[practiceFocus];
-  if (!data || localStorage.getItem('eklipses_mnemonic_off') === '1') { pill.style.display = 'none'; return; }
+  if (!data || localStorage.getItem('ozmeva_mnemonic_off') === '1') { pill.style.display = 'none'; return; }
   document.getElementById('mnemonic-pill-label').textContent = data.label + ' ▸';
   document.getElementById('mnemonic-card-name').textContent  = data.label;
   document.getElementById('mnemonic-items').innerHTML = data.items.map(it =>
     `<li class="mn-item"><span class="mn-letter">${it.letter}</span><span class="mn-meaning">${it.meaning}</span></li>`
   ).join('');
-  const expanded = localStorage.getItem('eklipses_mnemonic_expanded') === '1';
+  const expanded = localStorage.getItem('ozmeva_mnemonic_expanded') === '1';
   document.getElementById('mnemonic-pill-collapsed').style.display = expanded ? 'none' : 'flex';
   document.getElementById('mnemonic-pill-card').style.display      = expanded ? 'block' : 'none';
   pill.style.display = 'block';
@@ -3265,17 +3265,17 @@ function initMnemonicPill() {
   const collapse = document.getElementById('mnemonic-card-collapse');
   if (!label) return;
   label.addEventListener('click', () => {
-    localStorage.setItem('eklipses_mnemonic_expanded', '1');
+    localStorage.setItem('ozmeva_mnemonic_expanded', '1');
     document.getElementById('mnemonic-pill-collapsed').style.display = 'none';
     document.getElementById('mnemonic-pill-card').style.display      = 'block';
   });
   collapse.addEventListener('click', () => {
-    localStorage.setItem('eklipses_mnemonic_expanded', '0');
+    localStorage.setItem('ozmeva_mnemonic_expanded', '0');
     document.getElementById('mnemonic-pill-collapsed').style.display = 'flex';
     document.getElementById('mnemonic-pill-card').style.display      = 'none';
   });
   offBtn.addEventListener('click', () => {
-    localStorage.setItem('eklipses_mnemonic_off', '1');
+    localStorage.setItem('ozmeva_mnemonic_off', '1');
     document.getElementById('mnemonic-pill').style.display = 'none';
   });
 }
@@ -3376,7 +3376,7 @@ async function runDrill(lessonKey, scenarioKey) {
 
   if (mySession !== session) return;
 
-  localStorage.setItem(`eklipses_${lessonKey}_drill_done`, '1');
+  localStorage.setItem(`ozmeva_${lessonKey}_drill_done`, '1');
   const bridge = "Good. Now let's run the full scenario.";
   setMediaForSpeaker('Ryan');
   els.name.textContent = 'Ryan';
@@ -3395,11 +3395,11 @@ function showPracticeFocusModal(scenarioKey) {
   const body      = document.getElementById('practice-focus-body');
 
   function start(focus, coached = false) {
-    localStorage.setItem('eklipses_practice_focus', focus);
+    localStorage.setItem('ozmeva_practice_focus', focus);
     if (coached) {
-      localStorage.setItem('eklipses_coached_mode', '1');
+      localStorage.setItem('ozmeva_coached_mode', '1');
     } else {
-      localStorage.removeItem('eklipses_coached_mode');
+      localStorage.removeItem('ozmeva_coached_mode');
     }
     if (!DRILL_REPS[focus]) {
       // No drill for this focus (Free Practice, All Lessons)
@@ -3407,7 +3407,7 @@ function showPracticeFocusModal(scenarioKey) {
       playScenario(scenarioKey, true);
       return;
     }
-    if (localStorage.getItem(`eklipses_${focus}_drill_done`) !== '1') {
+    if (localStorage.getItem(`ozmeva_${focus}_drill_done`) !== '1') {
       // First time — forced drill (runDrill calls playScenario internally when done)
       modal.style.display = 'none';
       runDrill(focus, scenarioKey);
@@ -3795,7 +3795,7 @@ function launchHeroV6() {
 
   overlay.innerHTML = `
     <nav class="ek-h6-nav">
-      <div class="ek-h6-brand">Eklipses</div>
+      <div class="ek-h6-brand">Ozmeva</div>
       <div class="ek-h6-navlinks">
         <a href="#ek-h6-breadth">How it works</a>
         <button class="ek-h6-signin-btn" id="ek-hero-signin">Sign in</button>
@@ -3805,7 +3805,7 @@ function launchHeroV6() {
       <div>
         <div class="ek-h6-eyebrow">Practice, not another video</div>
         <h1 class="ek-h6-h1">Watching changes nothing.<br><em>Doing</em> changes you.</h1>
-        <p class="ek-h6-sub">You can read every book and watch every video, and still freeze when it’s real. That’s because a skill isn’t something you learn. It’s something you build, by doing it badly, then doing it again, and again, until it’s easy. Eklipses is where you do the real thing, as many times as it takes, until you’re actually good at it.</p>
+        <p class="ek-h6-sub">You can read every book and watch every video, and still freeze when it’s real. That’s because a skill isn’t something you learn. It’s something you build, by doing it badly, then doing it again, and again, until it’s easy. Ozmeva is where you do the real thing, as many times as it takes, until you’re actually good at it.</p>
         <div>
           <div class="ek-h6-prompt-label">What do you want to get good at?</div>
           <div class="ek-h6-prompt-box">
@@ -3844,7 +3844,7 @@ function launchHeroV6() {
     </section>
     <div class="ek-h6-breadth" id="ek-h6-breadth">
       <div class="ek-h6-breadth-label">Not a course. A gym for real conversations.</div>
-      <h2 class="ek-h6-breadth-h2">A book ends. A video ends. Nothing about you has to change once they’re over. Eklipses doesn’t end, you practice the same moment <b>again and again</b>, and Eklipses tells you exactly what to fix, until you can’t get it wrong anymore.</h2>
+      <h2 class="ek-h6-breadth-h2">A book ends. A video ends. Nothing about you has to change once they’re over. Ozmeva doesn’t end, you practice the same moment <b>again and again</b>, and Ozmeva tells you exactly what to fix, until you can’t get it wrong anymore.</h2>
       <div class="ek-h6-ticker"><div class="ek-h6-ticker-track">${tickerChips}</div></div>
     </div>`;
 
@@ -4161,12 +4161,12 @@ function initInputModeToggle() {
   btn.addEventListener('click', () => {
     const current = getInputMode();
     const next = current === 'voice' ? 'type' : 'voice';
-    localStorage.setItem('eklipses_input_mode', next);
+    localStorage.setItem('ozmeva_input_mode', next);
     updateToggle();
     if (next === 'voice') {
       // Signal listenForUserType (if currently waiting) to abort and let playLoop
       // re-call listenForUser in voice mode for the same turn.
-      window.dispatchEvent(new CustomEvent('eklipses-abort-type-listen'));
+      window.dispatchEvent(new CustomEvent('ozmeva-abort-type-listen'));
       const wrap = document.getElementById('type-input-wrap');
       if (wrap) wrap.style.display = 'none';
     }

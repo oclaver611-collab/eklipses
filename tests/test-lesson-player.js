@@ -36,8 +36,8 @@ async function run() {
   await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.evaluate(() => {
     localStorage.setItem('ek-dev-key', 'ek_dev_2026'); // dev bypass
-    localStorage.removeItem('eklipses_lesson1_complete'); // start fresh
-    localStorage.removeItem('eklipses_lesson1_progress');
+    localStorage.removeItem('ozmeva_lesson1_complete'); // start fresh
+    localStorage.removeItem('ozmeva_lesson1_progress');
   });
   await page.reload({ waitUntil: 'networkidle', timeout: 30000 });
   await page.waitForSelector('#ek-h6-start', { timeout: 15000 });
@@ -175,7 +175,7 @@ async function run() {
       window.LessonPlayer.showCompletion();
     } else {
       // Fallback: just reveal the container (mnemonic phrase won't be populated)
-      localStorage.setItem('eklipses_lesson1_complete', 'true');
+      localStorage.setItem('ozmeva_lesson1_complete', 'true');
       const el = document.getElementById('elp-complete');
       if (el) el.style.display = '';
     }
@@ -193,23 +193,23 @@ async function run() {
   // Regression for commit 19d0278: listenForUserType had no abort path when the
   // mic toggle fired mid-conversation. The game froze because the Promise only
   // resolved via text submit or session change — never via a toggle event.
-  // Fix: added window.addEventListener('eklipses-abort-type-listen', onAbort).
+  // Fix: added window.addEventListener('ozmeva-abort-type-listen', onAbort).
   //
   // Test 16 (sanity) simulates the PRE-FIX state by monkey-patching addEventListener
-  // to silently drop eklipses-abort-type-listen registrations. The abort event is
+  // to silently drop ozmeva-abort-type-listen registrations. The abort event is
   // then dispatched; without the handler the Promise must hang → timedOut:true.
   // This confirms the test WOULD have caught the original bug.
   // Tests 17-18 run with the real fix in place.
 
   const sanityResult = await page.evaluate(async () => {
-    // Suppress eklipses-abort-type-listen registrations to simulate missing fix
+    // Suppress ozmeva-abort-type-listen registrations to simulate missing fix
     const origAddEL = window.addEventListener.bind(window);
     window.addEventListener = function(type, handler, options) {
-      if (type === 'eklipses-abort-type-listen') return;
+      if (type === 'ozmeva-abort-type-listen') return;
       return origAddEL(type, handler, options);
     };
 
-    localStorage.setItem('eklipses_input_mode', 'type');
+    localStorage.setItem('ozmeva_input_mode', 'type');
     const snap = session;
     const p = listenForUserType(snap);
     await new Promise(r => setTimeout(r, 150)); // let setup complete
@@ -217,8 +217,8 @@ async function run() {
     const wrapShown = document.getElementById('type-input-wrap')?.style.display === 'flex';
 
     // Dispatch abort event — should have NO effect (handler was never registered)
-    localStorage.setItem('eklipses_input_mode', 'voice');
-    window.dispatchEvent(new CustomEvent('eklipses-abort-type-listen'));
+    localStorage.setItem('ozmeva_input_mode', 'voice');
+    window.dispatchEvent(new CustomEvent('ozmeva-abort-type-listen'));
 
     const outcome = await Promise.race([
       p.then(val => ({ timedOut: false, val })),
@@ -241,7 +241,7 @@ async function run() {
       : 'UNEXPECTED RESOLVE — abort fired without handler (sanity invalid)');
 
   const abortResult = await page.evaluate(async () => {
-    localStorage.setItem('eklipses_input_mode', 'type');
+    localStorage.setItem('ozmeva_input_mode', 'type');
     const snap = session; // session may have incremented after stopEverything above
     const startMs = Date.now();
     // Set _testMode so the recursive voice re-listen returns null immediately (deterministic)
@@ -255,8 +255,8 @@ async function run() {
 
     // Simulate mic toggle: set voice in localStorage then dispatch abort event
     // (exact sequence from initInputModeToggle click handler in player.js)
-    localStorage.setItem('eklipses_input_mode', 'voice');
-    window.dispatchEvent(new CustomEvent('eklipses-abort-type-listen'));
+    localStorage.setItem('ozmeva_input_mode', 'voice');
+    window.dispatchEvent(new CustomEvent('ozmeva-abort-type-listen'));
 
     const outcome = await Promise.race([
       p.then(val => ({ timedOut: false, val, elapsedMs: Date.now() - startMs })),
@@ -265,7 +265,7 @@ async function run() {
 
     window._testMode = prevTestMode;
     const wrapAfter = document.getElementById('type-input-wrap')?.style.display;
-    const modeAfter = localStorage.getItem('eklipses_input_mode');
+    const modeAfter = localStorage.getItem('ozmeva_input_mode');
 
     return { wrapBefore, outcome, wrapAfter, modeAfter };
   });
@@ -276,7 +276,7 @@ async function run() {
       ? `TIMED OUT ${abortResult.outcome.elapsedMs}ms — freeze bug present`
       : `resolved null in ${abortResult.outcome.elapsedMs}ms`);
 
-  report('18. After mic toggle — type wrap hidden and eklipses_input_mode is voice',
+  report('18. After mic toggle — type wrap hidden and ozmeva_input_mode is voice',
     abortResult.wrapAfter === 'none' && abortResult.modeAfter === 'voice',
     `wrap="${abortResult.wrapAfter}" mode="${abortResult.modeAfter}"`);
 
@@ -292,15 +292,15 @@ async function run() {
   const modeSwitchResult = await page.evaluate(async () => {
     const prevTestMode = window._testMode;
     window._testMode = true; // voice path returns null immediately — no SR needed
-    localStorage.setItem('eklipses_input_mode', 'type');
+    localStorage.setItem('ozmeva_input_mode', 'type');
     const snap = session;
 
     const p = listenForUser(snap, 5000);
     await new Promise(r => setTimeout(r, 100));
 
     // Simulate toggle
-    localStorage.setItem('eklipses_input_mode', 'voice');
-    window.dispatchEvent(new CustomEvent('eklipses-abort-type-listen'));
+    localStorage.setItem('ozmeva_input_mode', 'voice');
+    window.dispatchEvent(new CustomEvent('ozmeva-abort-type-listen'));
 
     const val = await Promise.race([
       p,
@@ -317,7 +317,7 @@ async function run() {
     `_lastInputMode="${modeSwitchResult.lastMode}" val="${modeSwitchResult.val}"`);
 
   // ── 20. Drill skip choice on second entry ────────────────────────────────
-  // When eklipses_{lesson}_drill_done='1', clicking Latest Lesson in the
+  // When ozmeva_{lesson}_drill_done='1', clicking Latest Lesson in the
   // practice-focus modal should replace the modal body with the skip choice
   // (drill-warmup-btn + drill-skip-btn) rather than closing the modal.
   // Pre-deploy: test will fail (buildDrillSkipHTML not on production yet).
@@ -325,8 +325,8 @@ async function run() {
 
   const drillSkipResult = await page.evaluate(() => {
     try {
-      localStorage.setItem('eklipses_lesson1_complete', 'true');
-      localStorage.setItem('eklipses_lesson1_drill_done', '1');
+      localStorage.setItem('ozmeva_lesson1_complete', 'true');
+      localStorage.setItem('ozmeva_lesson1_drill_done', '1');
 
       const key = Object.keys(SCENARIOS)[0];
       showPracticeFocusModal(key);
@@ -347,7 +347,7 @@ async function run() {
       // Clean up so this test doesn't affect the session state
       const m = document.getElementById('practice-focus-modal');
       if (m) m.style.display = 'none';
-      localStorage.removeItem('eklipses_lesson1_drill_done');
+      localStorage.removeItem('ozmeva_lesson1_drill_done');
     }
   });
 

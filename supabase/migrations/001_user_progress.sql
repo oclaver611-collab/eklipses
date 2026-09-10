@@ -1,4 +1,4 @@
--- Eklipses: user progress table
+-- Ozmeva: user progress table
 -- Run this in the Supabase SQL Editor for your project.
 
 create table if not exists public.user_progress (

@@ -211,7 +211,7 @@ function buildPrompt(groupId, task, priorContext) {
   const taskText = task.text;
   const isRisky  = task.risky;
 
-  return `You are working on the Eklipses dating practice app (D:/BUSINESS/executables/love/eklipses/EK7).
+  return `You are working on the Ozmeva dating practice app (D:/BUSINESS/executables/love/eklipses/EK7).
 This is a headless automation run — no human is present. Work autonomously.
 
 ## Your task
@@ -361,7 +361,7 @@ async function runNextGroup(forcedGroupId) {
 
 (async () => {
   log('\n╔══════════════════════════════════════════════════════════════════════╗');
-  log('║  EKLIPSES DATING MVP RUNNER                                          ║');
+  log('║  OZMEVA DATING MVP RUNNER                                            ║');
   log(`║  ${ts()}                                                   ║`);
   log('╚══════════════════════════════════════════════════════════════════════╝\n');
 

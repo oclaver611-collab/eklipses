@@ -1,5 +1,5 @@
 // ============================================================
-// EKLIPSES — HeyGen Test (Sanna only) v2
+// OZMEVA — HeyGen Test (Sanna only) v2
 // Fixed: upload uses raw binary body, not multipart
 // Usage: node scripts/heygen-test.js
 // ============================================================

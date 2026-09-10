@@ -92,7 +92,7 @@ function buildOutroASS() {
   return ASS_STYLES_HEADER + '\n' +
     // \pos(x,y) + alignment 5 (middle-center): anchor at screen center offset by y
     'Dialogue: 0,0:00:00.20,0:00:04.00,OutroTag,,0,0,0,,{\\pos(540,830)}Want to try this yourself?\n' +
-    'Dialogue: 0,0:00:00.50,0:00:04.00,OutroUrl,,0,0,0,,{\\pos(540,960)}eklipses.com\n' +
+    'Dialogue: 0,0:00:00.50,0:00:04.00,OutroUrl,,0,0,0,,{\\pos(540,960)}ozmeva.com\n' +
     'Dialogue: 0,0:00:01.00,0:00:04.00,OutroSub,,0,0,0,,{\\pos(540,1090)}2 free sessions · no card required';
 }
 
@@ -153,8 +153,8 @@ function ffmpeg(args, label, cwd) {
     await context.addInitScript(() => {
       localStorage.setItem('ek-dev-key', 'ek_dev_2026');
       // Reset lesson progress so lesson starts from the beginning
-      localStorage.removeItem('eklipses_lesson1_complete');
-      localStorage.removeItem('eklipses_lesson1_progress');
+      localStorage.removeItem('ozmeva_lesson1_complete');
+      localStorage.removeItem('ozmeva_lesson1_progress');
     });
 
     const page = await context.newPage();

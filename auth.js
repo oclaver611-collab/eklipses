@@ -1,4 +1,4 @@
-// auth.js — Eklipses Auth + Progress Sync
+// auth.js — Ozmeva Auth + Progress Sync
 // Exposes window.EkAuth  (sign-in / sign-up / sign-out / getUser)
 // Exposes window.EkProgress (hooks called by lesson-player.js on completion)
 //
@@ -12,13 +12,13 @@
 
   // ── Keys that sync to DB ─────────────────────────────────────────────────
   const PROGRESS_KEYS = {
-    lesson1_complete: 'eklipses_lesson1_complete',
-    lesson2_complete: 'eklipses_lesson2_complete',
-    lesson3_complete: 'eklipses_lesson3_complete',
-    lesson1_progress: 'eklipses_lesson1_progress',
-    lesson2_progress: 'eklipses_lesson2_progress',
-    lesson3_progress: 'eklipses_lesson3_progress',
-    lesson1_cert:     'eklipses_lesson1_certification',
+    lesson1_complete: 'ozmeva_lesson1_complete',
+    lesson2_complete: 'ozmeva_lesson2_complete',
+    lesson3_complete: 'ozmeva_lesson3_complete',
+    lesson1_progress: 'ozmeva_lesson1_progress',
+    lesson2_progress: 'ozmeva_lesson2_progress',
+    lesson3_progress: 'ozmeva_lesson3_progress',
+    lesson1_cert:     'ozmeva_lesson1_certification',
   };
 
   // ── State ────────────────────────────────────────────────────────────────
@@ -178,7 +178,7 @@
     overlay.innerHTML = `
       <div style="background:#1a1d26;border:1px solid #2b2e3b;border-radius:14px;padding:28px 24px;max-width:360px;width:90%;position:relative">
         <button id="ek-auth-close" style="position:absolute;top:12px;right:14px;background:none;border:none;color:#666;font-size:20px;cursor:pointer;line-height:1">×</button>
-        <h2 style="margin:0 0 20px;font-size:18px;font-weight:700;color:#e9ecf1">Your Eklipses account</h2>
+        <h2 style="margin:0 0 20px;font-size:18px;font-weight:700;color:#e9ecf1">Your Ozmeva account</h2>
 
         <div style="display:flex;gap:6px;margin-bottom:20px">
           <button id="ek-tab-signin" class="active" style="flex:1;padding:8px;border-radius:8px;border:1px solid #2b2e3b;background:#2a2e38;color:#e9ecf1;font-size:14px;font-weight:600;cursor:pointer">Sign in</button>

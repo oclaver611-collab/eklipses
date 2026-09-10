@@ -1,5 +1,5 @@
 // ============================================================
-// EKLIPSES — fal.ai / Kling Avatar Batch Generator
+// OZMEVA — fal.ai / Kling Avatar Batch Generator
 // Usage: node scripts/heygen-batch.js camille priya ingrid
 // ============================================================
 

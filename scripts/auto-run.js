@@ -1,5 +1,5 @@
 /**
- * auto-run.js — Eklipses master automation pipeline
+ * auto-run.js — Ozmeva master automation pipeline
  *
  * STEP 1: Run all 3 test suites, log pass/fail
  * STEP 2: Verify paywall test fix (page.route mock) is in place; apply if missing
@@ -64,7 +64,7 @@ function recordStep(stepNum, label, status, notes = '') {
 (async () => {
   const startedAt = new Date().toISOString();
   log('\n╔══════════════════════════════════════════════════════════╗');
-  log('║       EKLIPSES MASTER AUTOMATION PIPELINE                ║');
+  log('║       OZMEVA MASTER AUTOMATION PIPELINE                  ║');
   log(`║       Started: ${startedAt.slice(0, 19).replace('T', ' ')} UTC               ║`);
   log('╚══════════════════════════════════════════════════════════╝\n');
 
@@ -275,7 +275,7 @@ function recordStep(stepNum, label, status, notes = '') {
   reportLines.push('| `tests/test-paywall.js` | Added `page.route()` to mock `/api/check-session` → `allowed:false`; test no longer depends on live Supabase IP count |');
   reportLines.push('| `api/character.js` | Added `lesson2Complete` param; added `lesson2TestBlock` with 5 FRAME tests (F/R/A/M/E) for Sofia |');
   reportLines.push('| `api/character-stream.js` | Added `lesson2Complete` param; added condensed `lesson2TestBlock` for Sofia |');
-  reportLines.push('| `player.js` | Added `lesson2Complete: localStorage.getItem(\'eklipses_lesson2_complete\') === \'true\'` to both character API fetch calls |');
+  reportLines.push('| `player.js` | Added `lesson2Complete: localStorage.getItem(\'ozmeva_lesson2_complete\') === \'true\'` to both character API fetch calls |');
   reportLines.push('| `scripts/record_lesson2.js` | New — records all 14 lesson 2 segments (Ryan via Fish Audio, Alex via OpenAI onyx, Sofia via ElevenLabs Flash v2.5), uploads to R2 |');
   reportLines.push('| `LESSON2_RYAN_SCRIPTS.md` | New — full content scripts for all 14 segments |');
   reportLines.push('| `scripts/auto-run.js` | New — this script |');

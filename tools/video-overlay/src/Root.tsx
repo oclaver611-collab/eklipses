@@ -1,6 +1,6 @@
 import React from 'react';
 import {Composition} from 'remotion';
-import {EklipsesOverlay} from './Overlay';
+import {OzmevaOverlay} from './Overlay';
 import {CaptionOverlay} from './CaptionOverlay';
 import {SlideshowAd} from './SlideshowAd';
 import {LessonSlice} from './LessonSlice';
@@ -17,8 +17,8 @@ export const RemotionRoot: React.FC = () => {
     <>
       {/* Episode clips — 90s portrait TikTok format */}
       <Composition
-        id="EklipsesOverlay"
-        component={EklipsesOverlay}
+        id="OzmevaOverlay"
+        component={OzmevaOverlay}
         durationInFrames={90 * FPS}
         fps={FPS}
         width={1080}

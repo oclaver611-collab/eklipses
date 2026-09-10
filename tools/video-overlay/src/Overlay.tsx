@@ -13,12 +13,12 @@ import {
 
 const HOOK = 'I Tried to Date This AI Girl — Episode 1';
 const SUB = 'Real AI dating practice session';
-const TAGLINE = 'Eklipses  —  AI that reads the room';
+const TAGLINE = 'Ozmeva  —  AI that reads the room';
 
 const BOX_BG = 'rgba(0, 0, 0, 0.68)';
 const FONT = '"Arial Black", Arial, sans-serif';
 
-export const EklipsesOverlay: React.FC = () => {
+export const OzmevaOverlay: React.FC = () => {
   const frame = useCurrentFrame();
   const {fps, durationInFrames} = useVideoConfig();
 

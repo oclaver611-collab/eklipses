@@ -435,7 +435,7 @@ function buildOutroASS(sliceNum, totalSlices) {
   return ASS_HEADER + '\n' +
     followLine +
     'Dialogue: 0,0:00:00.20,0:00:04.00,OutroTag,,0,0,0,,{\\pos(540,830)}Want to try this yourself?\n' +
-    'Dialogue: 0,0:00:00.50,0:00:04.00,OutroUrl,,0,0,0,,{\\pos(540,960)}eklipses.com\n' +
+    'Dialogue: 0,0:00:00.50,0:00:04.00,OutroUrl,,0,0,0,,{\\pos(540,960)}ozmeva.com\n' +
     'Dialogue: 0,0:00:01.00,0:00:04.00,OutroSub,,0,0,0,,{\\pos(540,1090)}2 free sessions \u00B7 no card required';
 }
 

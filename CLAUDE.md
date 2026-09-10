@@ -1,4 +1,4 @@
-# Eklipses — Project Conventions
+# Ozmeva — Project Conventions
 
 ## Testing
 The ONLY canonical test suites are these three Playwright browser tests:
@@ -21,7 +21,7 @@ NEVER let dev-only bypass tools (e.g. dev-setup.html, ek-dev-key flags) ship to 
 Any feature bigger than a small bugfix goes on its own branch (feature/name-here), gets a baseline test run BEFORE changes, then a full test run AFTER changes, confirming nothing that was passing before is now broken — not just that new tests pass. Only merge to main after explicit approval.
 
 ## Workflow
-Serge works a 9-5 day job and reviews Eklipses work in a 1-2 hour evening window. Bucket A = tasks you can complete fully autonomously (code, content drafts, tests) without needing his real-time input — dispatch these freely. Bucket B = anything requiring his actual eyes/ears/judgment (visual UI checks, audio quality, voice/mic testing, strategic decisions) — minimize what lands here, and when something does need his review, make it as fast as possible (see "Review efficiency" below).
+Serge works a 9-5 day job and reviews Ozmeva work in a 1-2 hour evening window. Bucket A = tasks you can complete fully autonomously (code, content drafts, tests) without needing his real-time input — dispatch these freely. Bucket B = anything requiring his actual eyes/ears/judgment (visual UI checks, audio quality, voice/mic testing, strategic decisions) — minimize what lands here, and when something does need his review, make it as fast as possible (see "Review efficiency" below).
 
 ## Review efficiency (important — read before finishing any Bucket A task)
 Before marking anything "ready for review," ask: could this have been verified without a human? Specifically:

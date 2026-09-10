@@ -1,2 +1,2 @@
-# eklipses
+# ozmeva
 Communication skills practice app

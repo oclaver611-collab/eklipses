@@ -11,7 +11,7 @@ import type {LessonCaption} from './LessonSliceData';
 
 const FONT = '"Arial Black", Arial, sans-serif';
 const BRAND_FONT = 'Georgia, "Times New Roman", serif';
-const CAPTION_COLOR = '#D9A054';   // Eklipses gold
+const CAPTION_COLOR = '#D9A054';   // Ozmeva gold
 const OUTRO_SEC = 4;               // seconds of outro card after audio ends
 
 interface Props {
@@ -74,7 +74,7 @@ export const LessonSlice: React.FC<Props> = ({audioFile, captions, audioDuration
         letterSpacing: 4,
         textTransform: 'uppercase',
       }}>
-        Eklipses
+        Ozmeva
       </div>
 
       {/* Decorative rule below brand */}
@@ -154,7 +154,7 @@ export const LessonSlice: React.FC<Props> = ({audioFile, captions, audioDuration
             color: '#D9A054',
             letterSpacing: 3,
           }}>
-            eklipses.com
+            ozmeva.com
           </div>
           <div style={{
             fontFamily: FONT,

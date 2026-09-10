@@ -13,8 +13,8 @@ const LIVE_URL = 'https://eklipses.vercel.app';
   await page.evaluate(() => {
     localStorage.setItem('ek-onboarding-v1', '1');
     localStorage.setItem('ek-dev-key', 'ek_dev_2026');
-    localStorage.setItem('eklipses_practice_focus', 'lesson5');
-    localStorage.setItem('eklipses_lesson5_complete', 'true');
+    localStorage.setItem('ozmeva_practice_focus', 'lesson5');
+    localStorage.setItem('ozmeva_lesson5_complete', 'true');
   });
   await page.reload({ waitUntil: 'networkidle', timeout: 30000 });
   await page.waitForSelector('#ek-start-btn', { timeout: 15000 });

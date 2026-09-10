@@ -1,4 +1,4 @@
-// api/create-checkout.js — Creates a Stripe Checkout session for Eklipses Pro or Elite
+// api/create-checkout.js — Creates a Stripe Checkout session for Ozmeva Pro or Elite
 // POST { email?, plan? } → { url: string }
 // Requires env: STRIPE_SECRET_KEY, STRIPE_PRO_PRICE_ID, STRIPE_ELITE_PRICE_ID
 
@@ -38,7 +38,7 @@ module.exports = async function handler(req, res) {
       success_url: `${origin}/?stripe_session={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/`,
       metadata: {
-        source: 'eklipses-paywall',
+        source: 'ozmeva-paywall',
         plan: plan || 'pro',
       },
     });

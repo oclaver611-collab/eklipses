@@ -113,7 +113,7 @@ async function loadPage(browser) {
 
   // Bypass onboarding and dev-mode flags before any JS runs
   await page.addInitScript(() => {
-    localStorage.setItem('eklipses_lesson1_complete', 'true'); // avoid drill gate
+    localStorage.setItem('ozmeva_lesson1_complete', 'true'); // avoid drill gate
   });
 
   await page.goto(BASE, { waitUntil: 'domcontentloaded' });
@@ -311,7 +311,7 @@ async function run() {
     // — payload.cue fires TraceCue before the first sentence
     // — caption shows only the clean dialogue (no parenthetical)
     await tracePage.evaluate(() => {
-      localStorage.setItem('eklipses_practice_focus', 'lesson5');
+      localStorage.setItem('ozmeva_practice_focus', 'lesson5');
       const el = document.getElementById('ek-trace-cue');
       if (el) el.style.opacity = '0';
     });
@@ -360,7 +360,7 @@ async function run() {
 
     // Test D: No TraceCue when practiceFocus is NOT lesson5 (client-side guard)
     await tracePage.evaluate(() => {
-      localStorage.setItem('eklipses_practice_focus', 'free');
+      localStorage.setItem('ozmeva_practice_focus', 'free');
       const el = document.getElementById('ek-trace-cue');
       if (el) el.style.opacity = '0';
     });
@@ -549,8 +549,8 @@ async function run() {
 
     // Seed lesson1 complete so the modal has the coached option
     await coachedPage.evaluate(() => {
-      localStorage.setItem('eklipses_lesson1_complete', 'true');
-      localStorage.setItem('eklipses_lesson1_drill_done', '1'); // skip drill gate
+      localStorage.setItem('ozmeva_lesson1_complete', 'true');
+      localStorage.setItem('ozmeva_lesson1_drill_done', '1'); // skip drill gate
     });
 
     // 4a. showPracticeFocusModal() renders the Coached Practice button when a lesson is complete
@@ -561,37 +561,37 @@ async function run() {
     });
     report('showPracticeFocusModal() renders #pfm-coached button when lesson is complete', cp_hasCoached);
 
-    // 4b. Clicking "Coached Practice" sets eklipses_coached_mode = '1' and practice_focus = 'lesson1'
+    // 4b. Clicking "Coached Practice" sets ozmeva_coached_mode = '1' and practice_focus = 'lesson1'
     // We intercept playScenario to prevent actual scenario launch
     await coachedPage.evaluate(() => { window._scenarioLaunched = false; window.playScenario = () => { window._scenarioLaunched = true; }; });
     await coachedPage.evaluate(() => document.getElementById('pfm-coached')?.click());
     await coachedPage.waitForTimeout(100);
     const cp_coached = await coachedPage.evaluate(() => ({
-      coachMode:     localStorage.getItem('eklipses_coached_mode'),
-      practiceFocus: localStorage.getItem('eklipses_practice_focus'),
+      coachMode:     localStorage.getItem('ozmeva_coached_mode'),
+      practiceFocus: localStorage.getItem('ozmeva_practice_focus'),
       launched:      window._scenarioLaunched,
     }));
-    report('Coached Practice sets eklipses_coached_mode to "1"',  cp_coached.coachMode === '1',     `got: ${cp_coached.coachMode}`);
+    report('Coached Practice sets ozmeva_coached_mode to "1"',  cp_coached.coachMode === '1',     `got: ${cp_coached.coachMode}`);
     report('Coached Practice sets practiceFocus to the latest lesson', cp_coached.practiceFocus === 'lesson1', `got: ${cp_coached.practiceFocus}`);
 
-    // 4c. Selecting Free Practice clears eklipses_coached_mode
+    // 4c. Selecting Free Practice clears ozmeva_coached_mode
     await coachedPage.evaluate(() => showPracticeFocusModal('beach'));
     await coachedPage.evaluate(() => { window.playScenario = () => {}; }); // re-stub
     await coachedPage.evaluate(() => document.getElementById('pfm-free')?.click());
     await coachedPage.waitForTimeout(100);
-    const cp_cleared = await coachedPage.evaluate(() => localStorage.getItem('eklipses_coached_mode'));
-    report('Selecting Free Practice clears eklipses_coached_mode', cp_cleared === null, `got: ${JSON.stringify(cp_cleared)}`);
+    const cp_cleared = await coachedPage.evaluate(() => localStorage.getItem('ozmeva_coached_mode'));
+    report('Selecting Free Practice clears ozmeva_coached_mode', cp_cleared === null, `got: ${JSON.stringify(cp_cleared)}`);
 
-    // 4d. isCoachMode() returns false when eklipses_coached_mode is not set
+    // 4d. isCoachMode() returns false when ozmeva_coached_mode is not set
     const cp_isCoachFalse = await coachedPage.evaluate(() => {
-      localStorage.removeItem('eklipses_coached_mode');
+      localStorage.removeItem('ozmeva_coached_mode');
       return typeof isCoachMode === 'function' && isCoachMode() === false;
     });
     report('isCoachMode() returns false when coached_mode flag absent', cp_isCoachFalse);
 
-    // 4e. isCoachMode() returns true when eklipses_coached_mode = '1'
+    // 4e. isCoachMode() returns true when ozmeva_coached_mode = '1'
     const cp_isCoachTrue = await coachedPage.evaluate(() => {
-      localStorage.setItem('eklipses_coached_mode', '1');
+      localStorage.setItem('ozmeva_coached_mode', '1');
       return isCoachMode() === true;
     });
     report('isCoachMode() returns true when coached_mode flag = "1"', cp_isCoachTrue);
@@ -819,10 +819,10 @@ async function run() {
     const l3Page = await browser.newPage();
 
     await l3Page.addInitScript(() => {
-      localStorage.setItem('eklipses_lesson1_complete', 'true');
-      localStorage.setItem('eklipses_lesson2_complete', 'true');
-      localStorage.setItem('eklipses_lesson3_complete', 'true');
-      localStorage.removeItem('eklipses_mnemonic_off');
+      localStorage.setItem('ozmeva_lesson1_complete', 'true');
+      localStorage.setItem('ozmeva_lesson2_complete', 'true');
+      localStorage.setItem('ozmeva_lesson3_complete', 'true');
+      localStorage.removeItem('ozmeva_mnemonic_off');
     });
 
     await l3Page.goto(BASE, { waitUntil: 'domcontentloaded' });
@@ -899,7 +899,7 @@ async function run() {
     // Test C: drill skip UI shows 4 reps (PACE has 4 skills, not 5)
     // buildDrillSkipHTML is a function declaration → accessible as window property.
     const drillSkipHTML = await l3Page.evaluate(() => {
-      localStorage.setItem('eklipses_lesson3_drill_done', '1');
+      localStorage.setItem('ozmeva_lesson3_drill_done', '1');
       if (typeof buildDrillSkipHTML !== 'function') return { available: false, html: '' };
       return { available: true, html: buildDrillSkipHTML('lesson3') };
     });
@@ -928,11 +928,11 @@ async function run() {
     const l4Page = await browser.newPage();
 
     await l4Page.addInitScript(() => {
-      localStorage.setItem('eklipses_lesson1_complete', 'true');
-      localStorage.setItem('eklipses_lesson2_complete', 'true');
-      localStorage.setItem('eklipses_lesson3_complete', 'true');
-      localStorage.setItem('eklipses_lesson4_complete', 'true');
-      localStorage.removeItem('eklipses_mnemonic_off');
+      localStorage.setItem('ozmeva_lesson1_complete', 'true');
+      localStorage.setItem('ozmeva_lesson2_complete', 'true');
+      localStorage.setItem('ozmeva_lesson3_complete', 'true');
+      localStorage.setItem('ozmeva_lesson4_complete', 'true');
+      localStorage.removeItem('ozmeva_mnemonic_off');
     });
 
     await l4Page.goto(BASE, { waitUntil: 'domcontentloaded' });
@@ -1001,7 +1001,7 @@ async function run() {
 
     // Test C: drill skip UI shows 5 reps (CHAIN has 5 skills)
     const l4DrillSkipHTML = await l4Page.evaluate(() => {
-      localStorage.setItem('eklipses_lesson4_drill_done', '1');
+      localStorage.setItem('ozmeva_lesson4_drill_done', '1');
       if (typeof buildDrillSkipHTML !== 'function') return { available: false, html: '' };
       return { available: true, html: buildDrillSkipHTML('lesson4') };
     });
@@ -1095,9 +1095,9 @@ async function run() {
     // ── locked state: lesson3_complete absent ─────────────────────────────
     const l4LockedPage = await browser.newPage();
     await l4LockedPage.addInitScript(() => {
-      localStorage.removeItem('eklipses_lesson3_complete');
-      localStorage.removeItem('eklipses_lesson4_complete');
-      localStorage.removeItem('eklipses_lesson4_progress');
+      localStorage.removeItem('ozmeva_lesson3_complete');
+      localStorage.removeItem('ozmeva_lesson4_complete');
+      localStorage.removeItem('ozmeva_lesson4_progress');
     });
     await l4LockedPage.goto(BASE, { waitUntil: 'domcontentloaded' });
     await l4LockedPage.waitForSelector('#ek-h6-start', { timeout: 8000 });
@@ -1124,9 +1124,9 @@ async function run() {
     // ── unlocked state: lesson3_complete = true ────────────────────────────
     const l4UnlockedPage = await browser.newPage();
     await l4UnlockedPage.addInitScript(() => {
-      localStorage.setItem('eklipses_lesson3_complete', 'true');
-      localStorage.removeItem('eklipses_lesson4_complete');
-      localStorage.removeItem('eklipses_lesson4_progress');
+      localStorage.setItem('ozmeva_lesson3_complete', 'true');
+      localStorage.removeItem('ozmeva_lesson4_complete');
+      localStorage.removeItem('ozmeva_lesson4_progress');
     });
     await l4UnlockedPage.goto(BASE, { waitUntil: 'domcontentloaded' });
     await l4UnlockedPage.waitForSelector('#ek-h6-start', { timeout: 8000 });
@@ -1166,12 +1166,12 @@ async function run() {
     const l5Page = await browser.newPage();
 
     await l5Page.addInitScript(() => {
-      localStorage.setItem('eklipses_lesson1_complete', 'true');
-      localStorage.setItem('eklipses_lesson2_complete', 'true');
-      localStorage.setItem('eklipses_lesson3_complete', 'true');
-      localStorage.setItem('eklipses_lesson4_complete', 'true');
-      localStorage.setItem('eklipses_lesson5_complete', 'true');
-      localStorage.removeItem('eklipses_mnemonic_off');
+      localStorage.setItem('ozmeva_lesson1_complete', 'true');
+      localStorage.setItem('ozmeva_lesson2_complete', 'true');
+      localStorage.setItem('ozmeva_lesson3_complete', 'true');
+      localStorage.setItem('ozmeva_lesson4_complete', 'true');
+      localStorage.setItem('ozmeva_lesson5_complete', 'true');
+      localStorage.removeItem('ozmeva_mnemonic_off');
     });
 
     await l5Page.goto(BASE, { waitUntil: 'domcontentloaded' });
@@ -1239,7 +1239,7 @@ async function run() {
 
     // Test C: drill skip UI shows 5 reps (TRACE has 5 skills)
     const l5DrillSkipHTML = await l5Page.evaluate(() => {
-      localStorage.setItem('eklipses_lesson5_drill_done', '1');
+      localStorage.setItem('ozmeva_lesson5_drill_done', '1');
       if (typeof buildDrillSkipHTML !== 'function') return { available: false, html: '' };
       return { available: true, html: buildDrillSkipHTML('lesson5') };
     });
@@ -1275,9 +1275,9 @@ async function run() {
     // ── locked state: lesson4_complete absent ─────────────────────────────
     const l5LockedPage = await browser.newPage();
     await l5LockedPage.addInitScript(() => {
-      localStorage.removeItem('eklipses_lesson4_complete');
-      localStorage.removeItem('eklipses_lesson5_complete');
-      localStorage.removeItem('eklipses_lesson5_progress');
+      localStorage.removeItem('ozmeva_lesson4_complete');
+      localStorage.removeItem('ozmeva_lesson5_complete');
+      localStorage.removeItem('ozmeva_lesson5_progress');
     });
     await l5LockedPage.goto(BASE, { waitUntil: 'domcontentloaded' });
     await l5LockedPage.waitForSelector('#ek-h6-start', { timeout: 8000 });
@@ -1304,9 +1304,9 @@ async function run() {
     // ── unlocked state: lesson4_complete = true ────────────────────────────
     const l5UnlockedPage = await browser.newPage();
     await l5UnlockedPage.addInitScript(() => {
-      localStorage.setItem('eklipses_lesson4_complete', 'true');
-      localStorage.removeItem('eklipses_lesson5_complete');
-      localStorage.removeItem('eklipses_lesson5_progress');
+      localStorage.setItem('ozmeva_lesson4_complete', 'true');
+      localStorage.removeItem('ozmeva_lesson5_complete');
+      localStorage.removeItem('ozmeva_lesson5_progress');
     });
     await l5UnlockedPage.goto(BASE, { waitUntil: 'domcontentloaded' });
     await l5UnlockedPage.waitForSelector('#ek-h6-start', { timeout: 8000 });

@@ -7,7 +7,7 @@
   },
   "scripts": {
     "studio": "remotion studio",
-    "render": "remotion render EklipsesOverlay"
+    "render": "remotion render OzmevaOverlay"
   },
   "keywords": [],
   "author": "",

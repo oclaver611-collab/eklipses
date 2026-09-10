@@ -24,8 +24,8 @@ async function run() {
   await page.evaluate(() => {
     localStorage.setItem('ek-onboarding-v1', '1');
     localStorage.setItem('ek-dev-key', 'ek_dev_2026');
-    localStorage.removeItem('eklipses_lesson1_complete');
-    localStorage.removeItem('eklipses_lesson1_progress');
+    localStorage.removeItem('ozmeva_lesson1_complete');
+    localStorage.removeItem('ozmeva_lesson1_progress');
   });
   await page.reload({ waitUntil: 'networkidle', timeout: 30000 });
   await page.locator('#ek-start-btn').click();

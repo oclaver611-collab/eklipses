@@ -27,7 +27,7 @@ const SLIDES = [
   },
   {
     src: 'slide4.jpg',
-    line1: 'Eklipses.',
+    line1: 'Ozmeva.',
     line2: 'Practice the moves that actually work.',
     gold: true,
     durationS: 5,

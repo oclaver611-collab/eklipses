@@ -45,7 +45,7 @@ async function getOrCreateBin(scenarioKey, index) {
       headers: {
         'Content-Type': 'application/json',
         'X-Master-Key': process.env.JSONBIN_MASTER_KEY,
-        'X-Bin-Name': `eklipses-comments-${scenarioKey}`,
+        'X-Bin-Name': `ozmeva-comments-${scenarioKey}`,
         'X-Bin-Private': 'false',
       },
       body: JSON.stringify({ comments: [] }),

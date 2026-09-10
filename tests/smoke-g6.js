@@ -102,7 +102,7 @@ async function main() {
 
   console.log('[STEP 4] Launch Sofia/Beach in type mode');
   // Set type mode first
-  await page.evaluate(() => localStorage.setItem('eklipses_input_mode', 'type'));
+  await page.evaluate(() => localStorage.setItem('ozmeva_input_mode', 'type'));
   // Click first scenario card
   await page.locator('.nf-card').first().click();
   await page.waitForTimeout(1200);

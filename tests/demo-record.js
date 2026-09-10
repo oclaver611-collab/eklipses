@@ -392,7 +392,7 @@ async function main() {
   // Set before reload so the app reads them on init
   await page.evaluate(() => {
     localStorage.setItem('ek-dev-key', 'ek_dev_2026');          // bypass paywall
-    localStorage.setItem('eklipses_input_mode', 'voice');        // voice mode — mock STT intercepts
+    localStorage.setItem('ozmeva_input_mode', 'voice');        // voice mode — mock STT intercepts
     localStorage.setItem('ek-onboarding-v1', '1');               // skip onboarding overlay
     localStorage.setItem('ek-practice-banner-dismissed', '1');   // skip lesson banner
   });

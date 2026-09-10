@@ -13,7 +13,7 @@ const rl = readline.createInterface({
 const ask = (q) => new Promise(resolve => rl.question(q, resolve));
 
 console.log('\n╔══════════════════════════════════════════════════════════╗');
-console.log('║         EKLIPSES — HUMAN TEST CHECKLIST                 ║');
+console.log('║         OZMEVA — HUMAN TEST CHECKLIST                   ║');
 console.log('║         Needs your eyes, phone, or judgment.            ║');
 console.log('╚══════════════════════════════════════════════════════════╝\n');
 
