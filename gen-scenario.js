@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // ============================================================
-// gen-scenario.js — YouTube → Eklipses Scenario Generator
+// gen-scenario.js — YouTube → Ozmeva Scenario Generator
 //
 // Usage option 1 (auto transcript):
 //   node gen-scenario.js <youtube-url>
@@ -77,9 +77,9 @@ function generateScenario(transcript, videoUrl) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY not set in .env');
 
-  const prompt = `You are a scenario designer for Eklipses — an AI social simulation platform where men practice real conversations with AI video avatars and get coaching feedback. Users have a 10 minute free conversation with the avatar then get scored and coached by Ryan.
+  const prompt = `You are a scenario designer for Ozmeva — an AI social simulation platform where men practice real conversations with AI video avatars and get coaching feedback. Users have a 10 minute free conversation with the avatar then get scored and coached by Ryan.
 
-I will give you a YouTube video transcript about dating, social skills, attraction, or conversation. Your job is to transform the core insight into a complete Eklipses scenario.
+I will give you a YouTube video transcript about dating, social skills, attraction, or conversation. Your job is to transform the core insight into a complete Ozmeva scenario.
 
 VIDEO URL: ${videoUrl}
 
@@ -268,7 +268,7 @@ async function main() {
 
   if (!videoUrl) { console.error('❌ No YouTube URL provided'); process.exit(1); }
 
-  console.log('\n🎬 Eklipses Scenario Generator');
+  console.log('\n🎬 Ozmeva Scenario Generator');
   console.log('━'.repeat(42));
   console.log('Video:', videoUrl);
 

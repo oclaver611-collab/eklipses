@@ -366,7 +366,7 @@
   </div><!-- /#ek-practice-wrap -->
 
   <footer class="site-footer">
-    Questions? <a href="mailto:support@eklipses.com" style="color:#6b7685;text-decoration:none;">support@eklipses.com</a>
+    Questions? <a href="mailto:support@ozmeva.com" style="color:#6b7685;text-decoration:none;">support@ozmeva.com</a>
     &nbsp;·&nbsp;
     <a href="/terms" style="color:#6b7685;text-decoration:none;">Terms of Service</a>
     <span id="ek-cancel-wrap" style="display:none">
@@ -438,14 +438,14 @@
       const customerId = localStorage.getItem('ek-stripe-cus');
       if (!customerId) {
         document.getElementById('ek-cancel-body').innerHTML =
-          '<p style="color:#e05252;font-size:14px">Could not find your subscription. Email <a href="mailto:support@eklipses.com" style="color:#6b9fff">support@eklipses.com</a> and we\'ll cancel it for you.</p>';
+          '<p style="color:#e05252;font-size:14px">Could not find your subscription. Email <a href="mailto:support@ozmeva.com" style="color:#6b9fff">support@ozmeva.com</a> and we\'ll cancel it for you.</p>';
         return;
       }
       try {
         const token = await window.EkAuth?.getToken?.();
         if (!token) {
           document.getElementById('ek-cancel-body').innerHTML =
-            '<p style="color:#aaa;font-size:14px;margin-bottom:16px">To cancel, email us at <a href="mailto:support@eklipses.com?subject=Cancel+subscription&body=Please+cancel+my+subscription.+My+account+email+is%3A+" style="color:#6b9fff">support@eklipses.com</a> with "Cancel subscription" in the subject line. We\'ll process it within 24 hours.</p>' +
+            '<p style="color:#aaa;font-size:14px;margin-bottom:16px">To cancel, email us at <a href="mailto:support@ozmeva.com?subject=Cancel+subscription&body=Please+cancel+my+subscription.+My+account+email+is%3A+" style="color:#6b9fff">support@ozmeva.com</a> with "Cancel subscription" in the subject line. We\'ll process it within 24 hours.</p>' +
             '<button onclick="document.getElementById(\'ek-cancel-modal\').style.display=\'none\'" style="padding:8px 24px;background:#333;color:#fff;border:none;border-radius:6px;cursor:pointer">Close</button>';
           return;
         }
@@ -468,12 +468,12 @@
             '<button onclick="document.getElementById(\'ek-cancel-modal\').style.display=\'none\'" style="padding:8px 24px;background:#333;color:#fff;border:none;border-radius:6px;cursor:pointer">Close</button>';
         } else {
           document.getElementById('ek-cancel-body').innerHTML =
-            '<p style="color:#e05252;font-size:14px">Something went wrong — email <a href="mailto:support@eklipses.com" style="color:#6b9fff">support@eklipses.com</a></p>' +
+            '<p style="color:#e05252;font-size:14px">Something went wrong — email <a href="mailto:support@ozmeva.com" style="color:#6b9fff">support@ozmeva.com</a></p>' +
             '<button onclick="document.getElementById(\'ek-cancel-modal\').style.display=\'none\'" style="margin-top:16px;padding:8px 24px;background:#333;color:#fff;border:none;border-radius:6px;cursor:pointer">Close</button>';
         }
       } catch {
         document.getElementById('ek-cancel-body').innerHTML =
-          '<p style="color:#e05252;font-size:14px">Something went wrong — email <a href="mailto:support@eklipses.com" style="color:#6b9fff">support@eklipses.com</a></p>' +
+          '<p style="color:#e05252;font-size:14px">Something went wrong — email <a href="mailto:support@ozmeva.com" style="color:#6b9fff">support@ozmeva.com</a></p>' +
           '<button onclick="document.getElementById(\'ek-cancel-modal\').style.display=\'none\'" style="margin-top:16px;padding:8px 24px;background:#333;color:#fff;border:none;border-radius:6px;cursor:pointer">Close</button>';
       }
     };
@@ -497,12 +497,12 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
   <!-- Auth + progress sync — must load before lesson-player.js -->
-  <script src="auth.js?v=d321dff"></script>
+  <script src="auth.js?v=b4ae4e1"></script>
 
-  <script src="kokoro-speech.js?v=d321dff"></script>
-  <script src="player.js?v=d321dff"></script>
-  <script src="netflix-rows.js?v=d321dff"></script>
-  <script src="transcript.js?v=d321dff"></script>
-  <script src="lesson-player.js?v=d321dff"></script>
+  <script src="kokoro-speech.js?v=b4ae4e1"></script>
+  <script src="player.js?v=b4ae4e1"></script>
+  <script src="netflix-rows.js?v=b4ae4e1"></script>
+  <script src="transcript.js?v=b4ae4e1"></script>
+  <script src="lesson-player.js?v=b4ae4e1"></script>
 </body>
 </html>

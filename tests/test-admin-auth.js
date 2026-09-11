@@ -65,7 +65,7 @@ async function run() {
     try {
       const res = await fetch(`${BASE}/admin`, { headers: { Cookie: cookie } });
       const html = await res.text();
-      const ok = res.ok && html.includes('Eklipses Admin') && html.includes('Total users');
+      const ok = res.ok && html.includes('Ozmeva Admin') && html.includes('Total users');
       results.push({ label: 'GET /admin with cookie → dashboard', ok });
     } catch (e) {
       results.push({ label: 'GET /admin with cookie → dashboard', ok: false, err: e.message });

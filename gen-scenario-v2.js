@@ -1,4 +1,4 @@
-// gen-scenario.js — Eklipses Scenario Generator
+// gen-scenario.js — Ozmeva Scenario Generator
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // USAGE:
 //   Single video (auto transcript via yt-dlp):
@@ -192,9 +192,9 @@ function getTopChannelVideos(channelUrl, topN) {
 // ─── CLAUDE: GENERATE SCENARIO ───────────────────────────────────────────────
 
 async function generateScenario(transcript, videoUrl, videoTitle) {
-  const prompt = `You are a scenario designer for Eklipses, an AI social simulation platform where users practice real-life conversations with AI video avatars and get coaching feedback. The platform is focused on dating scenarios.
+  const prompt = `You are a scenario designer for Ozmeva, an AI social simulation platform where users practice real-life conversations with AI video avatars and get coaching feedback. The platform is focused on dating scenarios.
 
-I'm going to give you a YouTube video transcript from the dating/social skills niche. Your job is to extract the core emotional/social dynamic from the video and turn it into a complete, ready-to-deploy Eklipses scenario.
+I'm going to give you a YouTube video transcript from the dating/social skills niche. Your job is to extract the core emotional/social dynamic from the video and turn it into a complete, ready-to-deploy Ozmeva scenario.
 
 VIDEO URL: ${videoUrl}
 VIDEO TITLE: ${videoTitle || "Unknown"}
@@ -334,7 +334,7 @@ async function main() {
 
   if (args.length === 0) {
     console.log(`
-Eklipses Scenario Generator
+Ozmeva Scenario Generator
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 USAGE:
