@@ -1,4 +1,4 @@
-# Reddit Launch Drafts — Eklipses Organic Presence
+# Reddit Launch Drafts — Ozmeva Organic Presence
 
 **⚠️ DRAFT MATERIAL ONLY — DO NOT POST WITHOUT PERSONAL REVIEW**
 
@@ -21,7 +21,7 @@ All three communities have zero-tolerance self-promotion rules. The enforcement 
 - **r/selfimprovement**: Strictest of the three — no external links of any kind, not even in comments.
   App or brand mentions of any kind will get the post removed.
 
-**Implication for every post below:** The post bodies contain zero mention of Eklipses. The strategy is
+**Implication for every post below:** The post bodies contain zero mention of Ozmeva. The strategy is
 to establish a presence with genuine value, build comment-section credibility, and then in communities
 where it's allowed (r/dating_advice cautiously), mention the app only if someone in the thread asks
 a direct question like "what did you end up trying?" or "how did you fix this?" r/selfimprovement is
@@ -182,7 +182,7 @@ The closing question explicitly says "not just 'approach more'" — this filters
 the post most likely to generate "what did you end up doing?" replies  
 **Comment strategy:** This is the highest-value post for organic discovery. If someone asks what
 you ended up trying — one clear, honest reply. "I actually ended up building something for this
-because I couldn't find it anywhere — it's [brief description], called Eklipses, happy to share
+because I couldn't find it anywhere — it's [brief description], called Ozmeva, happy to share
 more if useful." Don't post it unless directly asked and the thread is engaged.
 
 ---
@@ -224,7 +224,7 @@ infrastructure). No triumphant resolution — that would feel fake
 is intentionally pointed but doesn't name anything. r/selfimprovement bans all links and brand
 mentions even in comments, so this is purely presence/credibility building  
 **Comment strategy:** No conversion path exists here. Post for karma, presence, and to get the
-Eklipses framing (skill gap, not anxiety) circulating in the community.
+Ozmeva framing (skill gap, not anxiety) circulating in the community.
 
 ---
 
@@ -281,7 +281,7 @@ this is. Suggested minimum gap: one post per two weeks, different subreddits fir
 - Minimum 30 days account age
 - Some karma from genuinely participating in other threads first (comment-only activity for a few
   weeks before any posts)
-- Nothing in post history that connects the account to Eklipses directly
+- Nothing in post history that connects the account to Ozmeva directly
 
 **Final flag:** These are drafts, not approved copy. The Reddit ban risk is real — read the current
 rules of each subreddit on the day you post, not just these notes written months earlier. Mod

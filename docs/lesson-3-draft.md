@@ -1,4 +1,4 @@
-# EKLIPSES — LESSON 3
+# OZMEVA — LESSON 3
 ## "The Long Game"
 **PACE mnemonic | Style: The Dark Needle | Status: Spec locked — ready to implement**
 

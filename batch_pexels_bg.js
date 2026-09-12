@@ -105,7 +105,7 @@ async function processScenario(scenario) {
 }
 
 async function main() {
-  console.log("=== Eklipses — Pexels Background Auto-Download + R2 Upload ===\n");
+  console.log("=== Ozmeva — Pexels Background Auto-Download + R2 Upload ===\n");
 
   for (const scenario of scenarios) {
     await processScenario(scenario);

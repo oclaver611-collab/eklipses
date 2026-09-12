@@ -1,5 +1,5 @@
 // ============================================================
-// EKLIPSES — player.js PATCH
+// OZMEVA — player.js PATCH
 // Apply these as replacements to the corresponding functions.
 // 3 replacements total — search for the function name and swap.
 // ============================================================

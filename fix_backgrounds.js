@@ -82,7 +82,7 @@ async function processScenario(scenario) {
 }
 
 async function main() {
-  console.log("=== Eklipses — Background Fix (no faces) ===\n");
+  console.log("=== Ozmeva — Background Fix (no faces) ===\n");
   for (const scenario of scenarios) {
     await processScenario(scenario);
   }

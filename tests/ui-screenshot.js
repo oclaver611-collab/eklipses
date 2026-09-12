@@ -4,7 +4,7 @@ const { chromium } = require('playwright');
   const browser = await chromium.launch();
   const page = await browser.newPage();
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto('https://eklipses.vercel.app', { waitUntil: 'networkidle', timeout: 30000 });
+  await page.goto('https://ozmeva.com', { waitUntil: 'networkidle', timeout: 30000 });
 
   // Click start if overlay is present
   const startBtn = page.locator('#ek-start-btn');

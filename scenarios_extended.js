@@ -1,5 +1,5 @@
 // ============================================================
-// Eklipses — Extended Scenarios (Interview + Dark Psychology)
+// Ozmeva — Extended Scenarios (Interview + Dark Psychology)
 // Add-on file — loads after scenarios.js
 // ============================================================
 // HOW TO USE:

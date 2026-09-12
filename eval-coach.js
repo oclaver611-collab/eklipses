@@ -148,7 +148,7 @@ function mockReqRes(body) {
 
 async function runAll() {
   console.log('\n╔══════════════════════════════════════════════════════╗');
-  console.log('║          EKLIPSES COACH EVALUATOR                   ║');
+  console.log('║          OZMEVA COACH EVALUATOR                     ║');
   console.log('╚══════════════════════════════════════════════════════╝\n');
 
   if (!process.env.GROQ_API_KEY) {

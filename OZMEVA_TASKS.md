@@ -1,4 +1,4 @@
-# Eklipses Task Tracker
+# Ozmeva Task Tracker
 
 ## Stable Tags (newest first)
 | Tag | What it marks |

@@ -45,7 +45,7 @@ for (const d of [VIDEO_DIR, AUDIO_DIR, DESKTOP]) {
 }
 
 // ─── Config ────────────────────────────────────────────────────────────────────
-const LIVE_URL = 'https://eklipses.vercel.app';
+const LIVE_URL = 'https://ozmeva.com';
 const VIEWPORT = { width: 540, height: 960 }; // exact 9:16 — scales cleanly to 1080×1920
 
 // TRACE cue texts as produced by the server (from tests/screenshot-trace-cues-all.js)

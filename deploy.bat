@@ -43,7 +43,7 @@ if errorlevel 1 ( echo ERROR: Vercel deploy trigger failed & exit /b 1 )
 
 echo.
 echo === DONE. Vercel deploy triggered. ===
-echo Wait 60 seconds then test at https://eklipses.vercel.app?dev=ek_dev_2026
+echo Wait 60 seconds then test at https://ozmeva.com?dev=ek_dev_2026
 echo.
 pause
 endlocal

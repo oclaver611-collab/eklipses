@@ -76,7 +76,7 @@ All values measured from the Lesson 1 OBS recording. Do not change without re-ru
 | Setting | Value | Why |
 |---------|-------|-----|
 | Crop origin | `x=445, y=18` | x=445 keeps Ryan's orb fully visible on the left and Sofia's face unclipped on the right. x=490 (earlier attempt) clipped Sofia's right edge. y=18 trims the OS title bar chrome. |
-| Crop size | `w=390, h=693` | Captures the Eklipses app lesson panel exactly — nothing from outside the app boundary. |
+| Crop size | `w=390, h=693` | Captures the Ozmeva app lesson panel exactly — nothing from outside the app boundary. |
 | Output scale | `1080×1920` | Standard portrait short-form (9:16 at 1080p). |
 | Scale filter | `lanczos` | Highest quality for upscaling from 390→1080px (≈2.77× magnification). |
 
@@ -86,13 +86,13 @@ All values measured from the Lesson 1 OBS recording. Do not change without re-ru
 |---------|-------|-----|
 | `y` | `1125` | Pixel-measured: Sofia's name tag text ends at y=1111 in the 1080×1920 output. y=1125 gives a 14px margin so the full name tag is visible. Earlier value of y=1110 clipped the bottom 2 rows of "Sofia". |
 | `h` | `795` (= 1920−1125) | Covers from the dark box start to the bottom of frame. |
-| Color | `0x15171C` | Matches the Eklipses app's dark background palette — no visible seam. |
+| Color | `0x15171C` | Matches the Ozmeva app's dark background palette — no visible seam. |
 
 ### Caption positioning
 
 | Setting | Value | Why |
 |---------|-------|-----|
-| Font | Arial Black | Matches the Eklipses app's bold display font used in lesson UI. |
+| Font | Arial Black | Matches the Ozmeva app's bold display font used in lesson UI. |
 | Font size | `86` | Verified readable at arm's length on mobile; fills ~75% of caption zone width for typical 4-5 word lines. |
 | ASS Alignment | `8` (top-anchor) | Positions caption at a fixed distance from the TOP of the frame rather than floating with content height. |
 | MarginV | `1182` | Caption text top = drawbox top (1125) + 80px desired gap − 23px libass internal offset = 1182. The 80px gap keeps captions visually clear of the content photo above. |
@@ -115,7 +115,7 @@ All in ASS BGR hex (note: ASS uses BBGGRR byte order, opposite of CSS RGB):
 |------|----------|-------|
 | Hook | 2s | Dark card at start of each slice. Text is white, centered, Alignment=5. Hook line uses `\\N` for line breaks in ASS. Badge appears in top-right corner (Alignment=9). |
 | Cliffhanger | ~5–7s (measured from actual TTS audio) | Dark card between lesson and outro. Ryan gold captions, Alignment=5 (centered). Text split by `chunkSegment` using proportional word timing. |
-| Outro | 4s | Dark card at end. Four elements (top to bottom): "Follow for Part [N+1]" (white, 60pt, y=700) · "Want to try this yourself?" (muted pink, 46pt, y=830) · "eklipses.com" (Ryan gold, 70pt, y=960) · "2 free sessions · no card required" (gray, 38pt, y=1090). The follow line is omitted on the final slice (no next part). Each slice gets its own `outro{N}.ass` file (not a shared one) so the part number can vary. |
+| Outro | 4s | Dark card at end. Four elements (top to bottom): "Follow for Part [N+1]" (white, 60pt, y=700) · "Want to try this yourself?" (muted pink, 46pt, y=830) · "ozmeva.com" (Ryan gold, 70pt, y=960) · "2 free sessions · no card required" (gray, 38pt, y=1090). The follow line is omitted on the final slice (no next part). Each slice gets its own `outro{N}.ass` file (not a shared one) so the part number can vary. |
 
 ### Badge style
 
@@ -211,7 +211,7 @@ ffprobe -f lavfi -i "amovie=lesson1-slice01-of08.mp4,ebur128" -show_entries fram
 
 - **Groq rate limits:** Whisper calls occasionally hit rate limits during batch processing. The script does not retry — re-run if one slice fails. Do not test locally with `npx vercel dev`; it hits rate limits faster than production.
 - **Slice 3 contamination:** Alex/Sofia voices bled into Ryan's lesson audio at t≈33–39.8s because they were recorded simultaneously. The contamination window was measured by listening and confirmed by checking Whisper's spurious word timestamps. If a future slice has the same symptom (captions show dialogue words during narration), add a `contamZone` to the manifest.
-- **Sofia name tag:** The Eklipses UI places Sofia's name tag at the very bottom of her photo card. The drawbox y must stay at or above the UI chrome elements but below the name tag bottom. Current value (y=1125) was pixel-measured from the raw OBS source. If the app layout changes (e.g. name tag moves), re-measure by extracting a raw OBS frame without drawbox and scanning for white pixel clusters in y=1090–1150.
+- **Sofia name tag:** The Ozmeva UI places Sofia's name tag at the very bottom of her photo card. The drawbox y must stay at or above the UI chrome elements but below the name tag bottom. Current value (y=1125) was pixel-measured from the raw OBS source. If the app layout changes (e.g. name tag moves), re-measure by extracting a raw OBS frame without drawbox and scanning for white pixel clusters in y=1090–1150.
 - **chunkSegment drift:** `chunkSegment` (proportional splitting) is still used for exchange dialogue since we have known text but no word-level timestamps. It's accurate enough for scripted exchanges with relatively even pacing. For long monologue segments, always use Whisper word-level timestamps instead.
 - **Two render scripts for Lesson 1:** The canonical template (`lesson-slice-template.js`) requires a manifest file and uses Fish Audio cliffhangers (4-segment concat). Lesson 1 was originally rendered by `scripts/process-obs-recording.js`, which has caption data hardcoded (no cliffhangers, 3-segment concat). Both scripts have been updated with the same outro follow text and audio normalization changes. To re-render Lesson 1, run `node scripts/process-obs-recording.js`; output goes to `content/lesson1/slices/`. Future lessons should use `lesson-slice-template.js` with a manifest.
 - **Follow text on last slice:** The `buildOutroASS(sliceNum, totalSlices)` function automatically omits the "Follow for Part X" line when `sliceNum >= totalSlices`. No special handling needed in the manifest.

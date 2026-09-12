@@ -6,7 +6,7 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
 
-const LIVE_URL = 'https://eklipses.vercel.app';
+const LIVE_URL = 'https://ozmeva.com';
 const CAPTURE_MS = 15000;
 
 // Injected before any page script — patches Audio constructor and .play()

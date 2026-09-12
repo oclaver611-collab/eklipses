@@ -118,7 +118,7 @@ async function generateIdle(char) {
 }
 
 async function main() {
-  console.log("=== Eklipses — Batch Idle Generator ===");
+  console.log("=== Ozmeva — Batch Idle Generator ===");
   console.log(`Endpoint: fal-ai/kling-video/ai-avatar/v2/standard`);
   console.log(`Cost: ~$0.56 per video (was $1.15 with Pro — 49% cheaper)\n`);
 

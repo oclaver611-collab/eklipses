@@ -1,10 +1,10 @@
-# EKLIPSES — SESSION START FILE
+# OZMEVA — SESSION START FILE
 # Last updated: May 18, 2026
 # Upload this file at the start of every session to restore full context.
 
 ---
 
-## WHAT IS EKLIPSES
+## WHAT IS OZMEVA
 
 A real-world social simulation platform. Users practice high-stakes conversations with AI video avatars, then get coached by Ryan. Dating is niche #1. The platform expands one niche per month as user milestones are hit.
 
@@ -29,7 +29,7 @@ git add . && git commit -m "rollback" && git push origin HEAD:main
 
 ## PLATFORM VISION
 
-Eklipses is NOT just a dating app. It is a real-world social simulation platform — a YouTube-style portal that expands niche by niche every month.
+Ozmeva is NOT just a dating app. It is a real-world social simulation platform — a YouTube-style portal that expands niche by niche every month.
 
 | Phase | User Milestone | Niche |
 |-------|---------------|-------|
@@ -85,7 +85,7 @@ Code is fully wired in character.js, scenarios.js, player.js. Only missing: HeyG
 
 ---
 
-## HEYGEN WORKFLOW (manual web UI — Avatar IV is better than V for Eklipses)
+## HEYGEN WORKFLOW (manual web UI — Avatar IV is better than V for Ozmeva)
 
 For each character:
 1. Go to app.heygen.com/avatar → My Avatars → Create Avatar → upload photo
@@ -179,7 +179,7 @@ Summary:
 - **Talkville**: iOS only, text-based, solo developer. Low threat.
 - **SmoothTalk**: Text-based, no avatars. Medium threat on messaging.
 - All three are bootstrapped with under 10,000 users each. No funded competitor yet.
-- **Eklipses advantage**: Only product with voice + video avatar + spoken coaching. 6x cheaper than RizzAgent.
+- **Ozmeva advantage**: Only product with voice + video avatar + spoken coaching. 6x cheaper than RizzAgent.
 
 ---
 
@@ -200,7 +200,7 @@ Priority order:
 - Free: 1 session/day
 - Paid ($4.99/month): unlimited sessions
 - Trigger to activate paywall: when monthly API bill hits $300
-- No ads ever — Eklipses is a clean product
+- No ads ever — Ozmeva is a clean product
 
 ---
 
@@ -247,7 +247,7 @@ npm run eval
 - Updated character.js, scenarios.js, player.js — all pushed and tagged
 - Built HeyGen API batch script — confirmed working endpoint
 - Discovered API quality inferior to web UI — switched to manual workflow
-- Confirmed Avatar IV better than Avatar V for Eklipses use case
+- Confirmed Avatar IV better than Avatar V for Ozmeva use case
 - Sanna speaking + idle uploaded to R2 — Rooftop scenario partially live
 - Added $5 to HeyGen API balance, generated API key
 - Created Eklipses_Competitive_Analysis_May2026.docx

@@ -6,7 +6,7 @@
 
 require('dotenv').config();
 
-const VERCEL_URL = process.env.VERCEL_URL || 'https://eklipses.vercel.app';
+const VERCEL_URL = process.env.VERCEL_URL || 'https://ozmeva.com';
 
 // ─── BANNED PHRASES TO CHECK ─────────────────────────────────────────────────
 
@@ -307,7 +307,7 @@ async function callCoach(body) {
 
 async function runAll() {
   console.log('\n╔══════════════════════════════════════════════════════════╗');
-  console.log('║       EKLIPSES COACH EVALUATOR v3                        ║');
+  console.log('║       OZMEVA COACH EVALUATOR v4                          ║');
   console.log('║       6 scenarios — banned phrases — score — card fields ║');
   console.log('╚══════════════════════════════════════════════════════════╝\n');
 

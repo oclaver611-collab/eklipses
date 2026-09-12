@@ -18,7 +18,7 @@ async function main() {
   const corsConfig = {
     CORSRules: [
       {
-        AllowedOrigins: ['https://eklipses.vercel.app', 'http://localhost:3000'],
+        AllowedOrigins: ['https://ozmeva.com', 'http://localhost:3000'],
         AllowedMethods: ['GET', 'HEAD'],
         AllowedHeaders: ['*'],
         MaxAgeSeconds: 86400,

@@ -32,7 +32,7 @@ const os                      = require('os');
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 // ── Config ─────────────────────────────────────────────────────────────────────
-const LIVE_URL        = 'https://www.eklipses.com';
+const LIVE_URL        = 'https://ozmeva.com';
 const GROQ_KEY        = process.env.GROQ_API_KEY;
 const GROQ_MODEL      = 'qwen/qwen3.8-27b';
 const OPENAI_KEY      = process.env.OPENAI_API_KEY;

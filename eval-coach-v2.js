@@ -4,7 +4,7 @@
 require('dotenv').config();
 
 const MODE = process.env.EVAL_MODE || 'live';
-const VERCEL_URL = process.env.VERCEL_URL || 'https://eklipses.vercel.app';
+const VERCEL_URL = process.env.VERCEL_URL || 'https://ozmeva.com';
 const DEV_KEY = process.env.DEV_BYPASS_KEY || '';
 
 let handler;
@@ -168,7 +168,7 @@ async function callLiveCoach(body, retries = 3) {
 
 async function runAll() {
   console.log('\n╔══════════════════════════════════════════════════════╗');
-  console.log('║          EKLIPSES COACH EVALUATOR                   ║');
+  console.log('║          OZMEVA COACH EVALUATOR                     ║');
   console.log('╚══════════════════════════════════════════════════════╝\n');
 
   if (!process.env.GROQ_API_KEY) {

@@ -4,7 +4,7 @@
 
 require('dotenv').config();
 
-const VERCEL_URL = process.env.VERCEL_URL || 'https://eklipses.vercel.app';
+const VERCEL_URL = process.env.VERCEL_URL || 'https://ozmeva.com';
 const DELAY_MS = 3000; // delay between tests to respect TPM limit
 
 // ─── TEST CASES ───────────────────────────────────────────────────────────────
@@ -251,7 +251,7 @@ async function callMary(body) {
 
 async function runAll() {
   console.log('\n╔══════════════════════════════════════════════════════════╗');
-  console.log('║        EKLIPSES CHARACTER EVALUATOR v2                       ║');
+  console.log('║        OZMEVA CHARACTER EVALUATOR v2                         ║');
   console.log(`║        ${TEST_CASES.length} tests  •  hitting ${VERCEL_URL.replace('https://','')}  ║`);
   console.log('╚══════════════════════════════════════════════════════════╝\n');
 

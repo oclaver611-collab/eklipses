@@ -169,7 +169,7 @@ function formatOutput(raw, videoUrl) {
 
   return `
 ${SEP}
-  EKLIPSES SCENARIO GENERATOR — OUTPUT
+  OZMEVA SCENARIO GENERATOR — OUTPUT
   Video: ${videoUrl}
   Emotional core: ${s.emotionalCore}
 ${SEP}

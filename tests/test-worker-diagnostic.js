@@ -3,7 +3,7 @@
 const { chromium } = require('playwright');
 
 const WORKER  = 'https://eklipses-lesson-audio.oclaver611.workers.dev';
-const BASE    = 'https://eklipses.vercel.app';
+const BASE    = 'https://ozmeva.com';
 
 const FILES = {
   ryan:  ['ryan_seg00.mp3', 'ryan_seg01.mp3'],

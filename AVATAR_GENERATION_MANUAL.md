@@ -1,4 +1,4 @@
-# EKLIPSES — Avatar Generation Manual
+# OZMEVA — Avatar Generation Manual
 ## Last updated: June 8, 2026
 
 ---

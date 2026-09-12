@@ -306,7 +306,7 @@ async function processVideo(url, title, opts = {}) {
 
   const outputFile = path.join(__dirname, `scenario-${scenarioKey}.txt`);
   const fileContent = [
-    `EKLIPSES SCENARIO GENERATOR OUTPUT`,
+    `OZMEVA SCENARIO GENERATOR OUTPUT`,
     `Generated: ${new Date().toISOString()}`,
     `Video: ${url}`,
     `Title: ${title || "Unknown"}`,

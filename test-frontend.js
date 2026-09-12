@@ -1,6 +1,6 @@
 // test-frontend.js — end-to-end API test for all characters
 // Usage: node test-frontend.js [base_url]
-// Example: node test-frontend.js https://love-eklipses.vercel.app
+// Example: node test-frontend.js https://ozmeva.com
 
 const BASE_URL = process.argv[2] || 'http://localhost:3000';
 const DEV_KEY  = process.env.DEV_BYPASS_KEY || 'ek_dev_2026';
@@ -81,7 +81,7 @@ async function testTTS(id) {
 }
 
 async function main() {
-  console.log(`\nEklipses end-to-end character test`);
+  console.log(`\nOzmeva end-to-end character test`);
   console.log(`Base URL : ${BASE_URL}`);
   console.log(`Dev key  : ${DEV_KEY}`);
   console.log(`Characters: ${characters.length}\n`);

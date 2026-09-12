@@ -1,4 +1,4 @@
-# EKLIPSES — LESSON 5 DRAFT
+# OZMEVA — LESSON 5 DRAFT
 ## "The Read" — Interest Signal Reading
 **TRACE mnemonic — LOCKED | Style: The Dark Needle | Status: Fully scripted — pending review before audio**
 

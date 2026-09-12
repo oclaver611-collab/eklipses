@@ -24,7 +24,7 @@ const TS_DATA    = path.join(ROOT, 'tools', 'video-overlay', 'src', 'LessonSlice
 const TMP        = path.join(os.tmpdir(), `ek-ui-record-${Date.now()}`);
 fs.mkdirSync(TMP, { recursive: true });
 
-const BASE_URL = 'https://eklipses.vercel.app';
+const BASE_URL = 'https://ozmeva.com';
 const VIEWPORT = { width: 540, height: 960 };  // 9:16 portrait; ffmpeg 2× to 1080×1920
 
 // ── Slice boundaries (seconds from lesson T=0) ─────────────────────────────────

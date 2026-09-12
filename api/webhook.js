@@ -9,7 +9,7 @@
 //   blocked = false → subscription is active again (payment retry succeeded)
 //
 // SETUP (one manual step required — see bottom of this file):
-//   Add https://eklipses.vercel.app/api/webhook as a Stripe webhook endpoint
+//   Add https://ozmeva.com/api/webhook as a Stripe webhook endpoint
 //   and set STRIPE_WEBHOOK_SECRET in Vercel env vars.
 
 // Disable Vercel's body parser — Stripe signature verification requires the
@@ -128,7 +128,7 @@ module.exports = async function handler(req, res) {
 //
 // 1. Go to https://dashboard.stripe.com/webhooks (or test: /test/webhooks)
 // 2. Click "Add endpoint"
-// 3. Endpoint URL: https://eklipses.vercel.app/api/webhook
+// 3. Endpoint URL: https://ozmeva.com/api/webhook
 // 4. Select events:
 //      invoice.payment_failed
 //      customer.subscription.deleted

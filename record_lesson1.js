@@ -1,5 +1,5 @@
 /**
- * EKLIPSES — Lesson 1 Audio Recording Script
+ * OZMEVA — Lesson 1 Audio Recording Script
  * 
  * Records all 13 Ryan narration segments via Fish Audio TTS API
  * and uploads each MP3 to Cloudflare R2.
@@ -337,7 +337,7 @@ function saveLocally(buffer, filename) {
 
 async function main() {
   console.log('\n═══════════════════════════════════════════');
-  console.log('  EKLIPSES — Lesson 1 Audio Recording');
+  console.log('  OZMEVA — Lesson 1 Audio Recording');
   console.log('═══════════════════════════════════════════\n');
 
   // Validate env vars

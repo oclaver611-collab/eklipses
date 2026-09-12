@@ -28,7 +28,7 @@ function upload(r2Key, localFile) {
   }
 }
 
-console.log("=== Eklipses Wave 2 — Batch R2 Upload ===\n");
+console.log("=== Ozmeva Wave 2 — Batch R2 Upload ===\n");
 
 for (const char of characters) {
   console.log(`\n--- ${char.name.toUpperCase()} ---`);

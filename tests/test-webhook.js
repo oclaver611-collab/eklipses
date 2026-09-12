@@ -22,7 +22,7 @@ const https  = require('https');
 const { Readable } = require('stream');
 
 const API_DIR  = path.join(__dirname, '..', 'api');
-const PROD_URL = 'https://eklipses.vercel.app';
+const PROD_URL = 'https://ozmeva.com';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -300,7 +300,7 @@ function injectMocks() {
     const result = await new Promise((resolve, reject) => {
       const payload = '{}';
       const req = https.request({
-        hostname: 'eklipses.vercel.app',
+        hostname: 'ozmeva.com',
         path:     '/api/webhook',
         method:   'POST',
         headers:  { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) },
@@ -338,7 +338,7 @@ function injectMocks() {
     console.log('\nAll webhook proof tests PASS.');
     console.log('\n⚠  MANUAL STEP REQUIRED to complete finding 5:');
     console.log('   1. Go to https://dashboard.stripe.com/webhooks');
-    console.log('   2. "Add endpoint" → URL: https://eklipses.vercel.app/api/webhook');
+    console.log('   2. "Add endpoint" → URL: https://ozmeva.com/api/webhook');
     console.log('   3. Select events: invoice.payment_failed,');
     console.log('                     customer.subscription.deleted,');
     console.log('                     customer.subscription.updated');

@@ -44,7 +44,7 @@ function didPass(output) {
 }
 
 console.log('\n╔══════════════════════════════════════════════════════════╗');
-console.log('║           EKLIPSES — MASTER TEST RUNNER                 ║');
+console.log('║           OZMEVA — MASTER TEST RUNNER                   ║');
 console.log('║           4 evals  •  run before every deploy           ║');
 console.log('╚══════════════════════════════════════════════════════════╝\n');
 

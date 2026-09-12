@@ -1,4 +1,4 @@
-// deploy-scenario.js — Eklipses Scenario Deployer
+// deploy-scenario.js — Ozmeva Scenario Deployer
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // Takes a scenario .txt file from gen-scenario-v2.js and patches
 // player.js, scenarios.js, and api/character.js automatically.
@@ -41,7 +41,7 @@ const args = process.argv.slice(2);
 
 if (args.length === 0) {
   console.log(`
-Eklipses Scenario Deployer
+Ozmeva Scenario Deployer
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 USAGE:
@@ -391,7 +391,7 @@ function patchScenariosJs(content, scenario) {
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
 
 async function main() {
-  console.log(`\n🚀 Eklipses Scenario Deployer`);
+  console.log(`\n🚀 Ozmeva Scenario Deployer`);
   console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
   console.log(`📄 Input file: ${txtFile}`);
 
@@ -514,7 +514,7 @@ async function main() {
     console.log(`   ⚠️  Using ${borrowId}'s avatar (test mode)`);
     console.log(`   To undo: node deploy-scenario.js --undo`);
   }
-  console.log(`\n   Check live at: https://eklipses.vercel.app`);
+  console.log(`\n   Check live at: https://ozmeva.com`);
   console.log(`${'═'.repeat(50)}\n`);
 }
 

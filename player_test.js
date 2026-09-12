@@ -864,7 +864,7 @@ function bootDefault(){
   ].join(';');
   overlay.innerHTML = `
     <div style="font-size:52px;line-height:1">🎙️</div>
-    <div style="font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.5px">Eklipses</div>
+    <div style="font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.5px">Ozmeva</div>
     <div style="font-size:14px;color:#9aa4b2;max-width:280px;text-align:center;line-height:1.7">
       AI voices load once (~80MB) and are cached forever after.
     </div>
@@ -899,7 +899,7 @@ function bootDefault(){
         if (label && info.file) label.textContent = 'Loading ' + info.file.split('/').pop() + '…';
       });
     } catch(err) {
-      console.error("[Eklipses] Model load failed:", err);
+      console.error("[Ozmeva] Model load failed:", err);
       const lbl = document.getElementById("ek-prog-label");
       if (lbl) lbl.innerHTML = "<span style='color:#ff6b6b'>❌ Failed: " + err.message + "<br>Check F12 console for details.</span>";
       return; // stay on start screen so user can read the error

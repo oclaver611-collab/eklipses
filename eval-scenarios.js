@@ -4,7 +4,7 @@
 
 require('dotenv').config();
 
-const VERCEL_URL = process.env.VERCEL_URL || 'https://eklipses.vercel.app';
+const VERCEL_URL = process.env.VERCEL_URL || 'https://ozmeva.com';
 const DEV_KEY = process.env.DEV_BYPASS_KEY || '';
 const DELAY_MS = 3000; // reduced from 12s — dev bypass means no rate limit
 
@@ -132,7 +132,7 @@ function checkCoach(scenario, feedback) {
 
 async function runAll() {
   console.log('\n╔══════════════════════════════════════════════════════════╗');
-  console.log('║       EKLIPSES — ALL-SCENARIOS EVALUATOR                ║');
+  console.log('║       OZMEVA — ALL-SCENARIOS EVALUATOR                  ║');
   console.log('║       6 scenarios × character + coach checks            ║');
   console.log('╚══════════════════════════════════════════════════════════╝\n');
 

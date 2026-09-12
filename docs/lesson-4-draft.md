@@ -1,4 +1,4 @@
-# EKLIPSES — LESSON 4 DRAFT
+# OZMEVA — LESSON 4 DRAFT
 ## "The Thread" — Conversational Threading
 **CHAIN mnemonic | Style: The Dark Needle | DRAFT — not yet scripted for recording**
 

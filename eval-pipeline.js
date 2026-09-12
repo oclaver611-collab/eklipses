@@ -4,7 +4,7 @@
 
 require('dotenv').config();
 
-const BASE = process.env.VERCEL_URL || 'https://eklipses.vercel.app';
+const BASE = process.env.VERCEL_URL || 'https://ozmeva.com';
 
 // ─── SOFIA BANNED PHRASES ─────────────────────────────────────────────────────
 const BANNED = [

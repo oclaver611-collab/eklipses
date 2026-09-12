@@ -1,4 +1,4 @@
-# EKLIPSES — LESSON 1: RYAN'S NARRATION SCRIPTS
+# OZMEVA — LESSON 1: RYAN'S NARRATION SCRIPTS
 ## "The Approach"
 **Style: The Dark Needle | Original content | Ready for Fish Audio recording**
 

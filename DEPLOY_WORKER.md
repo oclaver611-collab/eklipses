@@ -1,4 +1,4 @@
-# Deploy Eklipses Lesson Audio Worker
+# Deploy Ozmeva Lesson Audio Worker
 
 Deploy `cloudflare-worker/lesson-audio-worker.js` as a Cloudflare Worker bound to the `eklipses-videos` R2 bucket.
 

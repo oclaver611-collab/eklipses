@@ -1,5 +1,5 @@
 // ============================================================
-// EKLIPSES — 30 New Character Personalities
+// OZMEVA — 30 New Character Personalities
 // Drop these into the CHARACTERS object in api/character.js
 // Each character is complete: identity + personality + wit layer
 // ============================================================

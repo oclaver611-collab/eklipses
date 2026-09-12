@@ -5,7 +5,7 @@
 
 require('dotenv').config();
 
-const BASE = process.env.VERCEL_URL || 'https://eklipses.vercel.app';
+const BASE = process.env.VERCEL_URL || 'https://ozmeva.com';
 
 // ─── CHARACTER LIST — must match ELEVENLABS_VOICES in api/tts.js ─────────────
 const CHARACTERS = [

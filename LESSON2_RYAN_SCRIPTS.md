@@ -1,4 +1,4 @@
-# EKLIPSES — LESSON 2: RYAN'S NARRATION SCRIPTS
+# OZMEVA — LESSON 2: RYAN'S NARRATION SCRIPTS
 ## "Holding Your Ground"
 **FRAME mnemonic | Style: The Dark Needle | Ready for Fish Audio / OpenAI / ElevenLabs recording**
 

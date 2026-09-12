@@ -21,7 +21,7 @@ module.exports = async function handler(req, res) {
 
   if (!priceId) return res.status(500).json({ error: `Price ID not configured for plan: ${plan || 'pro'}` });
 
-  const origin = (req.headers.origin || req.headers.referer || 'https://eklipses.vercel.app').replace(/\/$/, '');
+  const origin = (req.headers.origin || req.headers.referer || 'https://ozmeva.com').replace(/\/$/, '');
 
   try {
     const session = await stripe.checkout.sessions.create({

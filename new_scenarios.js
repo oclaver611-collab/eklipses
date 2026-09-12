@@ -1,5 +1,5 @@
 // ============================================================
-// EKLIPSES — 30 New Scenarios
+// OZMEVA — 30 New Scenarios
 // Add these to window.SCENARIOS in scenarios.js
 // Each scenario includes demo + practice
 // R2 URLs follow pattern: [name]_thumb.jpg / speaking.mp4 / idle.mp4

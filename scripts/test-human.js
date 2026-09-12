@@ -17,7 +17,7 @@ console.log('║         OZMEVA — HUMAN TEST CHECKLIST                   ║')
 console.log('║         Needs your eyes, phone, or judgment.            ║');
 console.log('╚══════════════════════════════════════════════════════════╝\n');
 
-console.log('Open https://eklipses.vercel.app in a browser before starting.\n');
+console.log('Open https://ozmeva.com in a browser before starting.\n');
 
 const checks = [
 

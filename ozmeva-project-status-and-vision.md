@@ -1,12 +1,12 @@
-# Eklipses — Project Status & Vision
+# Ozmeva — Project Status & Vision
 
 *Last updated: July 20, 2026*
 
 ---
 
-## 1. What Eklipses Is
+## 1. What Ozmeva Is
 
-Eklipses is an AI conversation practice app. Users practice real, voice-driven conversations with AI video avatars (characters), get scored and coached by an AI coach named Ryan, and learn structured skills through mnemonic-based lessons. Started April/May 2026 as a dating-practice tool; built solo by Serge in evening hours around a full-time day job (technical support, PI System, Montréal).
+Ozmeva is an AI conversation practice app. Users practice real, voice-driven conversations with AI video avatars (characters), get scored and coached by an AI coach named Ryan, and learn structured skills through mnemonic-based lessons. Started April/May 2026 as a dating-practice tool; built solo by Serge in evening hours around a full-time day job (technical support, PI System, Montréal).
 
 ---
 
@@ -34,7 +34,7 @@ Eklipses is an AI conversation practice app. Users practice real, voice-driven c
 
 *(Captured from Serge's own thinking + external research sessions — this is a Phase 2+ direction, not a near-term plan. Current priority remains: finish validating the dating niche, get real paying users, then revisit.)*
 
-**The core insight:** most competitors in this space teach *contexts* ("how to date," "how to interview," "how to negotiate") without teaching the underlying *operating system* those contexts all depend on. Eklipses' avatar + coach + drill engine is context-agnostic — the same architecture that scores a dating conversation can score a job interview or a sales pitch.
+**The core insight:** most competitors in this space teach *contexts* ("how to date," "how to interview," "how to negotiate") without teaching the underlying *operating system* those contexts all depend on. Ozmeva's avatar + coach + drill engine is context-agnostic — the same architecture that scores a dating conversation can score a job interview or a sales pitch.
 
 **Proposed structure (future, not current):**
 
@@ -88,9 +88,9 @@ Conversation Flow    81
 
 **Avatar depth idea:** give each character hidden personality traits (introvert, sarcastic, slow to trust, high openness, etc.) that the AI knows and the user doesn't — the goal becomes *discovering* the person through conversation rather than "winning" against a script. Closer to real life than scripted pickup-artist material.
 
-**Central philosophy to build the whole curriculum around:** *every conversation is made of micro-skills; master the micro-skills, and you can succeed in almost any conversation.* This is what would let Eklipses scale to new niches (interview prep, sales, negotiation) later without re-architecting anything — same engine, new specialization content on top.
+**Central philosophy to build the whole curriculum around:** *every conversation is made of micro-skills; master the micro-skills, and you can succeed in almost any conversation.* This is what would let Ozmeva scale to new niches (interview prep, sales, negotiation) later without re-architecting anything — same engine, new specialization content on top.
 
-**Analogy used to describe it:** flight simulators don't teach aviation through lectures — they let you fly. Eklipses could do the same for conversation: a safe environment to practice, make mistakes, get targeted feedback, and improve through repetition, rather than static lessons alone.
+**Analogy used to describe it:** flight simulators don't teach aviation through lectures — they let you fly. Ozmeva could do the same for conversation: a safe environment to practice, make mistakes, get targeted feedback, and improve through repetition, rather than static lessons alone.
 
 ---
 

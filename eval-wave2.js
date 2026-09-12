@@ -6,7 +6,7 @@
 require('dotenv').config();
 const https = require('https');
 
-const BASE = 'https://eklipses.vercel.app';
+const BASE = 'https://ozmeva.com';
 const DEV_KEY = process.env.DEV_BYPASS_KEY || '';
 
 // Wave 2 scenarios — character, scenario key, title, unique env word to verify no beach bleed
@@ -33,7 +33,7 @@ function post(path, body) {
     if (DEV_KEY) headers['x-dev-key'] = DEV_KEY;
 
     const options = {
-      hostname: 'eklipses.vercel.app',
+      hostname: 'ozmeva.com',
       path,
       method: 'POST',
       headers,
@@ -171,7 +171,7 @@ async function testScenario(sc) {
 
 async function main() {
   console.log('\n╔══════════════════════════════════════════════════════════╗');
-  console.log('║       EKLIPSES — WAVE 2 SCENARIOS EVALUATOR            ║');
+  console.log('║       OZMEVA — WAVE 2 SCENARIOS EVALUATOR              ║');
   console.log('║       9 scenarios × character + coach checks           ║');
   console.log('╚══════════════════════════════════════════════════════════╝');
 

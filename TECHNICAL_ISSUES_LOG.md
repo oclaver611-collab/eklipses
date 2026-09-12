@@ -1,4 +1,4 @@
-# Eklipses — Technical Issues Log
+# Ozmeva — Technical Issues Log
 
 ## Issue #001 — Sofia/Character Audio Silent (Lips Moving, No Sound)
 **Date:** June 3, 2026  

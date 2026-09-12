@@ -1,4 +1,4 @@
-# Eklipses — Dating Niche MVP Tasks
+# Ozmeva — Dating Niche MVP Tasks
 # Target: paid-ready MVP in 7 days (deadline: 2026-09-03)
 # Runner: node scripts/dating-mvp-runner.js
 # Blocked decisions: see PENDING-APPROVALS.md

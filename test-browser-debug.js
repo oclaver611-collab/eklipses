@@ -1,5 +1,5 @@
 const { chromium } = require('playwright');
-const BASE_URL = 'https://eklipses.vercel.app?dev=ek_dev_2026';
+const BASE_URL = 'https://ozmeva.com?dev=ek_dev_2026';
 
 (async () => {
   const browser = await chromium.launch({ headless: true });

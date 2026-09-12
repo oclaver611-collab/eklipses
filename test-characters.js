@@ -21,7 +21,7 @@ const characters = [
 
 async function testCharacter(id, scenario) {
   try {
-    const res = await fetch('https://eklipses.vercel.app/api/character-stream', {
+    const res = await fetch('https://ozmeva.com/api/character-stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-dev-key': 'ek_dev_2026' },
       body: JSON.stringify({

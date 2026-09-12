@@ -1,7 +1,7 @@
 import { chromium } from 'playwright';
 import fs from 'fs';
 
-const URL = 'https://eklipses.vercel.app?dev=ek_dev_2026';
+const URL = 'https://ozmeva.com?dev=ek_dev_2026';
 const SS_DIR = './test-screenshots';
 
 const logs = [];

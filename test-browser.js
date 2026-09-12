@@ -1,6 +1,6 @@
 const { chromium } = require('playwright');
 
-const BASE_URL = 'https://eklipses.vercel.app?dev=ek_dev_2026';
+const BASE_URL = 'https://ozmeva.com?dev=ek_dev_2026';
 
 const SCENARIOS = [
   { key: 'beach',       character: 'Sofia' },
@@ -60,7 +60,7 @@ async function testScenario(page, key, character) {
 }
 
 (async () => {
-  console.log('Eklipses browser test\n');
+  console.log('Ozmeva browser test\n');
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ permissions: ['microphone'] });
   const page = await context.newPage();
