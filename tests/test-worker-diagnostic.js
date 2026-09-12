@@ -2,7 +2,7 @@
 // Run: node tests/test-worker-diagnostic.js
 const { chromium } = require('playwright');
 
-const WORKER  = 'https://eklipses-lesson-audio.oclaver611.workers.dev';
+const WORKER  = 'https://ozmeva-lesson-audio.oclaver611.workers.dev';
 const BASE    = 'https://ozmeva.com';
 
 const FILES = {

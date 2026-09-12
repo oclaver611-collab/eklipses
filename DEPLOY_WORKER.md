@@ -10,7 +10,7 @@ Deploy `cloudflare-worker/lesson-audio-worker.js` as a Cloudflare Worker bound t
 
 1. Go to [dash.cloudflare.com](https://dash.cloudflare.com)
 2. Select your account → **Workers & Pages** → **Create application** → **Create Worker**
-3. Name it: `eklipses-lesson-audio`
+3. Name it: `ozmeva-lesson-audio`
 4. Click **Deploy** (ignore the default hello-world code for now)
 
 ### Step 2 — Paste the worker code
@@ -33,26 +33,26 @@ Deploy `cloudflare-worker/lesson-audio-worker.js` as a Cloudflare Worker bound t
 
 The URL will be:
 ```
-https://eklipses-lesson-audio.YOUR_SUBDOMAIN.workers.dev
+https://ozmeva-lesson-audio.YOUR_SUBDOMAIN.workers.dev
 ```
 
 Replace `YOUR_SUBDOMAIN` with your Cloudflare workers subdomain (visible on the Workers dashboard overview page).
 
 For the Ozmeva account it should be:
 ```
-https://eklipses-lesson-audio.oclaver611.workers.dev
+https://ozmeva-lesson-audio.oclaver611.workers.dev
 ```
 
 ### Step 5 — Test it
 
 ```
-curl "https://eklipses-lesson-audio.oclaver611.workers.dev?file=manifest.json"
+curl "https://ozmeva-lesson-audio.oclaver611.workers.dev?file=manifest.json"
 ```
 
 Should return JSON. Then:
 
 ```
-curl -I "https://eklipses-lesson-audio.oclaver611.workers.dev?file=ryan_seg00.mp3"
+curl -I "https://ozmeva-lesson-audio.oclaver611.workers.dev?file=ryan_seg00.mp3"
 ```
 
 Should return `Content-Type: audio/mpeg` and `Access-Control-Allow-Origin: *`.
@@ -74,7 +74,7 @@ npx wrangler deploy
 In `lesson-player.js` lines 8–10, change to:
 
 ```js
-const WORKER_BASE   = 'https://eklipses-lesson-audio.oclaver611.workers.dev';
+const WORKER_BASE   = 'https://ozmeva-lesson-audio.oclaver611.workers.dev';
 const R2_BASE       = 'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev';
 const SOFIA_IDLE    = R2_BASE + '/sofia_idle.mp4';
 const SOFIA_SPEAK   = R2_BASE + '/sofia_speaking.mp4';

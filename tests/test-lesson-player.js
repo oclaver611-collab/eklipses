@@ -119,7 +119,7 @@ async function run() {
   // ── 7. ryan_seg00.mp3 accessible via worker (HTTP 200) ──────────────────
   const ryanStatus = await page.evaluate(async () => {
     try {
-      const r = await fetch('https://eklipses-lesson-audio.oclaver611.workers.dev?file=ryan_seg00.mp3', { method: 'HEAD' });
+      const r = await fetch('https://ozmeva-lesson-audio.oclaver611.workers.dev?file=ryan_seg00.mp3', { method: 'HEAD' });
       return r.status;
     } catch (e) { return -1; }
   });

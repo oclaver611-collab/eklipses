@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const WORKER_BASE = 'https://eklipses-lesson-audio.oclaver611.workers.dev';
+  const WORKER_BASE = 'https://ozmeva-lesson-audio.oclaver611.workers.dev';
   const R2_BASE     = 'https://pub-8dcb197cb8474bcfb3ef344b733745ca.r2.dev';
   const SOFIA_IDLE  = R2_BASE + '/sofia_idle.mp4';
   const SOFIA_SPEAK = R2_BASE + '/sofia_speaking.mp4';
