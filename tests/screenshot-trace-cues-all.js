@@ -77,9 +77,9 @@ const CUES = [
 
   // Detect Vercel auth wall
   const url = page.url();
-  if (!url.includes('eklipses') || url.includes('vercel.com/sso') || url.includes('/_vercel/')) {
+  if ((!url.includes('eklipses') && !url.includes('ozmeva')) || url.includes('vercel.com/sso') || url.includes('/_vercel/')) {
     console.warn('[NAV] Auth wall — falling back to production');
-    await page.goto('https://eklipses.vercel.app', { waitUntil: 'domcontentloaded', timeout: 40000 });
+    await page.goto('https://ozmeva.com', { waitUntil: 'domcontentloaded', timeout: 40000 });
   }
   console.log('[NAV] At:', page.url());
 

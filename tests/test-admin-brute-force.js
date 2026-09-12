@@ -21,7 +21,7 @@ const path  = require('path');
 const https = require('https');
 
 const API_DIR  = path.join(__dirname, '..', 'api');
-const PROD_URL = 'https://eklipses.vercel.app';
+const PROD_URL = 'https://ozmeva.com';
 const MY_IP    = '67.68.24.223'; // confirmed public IP from previous test session
 
 const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRteW5pbW1jbGZwd2J3cXBwcHFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA3NTI2NTAsImV4cCI6MjA5NjMyODY1MH0.dZ7xNDU86j06BbDiIhaPlCjwKbifxOC6ImkroN4o0Z0';

@@ -502,7 +502,7 @@ async function main() {
   const sessionStart = Date.now();
   let turn = 0;
   const transcriptLines = [
-    '=== Eklipses Marketing Demo — AI vs Sofia (voice-to-voice) ===',
+    '=== Ozmeva Marketing Demo — AI vs Sofia (voice-to-voice) ===',
     `Date: ${new Date().toISOString()}`,
     `URL: ${LIVE_URL}`,
     `AI user TTS: OpenAI tts-1-hd / echo (sentence-split)`,

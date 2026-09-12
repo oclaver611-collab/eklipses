@@ -1,11 +1,11 @@
 """
-Paywall flow verification for eklipses.vercel.app
+Paywall flow verification for ozmeva.com
 Tests: session counting -> paywall trigger -> Stripe redirect -> pro activation
 """
 from playwright.sync_api import sync_playwright
 import json, sys, time
 
-URL  = "https://eklipses.vercel.app"
+URL  = "https://ozmeva.com"
 TODAY = time.strftime("%Y-%m-%d")
 
 def log(msg):
@@ -22,7 +22,7 @@ with sync_playwright() as p:
     page = ctx.new_page()
 
     # ── STEP 1: Load + clear state ────────────────────────────────────────────
-    log("Step 1: Load page, clear all Eklipses localStorage keys...")
+    log("Step 1: Load page, clear all Ozmeva localStorage keys...")
     page.goto(URL, wait_until="networkidle", timeout=30000)
     cleared = page.evaluate("""() => {
         Object.keys(localStorage)
@@ -104,7 +104,7 @@ with sync_playwright() as p:
 
     # Check banner -- this test session ID was already used in prior testing so
     # verify-payment may return active:false. That's expected -- not a bug.
-    banner = page.locator('div:has-text("Eklipses Pro")')
+    banner = page.locator('div:has-text("Ozmeva Pro")')
     banner_shown = banner.count() > 0 and banner.first.is_visible()
     if banner_shown:
         log("PASS: Welcome banner shown (verify-payment returned active)")

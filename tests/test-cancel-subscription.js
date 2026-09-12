@@ -17,7 +17,7 @@ const path  = require('path');
 const https = require('https');
 
 const API_DIR  = path.join(__dirname, '..', 'api');
-const PROD_URL = 'https://eklipses.vercel.app';
+const PROD_URL = 'https://ozmeva.com';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

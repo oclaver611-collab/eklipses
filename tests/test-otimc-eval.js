@@ -11,7 +11,7 @@ const path = require('path');
 const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
 const hasDevScript = !!(pkg.scripts && pkg.scripts.dev);
 const baseArg = process.argv.find(a => a.startsWith('--base='));
-const BASE = baseArg ? baseArg.slice(7) : hasDevScript ? 'http://localhost:3000' : 'https://eklipses.vercel.app';
+const BASE = baseArg ? baseArg.slice(7) : hasDevScript ? 'http://localhost:3000' : 'https://ozmeva.com';
 
 const OUT_DIR = path.join(__dirname, 'output');
 if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });

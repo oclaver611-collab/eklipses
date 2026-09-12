@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const https = require('https');
 
-const PROD = 'https://eklipses.vercel.app';
+const PROD = 'https://ozmeva.com';
 const SS_DIR = path.join(__dirname, 'screenshots');
 if (!fs.existsSync(SS_DIR)) fs.mkdirSync(SS_DIR, { recursive: true });
 

@@ -8,7 +8,7 @@
 //   Expected: score <= 6, part4 reflects the negative outcome.
 //
 // Run: node tests/test-coach-outcome.js
-// Run against prod: node tests/test-coach-outcome.js --base=https://eklipses.vercel.app
+// Run against prod: node tests/test-coach-outcome.js --base=https://ozmeva.com
 
 const BASE = process.argv.find(a => a.startsWith('--base='))?.slice(7) || 'http://localhost:3000';
 

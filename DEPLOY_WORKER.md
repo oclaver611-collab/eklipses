@@ -38,7 +38,7 @@ https://eklipses-lesson-audio.YOUR_SUBDOMAIN.workers.dev
 
 Replace `YOUR_SUBDOMAIN` with your Cloudflare workers subdomain (visible on the Workers dashboard overview page).
 
-For the Eklipses account it should be:
+For the Ozmeva account it should be:
 ```
 https://eklipses-lesson-audio.oclaver611.workers.dev
 ```

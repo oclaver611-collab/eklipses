@@ -330,7 +330,7 @@ async function runSpotChecks() {
   for (const sc of SPOT_CHECKS) {
     process.stdout.write(`  ${sc.label} — `);
     try {
-      const result = await httpPost('eklipses.vercel.app', '/api/character', {
+      const result = await httpPost('ozmeva.com', '/api/character', {
         userMessage:  'hey, hope I\'m not interrupting',
         scenarioKey:  sc.scenarioKey,
         characterId:  sc.avatar,

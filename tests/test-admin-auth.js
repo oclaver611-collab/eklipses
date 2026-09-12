@@ -6,7 +6,7 @@
 
 require('dotenv').config({ path: '.env.local' });
 
-const BASE = 'https://eklipses.vercel.app';
+const BASE = 'https://ozmeva.com';
 const PASSWORD = process.env.ADMIN_PASSWORD;
 
 async function run() {

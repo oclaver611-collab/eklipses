@@ -2,7 +2,7 @@
 // Run: node tests/test-lesson-player.js
 const { chromium } = require('playwright');
 
-const BASE = 'https://eklipses.vercel.app';
+const BASE = 'https://ozmeva.com';
 const results = [];
 
 function report(name, passed, detail = '') {

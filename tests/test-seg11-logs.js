@@ -2,7 +2,7 @@
 // Run: node tests/test-seg11-logs.js
 const { chromium } = require('playwright');
 
-const BASE = 'https://eklipses.vercel.app';
+const BASE = 'https://ozmeva.com';
 
 async function run() {
   const browser = await chromium.launch({ headless: true });

@@ -7,7 +7,7 @@
 
 const { chromium } = require('playwright');
 
-const BASE = 'https://eklipses.vercel.app';
+const BASE = 'https://ozmeva.com';
 
 async function fetchJSON(url, opts = {}) {
   const res = await fetch(url, opts);

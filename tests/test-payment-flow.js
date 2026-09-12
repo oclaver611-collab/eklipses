@@ -30,7 +30,7 @@ const dotenv = require('dotenv');
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 const API_DIR  = path.join(__dirname, '..', 'api');
-const PROD_HOST = 'eklipses.vercel.app';
+const PROD_HOST = 'ozmeva.com';
 
 // ── Guard: test mode key required ─────────────────────────────────────────
 const STRIPE_KEY = process.env.STRIPE_SECRET_KEY || '';
@@ -191,7 +191,7 @@ async function ensureTestPrices() {
 
   // Create a test product + prices
   const product = await stripe.products.create({
-    name: 'Eklipses Test (ek-payment-flow)',
+    name: 'Ozmeva Test (ek-payment-flow)',
     metadata: { ek_test: 'payment-flow' },
   });
   TEST_PRODUCT_ID = product.id;
@@ -248,7 +248,7 @@ async function scenario1() {
     { plan: 'pro',   priceId: TEST_PRO_PRICE_ID },
     { plan: 'elite', priceId: TEST_ELITE_PRICE_ID },
   ]) {
-    const testEmail = `ek-test-checkout-${Date.now()}@test.eklipses.com`;
+    const testEmail = `ek-test-checkout-${Date.now()}@test.ozmeva.com`;
 
     // 1a) Production endpoint — verify it returns a valid checkout URL
     const r = await httpPost('/api/create-checkout', { email: testEmail, plan });
@@ -276,7 +276,7 @@ async function scenario1() {
     const createHandler = freshModule('create-checkout');
     const localReq = {
       method: 'POST',
-      headers: { 'origin': 'https://eklipses.vercel.app', 'content-type': 'application/json' },
+      headers: { 'origin': 'https://ozmeva.com', 'content-type': 'application/json' },
       query:  {},
       body:   { email: testEmail, plan },
     };
@@ -336,7 +336,7 @@ async function scenario2() {
     { plan: 'elite', priceId: TEST_ELITE_PRICE_ID },
   ]) {
     const ts    = Date.now();
-    const email = `ek-test-${plan}-${ts}@test.eklipses.com`;
+    const email = `ek-test-${plan}-${ts}@test.ozmeva.com`;
 
     // pm_card_visa → card 4242 4242 4242 4242 in Stripe test mode
     const customer = await createTestCustomer(email, 'pm_card_visa');
@@ -431,7 +431,7 @@ async function scenario3() {
   }
 
   // 3d) Full cancellation: local handler with real Stripe API + mocked Supabase auth
-  const cancelEmail = `ek-test-cancel-${Date.now()}@test.eklipses.com`;
+  const cancelEmail = `ek-test-cancel-${Date.now()}@test.ozmeva.com`;
   const cancelCustomer = await createTestCustomer(cancelEmail, 'pm_card_visa');
   const cancelSub = await stripe.subscriptions.create({
     customer: cancelCustomer.id,
@@ -475,7 +475,7 @@ async function scenario4() {
   // be attached to a customer directly — it's declined even at attach time.
   // Instead, create a PaymentMethod from raw card number 4000000000000002
   // (always declined in test mode). Stripe allows raw card numbers via API in test mode.
-  const failEmail    = `ek-test-fail-${Date.now()}@test.eklipses.com`;
+  const failEmail    = `ek-test-fail-${Date.now()}@test.ozmeva.com`;
   const failCustomerRaw = await stripe.customers.create({
     email: failEmail,
     description: 'ek-payment-test — safe to delete',
@@ -712,7 +712,7 @@ async function cleanup() {
 
 (async () => {
   console.log('\n════════════════════════════════════════════════════════════════════════');
-  console.log('  Eklipses Payment Flow Simulation — Stripe TEST mode');
+  console.log('  Ozmeva Payment Flow Simulation — Stripe TEST mode');
   console.log(`  Key: ${STRIPE_KEY.slice(0, 20)}...`);
   console.log(`  Production prices: ${process.env.STRIPE_PRO_PRICE_ID} / ${process.env.STRIPE_ELITE_PRICE_ID} (live-mode, used by prod endpoint)`);
   console.log(`  Test-mode prices: resolved at startup (see below)`);

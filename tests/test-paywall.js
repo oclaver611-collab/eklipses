@@ -10,7 +10,7 @@
 
   // ── 1. Load the page once so localStorage is available ───────────────────
   console.log('[TEST] Initial load...');
-  await page.goto('https://eklipses.vercel.app', { waitUntil: 'domcontentloaded' });
+  await page.goto('https://ozmeva.com', { waitUntil: 'domcontentloaded' });
 
   // ── 1b. Mock /api/check-session so it returns "not allowed" for this test ──
   // The real endpoint checks Supabase IP count — we control the browser-side check here.

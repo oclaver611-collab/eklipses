@@ -8,7 +8,7 @@ const { chromium } = require('playwright');
 const path = require('path');
 const fs   = require('fs');
 
-const BASE    = 'https://eklipses.vercel.app';
+const BASE    = 'https://ozmeva.com';
 const OUT_DIR = path.join(__dirname, '..', 'test-results', 'audit-shots');
 if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });
 

@@ -20,7 +20,7 @@ const path = require('path');
 const PROJECT_ROOT   = path.resolve(__dirname, '..');
 // Use production — local server can't render the stageFrame layout without
 // all assets (images, CSS grid, etc.) that the production bundle provides.
-const BASE           = 'https://eklipses.vercel.app';
+const BASE           = 'https://ozmeva.com';
 const SCREENSHOT_DIR = path.join(PROJECT_ROOT, 'test-results', 'caption-visual');
 
 // ─── helpers ─────────────────────────────────────────────────────────────────

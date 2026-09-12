@@ -6,7 +6,7 @@
 //
 // WHY A NEW FILE (not test-lesson-player.js):
 //   These features are not yet deployed to production. test-lesson-player.js and
-//   test-all-scenarios.js both target https://eklipses.vercel.app. These tests must
+//   test-all-scenarios.js both target https://ozmeva.com. These tests must
 //   run against the local codebase, so they use a built-in Node.js HTTP server that
 //   serves the project directory. API routes (/api/*) are mocked inline.
 //

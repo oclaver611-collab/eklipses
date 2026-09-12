@@ -1,5 +1,5 @@
 // tests/test-coach-suggest.js — Validates /api/coach-suggest returns 3 grounded suggestions
-const BASE = 'https://eklipses.vercel.app';
+const BASE = 'https://ozmeva.com';
 
 const HISTORY = [
   { role: 'user',      content: "Hi, I couldn't help but notice you've been here a while." },

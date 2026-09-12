@@ -4,7 +4,7 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
 
-const LIVE_URL = 'https://eklipses.vercel.app';
+const LIVE_URL = 'https://ozmeva.com';
 const CAPTURE_MS = 20000;
 
 const STT_PATCH = () => {

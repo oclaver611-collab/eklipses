@@ -16,7 +16,7 @@ const { chromium } = require('playwright');
 const path = require('path');
 const fs = require('fs');
 
-const LIVE_URL = 'https://eklipses.vercel.app';
+const LIVE_URL = 'https://ozmeva.com';
 const TEST_MESSAGE = "I couldn't help but notice you — you have a really great presence.";
 const CAPTURE_MS = 25000;        // response window per scenario
 const AUDIO_END_LIMIT_MS = 30000; // AUDIO_END must fire within 30s of AUDIO_START

@@ -2,7 +2,7 @@ const { chromium } = require('playwright');
 const path = require('path');
 
 const OUT = path.join(__dirname, 'trace-cue-placement.png');
-const LIVE_URL = 'https://eklipses.vercel.app';
+const LIVE_URL = 'https://ozmeva.com';
 
 (async () => {
   const browser = await chromium.launch();
