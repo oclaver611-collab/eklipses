@@ -8,7 +8,7 @@
 
 A real-world social simulation platform. Users practice high-stakes conversations with AI video avatars, then get coached by Ryan. Dating is niche #1. The platform expands one niche per month as user milestones are hit.
 
-**Live URL:** https://eklipses.vercel.app
+**Live URL:** https://ozmeva.com
 **Repo:** https://github.com/oclaver611-collab/ozmeva
 **Stack:** Vercel (frontend + API routes) + Cloudflare R2 (video/image storage) + Groq/OpenAI (AI characters) + HeyGen (avatar videos)
 **Local path:** D:\BUSINESS\executables\love\eklipses\EK7
